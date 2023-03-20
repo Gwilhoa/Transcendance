@@ -4,7 +4,8 @@ services:
   db:
     container_name:
       postgres
-    image: postgres
+    build: 
+      context: ./project/sql
     restart: unless-stopped
     environment:
       POSTGRES_PASSWORD: ${BACK_SQL_PASSWORD}
@@ -13,48 +14,40 @@ services:
     networks:
       - transnet
     volumes:
-      - "mariadb_vol:${MYSQL_VOLUME}"
+      - "transvolu:/var/lib/postgresql/data"
 
   back:
     container_name:
       back
     depends_on:
-      db
+      - db
     environment:
       POSTGRES_PASSWORD: ${BACK_SQL_PASSWORD}
       POSTGRES_USER: ${BACK_SQL_NAME}
       POSTGRES_DB: ${DATA_BASE_NAME}
     build:
-      context: project/front
+      context: project/back
     networks:
       - transnet
-    
-
 
   front:
     container_name:
       front
     depends_on:
-      back
+      - back
+    build:
+      context: project/front
     networks:
       - transnet
 
-
 volumes:
-  wordpress_vol:
+  transvolu:
     driver: local
     driver_opts:
       type: none
-      device: /home/ajossera/data/wordpress
+      device: ./device
       o: bind
-  mariadb_vol:
-    driver: local
-    driver_opts:
-      type: none
-      device: /home/ajossera/data/mariadb
-      o: bind
-
 
 networks:
-  inception:
+  transnet:
     driver: bridge
