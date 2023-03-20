@@ -1,0 +1,108 @@
+version: "3.9"
+
+services:
+  db:
+    container_name:
+      postgres
+    image: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: ${BACK_SQL_PASSWORD}
+      POSTGRES_USER: ${BACK_SQL_NAME}
+      POSTGRES_DB: ${DATA_BASE_NAME}
+    networks:
+      - inception
+    volumes:
+      - "mariadb_vol:${MYSQL_VOLUME}"
+
+  back:
+    container_name:
+      back
+    build:
+      context: project/front
+      
+    depends_on:
+      db
+    
+
+
+  front:
+    container_name:
+      front
+    depends_on:
+      back
+
+
+
+
+
+  wordpress:
+    container_name:
+      wordpress
+    depends_on:
+      - mariadb
+
+    environment:
+      DOMAIN: ${DOMAIN_NAME}
+      DATABASE: ${MYSQL_DATABASE}
+      SITE: ${SITE_NAME}
+      SQL_HOST: ${MYSQL_HOST}
+      SQL_USER: ${MYSQL_USER_FOR_WORDPRESS}
+      SQL_PASS: ${MYSQL_PASSWORD_FOR_WORDPRESS}
+
+      USER_NAME: ${WORDPRESS_MICHEL_USER}
+      USER_PASS: ${WORDPRESS_MICHEL_PASSWORD}
+      USER_MAIL: ${WORDPRESS_MICHEL_MAIL}
+
+      ROOT_PASS: ${WORDPRESS_ROOT_PASSWORD}
+      ROOT_NAME: ${WORDPRESS_ROOT_USER}
+      ROOT_MAIL: ${WORDPRESS_ROOT_MAIL}
+
+    build:
+      context: requirements/wordpress
+      dockerfile: Dockerfile
+      args:
+        VOLUME: ${WORDPRESS_VOLUME}
+
+    restart: unless-stopped
+    networks: 
+      - inception
+    volumes:
+      - "wordpress_vol:${WORDPRESS_VOLUME}"
+
+
+  nginx:
+    container_name: nginx
+    depends_on:
+      - wordpress
+    ports:
+      - "443:443"
+    build:
+      context: requirements/nginx
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    networks: 
+      - inception
+    volumes:
+      - "wordpress_vol:${NGINX_VOLUME}"
+
+
+
+volumes:
+  wordpress_vol:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/ajossera/data/wordpress
+      o: bind
+  mariadb_vol:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/ajossera/data/mariadb
+      o: bind
+
+
+networks:
+  inception:
+    driver: bridge
