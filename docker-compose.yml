@@ -3,7 +3,7 @@ version: "3.9"
 services:
   db:
     container_name:
-      postgres
+      db
     build: 
       context: ./project/sql
     restart: unless-stopped
