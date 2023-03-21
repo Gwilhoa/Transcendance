@@ -28,7 +28,7 @@ services:
       POSTGRES_USER: ${BACK_SQL_NAME}
       POSTGRES_DB: ${DATA_BASE_NAME}
     build:
-      context: project/back
+      context: ./project/back
     networks:
       - transnet
 
@@ -38,7 +38,7 @@ services:
     depends_on:
       - back
     build:
-      context: project/front
+      context: ./project/front
     networks:
       - transnet
 
