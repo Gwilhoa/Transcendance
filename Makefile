@@ -92,6 +92,7 @@ fclean purge : clean
 	docker system prune -af
 	printf "$(RED) Removing volumes$(END)\n"
 	docker volume prune -f
+	rm -rf .temp/*
 
 # ~~~~~~~~~~~~~~ REMAKE RULE ~~~~~~~~~~~~~~
 re: fclean all
