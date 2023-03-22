@@ -9,4 +9,9 @@ export class AppController {
   getHello(): string {
     return this.appService.getHello();
   }
+
+  @Get('/auth/login:id')
+  getLogin(@Param()): string {
+    return IdleDeadline;
+  }
 }
