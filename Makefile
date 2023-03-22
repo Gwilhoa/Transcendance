@@ -9,7 +9,7 @@ endif
 
 # --> PROGRAM --------------------------------------------------------------------
 PROGRAM = FT_TRANSCENDANCE
-AUTHOR = Aurele / Florian / Guilhem /Henri
+AUTHOR = Aurele / Florian / Guilhem / Henri
 
 # ~~~~~~~~~~~~~~~~ SOURCES ~~~~~~~~~~~~~~~~
 
@@ -75,30 +75,36 @@ build :
 # ~~~~~~~ START ~~~~~~~~
 
 start :	
-	printf "$(BOLD)$(GREEN) Starting containers$(END)\n"
+	printf "%-62b%b" "$(BOLD)$(GREEN) Starting$(END) containers$(patsubst $(SRC_DIR)/%,%,$<)"
 	docker-compose -f docker-compose.yml start
+	printf "$(GREEN)[✓]$(END)\n\n"
 
 # ~~~~~~~~~~~~~~~ STOP ~~~~~~~~~~~~~~~
 
 stop clean:
-	printf "$(BOLD)$(PURPLE) Stoping containers$(END)\n"
+	printf "%-62b%b" "$(BOLD)$(PURPLE) Stoping$(END) containers$(patsubst $(SRC_DIR)/%,%,$<)"
 	docker-compose -f docker-compose.yml stop
+	printf "$(GREEN)[✓]$(END)\n\n"
 	([ cp -rf .temp back/app/src 2> /dev/null -eq 0 ] && printf "Color : $(YELLOW) Copy temp file to src with Success$(END)\n") || echo -n
 
 # ~~~~~~~~~~~~ CLEANNING RULES ~~~~~~~~~~~~
 
 fclean purge : clean
-	printf "$(BOLD)$(RED) Removing$(END) containers\n"
-	docker system prune -af
-	printf "$(BOLD)$(RED) Removing$(END) volumes\n"
-	docker volume prune -f
+	printf "%-62b%b" "$(BOLD)$(RED) Removing$(END) containers$(patsubst $(SRC_DIR)/%,%,$<)"
+	@docker system prune -af >> /dev/null
+	printf "$(GREEN)[✓]$(END)\n\n"
+	printf "%-62b%b" "$(BOLD)$(RED) Removing$(END) volumes$(patsubst $(SRC_DIR)/%,%,$<)"
+	@docker volume prune -f >> /dev/null
+	printf "$(GREEN)[✓]$(END)\n\n"
 
 # ~~~~~~~~~~~~~~ REMAKE RULE ~~~~~~~~~~~~~~
-re: fclean all
+re: header fclean all
 
 # --> HEADER ---------------------------------------------------------------------
 
 header :
+	echo
+	
 	@printf "████████╗██████╗  █████╗ ███╗   ██╗███████╗ ██████╗███████╗███╗   ██╗██████╗ ███████╗███╗   ██╗ ██████╗███████╗\n"
 	@printf "╚══██╔══╝██╔══██╗██╔══██╗████╗  ██║██╔════╝██╔════╝██╔════╝████╗  ██║██╔══██╗██╔════╝████╗  ██║██╔════╝██╔════╝\n"
 	@printf "   ██║   ██████╔╝███████║██╔██╗ ██║███████╗██║     █████╗  ██╔██╗ ██║██║  ██║█████╗  ██╔██╗ ██║██║     █████╗  \n"
@@ -107,7 +113,7 @@ header :
 	@printf "   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚══════╝ ╚═════╝╚══════╝╚═╝  ╚═══╝╚═════╝ ╚══════╝╚═╝  ╚═══╝ ╚═════╝╚══════╝\n"
 
 	echo
-	echo "Author :" $(AUTHOR)
+	echo "Authors :" $(AUTHOR)
 ifeq ($(OS_NAME), Linux)
 	echo "Last modification :" `ls --time-style=long-iso  -la1rt | awk '{print $$6, $$7, $$9, $$8}' | tail -n 1`
 else
