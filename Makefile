@@ -96,6 +96,7 @@ fclean purge : clean
 	printf "%-62b%b" "$(BOLD)$(RED) Removing$(END) volumes$(patsubst $(SRC_DIR)/%,%,$<)"
 	@docker volume prune -f >> /dev/null
 	printf "$(GREEN)[✓]$(END)\n\n"
+	rm -rf .temp/*
 
 # ~~~~~~~~~~~~~~ REMAKE RULE ~~~~~~~~~~~~~~
 re: header fclean all
@@ -104,7 +105,7 @@ re: header fclean all
 
 header :
 	echo
-	
+
 	@printf "████████╗██████╗  █████╗ ███╗   ██╗███████╗ ██████╗███████╗███╗   ██╗██████╗ ███████╗███╗   ██╗ ██████╗███████╗\n"
 	@printf "╚══██╔══╝██╔══██╗██╔══██╗████╗  ██║██╔════╝██╔════╝██╔════╝████╗  ██║██╔══██╗██╔════╝████╗  ██║██╔════╝██╔════╝\n"
 	@printf "   ██║   ██████╔╝███████║██╔██╗ ██║███████╗██║     █████╗  ██╔██╗ ██║██║  ██║█████╗  ██╔██╗ ██║██║     █████╗  \n"

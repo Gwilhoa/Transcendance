@@ -17,6 +17,8 @@ services:
       - "transvolu:/var/lib/postgresql/data"
 
   back:
+    ports:
+      - "6200:6200"
     container_name:
       back
     depends_on:
