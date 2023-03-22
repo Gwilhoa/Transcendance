@@ -76,14 +76,12 @@ start :
 # ~~~~~~~~~~~~~~~ STOP ~~~~~~~~~~~~~~~
 
 stop clean:
+	cp -rf .temp back/app/src
 	docker-compose -f docker-compose.yml stop
 
 # ~~~~~~~~~~~~ CLEANNING RULES ~~~~~~~~~~~~
 
-clean:
-
 fclean purge : clean
-
 	docker system prune -af
 	docker volume prune -f
 
