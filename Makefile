@@ -65,24 +65,32 @@ all:   header build start
 # ~~~~~~~~~~~~~~~~~ BUILD ~~~~~~~~~~~~~~~~~
 
 build :
+	printf "%-62b%b" "$(CYAN) Create volumes folder$(END)$(patsubst $(SRC_DIR)/%,%,$<)"
+	mkdir -p device temp
+	printf "$(GREEN)[✓]$(END)\n\n"
+	printf "$(CYAN) Building containers$(END)\n"
 	docker-compose -f docker-compose.yml build
 	docker-compose -f docker-compose.yml create
 
 # ~~~~~~~ START ~~~~~~~~
 
 start :	
+	printf "$(GREEN) Starting containers$(END)\n"
 	docker-compose -f docker-compose.yml start
 
 # ~~~~~~~~~~~~~~~ STOP ~~~~~~~~~~~~~~~
 
 stop clean:
-	cp -rf .temp back/app/src
+	printf "$(PURPLE) Stoping containers$(END)\n"
 	docker-compose -f docker-compose.yml stop
+	([ cp -rf .temp back/app/src 2> /dev/null -eq 0 ] && printf "Color : $(YELLOW) Copy temp file to src with Success$(END)\n") || echo -n
 
 # ~~~~~~~~~~~~ CLEANNING RULES ~~~~~~~~~~~~
 
 fclean purge : clean
+	printf "$(RED) Removing containers$(END)\n"
 	docker system prune -af
+	printf "$(RED) Removing volumes$(END)\n"
 	docker volume prune -f
 
 # ~~~~~~~~~~~~~~ REMAKE RULE ~~~~~~~~~~~~~~
