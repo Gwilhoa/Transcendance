@@ -60,7 +60,7 @@ endif
 
 # # --> RULES ----------------------------------------------------------------------
 
-all:   header build start
+all:   header start
 
 # ~~~~~~~~~~~~~~~~~ BUILD ~~~~~~~~~~~~~~~~~
 
@@ -68,16 +68,16 @@ build :
 	printf "%-62b%b" "$(BOLD)$(CYAN)Create$(END) volumes folder$(patsubst $(SRC_DIR)/%,%,$<)"
 	mkdir -p device temp
 	printf "$(GREEN)[✓]$(END)\n\n"
-	printf "$(BOLD)$(CYAN) Building$(END) containers ... \n"
+	printf "$(BOLD)$(CYAN)Building$(END) containers ... \n"
 	docker-compose -f docker-compose.yml build
 	docker-compose -f docker-compose.yml create
 
 # ~~~~~~~ START ~~~~~~~~
 
-start :	
+start :	build
 	printf "%-62b%b" "$(BOLD)$(GREEN) Starting$(END) containers$(patsubst $(SRC_DIR)/%,%,$<)"
 	docker-compose -f docker-compose.yml start
-	printf "$(GREEN)[✓]$(END)\n\n"
+	# printf "$(GREEN)[✓]$(END)\n\n"
 
 # ~~~~~~~~~~~~~~~ STOP ~~~~~~~~~~~~~~~
 
