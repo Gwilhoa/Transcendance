@@ -65,32 +65,32 @@ all:   header build start
 # ~~~~~~~~~~~~~~~~~ BUILD ~~~~~~~~~~~~~~~~~
 
 build :
-	printf "%-62b%b" "$(CYAN) Create volumes folder$(END)$(patsubst $(SRC_DIR)/%,%,$<)"
+	printf "%-62b%b" "$(BOLD)$(CYAN)Create$(END) volumes folder$(patsubst $(SRC_DIR)/%,%,$<)"
 	mkdir -p device temp
 	printf "$(GREEN)[✓]$(END)\n\n"
-	printf "$(CYAN) Building containers$(END)\n"
+	printf "$(BOLD)$(CYAN) Building$(END) containers ... \n"
 	docker-compose -f docker-compose.yml build
 	docker-compose -f docker-compose.yml create
 
 # ~~~~~~~ START ~~~~~~~~
 
 start :	
-	printf "$(GREEN) Starting containers$(END)\n"
+	printf "$(BOLD)$(GREEN) Starting containers$(END)\n"
 	docker-compose -f docker-compose.yml start
 
 # ~~~~~~~~~~~~~~~ STOP ~~~~~~~~~~~~~~~
 
 stop clean:
-	printf "$(PURPLE) Stoping containers$(END)\n"
+	printf "$(BOLD)$(PURPLE) Stoping containers$(END)\n"
 	docker-compose -f docker-compose.yml stop
 	([ cp -rf .temp back/app/src 2> /dev/null -eq 0 ] && printf "Color : $(YELLOW) Copy temp file to src with Success$(END)\n") || echo -n
 
 # ~~~~~~~~~~~~ CLEANNING RULES ~~~~~~~~~~~~
 
 fclean purge : clean
-	printf "$(RED) Removing containers$(END)\n"
+	printf "$(BOLD)$(RED) Removing$(END) containers\n"
 	docker system prune -af
-	printf "$(RED) Removing volumes$(END)\n"
+	printf "$(BOLD)$(RED) Removing$(END) volumes\n"
 	docker volume prune -f
 	rm -rf .temp/*
 
