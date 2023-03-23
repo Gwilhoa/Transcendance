@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from './user';
+import { User } from './user.entity';
 
 @Injectable()
 export class UserService {
@@ -52,6 +52,19 @@ export class UserService {
             return null;
         }
         const retUser = await this.getUserIntra(retIntra.access_token);
-        console.log(retUser);
+        console.log(retUser.id);
+        console.log(retUser.login);
+        console.log(retUser.image.link);
+        const user = new User();
+        user.id = retUser.id;
+        user.username = retUser.login;
+        user.avatar_url = retUser.image.link;
+        await this.userRepository.save(user);
+        return user;
     }
+
+    public async getUsers(): Promise<User[]> {
+        return await this.userRepository.find();
+    }
+
 }

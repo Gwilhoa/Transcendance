@@ -12,4 +12,7 @@ export class User {
     @Column()
     avatar_url: string;
 
+    @Column({default: 0})
+    experience: number;
+
 }
