@@ -21,6 +21,9 @@ export class UserService {
         user.id = retUser.id;
         user.username = retUser.login;
         user.avatar_url = retUser.image.link;
+        if (await this.userRepository.findOneBy({id : user.id}) != null) {
+            return null;
+        }
         await this.userRepository.save(user);
         return user;
     }
