@@ -1,8 +1,7 @@
 FROM node:latest
 EXPOSE 6200
 RUN apt-get update && apt-get upgrade -y && \
-    npm install -g npm@9.2 && \
-    apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+    npm install -g npm@9.2
 
 COPY ./app /home/app
 

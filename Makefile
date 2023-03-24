@@ -89,7 +89,7 @@ stop clean:
 	printf "%-62b%b" "$(BOLD)$(PURPLE)Stoping$(END) containers"
 	docker-compose -f docker-compose.yml stop
 	printf "$(GREEN)[✓]$(END)\n\n"
-	([ cp -rf temp back/app/src 2> /dev/null -eq 0 ] && printf "$(BOLD)$(YELLOW)Copy$(END) temp file to src with Success\n") || echo -n
+	([ cp -rf temp/src back/app/src 2> /dev/null -eq 0 ] && printf "$(BOLD)$(YELLOW)Copy$(END) temp file to src with Success\n") || echo -n
 
 # ~~~~~~~~~~~~ CLEANNING RULES ~~~~~~~~~~~~
 
