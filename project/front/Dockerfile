@@ -1,9 +1,9 @@
 FROM node:latest
-CMD ["sleep", "infinity"]
-# WORKDIR /usr/src/app
 
-# COPY . .
+WORKDIR /usr/src/app
 
-# RUN npm install
+COPY ./transcend .
 
-# CMD ["npm", "run", "start"]
+RUN npm install
+
+CMD ["npm", "run", "start"]
