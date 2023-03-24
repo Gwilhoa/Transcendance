@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { AppService } from './app.service';
 
 @Controller()
@@ -10,8 +10,4 @@ export class AppController {
     return this.appService.getHello();
   }
 
-  @Get('/auth/login:id')
-  getLogin(@Param()): string {
-    return IdleDeadline;
-  }
 }

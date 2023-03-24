@@ -60,43 +60,49 @@ endif
 
 # # --> RULES ----------------------------------------------------------------------
 
-all:   header build start
+all:   header start
 
 # ~~~~~~~~~~~~~~~~~ BUILD ~~~~~~~~~~~~~~~~~
 
 build :
-	printf "%-62b%b" "$(BOLD)$(CYAN)Create$(END) volumes folder$(patsubst $(SRC_DIR)/%,%,$<)"
+	printf "%-62b%b" "$(BOLD)$(CYAN)Create$(END) volumes folder"
 	mkdir -p device temp
 	printf "$(GREEN)[✓]$(END)\n\n"
-	printf "$(BOLD)$(CYAN) Building$(END) containers ... \n"
+	printf "$(BOLD)$(CYAN)Building$(END) containers ... \n"
 	docker-compose -f docker-compose.yml build
+
+# ~~~~~~~~~~~~~~~~ CREATE ~~~~~~~~~~~~~~~~
+
+create: build
 	docker-compose -f docker-compose.yml create
 
-# ~~~~~~~ START ~~~~~~~~
+# ~~~~~~~~~~~~~~~~ START ~~~~~~~~~~~~~~~~
 
-start :	
-	printf "%-62b%b" "$(BOLD)$(GREEN) Starting$(END) containers$(patsubst $(SRC_DIR)/%,%,$<)"
+start :	create
+	# printf "%-62b%b" "$(BOLD)$(GREEN)Starting$(END) containers"
 	docker-compose -f docker-compose.yml start
-	printf "$(GREEN)[✓]$(END)\n\n"
+	# printf "$(GREEN)[✓]$(END)\n\n"
 
 # ~~~~~~~~~~~~~~~ STOP ~~~~~~~~~~~~~~~
 
 stop clean:
-	printf "%-62b%b" "$(BOLD)$(PURPLE) Stoping$(END) containers$(patsubst $(SRC_DIR)/%,%,$<)"
+	printf "%-62b%b" "$(BOLD)$(PURPLE)Stoping$(END) containers"
 	docker-compose -f docker-compose.yml stop
 	printf "$(GREEN)[✓]$(END)\n\n"
-	([ cp -rf .temp back/app/src 2> /dev/null -eq 0 ] && printf "Color : $(YELLOW) Copy temp file to src with Success$(END)\n") || echo -n
+	([ cp -rf temp/src back/app/src 2> /dev/null -eq 0 ] && printf "$(BOLD)$(YELLOW)Copy$(END) temp file to src with Success\n") || echo -n
 
 # ~~~~~~~~~~~~ CLEANNING RULES ~~~~~~~~~~~~
 
 fclean purge : clean
-	printf "%-62b%b" "$(BOLD)$(RED) Removing$(END) containers$(patsubst $(SRC_DIR)/%,%,$<)"
+	printf "%-62b%b" "$(BOLD)$(RED)Removing$(END) containers"
 	@docker system prune -af >> /dev/null
 	printf "$(GREEN)[✓]$(END)\n\n"
-	printf "%-62b%b" "$(BOLD)$(RED) Removing$(END) volumes$(patsubst $(SRC_DIR)/%,%,$<)"
+	printf "%-62b%b" "$(BOLD)$(RED)Removing$(END) volumes"
 	@docker volume prune -f >> /dev/null
+	rm -rf .temp
+	rm -rf temp
+	rm -rf device
 	printf "$(GREEN)[✓]$(END)\n\n"
-	rm -rf .temp/*
 
 # ~~~~~~~~~~~~~~ REMAKE RULE ~~~~~~~~~~~~~~
 re: header fclean all
@@ -135,7 +141,7 @@ help :
 	echo "Generic Makefile for my C/C++ Projects\n"
 	echo "Usage : make [arg]\n"
 	echo "Argument :\n"
-	echo "	all			(=make) compile and link"
+	echo "	all			(=make) compile"
 	echo "	clean		remove objects and dependencies"
 	echo "	fclean		remove objects, dependencies and the executable"
 	echo "	debug		show variables (for debug use only)"
