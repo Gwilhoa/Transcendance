@@ -4,6 +4,6 @@ WORKDIR /usr/src/app
 
 COPY ./tsx .
 
-RUN npm install
+RUN npm install -g npm@9.6.2
 
 CMD ["npm", "run", "start"]
