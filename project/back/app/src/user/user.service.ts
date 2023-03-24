@@ -26,14 +26,17 @@ export class UserService {
     }
 
     public async getToken(code): Promise<any> {
+        const appId = process.env.APP_ID;
+        const appSecret = process.env.APP_SECRET;
+        const appRedirect = process.env.APP_REDIRECT_URI;
         const axios = require('axios');
         const url = 'https://api.intra.42.fr/oauth/token';
         const data = {
-            client_id: 'u-s4t2ud-429c6fba8f8262b957353e8b23183e7cbc8e353150e050c06d540c0a8e84677a',
-            client_secret: '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',
+            client_id: appId,
+            client_secret: appSecret,
             grant_type: 'authorization_code',
             code: code,
-            redirect_uri : 'http://localhost:6200/user/login'
+            redirect_uri : appRedirect,
         };
     
         try {
@@ -47,7 +50,6 @@ export class UserService {
     
     public async createUsers(code) {
         const retIntra =  await this.getToken(code);
-        console.log(retIntra);
         if (retIntra == null) {
             return null;
         }
