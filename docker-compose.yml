@@ -50,13 +50,13 @@ volumes:
   transvolu:
     driver: local
     driver_opts:
-      type: none
+      type: nfs
       device: ./device
       o: bind
   temp:
     driver: local
     driver_opts:
-      type: none
+      type: nfs
       device: ./temp
       o: bind
 
