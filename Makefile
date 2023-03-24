@@ -70,13 +70,12 @@ build :
 	printf "$(GREEN)[✓]$(END)\n\n"
 	printf "$(BOLD)$(CYAN) Building$(END) containers ... \n"
 	docker-compose -f docker-compose.yml build
-	docker-compose -f docker-compose.yml create
 
 # ~~~~~~~ START ~~~~~~~~
 
 start :	
 	printf "%-62b%b" "$(BOLD)$(GREEN) Starting$(END) containers$(patsubst $(SRC_DIR)/%,%,$<)"
-	docker-compose -f docker-compose.yml start
+	docker-compose -f docker-compose.yml up
 	printf "$(GREEN)[✓]$(END)\n\n"
 
 # ~~~~~~~~~~~~~~~ STOP ~~~~~~~~~~~~~~~

@@ -2,7 +2,7 @@ FROM node:latest
 
 WORKDIR /usr/src/app
 
-COPY ./transcend .
+COPY ./tsx .
 
 RUN npm install
 

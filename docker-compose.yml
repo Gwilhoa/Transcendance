@@ -1,5 +1,29 @@
 version: "3.9"
 
+volumes:
+  transvolu:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./device
+      o: bind
+  temp:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./temp
+      o: bind
+  tempfront:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./project/front/tsx
+      o: bind
+
+networks:
+  transnet:
+    driver: bridge
+
 services:
   db:
     container_name:
@@ -47,21 +71,5 @@ services:
       - transnet
     ports:
       - "3000:3000"
-
-volumes:
-  transvolu:
-    driver: local
-    driver_opts:
-      type: none
-      device: ./device
-      o: bind
-  temp:
-    driver: local
-    driver_opts:
-      type: none
-      device: ./temp
-      o: bind
-
-networks:
-  transnet:
-    driver: bridge
+    volumes:
+      - "tempfront:/usr/src/app"
