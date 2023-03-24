@@ -8,6 +8,6 @@ COPY ./app /home/app
 
 WORKDIR /home/app
 
-RUN npm install @nestjs/cli @nestjs/typeorm typeorm dotenv pg
+RUN npm install @nestjs/cli @nestjs/typeorm typeorm dotenv pg axios
 
 CMD ["npm", "run", "start:dev"]

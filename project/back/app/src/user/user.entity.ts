@@ -2,18 +2,17 @@ import { Column, Double, Entity, PrimaryColumn, PrimaryGeneratedColumn } from 't
 
 @Entity()
 export class User {
+
     @PrimaryColumn()
     id: string;
 
     @Column()
-    name: string;
+    username: string;
 
     @Column()
+    avatar_url: string;
 
-
-    @Column()
-    experience: Double;
-
-    
+    @Column({default: 0})
+    experience: number;
 
 }

@@ -100,7 +100,9 @@ fclean purge : clean
 	printf "%-62b%b" "$(BOLD)$(RED) Removing$(END) volumes"
 	@docker volume prune -f >> /dev/null
 	printf "$(GREEN)[✓]$(END)\n\n"
-	rm -rf .temp/*
+	rm -rf .temp
+	rm -rf temp
+	rm -rf device
 
 # ~~~~~~~~~~~~~~ REMAKE RULE ~~~~~~~~~~~~~~
 re: header fclean all
