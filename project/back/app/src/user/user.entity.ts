@@ -9,9 +9,6 @@ export class User {
     @Column()
     username: string;
 
-    @Column()
-    avatar_url: string;
-
     @Column({default: 0})
     experience: number;
 

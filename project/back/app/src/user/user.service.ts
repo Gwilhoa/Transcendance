@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { AuthService } from '../auth/auth.service';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
+import fetch from 'node-fetch';
+
 
 @Injectable()
 export class UserService {
@@ -20,7 +22,25 @@ export class UserService {
         const user = new User();
         user.id = retUser.id;
         user.username = retUser.login;
-        user.avatar_url = retUser.image.link;
+        var avatar_url = retUser.image.link;
+        
+
+
+        var request = await fetch(avatar_url);
+        var buffer = await request.buffer();
+        var fs = require('fs');
+        fs.mkdirSync('/home/images', { recursive: true });
+        var path = '/home/images/' + user.id + '.jpg';
+        console.log(path);
+        fs.writeFile(path, buffer, (err) => {
+            if (err) throw err;
+            console.log('Image downloaded successfully!');
+          });
+        
+        
+
+
+
         if (await this.userRepository.findOneBy({id : user.id}) != null) {
             return null;
         }
@@ -28,7 +48,21 @@ export class UserService {
         return user;
     }
 
-    public async getUsers(): Promise<User[]> {
+    public async getUsers() {
         return await this.userRepository.find();
+    }
+
+    public async getUserById(id: string) {
+        return await this.userRepository.findOneBy({id : id});
+    }
+
+    public async getImageById(id: string) {
+        var user = await this.userRepository.findOneBy({id : id});
+        if (user == null) {
+            return null;
+        }
+        var path = '/home/images/' + user.id + '.jpg';
+        return path;
+
     }
 }

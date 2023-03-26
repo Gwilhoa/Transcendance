@@ -36,8 +36,8 @@ services:
       context: ./project/back
     networks:
       - transnet
-    # volumes:
-    #   - "temp:/home/app"
+    volumes:
+      - "temp:/home/app"
     restart: unless-stopped
 
   front:
@@ -59,12 +59,12 @@ volumes:
       type: none
       device: ./device
       o: bind
-  # temp:
-  #   driver: local
-  #   driver_opts:
-  #     type: none
-  #     device: ./temp
-  #     o: bind
+  temp:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./temp
+      o: bind
 
 networks:
   transnet:

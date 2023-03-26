@@ -1,33 +1,56 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { User } from './user.entity';
 import { UserService } from './user.service';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-//   @Get()
-//   async findAll(): Promise<User[]> {
-//     return this.userService.findAll();
-//   }
+  @Get()
+  async findAll(): Promise<User[]> {
+    return this.userService.getUsers();
+  }
 
-//   @Get(':id')
-//   async findOne(@Param('id') id: string): Promise<User> {
-//     return this.userService.findOne(id);
-//   }
+  @Get('/id/:id')
+  async findOne(@Param('id') id: string, @Res() response): Promise<User> {
+    var ret = await this.userService.getUserById(id);
+    if (ret == null) {
+      response.status(204).send('No Content');
+    }
+    return this.userService.getUserById(id);
+  }
 
-//   @Post()
-//   async create(@Body() user: User): Promise<User> {
-//     return this.userService.createUsers(user);
-//   }
+  @Get('/image/:id')
+  async getImage(@Param('id') id: string, @Res() response) {
+    const path = await this.userService.getImageById(id);
+    if (path == null) {
+      response.status(204).send('No Content');
+    } else {
+      const fs = require('fs');
+      const stream = fs.createReadStream(path);
+      stream.on('error', (error) => {
+        response.status(500).send('Cannot read file');
+      });
+      stream.pipe(response);
+    }
+  }
 
-//   @Put(':id')
-//   async update(@Param('id') id: string, @Body() user: User): Promise<User> {
-//     return this.userService.update(id, user);
-//   }
-
-//   @Delete(':id')
-//   async delete(@Param('id') id: string): Promise<User> {
-//     return this.userService.delete(id);
-//   }
+  @Post('/image/:id')
+  @UseInterceptors(FileInterceptor('image'))
+  async setImage(@Param('id') id: string, @Res() response, @UploadedFile() file) {
+    const path = await this.userService.getImageById(id);
+    if (path == null) {
+      response.status(204).send('No Content');
+    } else {
+      const fs = require('fs');
+      fs.writeFile(path, file.buffer, (err) => {
+        if (err) {
+          response.status(500).send('Cannot write file');
+        }
+        console.log('Image downloaded successfully!');
+        response.status(200).send('OK');
+      });
+    }
+  }
 }
