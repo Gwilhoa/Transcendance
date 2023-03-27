@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-// import { JwtService } from '@nestjs/jwt';
+import { JwtService } from '@nestjs/jwt';
 
 
 @Injectable()
 export class AuthService {
-    constructor() {}
+    constructor(private jwt: JwtService) {}
 
     public async getUserIntra(token) {
         const axios = require('axios');
@@ -24,7 +24,7 @@ export class AuthService {
         }
     }
 
-    public async getToken(code): Promise<any> {
+    public async getIntraToken(code): Promise<any> {
         const appId = process.env.APP_ID;
         const appSecret = process.env.APP_SECRET;
         const appRedirect = process.env.APP_REDIRECT_URI;
@@ -40,11 +40,18 @@ export class AuthService {
     
         try {
             const response = await axios.post(url, data);
+            // console.log(response.data);
             return response.data;
+            //return this.signJwtToken(response.data.user_id, response.data.email);
         } catch (error) {
             console.error(error);
             return null;
         }
+    }
+
+    async signJwtToken(userId: number, email: string): Promise<string> {
+        const payload = { userId: userId, email: email };
+        return this.jwt.signAsync(payload, { expiresIn: '2h', secret: process.env.JWT_SECRET})
     }
 
 
