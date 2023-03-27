@@ -4,7 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-    constructor(private jwt: JwtService) {}
+    constructor() {}
 
     public async getUserIntra(token) {
         const axios = require('axios');
@@ -49,10 +49,10 @@ export class AuthService {
         }
     }
 
-    async signJwtToken(userId: number, email: string): Promise<string> {
-        const payload = { userId: userId, email: email };
-        return this.jwt.signAsync(payload, { expiresIn: '2h', secret: process.env.JWT_SECRET})
-    }
+    // async signJwtToken(userId: number, email: string): Promise<string> {
+    //     const payload = { userId: userId, email: email };
+    //     return this.jwt.signAsync(payload, { expiresIn: '2h', secret: process.env.JWT_SECRET})
+    // }
 
 
 }
