@@ -9,7 +9,7 @@ endif
 
 # --> PROGRAM --------------------------------------------------------------------
 PROGRAM = FT_TRANSCENDANCE
-AUTHOR = Aurele / Florian / Guilhem / Henri
+AUTHOR = ajossera / fdaumas / gchatain / hpenaud
 
 # ~~~~~~~~~~~~~~~~ SOURCES ~~~~~~~~~~~~~~~~
 
