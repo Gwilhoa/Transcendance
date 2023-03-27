@@ -29,8 +29,8 @@ export class UserService {
         var request = await fetch(avatar_url);
         var buffer = await request.buffer();
         var fs = require('fs');
-        fs.mkdirSync('/home/images', { recursive: true });
-        var path = '/home/images/' + user.id + '.jpg';
+        fs.mkdirSync(__dirname+'/../../../images', { recursive: true });
+        var path = __dirname+'/../../../images/' + user.id + '.jpg';
         console.log(path);
         fs.writeFile(path, buffer, (err) => {
             if (err) throw err;
@@ -61,8 +61,27 @@ export class UserService {
         if (user == null) {
             return null;
         }
-        var path = '/home/images/' + user.id + '.jpg';
+        var path = __dirname+'/../../../images/' + user.id + '.jpg';
         return path;
 
+    }
+    
+    public async addFriend(id: string, friend_id: string) {
+        var user = await this.userRepository.findOneBy({id : id});
+        var friend = await this.userRepository.findOneBy({id : friend_id});
+        if (user == null || friend == null) {
+            return null;
+        }
+        user.friends.push(friend);
+        await this.userRepository.save(user);
+        return user;
+    }
+
+    public async getFriends(id: string) {
+        var user = await this.userRepository.findOneBy({id : id});
+        if (user == null) {
+            return null;
+        }
+        return user.friends;
     }
 }

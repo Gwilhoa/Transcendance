@@ -53,4 +53,22 @@ export class UserController {
       });
     }
   }
+
+  @Post('/friend/:id')
+  async addFriend(@Param('id') id: string, @Body('friend_id') friend_id: string, @Res() response) {
+    var ret = await this.userService.addFriend(id, friend_id);
+    if (ret == null) {
+      response.status(204).send('No Content');
+    }
+    return ret;
+  }
+
+  @Get('/friend/:id')
+  async getFriends(@Param('id') id: string, @Res() response) {
+    var ret = await this.userService.getFriends(id);
+    if (ret == null) {
+      response.status(204).send('No Content');
+    }
+    return ret;
+  }
 }
