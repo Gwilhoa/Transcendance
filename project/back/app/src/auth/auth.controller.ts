@@ -13,7 +13,7 @@ export class AuthController {
     
 
     @Get('login/token')
-    getLogin(@Query() id, @Res() res) : string {
+    getLogin(@Query() id, @Res() res) {
       if (id.code == null) {
         res.status(400).send('Bad Request');
       }
