@@ -15,7 +15,7 @@ services:
       - transnet
     volumes:
       - "transvolu:/var/lib/postgresql/data"
-    ports: // à enlever
+    ports: # à enlever
       - "5432:5432"
 
   back:

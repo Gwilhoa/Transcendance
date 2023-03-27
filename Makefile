@@ -91,6 +91,7 @@ stop clean:
 	docker-compose -f docker-compose.yml stop
 	printf "$(GREEN)[✓]$(END)\n\n"
 	([ cp -rf temp/src back/app/src 2> /dev/null -eq 0 ] && printf "$(BOLD)$(YELLOW)Copy$(END) temp file to src with Success\n") || echo -n
+	rm -r /goinfre/hpenaud/docker/volumes/transcendance_temp/_data/src 2> /dev/null ; true
 
 # ~~~~~~~~~~~~ CLEANNING RULES ~~~~~~~~~~~~
 
