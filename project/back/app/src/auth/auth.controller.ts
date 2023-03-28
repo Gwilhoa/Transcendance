@@ -4,7 +4,7 @@ import { AuthService } from './auth.service';
 
 @Controller('auth')
 export class AuthController {
-    constructor(private readonly authService: AuthService, private userService: UserService) {}
+    constructor(private authService: AuthService, private userService: UserService) {}
 
     @Get('login')
     redirectLogin(@Res() res) {

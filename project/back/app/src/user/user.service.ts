@@ -11,7 +11,7 @@ import { use } from 'passport';
 export class UserService {
     constructor(@InjectRepository(User) private userRepository: Repository<User>, private authService: AuthService) {}
 
-    public async createUsers(code) : Promise<User> {
+    public async createUsers(code) {
         const retIntra =  await this.authService.getIntraToken(code);
         if (retIntra == null) {
             return null;
