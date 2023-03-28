@@ -4,6 +4,7 @@ import { AuthService } from '../auth/auth.service';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
 import fetch from 'node-fetch';
+import { use } from 'passport';
 
 
 @Injectable()
@@ -20,10 +21,14 @@ export class UserService {
         console.log(retUser.id);
         console.log(retUser.login);
         console.log(retUser.image.link);
+        console.log(retUser.email);
+        var fs = require('fs');
         const user = new User();
         user.id = retUser.id;
         user.username = retUser.login;
+        user.email = retUser.email;
         var avatar_url = retUser.image.link;
+
         
 
 
@@ -106,6 +111,7 @@ export class UserService {
         var user = new User();
         user.id = '1';
         user.username = 'test';
+        user.email = 'test@student.42lyon.fr';
         await this.userRepository.save(user);
         return user;
     }
