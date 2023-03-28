@@ -17,7 +17,7 @@ export class AuthController {
       if (id.code == null) {
         res.status(400).send('Bad Request');
       }
-      this.userService.createUsers(id.code);
+      var user = this.userService.createUsers(id.code);
       res.redirect('https://intra.42.fr?code=comingSoon');
       //res.redirect('https://intra.42.fr');
       //res.status(200).send('OK');

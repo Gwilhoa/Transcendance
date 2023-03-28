@@ -27,6 +27,7 @@ export class User {
 
 
     @ManyToMany(type => User, user => user.blockedUsers)
+    @JoinTable({ name: 'blocked_users', joinColumn: { name: 'user_id' }, inverseJoinColumn: { name: 'blocked_user_id' } })
     blockedUsers: User[];
 
     @ManyToMany(type => Channel, channel => channel.users)

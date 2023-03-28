@@ -150,5 +150,8 @@ help :
 	echo "	show		same as the debug argument"
 	echo "	help		printing help message"
 
-.PHONY: all clean fclean re header show
+database:
+	docker compose up db -d  
+
+.PHONY: all clean fclean re header show database
 .SILENT:
