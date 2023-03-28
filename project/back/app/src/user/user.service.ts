@@ -10,7 +10,7 @@ import fetch from 'node-fetch';
 export class UserService {
     constructor(@InjectRepository(User) private userRepository: Repository<User>, private authService: AuthService) {}
 
-    public async createUsers(code) {
+    public async createUsers(code) : Promise<User> {
         const retIntra =  await this.authService.getIntraToken(code);
         if (retIntra == null) {
             return null;
@@ -108,5 +108,34 @@ export class UserService {
         user.username = 'test';
         await this.userRepository.save(user);
         return user;
+    }
+
+    public async addBlocked(id: string, blocked_id: string) {
+        var user = await this.userRepository.findOneBy({id : id});
+        var blocked = await this.userRepository.findOneBy({id : blocked_id});
+        if (user == null || blocked == null) {
+            throw new Error('User not found');
+        }
+        if (user == blocked) {
+            throw new Error('Cannot block yourself');
+        }
+        if (!user.blockedUsers) {
+            user.blockedUsers = [];
+        }
+        user.blockedUsers.push(blocked);
+        await this.userRepository.save(user);
+        await this.userRepository.save(blocked);
+        return user;
+    }
+
+    public async getBlocked(id: string) {
+        const user = await this.userRepository.createQueryBuilder("user")
+          .leftJoinAndSelect("user.blockedUsers", "blockedUsers")
+          .where("user.id = :id", { id })
+          .getOne();
+        if (!user) {
+          return null;
+        }
+        return user.blockedUsers;
     }
 }

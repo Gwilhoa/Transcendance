@@ -17,13 +17,10 @@ export class AuthController {
       if (id.code == null) {
         res.status(400).send('Bad Request');
       }
-      this.userService.createUsers(id.code);
+      var user = this.userService.createUsers(id.code);
 
-      // return (this.signJwtToken(userId: number, email: string))
-      res.redirect('https://localhost:6200?code=comingSoon');
-      
-      
-      
+      return (this.signJwtToken(parseInt(user.id), user.email))
+      // res.redirect('https://intra.42.fr?code=comingSoon');
       //res.redirect('https://intra.42.fr');
       //res.status(200).send('OK');
       //return id;
