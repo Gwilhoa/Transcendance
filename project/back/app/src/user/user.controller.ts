@@ -44,11 +44,15 @@ export class UserController {
       response.status(204).send('No Content');
     } else {
       const fs = require('fs');
+      if (file == null) {
+        response.status(400).send('Bad Request');
+        return;
+      }
       fs.writeFile(path, file.buffer, (err) => {
         if (err) {
-          response.status(500).send('Cannot write file');
+          response.status(400).send('Cannot write file');
         }
-        console.log('Image downloaded successfully!');
+        console.log(id + ' image updated');
         response.status(200).send('OK');
       });
     }
@@ -64,7 +68,6 @@ export class UserController {
       return;
     }
     response.status(200).send(ret);
-    // return ret;
   }
 
   @Get('/friend/:id')
@@ -75,6 +78,5 @@ export class UserController {
       return;
     }
     response.status(200).send(ret);
-    // return ret;
   }
 }
