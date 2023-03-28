@@ -1,72 +1,112 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { AuthService } from '../auth/auth.service';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
+import fetch from 'node-fetch';
+
 
 @Injectable()
 export class UserService {
-    constructor(@InjectRepository(User) private userRepository: Repository<User>) {}
+    constructor(@InjectRepository(User) private userRepository: Repository<User>, private authService: AuthService) {}
 
-    public async getUserIntra(token) {
-        const axios = require('axios');
-        const url = 'https://api.intra.42.fr/v2/me';
-        const data = {
-            headers: {
-                "Authorization": "Bearer " + token
-            }
-        };
-        try {
-            const response = await axios.get(url, data);
-            return response.data;
-        }
-        catch (error) {
-            console.error(error);
-            return null;
-        }
-    }
-
-    public async getToken(code): Promise<any> {
-        const appId = process.env.APP_ID;
-        const appSecret = process.env.APP_SECRET;
-        const appRedirect = process.env.APP_REDIRECT_URI;
-        const axios = require('axios');
-        const url = 'https://api.intra.42.fr/oauth/token';
-        const data = {
-            client_id: appId,
-            client_secret: appSecret,
-            grant_type: 'authorization_code',
-            code: code,
-            redirect_uri : appRedirect,
-        };
-    
-        try {
-            const response = await axios.post(url, data);
-            return response.data;
-        } catch (error) {
-            console.error(error);
-            return null;
-        }
-    }
-    
     public async createUsers(code) {
-        const retIntra =  await this.getToken(code);
+        const retIntra =  await this.authService.getIntraToken(code);
         if (retIntra == null) {
             return null;
         }
-        const retUser = await this.getUserIntra(retIntra.access_token);
+        await this.test();
+        const retUser = await this.authService.getUserIntra(retIntra.access_token);
         console.log(retUser.id);
         console.log(retUser.login);
         console.log(retUser.image.link);
         const user = new User();
         user.id = retUser.id;
         user.username = retUser.login;
-        user.avatar_url = retUser.image.link;
+        var avatar_url = retUser.image.link;
+        
+
+
+        var request = await fetch(avatar_url);
+        var buffer = await request.buffer();
+        var fs = require('fs');
+        fs.mkdirSync(__dirname+'/../../../images', { recursive: true });
+        var path = __dirname+'/../../../images/' + user.id + '.jpg';
+        console.log(path);
+        fs.writeFile(path, buffer, (err) => {
+            if (err) throw err;
+            console.log('Image downloaded successfully!');
+          });
+        
+        
+
+
+
+        if (await this.userRepository.findOneBy({id : user.id}) != null) {
+            return null;
+        }
         await this.userRepository.save(user);
         return user;
     }
 
-    public async getUsers(): Promise<User[]> {
+    public async getUsers() {
         return await this.userRepository.find();
     }
 
+    public async getUserById(id: string) {
+        return await this.userRepository.findOneBy({id : id});
+    }
+
+    public async getImageById(id: string) {
+        var user = await this.userRepository.findOneBy({id : id});
+        if (user == null) {
+            return null;
+        }
+        var path = __dirname+'/../../../images/' + user.id + '.jpg';
+        return path;
+
+    }
+    
+    public async addFriend(id: string, friend_id: string) {
+        var user = await this.userRepository.findOneBy({id : id});
+        var friend = await this.userRepository.findOneBy({id : friend_id});
+        if (user == null || friend == null) {
+            throw new Error('User not found');
+        }
+        if (user == friend) {
+            throw new Error('Cannot add yourself as a friend');
+        }
+        if (!user.friends) {
+            user.friends = [];
+        }
+        user.friends.push(friend);
+        await this.userRepository.save(user);
+        await this.userRepository.save(friend);
+        return user;
+    }
+
+    public async getFriends(id: string) {
+        const user = await this.userRepository.createQueryBuilder("user")
+          .leftJoinAndSelect("user.friends", "friends")
+          .where("user.id = :id", { id })
+          .getOne();
+      
+        if (!user) {
+          return null;
+        }
+      
+        console.log(user.friends);
+        return user.friends;
+      }
+
+    public async test() {
+        if (await this.userRepository.findOneBy({id : '1'}) != null) {
+            return null;
+        }
+        var user = new User();
+        user.id = '1';
+        user.username = 'test';
+        await this.userRepository.save(user);
+        return user;
+    }
 }

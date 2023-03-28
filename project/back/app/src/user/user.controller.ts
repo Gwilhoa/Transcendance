@@ -1,31 +1,82 @@
-import { Controller, Get, Query, Redirect, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { User } from './user.entity';
 import { UserService } from './user.service';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('user')
 export class UserController {
-    constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) {}
 
-    @Get('login')
-    redirectLogin(@Res() res) {
-      res.redirect('https://api.intra.42.fr/oauth/authorize?client_id=' + process.env.APP_ID + '&redirect_uri=' + process.env.APP_REDIRECT_URI + '&response_type=code');
+  @Get()
+  async findAll(): Promise<User[]> {
+    return this.userService.getUsers();
+  }
+
+  @Get('/id/:id')
+  async findOne(@Param('id') id: string, @Res() response): Promise<User> {
+    var ret = await this.userService.getUserById(id);
+    if (ret == null) {
+      response.status(204).send('No Content');
     }
-    
+    return this.userService.getUserById(id);
+  }
 
-    @Get('login/token')
-    getLogin(@Query() id, @Res() res) : string {
-      if (id.code == null) {
-        res.status(400).send('Bad Request');
+  @Get('/image/:id')
+  async getImage(@Param('id') id: string, @Res() response) {
+    const path = await this.userService.getImageById(id);
+    if (path == null) {
+      response.status(204).send('No Content');
+    } else {
+      const fs = require('fs');
+      const stream = fs.createReadStream(path);
+      stream.on('error', (error) => {
+        response.status(500).send('Cannot read file');
+      });
+      stream.pipe(response);
+    }
+  }
+
+  @Post('/image/:id')
+  @UseInterceptors(FileInterceptor('image'))
+  async setImage(@Param('id') id: string, @Res() response, @UploadedFile() file) {
+    const path = await this.userService.getImageById(id);
+    if (path == null) {
+      response.status(204).send('No Content');
+    } else {
+      const fs = require('fs');
+      if (file == null) {
+        response.status(400).send('Bad Request');
+        return;
       }
-      this.userService.createUsers(id.code);
-      res.redirect('https://intra.42.fr');
-      //res.status(200).send('OK');
-      return id;
+      fs.writeFile(path, file.buffer, (err) => {
+        if (err) {
+          response.status(400).send('Cannot write file');
+        }
+        console.log(id + ' image updated');
+        response.status(200).send('OK');
+      });
     }
+  }
 
-
-    @Get()
-    getUsers() {
-      return this.userService.getUsers();
+  @Post('/friend/:id')
+  async addFriend(@Param('id') id: string, @Body('friend_id') friend_id: string, @Res() response) {
+    try {
+      var ret = await this.userService.addFriend(id, friend_id);
+      await this.userService.addFriend(friend_id, id);
+    } catch (e) {
+      response.status(400).send('Bad Request '+ e);
+      return;
     }
+    response.status(200).send(ret);
+  }
+
+  @Get('/friend/:id')
+  async getFriends(@Param('id') id: string, @Res() response) {
+    var ret = await this.userService.getFriends(id);
+    if (ret == null) {
+      response.status(204).send('No Friends');
+      return;
+    }
+    response.status(200).send(ret);
+  }
 }
-
