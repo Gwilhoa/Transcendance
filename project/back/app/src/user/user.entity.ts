@@ -1,12 +1,12 @@
 import { Channel } from 'src/channel/channel.entity';
-import { Column, Double, Entity, ManyToMany, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Double, Entity, JoinTable, ManyToMany, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
 
 export enum Status {
     CONNECTED = 0,
     DISCONNECTED = 1,
     IN_GAME = 2,
 }
-@Entity()
+@Entity({name: 'users'})
 export class User {
 
     @PrimaryColumn()
@@ -22,7 +22,9 @@ export class User {
     status : Status;
 
     @ManyToMany(type => User, user => user.friends)
+    @JoinTable({ name: 'friends', joinColumn: { name: 'user_id' }, inverseJoinColumn: { name: 'friend_id' } })
     friends: User[];
+
 
     @ManyToMany(type => User, user => user.blockedUsers)
     blockedUsers: User[];

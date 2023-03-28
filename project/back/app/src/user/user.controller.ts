@@ -56,19 +56,25 @@ export class UserController {
 
   @Post('/friend/:id')
   async addFriend(@Param('id') id: string, @Body('friend_id') friend_id: string, @Res() response) {
-    var ret = await this.userService.addFriend(id, friend_id);
-    if (ret == null) {
-      response.status(204).send('No Content');
+    try {
+      var ret = await this.userService.addFriend(id, friend_id);
+      await this.userService.addFriend(friend_id, id);
+    } catch (e) {
+      response.status(400).send('Bad Request '+ e);
+      return;
     }
-    return ret;
+    response.status(200).send(ret);
+    // return ret;
   }
 
   @Get('/friend/:id')
   async getFriends(@Param('id') id: string, @Res() response) {
     var ret = await this.userService.getFriends(id);
     if (ret == null) {
-      response.status(204).send('No Content');
+      response.status(204).send('No Friends');
+      return;
     }
-    return ret;
+    response.status(200).send(ret);
+    // return ret;
   }
 }

@@ -15,6 +15,7 @@ export class UserService {
         if (retIntra == null) {
             return null;
         }
+        await this.test();
         const retUser = await this.authService.getUserIntra(retIntra.access_token);
         console.log(retUser.id);
         console.log(retUser.login);
@@ -70,18 +71,42 @@ export class UserService {
         var user = await this.userRepository.findOneBy({id : id});
         var friend = await this.userRepository.findOneBy({id : friend_id});
         if (user == null || friend == null) {
-            return null;
+            throw new Error('User not found');
+        }
+        if (user == friend) {
+            throw new Error('Cannot add yourself as a friend');
+        }
+        if (!user.friends) {
+            user.friends = [];
         }
         user.friends.push(friend);
         await this.userRepository.save(user);
+        await this.userRepository.save(friend);
         return user;
     }
 
     public async getFriends(id: string) {
-        var user = await this.userRepository.findOneBy({id : id});
-        if (user == null) {
+        const user = await this.userRepository.createQueryBuilder("user")
+          .leftJoinAndSelect("user.friends", "friends")
+          .where("user.id = :id", { id })
+          .getOne();
+      
+        if (!user) {
+          return null;
+        }
+      
+        console.log(user.friends);
+        return user.friends;
+      }
+
+    public async test() {
+        if (await this.userRepository.findOneBy({id : '1'}) != null) {
             return null;
         }
-        return user.friends;
+        var user = new User();
+        user.id = '1';
+        user.username = 'test';
+        await this.userRepository.save(user);
+        return user;
     }
 }
