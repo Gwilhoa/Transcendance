@@ -78,12 +78,7 @@ create: build
 
 # ~~~~~~~~~~~~~~~~ START ~~~~~~~~~~~~~~~~
 
-<<<<<<< HEAD
-start : build
-	# ln -s /goinfre/hpenaud/docker/volumes/transcendance_temp/_data/src temp/src
-=======
-start :	create
->>>>>>> refs/remotes/origin/main
+start: build
 	# printf "%-62b%b" "$(BOLD)$(GREEN)Starting$(END) containers"
 	docker-compose -f docker-compose.yml up
 	# printf "$(GREEN)[✓]$(END)\n\n"

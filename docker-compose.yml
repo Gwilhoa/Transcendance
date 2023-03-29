@@ -80,7 +80,7 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: ./temp
+      device: ./device
       o: bind
 
 networks:
