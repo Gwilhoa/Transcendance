@@ -13,6 +13,9 @@ export class User {
     id: string;
 
     @Column()
+    email: string;
+
+    @Column()
     username: string;
 
     @Column({default: 0})
@@ -27,6 +30,7 @@ export class User {
 
 
     @ManyToMany(type => User, user => user.blockedUsers)
+    @JoinTable({ name: 'blocked_users', joinColumn: { name: 'user_id' }, inverseJoinColumn: { name: 'blocked_user_id' } })
     blockedUsers: User[];
 
     @ManyToMany(type => Channel, channel => channel.users)

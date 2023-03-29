@@ -79,4 +79,25 @@ export class UserController {
     }
     response.status(200).send(ret);
   }
+
+  @Post('/blocked/:id')
+  async addBlocked(@Param('id') id: string, @Body('blocked_id') blocked_id: string, @Res() response) {
+    try {
+      var ret = await this.userService.addBlocked(id, blocked_id);
+    } catch (e) {
+      response.status(400).send('Bad Request '+ e);
+      return;
+    }
+    response.status(200).send(ret);
+  }
+
+  @Get('/blocked/:id')
+  async getBlocked(@Param('id') id: string, @Res() response) {
+    var ret = await this.userService.getBlocked(id);
+    if (ret == null) {
+      response.status(204).send('No Blocked');
+      return;
+    }
+    response.status(200).send(ret);
+  }
 }

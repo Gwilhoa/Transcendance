@@ -66,7 +66,7 @@ all:   header start
 
 build :
 	printf "%-62b%b" "$(BOLD)$(CYAN)Create$(END) volumes folder"
-	mkdir -p device temp
+	mkdir -p device
 	printf "$(GREEN)[✓]$(END)\n\n"
 	printf "$(BOLD)$(CYAN)Building$(END) containers ... \n"
 	docker-compose -f docker-compose.yml build
@@ -78,8 +78,12 @@ create: build
 
 # ~~~~~~~~~~~~~~~~ START ~~~~~~~~~~~~~~~~
 
+<<<<<<< HEAD
 start : build
 	# ln -s /goinfre/hpenaud/docker/volumes/transcendance_temp/_data/src temp/src
+=======
+start :	create
+>>>>>>> refs/remotes/origin/main
 	# printf "%-62b%b" "$(BOLD)$(GREEN)Starting$(END) containers"
 	docker-compose -f docker-compose.yml up
 	# printf "$(GREEN)[✓]$(END)\n\n"
@@ -90,8 +94,6 @@ stop clean:
 	printf "%-62b%b" "$(BOLD)$(PURPLE)Stoping$(END) containers"
 	docker-compose -f docker-compose.yml stop
 	printf "$(GREEN)[✓]$(END)\n\n"
-	([ cp -rf temp/src back/app/src 2> /dev/null -eq 0 ] && printf "$(BOLD)$(YELLOW)Copy$(END) temp file to src with Success\n") || echo -n
-	rm -r /goinfre/hpenaud/docker/volumes/transcendance_temp/_data/src 2> /dev/null ; true
 
 # ~~~~~~~~~~~~ CLEANNING RULES ~~~~~~~~~~~~
 
@@ -150,5 +152,8 @@ help :
 	echo "	show		same as the debug argument"
 	echo "	help		printing help message"
 
-.PHONY: all clean fclean re header show
+database:
+	docker compose up db -d  
+
+.PHONY: all clean fclean re header show database
 .SILENT:

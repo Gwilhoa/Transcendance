@@ -4,6 +4,7 @@ import { AuthService } from '../auth/auth.service';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
 import fetch from 'node-fetch';
+import { use } from 'passport';
 
 
 @Injectable()
@@ -20,10 +21,14 @@ export class UserService {
         console.log(retUser.id);
         console.log(retUser.login);
         console.log(retUser.image.link);
+        console.log(retUser.email);
+        var fs = require('fs');
         const user = new User();
         user.id = retUser.id;
         user.username = retUser.login;
+        user.email = retUser.email;
         var avatar_url = retUser.image.link;
+
         
 
 
@@ -106,7 +111,37 @@ export class UserService {
         var user = new User();
         user.id = '1';
         user.username = 'test';
+        user.email = 'test@student.42lyon.fr';
         await this.userRepository.save(user);
         return user;
+    }
+
+    public async addBlocked(id: string, blocked_id: string) {
+        var user = await this.userRepository.findOneBy({id : id});
+        var blocked = await this.userRepository.findOneBy({id : blocked_id});
+        if (user == null || blocked == null) {
+            throw new Error('User not found');
+        }
+        if (user == blocked) {
+            throw new Error('Cannot block yourself');
+        }
+        if (!user.blockedUsers) {
+            user.blockedUsers = [];
+        }
+        user.blockedUsers.push(blocked);
+        await this.userRepository.save(user);
+        await this.userRepository.save(blocked);
+        return user;
+    }
+
+    public async getBlocked(id: string) {
+        const user = await this.userRepository.createQueryBuilder("user")
+          .leftJoinAndSelect("user.blockedUsers", "blockedUsers")
+          .where("user.id = :id", { id })
+          .getOne();
+        if (!user) {
+          return null;
+        }
+        return user.blockedUsers;
     }
 }
