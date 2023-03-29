@@ -1,5 +1,6 @@
 import { Channel } from 'src/channel/channel.entity';
-import { Column, Double, Entity, JoinTable, ManyToMany, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
+import { Message } from 'src/channel/message.entity';
+import { Column, Double, Entity, JoinTable, ManyToMany, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
 
 export enum Status {
     CONNECTED = 0,
@@ -42,4 +43,6 @@ export class User {
     @ManyToMany(type => Channel, channel => channel.bannedUsers)
     bannedChannels: Channel[];
 
+    @OneToMany(type => Message , message => message.user)
+    messages: Message[];
 }

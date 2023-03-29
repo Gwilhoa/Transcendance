@@ -2,7 +2,6 @@ import { Body, Controller, Delete, Get, Param, Post, Put, Res, UploadedFile, Use
 import { User } from './user.entity';
 import { UserService } from './user.service';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { AuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('user')
 export class UserController {
@@ -99,6 +98,16 @@ export class UserController {
     var ret = await this.userService.getBlocked(id);
     if (ret == null) {
       response.status(204).send('No Blocked');
+      return;
+    }
+    response.status(200).send(ret);
+  }
+
+  @Get('/channel/:id')
+  async getChannel(@Param('id') id: string, @Res() response) {
+    var ret = await this.userService.getChannels(id);
+    if (ret == null) {
+      response.status(204).send('No Channel');
       return;
     }
     response.status(200).send(ret);
