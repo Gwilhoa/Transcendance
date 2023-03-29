@@ -21,7 +21,8 @@ export class AuthController {
 
       // return (this.authService.signJwtToken(parseInt(user.id), user.email))
       // console.log("Jwt : " + await this.authService.signJwtToken(parseInt(user.id), user.email));
-      return (await this.authService.signJwtToken(parseInt(user.id), user.email));
+      res.status(200).send(await this.authService.signJwtToken(parseInt(user.id), user.email));
+      return;
       // res.redirect('http://localhost:6200?code=' + await this.authService.signJwtToken(parseInt(user.id), user.email));
       // res.redirect('https://intra.42.fr?code=comingSoon');
       //res.redirect('https://intra.42.fr');
