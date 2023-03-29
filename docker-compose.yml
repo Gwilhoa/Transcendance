@@ -2,6 +2,7 @@ version: "3.9"
 
 services:
   db:
+    init: true
     container_name:
       db
     build: 
@@ -19,6 +20,7 @@ services:
       - "5432:5432"
 
   back:
+    init: true
     ports:
       - "6200:6200"
     container_name:
@@ -42,6 +44,7 @@ services:
     restart: unless-stopped
 
   front:
+    init: true
     container_name:
       front
     depends_on:
@@ -52,6 +55,8 @@ services:
       - transnet
     ports:
       - "3000:3000"
+    volumes:
+      - temp:/usr/src/app
 
 # volumes:
 #   transcendance_db:
@@ -66,6 +71,7 @@ services:
 #       type: none
 #       device: ./temp
 #       o: bind
+#./project/front/ts
 
 volumes:
   transcendance_db:

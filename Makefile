@@ -78,9 +78,9 @@ create: build
 
 # ~~~~~~~~~~~~~~~~ START ~~~~~~~~~~~~~~~~
 
-start :	create
+start: build
 	# printf "%-62b%b" "$(BOLD)$(GREEN)Starting$(END) containers"
-	docker-compose -f docker-compose.yml start
+	docker-compose -f docker-compose.yml up
 	# printf "$(GREEN)[✓]$(END)\n\n"
 
 # ~~~~~~~~~~~~~~~ STOP ~~~~~~~~~~~~~~~
