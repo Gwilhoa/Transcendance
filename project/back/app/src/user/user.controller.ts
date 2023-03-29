@@ -1,11 +1,14 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Res, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { User } from './user.entity';
 import { UserService } from './user.service';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { AuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  // @UseGuards(AuthGuard('jwt'))
 
   @Get()
   async findAll(): Promise<User[]> {
