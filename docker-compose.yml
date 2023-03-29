@@ -51,6 +51,8 @@ services:
       - transnet
     ports:
       - "3000:3000"
+    volumes:
+      - temp:/usr/src/app
 
 # volumes:
 #   transvolu:
@@ -67,7 +69,19 @@ services:
 #       o: bind
 
 volumes:
+  temp:
+    driver: local
+    driver_opts:
+       type: none
+       device: ./temp
+       o: bind
+       #./project/front/ts
   transvolu:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./temp
+      o: bind
 
 networks:
   transnet:

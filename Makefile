@@ -78,10 +78,10 @@ create: build
 
 # ~~~~~~~~~~~~~~~~ START ~~~~~~~~~~~~~~~~
 
-start :	create
+start : build
 	# ln -s /goinfre/hpenaud/docker/volumes/transcendance_temp/_data/src temp/src
 	# printf "%-62b%b" "$(BOLD)$(GREEN)Starting$(END) containers"
-	docker-compose -f docker-compose.yml start
+	docker-compose -f docker-compose.yml up
 	# printf "$(GREEN)[✓]$(END)\n\n"
 
 # ~~~~~~~~~~~~~~~ STOP ~~~~~~~~~~~~~~~
