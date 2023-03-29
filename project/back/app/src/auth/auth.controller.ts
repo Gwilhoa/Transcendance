@@ -13,13 +13,14 @@ export class AuthController {
     
 
     @Get('login/token')
-    getLogin(@Query() id, @Res() res) {
+    async getLogin(@Query() id, @Res() res) {
       if (id.code == null) {
         res.status(400).send('Bad Request');
       }
-      var user = this.userService.createUsers(id.code);
+      var user = await this.userService.createUsers(id.code);
 
-      return (this.signJwtToken(parseInt(user.id), user.email))
+      console.log("--- user :" + user);
+      return (this.authService.signJwtToken(parseInt(user.id), user.email))
       // res.redirect('https://intra.42.fr?code=comingSoon');
       //res.redirect('https://intra.42.fr');
       //res.status(200).send('OK');
