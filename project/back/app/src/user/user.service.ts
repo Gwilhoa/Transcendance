@@ -48,7 +48,7 @@ export class UserService {
 
 
         if (await this.userRepository.findOneBy({id : user.id}) != null) {
-            return null;
+            return user;
         }
         await this.userRepository.save(user);
         return user;

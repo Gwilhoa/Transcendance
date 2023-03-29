@@ -14,7 +14,7 @@ services:
     networks:
       - transnet
     volumes:
-      - "transvolu:/var/lib/postgresql/data"
+      - "transcendance_db:/var/lib/postgresql/data"
     ports:
       - "5432:5432"
 
@@ -34,6 +34,7 @@ services:
       APP_ID: ${APP_ID}
       APP_SECRET: ${APP_SECRET}
       APP_REDIRECT_URI: ${APP_REDIRECT_URI}
+      JWT_SECRET : ${JWT_SECRET}
     build:
       context: ./project/back
     networks:
@@ -53,7 +54,7 @@ services:
       - "3000:3000"
 
 # volumes:
-#   transvolu:
+#   transcendance_db:
 #     driver: local
 #     driver_opts:
 #       type: none
@@ -67,7 +68,7 @@ services:
 #       o: bind
 
 volumes:
-  transvolu:
+  transcendance_db:
 
 networks:
   transnet:
