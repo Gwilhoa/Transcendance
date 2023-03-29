@@ -4,7 +4,7 @@ import { AuthService } from './auth.service';
 
 @Controller('auth')
 export class AuthController {
-    constructor(private readonly authService: AuthService, private userService: UserService) {}
+    constructor(private authService: AuthService, private userService: UserService) {}
 
     @Get('login')
     redirectLogin(@Res() res) {
@@ -17,8 +17,10 @@ export class AuthController {
       if (id.code == null) {
         res.status(400).send('Bad Request');
       }
-      this.userService.createUsers(id.code);
-      res.redirect('https://intra.42.fr?code=comingSoon');
+      var user = this.userService.createUsers(id.code);
+
+      return (this.signJwtToken(parseInt(user.id), user.email))
+      // res.redirect('https://intra.42.fr?code=comingSoon');
       //res.redirect('https://intra.42.fr');
       //res.status(200).send('OK');
       //return id;
