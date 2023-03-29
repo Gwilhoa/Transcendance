@@ -2,7 +2,7 @@ FROM node:latest
 
 WORKDIR /usr/src/app
 
-COPY ./tsx .
+COPY ./ts .
 
 RUN npm install -g npm@9.6.2
 
