@@ -50,7 +50,8 @@ export class AuthService {
     }
 
     async signJwtToken(userId: number, email: string): Promise<string> {
-        const payload = { userId: userId, email: email };
+        const payload = { sub: userId, email };
+        console.log(process.env.JWT_SECRET);
         return this.jwt.signAsync(payload, { expiresIn: '2h', secret: process.env.JWT_SECRET})
     }
 
