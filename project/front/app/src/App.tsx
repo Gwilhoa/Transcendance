@@ -12,11 +12,11 @@ function App() {
         </p>
         <a
           className="App-link"
-          href="https://reactjs.org"
+          href="http://localhost:6200/auth/login"
           target="_blank"
           rel="noopener noreferrer"
         >
-		Authentificate
+		    Authentification
         </a>
       </header>
     </div>
