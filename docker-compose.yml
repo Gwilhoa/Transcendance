@@ -55,8 +55,8 @@ services:
       - transnet
     ports:
       - "3000:3000"
-    volumes:
-      - temp:/usr/src/app
+    # volumes:
+    #   - temp:/usr/src/app
 
 # volumes:
 #   transcendance_db:
