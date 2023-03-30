@@ -1,21 +1,25 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Res, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Res, UploadedFile, UseGuards, UseInterceptors} from '@nestjs/common';
 import { User } from './user.entity';
 import { UserService } from './user.service';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { JwtAuthGuard } from '../auth/guard/jwt.guard';
 
+import {Request} from '@nestjs/common';
+@UseGuards(JwtAuthGuard)
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   
-  @UseGuards(AuthGuard('jwt'))
   @Get()
   async findAll(): Promise<User[]> {
     return this.userService.getUsers();
   }
 
   @Get('/id/:id')
-  async findOne(@Param('id') id: string, @Res() response): Promise<User> {
+  // async findOne(@Param('id') id: string, @Res() response): Promise<User> {
+    async findOne(@Param('id') id: string, @Res() response, @Request() req): Promise<User> {
+    console.log("user info :" + req.user);
     var ret = await this.userService.getUserById(id);
     if (ret == null) {
       response.status(204).send('No Content');
