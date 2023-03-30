@@ -7,8 +7,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  // @UseGuards(AuthGuard('jwt'))
-
+  
+  @UseGuards(AuthGuard('jwt'))
   @Get()
   async findAll(): Promise<User[]> {
     return this.userService.getUsers();
