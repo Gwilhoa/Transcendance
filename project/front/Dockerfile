@@ -2,8 +2,8 @@ FROM node:latest
 
 WORKDIR /usr/src/app
 
-COPY ./ts .
+COPY ./app .
 
-RUN npm install -g npm@9.6.2
+RUN npm install 
 
 CMD ["npm", "run", "start"]
