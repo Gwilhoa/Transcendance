@@ -1,0 +1,10 @@
+<script>
+
+const socket = new WebSocket('ws://localhost:6200');
+socket.addEventListener('open', () => {
+  console.log('WebSocket connection established.');
+});
+socket.addEventListener('message', (event) => {
+  console.log('Received message:', event.data);
+});
+</script>

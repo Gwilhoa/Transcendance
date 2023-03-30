@@ -83,7 +83,17 @@ start: build
 	docker-compose -f docker-compose.yml up
 	# printf "$(GREEN)[✓]$(END)\n\n"
 
-# ~~~~~~~~~~~~~~~ STOP ~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~ DATABASE ~~~~~~~~~~~~~~
+
+database:
+	docker-compose up -d db
+
+# ~~~~~~~~~~~~~~ BACKEND ~~~~~~~~~~~~~~
+
+back: database
+	docker-compose up -d back
+
+# ~~~~~~~~~~~~~~~~ STOP ~~~~~~~~~~~~~~~~
 
 stop clean:
 	printf "%-62b%b" "$(BOLD)$(PURPLE)Stoping$(END) containers"
@@ -146,12 +156,6 @@ help :
 	echo "	debug		show variables (for debug use only)"
 	echo "	show		same as the debug argument"
 	echo "	help		printing help message"
-
-database:
-	docker-compose up -d db
-
-back: database
-	docker-compose up -d back
 
 .PHONY: all clean fclean re header show database
 .SILENT:
