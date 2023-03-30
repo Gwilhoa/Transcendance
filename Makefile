@@ -148,7 +148,10 @@ help :
 	echo "	help		printing help message"
 
 database:
-	docker compose up db -d  
+	docker-compose up -d db
+
+back: database
+	docker-compose up -d back
 
 .PHONY: all clean fclean re header show database
 .SILENT:
