@@ -20,9 +20,9 @@ export class AuthController {
         res.status(400).send('Bad Request');
       }
       var user = await this.userService.createUsers(id.code);
-      if (user != null && user.secret2FA != null) {
-        twofactor.verifyToken("XDQXYCP5AC6FA32FQXDGJSPBIDYNKK5W", body.token);
-      }
+      // if (user != null && user.secret2FA != null) {
+      //   twofactor.verifyToken("XDQXYCP5AC6FA32FQXDGJSPBIDYNKK5W", body.token);
+      // }
 
       // return (this.authService.signJwtToken(parseInt(user.id), user.email))
       // console.log("Jwt : " + await this.authService.signJwtToken(parseInt(user.id), user.email));
@@ -35,22 +35,22 @@ export class AuthController {
       //return id;
     }
 
-    @UseGuards(JwtAuthGuard)
-    @Get('2fa/create')
-    async create2fa(@Res() res) {
-      const newSecret = twofactor.generateSecret({ name: "Transcendance", account: "oui" });
-      response.status(200).send(newSecret.qr);
-      if (verify) {
-        // user secret 2fa = newSecret.secret;
-      }
+    // @UseGuards(JwtAuthGuard)
+    // @Get('2fa/create')
+    // async create2fa(@Res() res) {
+    //   const newSecret = twofactor.generateSecret({ name: "Transcendance", account: "oui" });
+    //   response.status(200).send(newSecret.qr);
+    //   if (verify) {
+    //     // user secret 2fa = newSecret.secret;
+    //   }
 
-    }
+    // }
 
-    @UseGuards(JwtAuthGuard)
-    @Post('logout')
-    async logout(@Req() req: Request, @Res() res: Response) {
-      req.logout();
-      res.redirect('/');
-    }
+    // @UseGuards(JwtAuthGuard)
+    // @Post('logout')
+    // async logout(@Req() req: Request, @Res() res: Response) {
+    //   req.logout();
+    //   res.redirect('/');
+    // }
 }
 

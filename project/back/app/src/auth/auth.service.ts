@@ -2,12 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { Repository } from 'typeorm';
-import { Token } from './token.entity';
+// import { Token } from './token.entity';
 
 
 @Injectable()
 export class AuthService {
-    constructor(private jwt: JwtService, private config: ConfigService, private tokenRepository: Repository<Token>) {}
+    // constructor(private jwt: JwtService, private config: ConfigService, private tokenRepository: Repository<Token>) {}
+    constructor(private jwt: JwtService, private config: ConfigService) {}
 
     public async getUserIntra(token) {
         const axios = require('axios');
