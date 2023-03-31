@@ -45,4 +45,7 @@ export class User {
 
     @OneToMany(type => Message , message => message.user)
     messages: Message[];
+
+    @Column({nullable: true})
+    secret2FA: string;
 }
