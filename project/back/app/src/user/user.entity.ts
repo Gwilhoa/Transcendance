@@ -1,6 +1,7 @@
 import { Channel } from 'src/channel/channel.entity';
 import { Message } from 'src/channel/message.entity';
 import { Column, Double, Entity, JoinTable, ManyToMany, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
+import { RequestFriend } from './requestfriend.entity';
 
 export enum Status {
     CONNECTED = 0,
@@ -45,4 +46,10 @@ export class User {
 
     @OneToMany(type => Message , message => message.user)
     messages: Message[];
+
+    @OneToMany(type => RequestFriend, request => request.sender)
+    requests: RequestFriend[];
+
+    @OneToMany(type => RequestFriend, request => request.receiver)
+    requestsReceived: RequestFriend[];
 }

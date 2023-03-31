@@ -4,6 +4,7 @@ import { UserService } from './user.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from '../auth/guard/jwt.guard';
 import { GetUser } from '../auth/decorator/auth.decorator';
+import { rmSync } from 'fs';
 
 @UseGuards(JwtAuthGuard)
 @Controller('user')
@@ -18,12 +19,13 @@ export class UserController {
 
   @Get('/id')
   async findOne(@GetUser('sub') id: string, @Res() response): Promise<User> {
-    console.log("id : " + id);
     var ret = await this.userService.getUserById(id);
     if (ret == null) {
       response.status(204).send('No Content');
+      return;
     }
-    return this.userService.getUserById(id);
+    response.status(200).send(ret);
+    return;
   }
 
   @Get('/image')
@@ -85,6 +87,17 @@ export class UserController {
     response.status(200).send(ret);
   }
 
+  @Get('/friendrequest')
+  async getFriendRequests(@GetUser('sub') id: string, @Res() response) {
+    var ret = await this.userService.getFriendRequests(id);
+    if (ret == null) {
+      response.status(204).send('No Friend Requests');
+      return;
+    }
+    response.status(200).send(ret);
+    return;
+  }
+
   @Post('/blocked')
   async addBlocked(@GetUser('sub') id: string, @Body('blocked_id') blocked_id: string, @Res() response) {
     try {
@@ -114,5 +127,6 @@ export class UserController {
       return;
     }
     response.status(200).send(ret);
+    return;
   }
 }

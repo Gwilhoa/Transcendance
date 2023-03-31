@@ -74,13 +74,6 @@ services:
 #./project/front/ts
 
 volumes:
-  temp:
-    driver: local
-    driver_opts:
-       type: none
-       device: ./tempfront
-       o: bind
-       #./project/front/ts
   transcendance_db:
     driver: local
     driver_opts:

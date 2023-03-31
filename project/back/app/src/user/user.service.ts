@@ -155,4 +155,15 @@ export class UserService {
         }
         return user.joinedChannels;
     }
+
+    public async getFriendRequests(id: string) {
+        const user = await this.userRepository.createQueryBuilder("user")
+          .leftJoinAndSelect("user.friendRequests", "friendRequests")
+          .where("user.id = :id", { id })
+          .getOne();
+        if (!user) {
+          return null;
+        }
+        return user.requestsReceived;
+    }
 }
