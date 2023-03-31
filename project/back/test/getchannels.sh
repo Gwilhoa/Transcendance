@@ -1,0 +1,1 @@
+curl http://localhost:6200/channel -H "authorization: bearer $ACCESS_TOKEN"

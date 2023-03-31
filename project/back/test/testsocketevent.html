@@ -1,10 +1,32 @@
-<script>
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Test WebSocket</title>
+    <script src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script>
+  </head>
+  <body>
+    <div id="messages"></div>
+    <input type="text" id="message-input" />
+    <button id="send-button">Envoyer</button>
+    <script>
+      const socket = io('http://localhost:6200');
 
-const socket = new WebSocket('ws://localhost:6200');
-socket.addEventListener('open', () => {
-  console.log('WebSocket connection established.');
-});
-socket.addEventListener('message', (event) => {
-  console.log('Received message:', event.data);
-});
-</script>
+      const messagesDiv = document.getElementById('messages');
+      const messageInput = document.getElementById('message-input');
+      const sendButton = document.getElementById('send-button');
+
+      sendButton.addEventListener('click', () => {
+        const message = messageInput.value;
+        socket.emit('events', message);
+        messageInput.value = '';
+      });
+
+      socket.on('msgToClient', (message) => {
+        const messageElement = document.createElement('div');
+        messageElement.innerText = message;
+        messagesDiv.appendChild(messageElement);
+      });
+    </script>
+  </body>
+</html>
