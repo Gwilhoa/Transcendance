@@ -1,27 +1,10 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import logo from './logo.svg';
+import { BrowserRouter, Routes, Route} from "react-router-dom";
 import './App.css';
-import Begin from './components/begin'
-
-
-import { ReactNode } from "react";
-
-type Props = {
-  children: ReactNode;
-};
-
-function Template(props: Props) {
-  return (
-    <div>
-      <header>Header goes here</header>
-      <main>{props.children}</main>
-      <footer>Footer goes here</footer>
-    </div>
-  );
-}
-
-
+import Template from './template/template'
+import Chat from './components/chat'
+import Game from './components/game'
+import Profil from './components/profil'
+import Historic from "./components/historic";
 
 const Authentificate = () => {
     return (<div className="App">
@@ -44,18 +27,13 @@ const Authentificate = () => {
 };
 
 
-const Chat = () => {
+const maBiteEstGrosse = () => {
 	return (
 		<Template>
-			<h1> sfsdsfs </h1>
+			<h1> Bite </h1>
 		</Template>
 
 	)
-
-}
-
-const maBiteEstGrosse = () => {
-	return (null)
 }
 
 
@@ -66,6 +44,9 @@ function App() {
 			<Route path="/" Component={Authentificate} />
 			<Route path="/chat" Component={Chat} />
 			<Route path="/accueil" Component={maBiteEstGrosse} />
+      <Route path="/game" Component={Game} />
+			<Route path="/historic" Component={Historic} />
+      <Route path="/profil" Component={Profil} />
 		</Routes>
 	</BrowserRouter>
   );
