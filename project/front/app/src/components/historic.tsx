@@ -83,10 +83,8 @@ const Historic = () => {
     return (
         <Template>
             <div className="scrollBlock">
-
                 <Add/>
             </div>
-    
         </Template>
     );
   }
