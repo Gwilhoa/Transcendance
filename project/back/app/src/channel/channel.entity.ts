@@ -1,5 +1,6 @@
 import { User } from "src/user/user.entity";
 import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Message } from "./message.entity";
 
 export enum Type {
     PRIVATE_CHANNEL = 0,
@@ -24,6 +25,9 @@ export class Channel {
     @ManyToMany(type => User, user => user.bannedChannels)
     @JoinTable({ name: 'channels_banned_users', joinColumn: { name: 'channel_id' }, inverseJoinColumn: { name: 'user_id' } })
     bannedUsers: User[];
+
+    @OneToMany(type => Message, message => message.channel, {cascade: true, eager: true})
+    messages: Message[];
 
     @Column()
     name: string;

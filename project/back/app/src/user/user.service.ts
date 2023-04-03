@@ -144,4 +144,15 @@ export class UserService {
         }
         return user.blockedUsers;
     }
+
+    public async getChannels(id: string) {
+        const user = await this.userRepository.createQueryBuilder("user")
+          .leftJoinAndSelect("user.joinedChannels", "channels")
+          .where("user.id = :id", { id })
+          .getOne();
+        if (!user) {
+          return null;
+        }
+        return user.joinedChannels;
+    }
 }

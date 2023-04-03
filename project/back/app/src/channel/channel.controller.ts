@@ -25,14 +25,24 @@ export class ChannelController {
         return await this.channelService.leaveChannel(body);
     }
 
-    @Post('addAdmin')
+    @Post('admin')
     async addAdmin(@Body() body) {
         return await this.channelService.addAdmin(body);
     }
 
-    @Post('removeAdmin')
-    async removeAdmin(@Body() body) {
-        return await this.channelService.removeAdmin(body);
+    @Post('ban')
+    async banUser(@Body() body) {
+        return await this.channelService.banUser(body);
+    }
+
+    @Get('message')
+    async getMessages(@Body() body) {
+        return await this.channelService.getMessage(body.channel_id);
+    }
+
+    @Post('message')
+    async createMessage(@Body() body) {
+        return await this.channelService.sendMessage(body);
     }
 
 }
