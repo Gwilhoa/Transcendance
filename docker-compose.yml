@@ -70,6 +70,11 @@ services:
 #       type: none
 #       device: ./device
 #       o: bind
+#./project/front/ts
+
+volumes:
+  temp:
+  transcendance_db:
 
 networks:
   transnet:

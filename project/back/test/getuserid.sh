@@ -1,0 +1,1 @@
+curl http://localhost:6200/user/id -H "authorization: bearer $ACCESS_TOKEN"

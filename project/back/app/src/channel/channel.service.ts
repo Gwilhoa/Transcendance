@@ -13,7 +13,7 @@ import { Message } from './message.entity';
 
 @Injectable()
 export class ChannelService {
-    constructor(@InjectRepository(Channel) private channelRepository: Repository<Channel>, @InjectRepository(User) private userRepository: Repository<User>) {}
+    constructor(@InjectRepository(Channel) private channelRepository: Repository<Channel>, private readonly userService : UserService) {}
 
     public async createChannel(body : CreateChannelDto) {
         var chan = new Channel();
@@ -23,7 +23,8 @@ export class ChannelService {
         chan.users = [];
         chan.type = body.type;
         console.log(body);
-        var user = await this.userRepository.findOneBy({id : body.creator_id});
+        var user = await this.userService.getUserById(body.creator_id);
+        console.log(body.creator_id);
         if (user == null)
             return null;
         chan.users.push(user);
@@ -41,8 +42,8 @@ export class ChannelService {
         chan.bannedUsers = [];
         chan.users = [];
         chan.type = Type.MP_CHANNEL;
-        var user = await this.userRepository.findOneBy({id : friend_id});
-        var user1 = await this.userRepository.findOneBy({id : friend_id1});
+        var user = await this.userService.getUserById(friend_id);
+        var user1 = await this.userService.getUserById(friend_id1);
         chan.users.push(user);
         chan.users.push(user1);
         await this.channelRepository.save(chan);
@@ -57,7 +58,7 @@ export class ChannelService {
         var chan = await this.channelRepository.findOneBy({id : body.channel_id});
         if (chan == null)
             return null;
-        var user = await this.userRepository.findOneBy({id : body.user_id});
+        var user = await this.userService.getUserById(body.user_id);
         if (user == null)
             return null;
         if (chan.type == Type.PROTECTED_CHANNEL && chan.pwd != body.password)
@@ -73,14 +74,14 @@ export class ChannelService {
         var chan = await this.channelRepository.findOneBy({id : body.channel_id});
         if (chan == null)
             return null;
-        var user = await this.userRepository.findOneBy({id : body.user_id});
+        var user = await this.userService.getUserById(body.user_id);
         if (user == null)
             return null;
         chan.users = chan.users.filter((u) => u.id != user.id);
     }
 
     public async addAdmin(body: addAdminDTO) {
-        var user = await this.userRepository.findOneBy({id : body.user_id});
+        var user = await this.userService.getUserById(body.user_id);
         if (user == null)
             return null;
         var chan = await this.channelRepository.findOneBy({id : body.channel_id});
@@ -92,7 +93,8 @@ export class ChannelService {
     }
 
     public async banUser(body: addAdminDTO) {
-        var user = await this.userRepository.findOneBy({id : body.user_id});
+        var user = await this.userService.getUserById(body.user_id);
+
         if (user == null)
             return null;
         var chan = await this.channelRepository.findOneBy({id : body.channel_id});
@@ -115,7 +117,7 @@ export class ChannelService {
         var message = new Message;
         message.content = body.content;
         message.date = new Date;
-        var user = await this.userRepository.findOneBy({id : body.user_id});
+        var user = await this.userService.getUserById(body.user_id);
         if (user == null)
             return null;
         

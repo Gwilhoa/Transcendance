@@ -1,12 +1,9 @@
 import { Channel } from 'src/channel/channel.entity';
 import { Message } from 'src/channel/message.entity';
 import { Column, Double, Entity, JoinTable, ManyToMany, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
+import { RequestFriend } from './requestfriend.entity';
 
-export enum Status {
-    CONNECTED = 0,
-    DISCONNECTED = 1,
-    IN_GAME = 2,
-}
+
 @Entity({name: 'users'})
 export class User {
 
@@ -21,9 +18,6 @@ export class User {
 
     @Column({default: 0})
     experience: number;
-
-    @Column({default: 0})
-    status : Status;
 
     @ManyToMany(type => User, user => user.friends)
     @JoinTable({ name: 'friends', joinColumn: { name: 'user_id' }, inverseJoinColumn: { name: 'friend_id' } })
@@ -45,4 +39,13 @@ export class User {
 
     @OneToMany(type => Message , message => message.user)
     messages: Message[];
+    
+    @OneToMany(type => RequestFriend, request => request.sender)
+    requests: RequestFriend[];
+    
+    @OneToMany(type => RequestFriend, request => request.receiver)
+    requestsReceived: RequestFriend[];
+    
+        @Column({nullable: true})
+        secret2FA: string;
 }
