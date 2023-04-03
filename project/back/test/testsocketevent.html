@@ -1,32 +1,42 @@
 <!DOCTYPE html>
 <html>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.min.js" integrity="sha512-AI5A3zIoeRSEEX9z3Vyir8NqSMC1pY7r5h2cE+9J6FLsoEmSSGLFaqMQw8SWvoONXogkfFrkQiJfLeHLz3+HOg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
   <head>
-    <meta charset="UTF-8">
-    <title>Test WebSocket</title>
-    <script src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script>
+    <meta charset="UTF-8" />
+    <title>WebSocket Test</title>
   </head>
   <body>
-    <div id="messages"></div>
-    <input type="text" id="message-input" />
-    <button id="send-button">Envoyer</button>
+    <h1>WebSocket Test</h1>
+    <script src="/socket.io/socket.io.js"></script>
     <script>
+      // Connect to the WebSocket server
       const socket = io('http://localhost:6200');
 
-      const messagesDiv = document.getElementById('messages');
-      const messageInput = document.getElementById('message-input');
-      const sendButton = document.getElementById('send-button');
+      socket.addEventListener('open', (event) => {
+      console.log('Connected to WebSocket server');
 
-      sendButton.addEventListener('click', () => {
-        const message = messageInput.value;
-        socket.emit('events', message);
-        messageInput.value = '';
+      // Envoie un message d'identification avec l'identifiant unique
+      const clientId = 92000;
+      socket.send(JSON.stringify({ type: 'identify', clientId }));
+    });
+
+
+      // Listen for incoming friendRequest messages
+      socket.on('friendRequest', (payload) => {
+        console.log(`Received friend request from ${payload.from} to ${payload.to}`);
       });
 
-      socket.on('msgToClient', (message) => {
-        const messageElement = document.createElement('div');
-        messageElement.innerText = message;
-        messagesDiv.appendChild(messageElement);
-      });
+      // Send a friendRequest message to the server
+      function sendFriendRequest() {
+        const payload = {
+          from: 'Alice',
+          to: 'Bob'
+        };
+        socket.emit('friendRequest', payload);
+        console.log(`Sent friend request from ${payload.from} to ${payload.to}`);
+      }
     </script>
+    <button onclick="sendFriendRequest()">Send Friend Request</button>
   </body>
 </html>

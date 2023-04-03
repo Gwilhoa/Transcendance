@@ -19,15 +19,9 @@ export class AuthController {
       }
       var user = await this.userService.createUsers(id.code);
 
-      // return (this.authService.signJwtToken(parseInt(user.id), user.email))
-      // console.log("Jwt : " + await this.authService.signJwtToken(parseInt(user.id), user.email));
       res.status(200).send(await this.authService.signJwtToken(parseInt(user.id), user.email));
       return;
-      // res.redirect('http://localhost:6200?code=' + await this.authService.signJwtToken(parseInt(user.id), user.email));
-      // res.redirect('https://intra.42.fr?code=comingSoon');
-      //res.redirect('https://intra.42.fr');
-      //res.status(200).send('OK');
-      //return id;
+
     }
 
 }
