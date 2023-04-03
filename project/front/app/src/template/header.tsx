@@ -1,7 +1,24 @@
 import { Link } from "react-router-dom";
 import './template.css'
+import PopupChat from "../popup/popupChat"
+import { useState } from "react";
+import PopupHisto from "../popup/popupHisto"
+
 
 const Head = () => {
+  const [showPopupChat, setShowPopupChat] = useState(false);
+  
+    const handlePopupCloseChat = () => {
+      setShowPopupChat(false);
+    };
+
+    const [showPopupHisto, setShowPopupHisto] = useState(false);
+  
+    const handlePopupCloseHisto = () => {
+      setShowPopupHisto(false);
+    };
+
+
     return (
           <div className="navbar">
           <div className="title">
@@ -11,17 +28,19 @@ const Head = () => {
             <Link to="/accueil" className="navbar__link">
               Accueil
             </Link>
-            <Link to="/chat" className="navbar__link">
-              Chat
-            </Link>
+            <button onClick={() => setShowPopupChat(true)} className="navbar__link">
+              <h3>Chat</h3>
+            </button>
+            {showPopupChat && <PopupChat onClose={handlePopupCloseChat} />}
             <Link to="/game" className="navbar__link">
               Jeu
             </Link>
-            <Link to="/historic" className="navbar__link">
-              Historique
-            </Link>
+            <button onClick={() => setShowPopupHisto(true)} className="navbar__link">
+              <h3>Historique</h3>
+            </button>
+            {showPopupHisto && <PopupHisto onClose={handlePopupCloseHisto} />}
             <Link to="/profil" className="navbar__link">
-              Profil
+              Profile
             </Link>
           </div>
           </div>

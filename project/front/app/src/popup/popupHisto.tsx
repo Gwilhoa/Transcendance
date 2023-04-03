@@ -1,26 +1,10 @@
 import Template from "../template/template"
-import './historic.css'
-import styled from "styled-components";
-
-interface ContainerProps {
-  maxHeight?: number;
-}
+import './popupHisto.css'
 
 
-const Container = styled.div<ContainerProps>`
-  max-height: ${({ maxHeight }) => (maxHeight ? `${maxHeight}px` : 'auto')};
-  overflow-y: auto;
-`;
-
-interface Props {
-  children: React.ReactNode;
-  maxHeight?: number;
-}
-
-const ScrollableContainer: React.FC<Props> = ({ children, maxHeight }) => {
-  return <Container maxHeight={maxHeight}>{children}</Container>;
+type PopupProps = {
+    onClose: () => void;
 };
-
 
 interface Score {
     ennemy: string;
@@ -55,6 +39,7 @@ const Add = () => {
         { ennemy: "Xav Niel", scoreEnnemy: 0, scoreMe: 100 },
 
       ];;
+    ////// REMPLIR LIST OF SCORE AVEC LES VRAIS SCORES ///////////
     
     for (let i = 0; i < ListOfScore.length; i++) {
         if (ListOfScore[i].scoreMe > ListOfScore[i].scoreEnnemy) {
@@ -79,14 +64,21 @@ const Add = () => {
         return <div className="score-board">{blocks}</div>;
 }
 
-const Historic = () => {
+const PopupHisto: React.FC<PopupProps> = ({ onClose }) => {
     return (
-        <Template>
+        <div className="popup left">
+             <header className="popup_up">
+                <button className="close-button" onClick={onClose}> X </button>
+                <div className="texte">
+                    {"Historique"}
+                </div>
+            </header>
             <div className="scrollBlock">
                 <Add/>
             </div>
-        </Template>
+    
+        </div>
     );
   }
 
-  export default Historic
+  export default PopupHisto

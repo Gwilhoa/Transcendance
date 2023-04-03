@@ -1,9 +1,13 @@
+@import url("popupTemplate.css");
+
 .score-board {
     display: flex;
     flex-direction: column;
     align-items: center;
   }
   
+
+
   .score-block {
     display: flex;
     flex-direction: column;
@@ -29,6 +33,10 @@
 
   .scrollBlock {
     overflow: auto;
-    max-height: 70vh;
+    max-height: 94%;
     background-color: #515151;
   }
+
+  .popup.right {
+    right: 0;
+}

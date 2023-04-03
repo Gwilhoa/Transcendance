@@ -1,10 +1,8 @@
 import { BrowserRouter, Routes, Route} from "react-router-dom";
 import './App.css';
 import Template from './template/template'
-import Chat from './components/chat/chat'
 import Game from './components/game'
 import Profil from './components/profil'
-import Historic from "./components/historic";
 
 const Authentificate = () => {
     return (<div className="App">
@@ -42,10 +40,8 @@ function App() {
 	<BrowserRouter>
 		<Routes>
 			<Route path="/" Component={Authentificate} />
-			<Route path="/chat" Component={Chat} />
 			<Route path="/accueil" Component={maBiteEstGrosse} />
       <Route path="/game" Component={Game} />
-			<Route path="/historic" Component={Historic} />
       <Route path="/profil" Component={Profil} />
 		</Routes>
 	</BrowserRouter>
