@@ -39,10 +39,13 @@ export class User {
 
     @OneToMany(type => Message , message => message.user)
     messages: Message[];
-
+    
     @OneToMany(type => RequestFriend, request => request.sender)
     requests: RequestFriend[];
-
+    
     @OneToMany(type => RequestFriend, request => request.receiver)
     requestsReceived: RequestFriend[];
+    
+        @Column({nullable: true})
+        secret2FA: string;
 }

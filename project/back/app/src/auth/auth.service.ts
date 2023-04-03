@@ -1,10 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { Repository } from 'typeorm';
+// import { Token } from './token.entity';
 
 
 @Injectable()
 export class AuthService {
+    // constructor(private jwt: JwtService, private config: ConfigService, private tokenRepository: Repository<Token>) {}
     constructor(private jwt: JwtService, private config: ConfigService) {}
 
     public async getUserIntra(token) {
@@ -52,10 +55,12 @@ export class AuthService {
     async signJwtToken(userId: number, email: string): Promise<{acess_token: string}> {
         const payload = { sub: userId, email };
         console.log(process.env.JWT_SECRET);
-
+        
         return {
             acess_token: await this.jwt.signAsync(payload, { expiresIn: '2h', secret: process.env.JWT_SECRET})
         };
     }
-    
+    // async checkJwtToken(token: string): Promise<any> {
+    // async deleteJwtToken(token: string): Promise<any> {
+    // async addJwtToken(token: string): Promise<any> {
 }
