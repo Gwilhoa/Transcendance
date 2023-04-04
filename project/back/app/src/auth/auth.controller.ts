@@ -2,7 +2,11 @@ import { Body, Controller, Get, Query, Redirect, Req, Res, UseGuards } from '@ne
 import { UserService } from '../user/user.service';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guard/jwt.guard';
+import { GetUser } from './decorator/auth.decorator';
 import { AuthGuard } from '@nestjs/passport';
+import { authenticator, totp } from 'otplib';
+import { toDataURL } from 'qrcode';
+
 
 @Controller('auth')
 export class AuthController {
@@ -29,16 +33,21 @@ export class AuthController {
 
     }
 
-    // @UseGuards(JwtAuthGuard)
-    // @Get('2fa/create')
-    // async create2fa(@Res() res) {
-    //   const newSecret = twofactor.generateSecret({ name: "Transcendance", account: "oui" });
-    //   response.status(200).send(newSecret.qr);
-    //   if (verify) {
-    //     // user secret 2fa = newSecret.secret;
-    //   }
+    @UseGuards(JwtAuthGuard)
+    @Get('2fa/create')
+    async create2fa(@GetUser() user ,@Res() res) {
+      const secret = authenticator.generateSecret(); // TODO : check if await is needed
 
-    // }
+      const otpauthUrl = authenticator.keyuri(user.email, 'Transcendence', secret); // TODO : check if await is needed
+  
+      await await this.userService.set2FASecret(secret, user.sub);
+      res.redirect(await toDataURL(otpauthUrl));
+      // return {
+      //   secret,
+      //   otpauthUrl
+      // }
+    }
+    // https://dev.to/hahnmatthieu/2fa-with-nestjs-passeport-using-google-authenticator-1l32
 
     // @UseGuards(JwtAuthGuard)
     // @Post('logout')

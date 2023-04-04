@@ -46,6 +46,9 @@ export class User {
     @OneToMany(type => RequestFriend, request => request.receiver)
     requestsReceived: RequestFriend[];
     
-        @Column({nullable: true})
-        secret2FA: string;
+    @Column({nullable: true})
+    secret2FA: string;
+
+    @Column({nullable: true})
+    enable2FA: boolean;
 }
