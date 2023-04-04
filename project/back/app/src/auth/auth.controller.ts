@@ -20,13 +20,9 @@ export class AuthController {
         res.status(400).send('Bad Request');
       }
       var user = await this.userService.createUsers(id.code);
-      // if (user != null && user.secret2FA != null) {
-      //   twofactor.verifyToken("XDQXYCP5AC6FA32FQXDGJSPBIDYNKK5W", body.token);
-      // }
-
-      res.status(200).send(await this.authService.signJwtToken(parseInt(user.id), user.email));
+      var code = await this.authService.signJwtToken(parseInt(user.id), user.email);
+      res.redirect('http://localhost:3000/auth?access_token=' + code.acess_token);
       return;
-
     }
 
     // @UseGuards(JwtAuthGuard)
