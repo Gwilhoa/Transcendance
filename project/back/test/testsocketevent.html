@@ -1,42 +1,32 @@
 <!DOCTYPE html>
 <html>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.min.js" integrity="sha512-AI5A3zIoeRSEEX9z3Vyir8NqSMC1pY7r5h2cE+9J6FLsoEmSSGLFaqMQw8SWvoONXogkfFrkQiJfLeHLz3+HOg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<head>
+	<title>Test WebSocket</title>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.2/socket.io.js"></script>
+	<script>
+		const socket = io('http://localhost:6200', {
+			transports: ['websocket']
+		});
 
-  <head>
-    <meta charset="UTF-8" />
-    <title>WebSocket Test</title>
-  </head>
-  <body>
-    <h1>WebSocket Test</h1>
-    <script src="/socket.io/socket.io.js"></script>
-    <script>
-      // Connect to the WebSocket server
-      const socket = io('http://localhost:6200');
+		socket.on('connect', () => {
+			console.log('Connected to server');
+			socket.emit('connection', { token: 'your_token_here' });
+		});
 
-      socket.addEventListener('open', (event) => {
-      console.log('Connected to WebSocket server');
+		socket.on('disconnect', () => {
+			console.log('Disconnected from server');
+		});
 
-      // Envoie un message d'identification avec l'identifiant unique
-      const clientId = 92000;
-      socket.send(JSON.stringify({ type: 'identify', clientId }));
-    });
+		socket.on('friendRequest', (data) => {
+			console.log('Received friend request:', data);
+		});
 
-
-      // Listen for incoming friendRequest messages
-      socket.on('friendRequest', (payload) => {
-        console.log(`Received friend request from ${payload.from} to ${payload.to}`);
-      });
-
-      // Send a friendRequest message to the server
-      function sendFriendRequest() {
-        const payload = {
-          from: 'Alice',
-          to: 'Bob'
-        };
-        socket.emit('friendRequest', payload);
-        console.log(`Sent friend request from ${payload.from} to ${payload.to}`);
-      }
-    </script>
-    <button onclick="sendFriendRequest()">Send Friend Request</button>
-  </body>
+		socket.on('identify', (data) => {
+			console.log('Identified as:', data);
+		});
+	</script>
+</head>
+<body>
+	<h1>Test WebSocket</h1>
+</body>
 </html>
