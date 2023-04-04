@@ -1,0 +1,36 @@
+.navbar {
+    background-color: #333;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 10vh;
+    padding: 0 20px;
+  }
+  
+  .title h3 {
+    color: #fff;
+  }
+  
+  .navbar__link {
+    color: #fff;
+    text-decoration: none;
+    background-color: #333;
+    border: none;
+    cursor: pointer;
+    margin-right: 40px;
+  }
+
+  .footer {
+    background-color: #333;
+    height: 6vh;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .form-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80vh;
+    margin: 0 auto;
+}
