@@ -25,7 +25,9 @@ export enum Status {
 
  
  export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
-  constructor(private userService: UserService, private authService: AuthService) {}
+  constructor(private userService: UserService, private authService: AuthService) {
+    this.clients.set("1", "test");
+  }
 
 
 
@@ -42,23 +44,29 @@ export enum Status {
   
    async handleConnection(client: Socket, ...args: any[]) {
      this.logger.log(`Client connected: ${client.id}`);
+     var id;
      client.on('connection', (data) => {
        this.logger.log(`Received data from client: ${data.token}`);
-       console.log(data.token);
-       var id = this.authService.getIdFromToken(data.token);
-       console.log(id);
+       id = this.authService.getIdFromToken(data.token);
        this.clients.set(client.id, id);
+       var sendserver = {
+        "connected" : id,
+      }
+      this.server.emit('connection_server', sendserver);
      });
+     var list = [];
+      this.clients.forEach((value, key) => {
+        list.push(value);
+      });
      var sendclient = {
-        "connected": this.clients.keys(),
+        "connected": list,
         "inGame": []
      }
-     var sendserver = {
-        "connected" : identity
-     }
-     client.emit('connection', sendclient)
-     this.server.emit('connection', sendserver);
+     console.log(id);
+     client.emit('connection_client', sendclient)
     }
+
+
   @WebSocketServer() server: Server;
   private logger: Logger = new Logger('EventsGateway');
  
