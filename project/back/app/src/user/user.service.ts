@@ -166,4 +166,11 @@ export class UserService {
         }
         return user.requestsReceived;
     }
+
+    public async set2FASecret(secret: string, id: string){
+        const user = await this.userRepository.findOneBy({id : id});
+        user.secret2FA = secret;
+        await this.userRepository.save(user);   // TODO: par sur demander a gchatain
+        return null;
+    }
 }
