@@ -10,6 +10,7 @@ import {
  import { Socket, Server } from 'socket.io';
 import { UserService } from 'src/user/user.service';
 import { GetUser } from 'src/auth/decorator/auth.decorator';
+import { AuthService } from 'src/auth/auth.service';
 export enum Status {
   CONNECTED = 0,
   DISCONNECTED = 1,
@@ -23,7 +24,7 @@ export enum Status {
 
  
  export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
-  constructor(private userService: UserService) {}
+  constructor(private userService: UserService, private authService: AuthService) {}
 
 
 
@@ -38,7 +39,8 @@ export enum Status {
      this.clients.delete(client.id);
    }
  
-   getUseridByToken(@GetUser('sub') id: string) {
+   async getUseridByToken(id: string) {
+      ;
      return id;
    }
   
@@ -46,9 +48,10 @@ export enum Status {
      this.logger.log(`Client connected: ${client.id}`);
      
      client.on('connection', (data) => {
-       this.logger.log(`Received data from client: ${data}`);
+       this.logger.log(`Received data from client: ${data.token}`);
        console.log(data.token);
-       var ret = this.getUseridByToken(data.token);
+       var ret = this.authService.getIdFromToken(data.token);
+       console.log(ret);
        this.clients.set(ret, client.id);
      });
     }

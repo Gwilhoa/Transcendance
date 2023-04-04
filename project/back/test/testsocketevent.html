@@ -10,7 +10,7 @@
 
 		socket.on('connect', () => {
 			console.log('Connected to server');
-			socket.emit('connection', { token: 'your_token_here' });
+			socket.emit('connection', { token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjkyMDAwLCJlbWFpbCI6ImdjaGF0YWluQHN0dWRlbnQuNDJseW9uLmZyIiwiaWF0IjoxNjgwNjE1ODIwLCJleHAiOjE2ODA2MjMwMjB9.sUkrYGkXfcemxwGmsYO2cUPTFkIZ32u5yH0nYDBzuME' });
 		});
 
 		socket.on('disconnect', () => {
