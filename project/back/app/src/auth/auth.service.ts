@@ -60,6 +60,11 @@ export class AuthService {
             acess_token: await this.jwt.signAsync(payload, { expiresIn: '2h', secret: process.env.JWT_SECRET})
         };
     }
+
+    getIdFromToken(token: string) {
+        const payload = this.jwt.verify(token, { secret: process.env.JWT_SECRET});
+        return payload.sub;
+    }
     // async checkJwtToken(token: string): Promise<any> {
     // async deleteJwtToken(token: string): Promise<any> {
     // async addJwtToken(token: string): Promise<any> {

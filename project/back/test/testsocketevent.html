@@ -10,19 +10,24 @@
 
 		socket.on('connect', () => {
 			console.log('Connected to server');
-			socket.emit('connection', { token: 'your_token_here' });
+			socket.emit('connection', { token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjkyMDAwLCJlbWFpbCI6ImdjaGF0YWluQHN0dWRlbnQuNDJseW9uLmZyIiwiaWF0IjoxNjgwNjMxMjQzLCJleHAiOjE2ODA2Mzg0NDN9.dJx1YNtxGz3SbCFJhvtXuBQppgZYPP2GpnKX0GCXeEI' });
 		});
 
 		socket.on('disconnect', () => {
 			console.log('Disconnected from server');
 		});
 
-		socket.on('friendRequest', (data) => {
-			console.log('Received friend request:', data);
+		socket.on('connection_client', (data) => {
+			console.log('Connected clients:', data.connected);
+			console.log('Clients in game:', data.inGame);
 		});
 
-		socket.on('identify', (data) => {
-			console.log('Identified as:', data);
+		socket.on('connection_server', (data) => {
+			console.log('new connected', data);
+		});
+
+		socket.on('friendRequest', (data) => {
+			console.log('Received friend request:', data);
 		});
 	</script>
 </head>

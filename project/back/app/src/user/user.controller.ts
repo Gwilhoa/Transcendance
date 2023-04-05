@@ -28,6 +28,16 @@ export class UserController {
     return;
   }
 
+  @Get('/id/:id')
+  async findOneById(@Param('id') iduser: string, @Res() response, @GetUser('sub') ud) {
+    var ret = await this.userService.getUserById(iduser);
+    if (ret == null) {
+      response.status(204).send('No Content');
+      return;
+    }
+    response.status(200).send(ret);
+    return;
+  }
   @Get('/image')
   async getImage(@GetUser('sub') id: string, @Res() response) {
     const path = await this.userService.getImageById(id);

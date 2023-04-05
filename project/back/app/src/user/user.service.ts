@@ -5,11 +5,36 @@ import { Repository } from 'typeorm';
 import { User } from './user.entity';
 import fetch from 'node-fetch';
 import { use } from 'passport';
+import { RequestFriend } from './requestfriend.entity';
 
 
 @Injectable()
 export class UserService {
     constructor(@InjectRepository(User) private userRepository: Repository<User>, private authService: AuthService) {}
+
+    public asfriendrequestby(user: User, friend: User) {
+        if (user.requestsReceived == null) {
+            return false;
+        }
+        for (var i = 0; i < user.requestsReceived.length; i++) {
+            if (user.requestsReceived[i].sender.id == friend.id) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public isfriend(user: User, friend: User) {
+        if (user.friends == null) {
+            return false;
+        }
+        for (var i = 0; i < user.friends.length; i++) {
+            if (user.friends[i].id == friend.id) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     public async createUsers(code) {
         const retIntra =  await this.authService.getIntraToken(code);
@@ -167,10 +192,42 @@ export class UserService {
         return user.requestsReceived;
     }
 
-    public async set2FASecret(secret: string, id: string){
-        const user = await this.userRepository.findOneBy({id : id});
-        user.secret2FA = secret;
-        await this.userRepository.save(user);   // TODO: par sur demander a gchatain
-        return null;
+    public async addFriendRequest(id: string, friend_id: string) {
+        var user = await this.userRepository.findOneBy({id : id});
+        var friend = await this.userRepository.findOneBy({id : friend_id});
+        if (user == null || friend == null) {
+            throw new Error('User not found');
+        }
+        if (user == friend) {
+            throw new Error('Cannot add yourself as a friend');
+        }
+        if (!user.requestsReceived) {
+            user.requestsReceived = [];
+        }
+        var friendrequest = new RequestFriend();
+        friendrequest.sender = user;
+        friendrequest.receiver = friend;
+        user.requestsReceived.push(friendrequest);
+        await this.userRepository.save(user);
+        await this.userRepository.save(friend);
+        return user;
+    }
+
+    public async removeFriendRequest(id: string, friend_id: string) {
+        var user = await this.userRepository.findOneBy({id : id});
+        var friend = await this.userRepository.findOneBy({id : friend_id});
+        if (user == null || friend == null) {
+            return null;
+        }
+        if (user == friend) {
+            return null;
+        }
+        if (!user.requestsReceived || user.requestsReceived.length == 0) {
+            return null;
+        }
+        user.requestsReceived = user.requestsReceived.filter((request) => request.receiver.id != friend.id);
+        await this.userRepository.save(user);
+        await this.userRepository.save(friend);
+        return user;
     }
 }
