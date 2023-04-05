@@ -4,13 +4,13 @@ import App from './App';
 import ReactDOM from 'react-dom';
 import reportWebVitals from './reportWebVitals';
 
-const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
-);
-root.render(
+const rootElement = document.getElementById('root');
+
+ReactDOM.render(
   <React.StrictMode>
     <App />
-  </React.StrictMode>
+  </React.StrictMode>, 
+  rootElement
 );
 
 // If you want to start measuring performance in your app, pass a function
