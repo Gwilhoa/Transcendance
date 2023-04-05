@@ -212,4 +212,22 @@ export class UserService {
         await this.userRepository.save(friend);
         return user;
     }
+
+    public async removeFriendRequest(id: string, friend_id: string) {
+        var user = await this.userRepository.findOneBy({id : id});
+        var friend = await this.userRepository.findOneBy({id : friend_id});
+        if (user == null || friend == null) {
+            return null;
+        }
+        if (user == friend) {
+            return null;
+        }
+        if (!user.requestsReceived || user.requestsReceived.length == 0) {
+            return null;
+        }
+        user.requestsReceived = user.requestsReceived.filter((request) => request.receiver.id != friend.id);
+        await this.userRepository.save(user);
+        await this.userRepository.save(friend);
+        return user;
+    }
 }

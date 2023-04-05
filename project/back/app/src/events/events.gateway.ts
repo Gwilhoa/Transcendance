@@ -111,13 +111,15 @@ export enum Status {
     }
     else if (this.userService.asfriendrequestby(user, friend))
     {
-      // il faut supprimer la demande d'ami
+      await this.userService.removeFriendRequest(user_id, friend_id);
       if (this.clients[friend_id] != null) {
         var send = {
           "code" : 5,
           "id": user.id
         }
         this.server.sockets[this.clients[friend_id]].emit('friend_request', send);
+        await this.userService.addFriend(user_id, friend_id);
+        await this.userService.addFriend(friend_id, user_id);
       }
       ret = {
         "code": 2
@@ -139,5 +141,7 @@ export enum Status {
     client.emit('friend_code', ret);
   }
 
+
+  
 }
 
