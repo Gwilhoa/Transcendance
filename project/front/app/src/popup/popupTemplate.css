@@ -1,5 +1,5 @@
 :root {
-    --colorside: #5b5b5b;
+    --colorside: #b8b7b7;
 }
 
 .close-button {
@@ -32,5 +32,4 @@
     display: flex;
     justify-content: center;
     text-align: center;
-    
 }

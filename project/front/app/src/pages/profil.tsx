@@ -1,7 +1,42 @@
 import Template from "../template/template"
 import React, { useState } from "react";
-import '../components/profil.css'
 
+interface PersonProps {
+  name: string;
+  photoUrl: string;
+  isMe: boolean;
+  isFriend: boolean;
+}
+
+const Person = ({ name, photoUrl, isMe, isFriend }: PersonProps) => {
+  const [showSettings, setShowSettings] = useState(false);
+
+  const handleSettingsClick = () => {
+    setShowSettings(true);
+  };
+
+  return (
+    <div>
+      <img src={photoUrl} alt={name} />
+      <h2 onClick={handleSettingsClick}>{name}</h2>
+      {showSettings && (
+        <div className="overlay">
+
+        <h1>
+
+          nom={name} /* autres propriétés de la personne */ /
+        </h1>
+        </div>
+      )}
+      {showSettings && <Overlay />}
+    </div>
+  );
+};
+
+
+const Overlay = () => {
+  return <div className="overlay" />;
+};
 
 const CircleImage = () => {
     const [imageUrl, setImageUrl] = useState<string>("https://www.treehugger.com/thmb/9fuOGVoJ23ZwziKRNtAEMHw8opU=/750x0/filters:no_upscale():max_bytes(150000):strip_icc():format(webp)/piglet-grass-dandelions-01-b21d7ef8f881496f8346dbe01859537e.jpg");
@@ -72,6 +107,8 @@ const Profil = () => {
                 <h3>
                     Nom : {name}
                 </h3>
+                <Person name="pigi" photoUrl={myImageUrl} isMe={true} isFriend={false}/>
+                
             </div>
         </Template>
     );
