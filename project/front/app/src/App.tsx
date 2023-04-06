@@ -15,7 +15,6 @@ function App() {
 				<Route path="*" Component={NotFound}/>
 				<Route path="/accueil" Component={Accueil} />
       			<Route path="/game" Component={Game} />
-      			<Route path="/profil" Component={Profil} />
 			</Routes>
 		</BrowserRouter>
 	);

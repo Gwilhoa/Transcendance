@@ -6,19 +6,11 @@ import React, { useState } from "react";
 type Props = {
     children: ReactNode;
 };
-/*
-export const [isClicked, setIsClicked] = useState<boolean>(false);
-
-export const Clicked = () => {
-    setIsClicked(true);
-    const buttons = document.querySelectorAll("button:not(.clicked-button)");
-    buttons.forEach((button) => button.classList.add("disabled-button"));
-};*/
 
 const Template = (props: Props) => {
 
     return (
-      <div /*className={`page ${isClicked ? "page-overlay" : ""}`}*/>
+      <div>
         <header>
             <Head/>
         </header>
