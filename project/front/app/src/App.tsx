@@ -1,5 +1,3 @@
-
-import React from 'react';
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Auth from './pages/Auth';
 import AuthToken from './pages/AuthToken';
@@ -19,7 +17,6 @@ function App() {
 				<Route path="*" Component={NotFound}/>
 				<Route path="/accueil" Component={Accueil} />
       			<Route path="/game" Component={Game} />
-      			<Route path="/profil" Component={Profil} />
 			</Routes>
 		</BrowserRouter>
 	);
