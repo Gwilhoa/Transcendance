@@ -50,6 +50,20 @@ export class ChannelService {
         return chan;
     }
 
+    public async getChannelById(id) {
+        return await this.channelRepository.findOneBy({id : id});
+    }
+
+    public async isInChannel(user_id, channel_id) {
+        var chan = await this.channelRepository.findOneBy({id : channel_id});
+        if (chan == null)
+            return false;
+        var user = await this.userService.getUserById(user_id);
+        if (user == null)
+            return false;
+        return chan.users.includes(user);
+    }
+
     public async getChannels() {
         return await this.channelRepository.find();
     }
