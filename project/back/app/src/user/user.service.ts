@@ -6,6 +6,7 @@ import { User } from './user.entity';
 import fetch from 'node-fetch';
 import { use } from 'passport';
 import { RequestFriend } from './requestfriend.entity';
+import { Type } from 'src/channel/channel.entity';
 
 
 @Injectable()
@@ -273,5 +274,13 @@ export class UserService {
             return false;
         }
         return this.isfriend(user, friend);
+    }
+
+    public async getMpChannels(id: string) {
+        const channels = await this.getChannels(id);
+        if (channels == null) {
+            return null;
+        }
+        return channels.filter((channel) => channel.type == Type.MP_CHANNEL);
     }
 }

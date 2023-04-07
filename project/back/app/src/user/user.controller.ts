@@ -166,5 +166,16 @@ export class UserController {
       return;
     }
     response.status(200).send(ret);
+  }
+
+  @Get('/mpchannel')
+  async getMpChannel(@GetUser('sub') id: string, @Res() response) {
+    var ret = await this.userService.getMpChannels(id);
+    if (ret == null) {
+      response.status(204).send('No Channel');
+      return;
     }
+    response.status(200).send(ret);
+    return;
+  }
 }
