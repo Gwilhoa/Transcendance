@@ -263,4 +263,15 @@ export class UserService {
         }
     }
 
+    public async isfriendReq(id: string, friend_id: string) {
+        var user = await this.userRepository.findOneBy({id : id});
+        var friend = await this.userRepository.findOneBy({id : friend_id});
+        if (user == null || friend == null) {
+            return false;
+        }
+        if (user == friend) {
+            return false;
+        }
+        return this.isfriend(user, friend);
+    }
 }

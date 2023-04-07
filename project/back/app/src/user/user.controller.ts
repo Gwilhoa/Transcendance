@@ -156,5 +156,15 @@ export class UserController {
       return;
     }
     response.status(200).send(ret);
-  }   
+  }
+
+  @Get('isfriend') 
+    async isFriend(@GetUser('sub') id: string, @Body('friend_id') friend_id: string, @Res() response) {
+    var ret = await this.userService.isfriendReq(id, friend_id);
+    if (ret == null) {
+      response.status(204).send('No Content');
+      return;
+    }
+    response.status(200).send(ret);
+    }
 }
