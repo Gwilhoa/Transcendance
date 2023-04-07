@@ -1,5 +1,6 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Auth from './pages/Auth';
+import AuthToken from './pages/AuthToken';
 import NotFound from './pages/NotFound';
 import Game from './pages/game';
 import Accueil from './pages/accueil';
@@ -9,6 +10,7 @@ function App() {
 		<BrowserRouter>
 			<Routes>
 				<Route path="/" Component={Auth}/>
+				<Route path="/auth" Component={AuthToken}/>
 				<Route path="*" Component={NotFound}/>
 				<Route path="/accueil" Component={Accueil} />
       			<Route path="/game" Component={Game} />
