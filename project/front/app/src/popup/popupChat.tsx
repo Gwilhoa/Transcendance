@@ -76,7 +76,7 @@ const getChanels = () => {
   for(let i = 0; i < ListOfChanel.length; i++) {
     chanels.push(
         <div className="chanel">
-          <a href={"#" + ListOfChanel[i]} onClick={() => takeMessagesToBack(ListOfChanel[i])}>
+          <a href={"#a"} onClick={() => takeMessagesToBack(ListOfChanel[i])}>
             {ListOfChanel[i]}
           </a>
         </div>

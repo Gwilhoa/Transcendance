@@ -2,10 +2,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Auth from './pages/Auth';
 import NotFound from './pages/NotFound';
 import Game from './pages/game';
-import Profil from './pages/profil';
 import Accueil from './pages/accueil';
-
-
 
 function App() {
 	return (
