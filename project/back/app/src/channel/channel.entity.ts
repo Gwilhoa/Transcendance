@@ -26,7 +26,7 @@ export class Channel {
     @JoinTable({ name: 'channels_banned_users', joinColumn: { name: 'channel_id' }, inverseJoinColumn: { name: 'user_id' } })
     bannedUsers: User[];
 
-    @OneToMany(type => Message, message => message.channel, {cascade: true, eager: true})
+    @OneToMany(type => Message, message => message.channel)
     messages: Message[];
 
     @Column()

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Res, UseGuards } from '@nestjs/common';
 import { GetUser } from 'src/auth/decorator/auth.decorator';
 import { JwtAuthGuard } from 'src/auth/guard/jwt.guard';
 import { ChannelService } from './channel.service';
@@ -44,14 +44,32 @@ export class ChannelController {
     }
 
     @Get('message')
-    async getMessages(@Body() body, @GetUser('sub') id: string) {
-        return await this.channelService.getMessage(body.channel_id);
+    async getMessages(@Body() body, @GetUser('sub') id: string, @Res() resp) {
+        
+        var ret = null;
+        try {
+            ret = await this.channelService.getMessage(body.channel_id, id);
+        }
+        catch (e) {
+            resp.status(401).send('unauthorized');
+            return;
+        }
+        if (ret == null) {
+            resp.status(204).send('No content');
+            return;
+        }
+        resp.status(200).send(ret);
     }
 
     @Post('message')
     async createMessage(@Body() body, @GetUser('sub') id: string) {
         body.user_id = id;
         return await this.channelService.sendMessage(body);
+    }
+
+    @Post('createmp')
+    async createMp(@Body() body, @GetUser('sub') id: string) {
+        return await this.channelService.createMPChannel(id, body.user_id);
     }
 
 }
