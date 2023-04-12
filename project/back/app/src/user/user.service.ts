@@ -290,4 +290,12 @@ export class UserService {
         await this.userRepository.save(user);
         return null;
     }
+
+    public async turnOn2FA(id: string)
+    {
+        const user = await this.userRepository.findOneBy({id : id});
+        user.enable2FA = true;
+        await this.userRepository.save(user);
+        return null;
+    }
 }

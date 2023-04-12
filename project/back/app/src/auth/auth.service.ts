@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { Repository } from 'typeorm';
+import { authenticator, totp } from 'otplib';
 // import { Token } from './token.entity';
 
 
@@ -52,7 +53,7 @@ export class AuthService {
         }
     }
 
-    async signJwtToken(userId: number, email: string): Promise<{acess_token: string}> {
+    public async signJwtToken(userId: number, email: string): Promise<{acess_token: string}> {
         const payload = { sub: userId, email };
         console.log(process.env.JWT_SECRET);
         
@@ -65,7 +66,11 @@ export class AuthService {
         const payload = this.jwt.verify(token, { secret: process.env.JWT_SECRET});
         return payload.sub;
     }
-    // async checkJwtToken(token: string): Promise<any> {
-    // async deleteJwtToken(token: string): Promise<any> {
-    // async addJwtToken(token: string): Promise<any> {
+
+    public async verify2FA(secret2FA: string, code2FA: string): Promise<boolean> {
+        return authenticator.verify({
+            token: code2FA,
+            secret: secret2FA,
+        });
+    }
 }

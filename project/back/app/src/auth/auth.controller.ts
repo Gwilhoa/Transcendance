@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Query, Redirect, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Query, Redirect, Req, Res, Post, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guard/jwt.guard';
@@ -33,6 +33,8 @@ export class AuthController {
       //return id;
     }
 
+    // TODO : change authenticator
+
     @UseGuards(JwtAuthGuard)
     @Get('2fa/create')
     async create2fa(@GetUser() user ,@Res() res) {
@@ -47,13 +49,41 @@ export class AuthController {
       //   otpauthUrl
       // }
     }
-    // https://dev.to/hahnmatthieu/2fa-with-nestjs-passeport-using-google-authenticator-1l32
+
+    @UseGuards(JwtAuthGuard)
+    @Get('2fa/turnOn')
+    async turnOn2FA(@GetUser('sub') id) {
+      var code2FA = '278'; // TODO : tmp
+      var user = await this.userService.getUserById(id);
+      const isValid: boolean = await this.authService.verify2FA(user.secret2FA, code2FA) // TODO : voir comment on recup le code
+
+      if (!isValid)
+        throw new UnauthorizedException('Wrong two factor authentication code')
+      await this.userService.turnOn2FA(id)
+    }
 
     // @UseGuards(JwtAuthGuard)
-    // @Post('logout')
-    // async logout(@Req() req: Request, @Res() res: Response) {
-    //   req.logout();
-    //   res.redirect('/');
-    // }
+    // @Get('2fa/turnOff')
+
+    @UseGuards(JwtAuthGuard)
+    @Get('2fa/authenticate')
+    async authenticate2FA(@GetUser('sub') id) {
+      var code2FA = '278'; // TODO : tmp
+      var user = await this.userService.getUserById(id);
+      const isValid: boolean = await this.authService.verify2FA(user.secret2FA, code2FA) // TODO : voir comment on recup le code
+
+      if (!isValid)
+        throw new UnauthorizedException('Wrong two factor authentication code')
+      // await this.authService.loginWith2fa(id) // TODO
+    }
+
+    // https://dev.to/hahnmatthieu/2fa-with-nestjs-passeport-using-google-authenticator-1l32
+
+    @UseGuards(JwtAuthGuard)
+    @Post('logout')
+    async logout(@Req() req, @Res() res) {
+      req.logout();
+      res.redirect('/');
+    }
 }
 
