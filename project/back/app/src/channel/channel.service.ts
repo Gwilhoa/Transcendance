@@ -35,19 +35,33 @@ export class ChannelService {
         return chan;
     }
 
-    public async createMPChannel(friend_id, friend_id1) {
+    public async createMPChannel(user_id, user_id1) {
         var chan = new Channel();
-        chan.name = friend_id + " - " + friend_id1;
+        chan.name = user_id + " - " + user_id1;
         chan.admins = [];
         chan.bannedUsers = [];
         chan.users = [];
         chan.type = Type.MP_CHANNEL;
-        var user = await this.userService.getUserById(friend_id);
-        var user1 = await this.userService.getUserById(friend_id1);
+        var user = await this.userService.getUserById(user_id);
+        var user1 = await this.userService.getUserById(user_id1);
         chan.users.push(user);
         chan.users.push(user1);
         await this.channelRepository.save(chan);
         return chan;
+    }
+
+    public async getChannelById(id) {
+        return await this.channelRepository.findOneBy({id : id});
+    }
+
+    public async isInChannel(user_id, channel_id) {
+        var chan = await this.channelRepository.findOneBy({id : channel_id});
+        if (chan == null)
+            return false;
+        var user = await this.userService.getUserById(user_id);
+        if (user == null)
+            return false;
+        return chan.users.includes(user);
     }
 
     public async getChannels() {
@@ -105,10 +119,15 @@ export class ChannelService {
         await this.channelRepository.save(chan);
     }
 
-    public async getMessage(channel_id) {
+    public async getMessage(channel_id, user_id) {
+        var user = await this.userService.getUserById(user_id);
+        if (user == null)
+            return null;
         var chan = await this.channelRepository.findOneBy({id : channel_id});
         if (chan == null)
             return null;
+        if (chan.users.includes(user) == false)
+            throw new Error("User is not in channel");
         chan.messages = chan.messages.sort((a, b) => a.date.getMilliseconds() - b.date.getMilliseconds());
         return chan.messages;
     }

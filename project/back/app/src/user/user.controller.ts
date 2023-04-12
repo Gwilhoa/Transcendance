@@ -1,10 +1,12 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Res, UploadedFile, UseGuards, UseInterceptors} from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Res, UploadedFile, UseGuards, UseInterceptors} from '@nestjs/common';
 import { User } from './user.entity';
 import { UserService } from './user.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from '../auth/guard/jwt.guard';
 import { GetUser } from '../auth/decorator/auth.decorator';
 import { rmSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { extname } from 'path';
 
 @UseGuards(JwtAuthGuard)
 @Controller('user')
@@ -38,41 +40,47 @@ export class UserController {
     response.status(200).send(ret);
     return;
   }
+
   @Get('/image')
   async getImage(@GetUser('sub') id: string, @Res() response) {
-    const path = await this.userService.getImageById(id);
-    if (path == null) {
-      response.status(204).send('No Content');
-    } else {
-      const fs = require('fs');
-      const stream = fs.createReadStream(path);
-      stream.on('error', (error) => {
-        response.status(500).send('Cannot read file');
-      });
-      stream.pipe(response);
-    }
+  const fs = require('fs');
+  const path = require('path');
+  const imagePath = await this.userService.getPathImage(id);
+  console.log(imagePath);
+  if (imagePath == null) {
+    response.status(404).send('Image not found');
+    return;
   }
+  const stream = fs.createReadStream(imagePath);
+  const fileExt = path.extname(imagePath).substr(1);
+  response.setHeader('Content-Type', 'image/'+fileExt);
+  stream.on('error', (error) => {
+    response.status(500).send('Cannot read file');
+  });
+  stream.pipe(response);
+}
 
   @Post('/image')
-  @UseInterceptors(FileInterceptor('image'))
-  async setImage(@GetUser('sub') id: string, @Res() response, @UploadedFile() file) {
-    const path = await this.userService.getImageById(id);
-    if (path == null) {
-      response.status(204).send('No Content');
-    } else {
-      const fs = require('fs');
-      if (file == null) {
-        response.status(400).send('Bad Request');
-        return;
+  @UseInterceptors(FileInterceptor('image', {
+    fileFilter: (req, file, callback) => {
+      const ext = extname(file.originalname);
+      if (ext !== '.jpg' && ext !== '.jpeg' && ext !== '.png' && ext !== '.gif') {
+        return callback(new HttpException('Only images are allowed', HttpStatus.BAD_REQUEST), false);
       }
-      fs.writeFile(path, file.buffer, (err) => {
-        if (err) {
-          response.status(400).send('Cannot write file');
-        }
-        console.log(id + ' image updated');
-        response.status(200).send('OK');
-      });
+      callback(null, true);
+    },
+  }))
+  async setImage(
+    @GetUser('sub') id: string,
+    @Res() response,
+    @UploadedFile() file,
+  ) {
+    const ret = await this.userService.setAvatar(id, file.buffer, extname(file.originalname));
+    if (ret == null) {
+      response.send('Error while uploading image').status(400);
+      return;
     }
+    response.status(200).send(ret);
   }
 
   @Post('/friend')
@@ -132,6 +140,37 @@ export class UserController {
   @Get('/channel')
   async getChannel(@GetUser('sub') id: string, @Res() response) {
     var ret = await this.userService.getChannels(id);
+    if (ret == null) {
+      response.status(204).send('No Channel');
+      return;
+    }
+    response.status(200).send(ret);
+    return;
+  }
+
+  @Post('/name')
+  async setName(@GetUser('sub') id: string, @Body('name') name: string, @Res() response) {
+    var ret = await this.userService.setName(id, name);
+    if (ret == null) {
+      response.status(204).send('No Content');
+      return;
+    }
+    response.status(200).send(ret);
+  }
+
+  @Get('isfriend') 
+    async isFriend(@GetUser('sub') id: string, @Body('friend_id') friend_id: string, @Res() response) {
+    var ret = await this.userService.isfriendReq(id, friend_id);
+    if (ret == null) {
+      response.status(204).send('No Content');
+      return;
+    }
+    response.status(200).send(ret);
+  }
+
+  @Get('/mpchannel')
+  async getMpChannel(@GetUser('sub') id: string, @Res() response) {
+    var ret = await this.userService.getMpChannels(id);
     if (ret == null) {
       response.status(204).send('No Channel');
       return;

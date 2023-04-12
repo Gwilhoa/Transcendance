@@ -12,6 +12,8 @@ import { UserService } from 'src/user/user.service';
 import { GetUser } from 'src/auth/decorator/auth.decorator';
 import { AuthService } from 'src/auth/auth.service';
 import { identity } from 'rxjs';
+import { ChannelService } from 'src/channel/channel.service';
+import { sendMessageDTO } from 'src/dto/sendmessage.dto';
 export enum Status {
   CONNECTED = 0,
   DISCONNECTED = 1,
@@ -25,7 +27,7 @@ export enum Status {
 
  
  export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
-  constructor(private userService: UserService, private authService: AuthService) {
+  constructor(private userService: UserService, private authService: AuthService, private channelService: ChannelService) {
     this.clients.set("1", "test");
   }
 
@@ -38,6 +40,14 @@ export enum Status {
       client.emit('connection_error', "Invalid token");
       return null;
     }
+  }
+
+  getConnectedUsers() {
+    var list = [];
+    this.clients.forEach((value, key) => {
+      list.push(value);
+    });
+    return list;
   }
 
   private clients: Map<string, string> = new Map<string, string>();
@@ -54,7 +64,7 @@ export enum Status {
     async handleConnection(client: Socket, ...args: any[]) {
       this.logger.log(`Client connected: ${client.id}`);
       var id;
-      client.on('connection', (data) => {
+      await client.on('connection', async (data) => {
         this.logger.log(`Received data from client: ${data.token}`);
         try {
           id = this.authService.getIdFromToken(data.token);
@@ -64,21 +74,22 @@ export enum Status {
           return;
         }
         this.clients.set(client.id, id);
+        var list = this.getConnectedUsers();
         var sendserver = {
-          "connected" : id,
+          "connected": list,
+          "inGame": []
+       }
+       var channels;
+       var user_chan = await this.userService.getChannels(id);
+        if (user_chan != null) {
+          user_chan.forEach(element => {
+            channels.push(element.id);
+          });
         }
+        if (channels != null && channels.length < 0)
+          client.join(channels);
         this.server.emit('connection_server', sendserver);
       });
-      var list = [];
-      this.clients.forEach((value, key) => {
-        list.push(value);
-      });
-     var sendclient = {
-        "connected": list,
-        "inGame": []
-     }
-     console.log(id);
-     client.emit('connection_client', sendclient);
     }
 
     
@@ -91,7 +102,10 @@ export enum Status {
     var friend_id = payload.friend_id;
     var user_id = this.verifyToken(token, client);
     if (user_id == null) {
-      client.disconnect();
+      var erro = {
+        "code": 401
+      }
+      client.emit('friend_code', erro);
       return;
     }
     var user = await this.userService.getUserById(user_id);
@@ -141,7 +155,137 @@ export enum Status {
     client.emit('friend_code', ret);
   }
 
+  @SubscribeMessage('send_message')
+  async handleMessage(client: Socket, payload: any) {
+    var token = payload.token;
+    var channel_id = payload.channel_id;
+    var message = payload.content;
+    var send;
+    var user_id = this.verifyToken(token, client);
+    if (user_id == null) {
+      send = {
+        "code": 401
+      }
+      client.emit('message_code', send);
+      return;
+    }
+    var user = await this.userService.getUserById(user_id);
+    var channel = await this.channelService.getChannelById(channel_id);
+    if (channel == null) {
+      send = {
+        "code": 1
+      }
+      client.emit('message_code', send);
+      return;
+    }
+    if (!await this.channelService.isInChannel(user, channel)) {
+      send = {
+        "code": 2
+      }
+      client.emit('message_code', send);
+      return;
+    }
+    message = new sendMessageDTO;
+    message.content = payload.content;
+    message.user = user_id;
+    message.channel = channel_id;
+    var msg = await this.channelService.sendMessage(message);
+    send = {
+      "code": 0
+    }
+    client.emit('message_code', send);
+    var sendmsg = {
+      "id": msg.id,
+      "content": msg.content,
+      "user": msg.user.id,
+      "channel": msg.channel,
+      "date": msg.date
+    }
+    this.server.to(channel_id).emit('message', sendmsg);
+  }
+
+  @SubscribeMessage('join_channel')
+  async handleJoinChannel(client: Socket, payload: any) {
+    var token = payload.token;
+    var channel_id = payload.channel_id;
+    var user_id = this.verifyToken(token, client);
+    if (user_id == null) {
+      var erro = {
+        "code": 401
+      }
+      client.emit('join_code', erro);
+      return;
+    }
+    var user = await this.userService.getUserById(user_id);
+    var channel = await this.channelService.getChannelById(channel_id);
+    var erro = {
+      "code": 0
+    }
+    if (channel == null) {
+      erro = {
+        "code": 1
+      }
+    }
+    else if (!await this.channelService.isInChannel(user, channel)) {
+       erro = {
+        "code": 2
+      }
+    }
+    else
+    {
+      client.join(channel_id);
+      erro = {
+        "code": 0
+      }
+    }
+    client.emit('join_code', erro);
+    var send = {
+      "user_id": user.id,
+      "channel_id": channel_id
+    }
+    this.server.to(channel_id).emit('user_join', send);
+  }
+  @SubscribeMessage('leave_channel')
+  async handleLeaveChannel(client: Socket, payload: any) {
+    var token = payload.token;
+    var channel_id = payload.channel_id;
+    var user_id = this.verifyToken(token, client);
+    if (user_id == null) {
+      var erro = {
+        "code": 401
+      }
+      client.emit('leave_code', erro);
+      return;
+    }
+    var user = await this.userService.getUserById(user_id);
+    var channel = await this.channelService.getChannelById(channel_id);
+    var erro = {
+      "code": 0
+    }
+    if (channel == null) {
+      erro = {
+        "code": 1
+      }
+    }
+    else if (!await this.channelService.isInChannel(user, channel)) {
+       erro = {
+        "code": 2
+      }
+    }
+    else
+    {
+      client.leave(channel_id);
+      erro = {
+        "code": 0
+      }
+    }
+    client.emit('leave_code', erro);
+    var send = {
+      "user_id": user.id,
+      "channel_id": channel_id
+    }
+    this.server.to(channel_id).emit('user_leave', send);
+  }
 
   
 }
-

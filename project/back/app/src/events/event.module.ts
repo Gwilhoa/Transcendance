@@ -7,10 +7,12 @@ import { AuthService } from "src/auth/auth.service";
 import { User } from "src/user/user.entity";
 import { UserService } from "src/user/user.service";
 import { EventsGateway } from "./events.gateway";
+import { Channel } from "src/channel/channel.entity";
+import { ChannelService } from "src/channel/channel.service";
 
 @Module({
-    imports: [TypeOrmModule.forFeature([User]), ConfigModule, AuthModule],
+    imports: [TypeOrmModule.forFeature([User]), ConfigModule, AuthModule, TypeOrmModule.forFeature([Channel])],
     controllers: [],
-    providers: [EventsGateway, UserService, AuthService, JwtService ,ConfigService],
+    providers: [EventsGateway, UserService, AuthService, JwtService ,ConfigService, ChannelService],
 })
 export class EventModule {}
