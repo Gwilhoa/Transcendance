@@ -38,6 +38,8 @@ export class AuthController {
     @UseGuards(JwtAuthGuard)
     @Get('2fa/create')
     async create2fa(@GetUser() user ,@Res() res) {
+      if (user.enable2FA != true)
+        throw new UnauthorizedException('You already have a two factor authentication enabled')
       const secret = authenticator.generateSecret(); // TODO : check if await is needed
 
       const otpauthUrl = authenticator.keyuri(user.email, 'Transcendence', secret); // TODO : check if await is needed
@@ -51,35 +53,48 @@ export class AuthController {
     }
 
     @UseGuards(JwtAuthGuard)
-    @Get('2fa/turnOn')
+    @Get('2fa/enable')
     async turnOn2FA(@GetUser('sub') id) {
-      var code2FA = '278'; // TODO : tmp
       var user = await this.userService.getUserById(id);
+      if (user.secret2FA == null)
+        throw new UnauthorizedException('You need to create a two factor authentication secret first')
+      var code2FA = '278'; // TODO : tmp
       const isValid: boolean = await this.authService.verify2FA(user.secret2FA, code2FA) // TODO : voir comment on recup le code
 
       if (!isValid)
         throw new UnauthorizedException('Wrong two factor authentication code')
-      await this.userService.turnOn2FA(id)
+      await this.userService.enabled2FA(id)
     }
 
+    
     // @UseGuards(JwtAuthGuard)
     // @Get('2fa/turnOff')
-
+    
     @UseGuards(JwtAuthGuard)
     @Get('2fa/authenticate')
     async authenticate2FA(@GetUser('sub') id) {
-      var code2FA = '278'; // TODO : tmp
       var user = await this.userService.getUserById(id);
+      if (user.enable2FA == null)
+      throw new UnauthorizedException('no active two factor authentication')
+      var code2FA = '278'; // TODO : tmp
       const isValid: boolean = await this.authService.verify2FA(user.secret2FA, code2FA) // TODO : voir comment on recup le code
-
+      
       if (!isValid)
-        throw new UnauthorizedException('Wrong two factor authentication code')
+      throw new UnauthorizedException('Wrong two factor authentication code');
       // await this.authService.loginWith2fa(id) // TODO
     }
-
+    
     // https://dev.to/hahnmatthieu/2fa-with-nestjs-passeport-using-google-authenticator-1l32
-
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard) // TODO : +2FA guard
+    @Get('2fa/disable')
+    async turnOff2FA(@GetUser('sub') id) {
+      var user = await this.userService.getUserById(id);
+      if (user.secret2FA == null)
+        throw new UnauthorizedException("You don't have the two factor authentication enabled");
+      await this.userService.disabled2FA(id);
+    }
+    
+    @UseGuards(JwtAuthGuard) // TODO : +2FA guard
     @Post('logout')
     async logout(@Req() req, @Res() res) {
       req.logout();
