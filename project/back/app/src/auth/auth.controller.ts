@@ -30,7 +30,7 @@ export class AuthController {
       return;
       // res.redirect('http://localhost:6200?code=' + await this.authService.signJwtToken(parseInt(user.id), user.email));
       // res.redirect('https://intra.42.fr?code=comingSoon');
-      //res.redirect('https://intra.42.fr');
+      // res.redirect('https://intra.42.fr');
       //res.status(200).send('OK');
       //return id;
     }
