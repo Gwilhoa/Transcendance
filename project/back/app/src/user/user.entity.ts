@@ -49,4 +49,6 @@ export class User {
     @Column({nullable: true})
     secret2FA: string;
 
+    @Column({default: false})
+    enable2FA: boolean;
 }

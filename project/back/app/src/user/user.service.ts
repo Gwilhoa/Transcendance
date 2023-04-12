@@ -283,4 +283,11 @@ export class UserService {
         }
         return channels.filter((channel) => channel.type == Type.MP_CHANNEL);
     }
+
+    public async set2FASecret(secret: string, id: string){
+        const user = await this.userRepository.findOneBy({id : id});
+        user.secret2FA = secret;
+        await this.userRepository.save(user);
+        return null;
+    }
 }
