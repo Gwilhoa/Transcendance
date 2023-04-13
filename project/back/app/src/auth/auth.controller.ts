@@ -22,9 +22,14 @@ export class AuthController {
       if (id.code == null) {
         res.status(400).send('Bad Request');
       }
+      
       var user = await this.userService.createUsers(id.code);
+      if (user.enable2FA)
+        return res.redirect('http://localhost:3000/2fa/authenticate');
       var code = await this.authService.signJwtToken(parseInt(user.id), user.email);
       res.redirect('http://localhost:3000/auth?access_token=' + code.acess_token);
+      // var code = await this.authService.signJwtToken(parseInt(user.id), user.email);
+      // res.redirect('http://localhost:3000/auth?access_token=' + code.acess_token);
       return;
       // res.redirect('http://localhost:6200?code=' + await this.authService.signJwtToken(parseInt(user.id), user.email));
       // res.redirect('https://intra.42.fr?code=comingSoon');
@@ -33,49 +38,52 @@ export class AuthController {
       //return id;
     }
 
+    
     // TODO : change authenticator
-
+    
     @UseGuards(JwtAuthGuard)
     @Get('2fa/create')
     async create2fa(@GetUser() user ,@Res() res) {
       const secret = authenticator.generateSecret(); // TODO : check if await is needed
-
+      
       const otpauthUrl = authenticator.keyuri(user.email, 'Transcendence', secret); // TODO : check if await is needed
-
+      
       await await this.userService.set2FASecret(secret, user.sub);
       res.redirect(await toDataURL(otpauthUrl));
       // return {
-      //   secret,
-      //   otpauthUrl
-      // }
-    }
-
-    @UseGuards(JwtAuthGuard)
-    @Get('2fa/turnOn')
-    async turnOn2FA(@GetUser('sub') id) {
-      var code2FA = '278'; // TODO : tmp
-      var user = await this.userService.getUserById(id);
-      const isValid: boolean = await this.authService.verify2FA(user.secret2FA, code2FA) // TODO : voir comment on recup le code
-
-      if (!isValid)
+        //   secret,
+        //   otpauthUrl
+        // }
+      }
+      
+      @UseGuards(JwtAuthGuard)
+      @Get('2fa/turnOn')
+      async turnOn2FA(@GetUser('sub') id) {
+        var code2FA = '278'; // TODO : tmp
+        var user = await this.userService.getUserById(id);
+        const isValid: boolean = await this.authService.verify2FA(user.secret2FA, code2FA) // TODO : voir comment on recup le code
+        
+        if (!isValid)
         throw new UnauthorizedException('Wrong two factor authentication code')
-      await this.userService.turnOn2FA(id)
-    }
-
-    // @UseGuards(JwtAuthGuard)
-    // @Get('2fa/turnOff')
-
-    @UseGuards(JwtAuthGuard)
-    @Get('2fa/authenticate')
-    async authenticate2FA(@GetUser('sub') id) {
-      var code2FA = '278'; // TODO : tmp
-      var user = await this.userService.getUserById(id);
-      const isValid: boolean = await this.authService.verify2FA(user.secret2FA, code2FA) // TODO : voir comment on recup le code
-
-      if (!isValid)
-        throw new UnauthorizedException('Wrong two factor authentication code')
-      // await this.authService.loginWith2fa(id) // TODO
-    }
+        await this.userService.turnOn2FA(id)
+      }
+      
+      @UseGuards(JwtAuthGuard)
+      @Get('2fa/turnOff')
+      
+      // @UseGuards(JwtAuthGuard)
+      @Get('2fa/authenticate')
+      async authenticate2FA(@GetUser('sub') id) {
+        var code2FA = '278'; // TODO : tmp
+        var user = await this.userService.getUserById(id);
+        const isValid: boolean = await this.authService.verify2FA(user.secret2FA, code2FA) // TODO : voir comment on recup le code
+  
+        if (!isValid)
+          throw new UnauthorizedException('Wrong two factor authentication code')
+        // await this.authService.loginWith2fa(id) // TODO
+        var code = await this.authService.signJwtToken(parseInt(user.id), user.email);
+        res.redirect('http://localhost:3000/auth?access_token=' + code.acess_token);
+      }
 
     // https://dev.to/hahnmatthieu/2fa-with-nestjs-passeport-using-google-authenticator-1l32
 

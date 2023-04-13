@@ -9,7 +9,7 @@ import { authenticator, totp } from 'otplib';
 @Injectable()
 export class AuthService {
     // constructor(private jwt: JwtService, private config: ConfigService, private tokenRepository: Repository<Token>) {}
-    constructor(private jwt: JwtService, private config: ConfigService) {}
+    constructor(private jwt: JwtService) {}
 
     public async getUserIntra(token) {
         const axios = require('axios');
