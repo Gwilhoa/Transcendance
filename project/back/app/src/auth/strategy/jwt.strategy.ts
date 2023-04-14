@@ -14,11 +14,13 @@ export class Jwt2FAStrategy extends PassportStrategy(Strategy, 'jwt2FA') {
 
     async validate(payload: any){
         // if () // TODO :check if user logout
-        var user = await this.userService.getUserById(payload.sub);
-        if (!user.enable2FA)
+        // var user = await this.userService.getUserById(payload.sub);
+        // if (!user.enable2FA)
+        //     return payload;
+        // if (payload.is2FA)
+        //     return payload;
+        if (payload.isauth)
             return payload;
-        if (payload.is2FA)
-            return payload; // TODO : can optimize code by not using database call (with 1 okauth variable instead of checking 2FA in database)
         // else user hasn't two authenticated so return null
     }
 
