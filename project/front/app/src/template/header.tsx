@@ -17,6 +17,9 @@ const Head = () => {
   const handlePopupCloseHisto = () => {
     setShowPopupHisto(false);
   };
+  const chatPop = () => {
+    window.location.href = window.location + "/chat";
+  }
 
 
 
@@ -32,10 +35,10 @@ const Head = () => {
             <Link to="/accueil" className="navbar__link">
               Accueil
             </Link>
-            <button onClick={() => setShowPopupChat(true)} className="navbar__link">
+            <button onClick={chatPop} className="navbar__link">
               <h3>Chat</h3>
             </button>
-            {showPopupChat && <PopupChat onClose={handlePopupCloseChat} />}
+            {showPopupChat && <PopupChat/>}
             <Link to="/game" className="navbar__link">
               Jeu
             </Link>

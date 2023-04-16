@@ -86,7 +86,7 @@ const getChanels = () => {
 }
 
 
-const PopupChat: React.FC<PopupProps> = ({ onClose }) => {
+const PopupChat: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [prompt, setMessage] = useState('');
 
@@ -105,12 +105,16 @@ const PopupChat: React.FC<PopupProps> = ({ onClose }) => {
     ChannelDescriptor.listMessage.push({author: "", contain: prompt})
     setMessage('');
   }
+
+  const close = () => {
+    window.location.href = window.location.origin + window.location.pathname.split("#")[0];
+  }
   
   return (
     <div className="popup right">
       <div className="popupchild">
         <header className="popup_up">
-          <button className="close-button" onClick={onClose}> X </button>
+          <button className="close-button" onClick={close} > X </button>
           <div className="texte">
             {ChannelDescriptor.name}
           </div>
