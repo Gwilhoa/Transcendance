@@ -307,4 +307,12 @@ export class UserService {
         await this.userRepository.save(user);
         return null;
     }
+
+    public async getGame(id: string) {
+        const user = await this.userRepository.findOneBy({id : id});
+        if (user == null) {
+            return null;
+        }
+        return user.games;
+    }
 }
