@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { useEffect } from "react";
 import './notific.css';
+import { ChangeChannel, JoinChat } from "../chatManager";
 
 interface NotificationProps {
   message: string;
+  channel: string;
 }
 
-export default function Notification({ message }: NotificationProps) {
+export default function Notification({ message, channel }: NotificationProps) {
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
@@ -18,7 +20,8 @@ export default function Notification({ message }: NotificationProps) {
     }, []);
 
     const handleClose = () => {
-    setVisible(false);
+      ChangeChannel(channel);
+      setVisible(false);
     };
 
   if (visible) {

@@ -3,25 +3,22 @@ import './popupChat.css'
 import { useState } from 'react';
 import Modal from '../profil/modal';
 import CV from '../profil/CV';
+import { ChangeChannel, LeaveChat } from '../chatManager';
 
-type PopupProps = {
-  onClose: () => void;
-};
-
-interface channelsDesc {
-  name: string,
-  listMessage: showMessage[]
-}
 
 interface showMessage {
   contain: string,
   author: string
 }
 
-const takeMessagesToBack = (channelName:string) => {
-  ChannelDescriptor.name = channelName;
+function takeMessagesToBack(name:string): showMessage[] {
+  const ret = [{author: "", contain:"dskdjfdddsj"}, {author:"sd ddsds", contain:"sodjgggg"},{author: "", contain:"dsvvvvvvvvvvvvvvvvkdjsj"}, {author:"s ddsds", contain:"sodjgggggggggggggggggggg"}]
   //////Bonne chance !!
+
+    
+  return (ret);
 }
+
 
 const sendNewMessageToBack = (message:string) => {
     //////J'me casse !!
@@ -31,42 +28,40 @@ const sendCommandToBack = (message:string) => {
   //////Chao !!
 }
 
-const getMessages = (chan:channelsDesc, isOpen:boolean, setIsOpen: (checked: boolean) => void) => {
+const getMessages = (chan:string, isOpen:boolean, setIsOpen: (checked: boolean) => void) => {
   const messagesRet = [];
-  for(let i = 0; i < chan.listMessage.length; i++) {
+  const listMessageGet = takeMessagesToBack(chan);
+
+  for(let i = 0; i < listMessageGet.length; i++) {
     
-    if (chan.listMessage[i].author === "") {
+    if (listMessageGet[i].author === "") {
       messagesRet.push(
-        <div className="message me">
-          {chan.listMessage[i].contain}
-        </div>
+        <li className="message me" key={i}>
+          {listMessageGet[i].contain}
+        </li>
       )
     }
     else {
 
       messagesRet.push(
-        <div>
+        <li key={i}>
             {"de : "}
             <a href="#" onClick={() => setIsOpen(true)} className=""> 
-            
-                {chan.listMessage[i].author}
-          
+              {listMessageGet[i].author}
             </a>
             <Modal open={isOpen} onClose={() => setIsOpen(false)}>
-              <CV name={chan.listMessage[i].author} isFriend={false} isMe={false} photoUrl={"https://www.treehugger.com/thmb/9fuOGVoJ23ZwziKRNtAEMHw8opU=/750x0/filters:no_upscale():max_bytes(150000):strip_icc():format(webp)/piglet-grass-dandelions-01-b21d7ef8f881496f8346dbe01859537e.jpg"}/>
+              <CV name={listMessageGet[i].author} isFriend={false} isMe={false} photoUrl={"https://www.treehugger.com/thmb/9fuOGVoJ23ZwziKRNtAEMHw8opU=/750x0/filters:no_upscale():max_bytes(150000):strip_icc():format(webp)/piglet-grass-dandelions-01-b21d7ef8f881496f8346dbe01859537e.jpg"}/>
             </Modal>  
-        <div className="message other">
-          {chan.listMessage[i].contain}
-        </div>
-        </div>
+            <div className="message other">
+              {listMessageGet[i].contain}
+            </div>
+        </li>
         )
       }
     }
     return <div className="messagePannel"> {messagesRet} </div>;
   }
   
-var ChannelDescriptor:channelsDesc = {name:"Salon", listMessage: [{author: "", contain:"dskdjsj"}, {author:"s ddsds", contain:"sodjgggg"},{author: "", contain:"dsvvvvvvvvvvvvvvvvkdjsj"}, {author:"s ddsds", contain:"sodjgggggggggggggggggggg"}]}
-
 const getChanels = () => {
   var ListOfChanel:string[] = ["hdh", "sdjs", "dsdsdssddsddssdds"];
   
@@ -75,18 +70,18 @@ const getChanels = () => {
   const chanels = [];
   for(let i = 0; i < ListOfChanel.length; i++) {
     chanels.push(
-        <div className="chanel">
-          <a href={"#a"} onClick={() => takeMessagesToBack(ListOfChanel[i])}>
+        <li className="chanel" key={i}>
+          <a href={"#"} onClick={() => ChangeChannel(ListOfChanel[i])}>
             {ListOfChanel[i]}
           </a>
-        </div>
+        </li>
     )
   } 
   return <div className="popup_list_of_chanel">{chanels}</div>
 }
 
 
-const PopupChat: React.FC = () => {
+const PopupChat: React.FC<{path:string}> = (path) => {
   const [isOpen, setIsOpen] = useState(false)
   const [prompt, setMessage] = useState('');
 
@@ -102,27 +97,24 @@ const PopupChat: React.FC = () => {
     else {
       sendNewMessageToBack(prompt);
     }
-    ChannelDescriptor.listMessage.push({author: "", contain: prompt})
-    setMessage('');
+    
+   setMessage('');
   }
-
-  const close = () => {
-    window.location.href = window.location.origin + window.location.pathname.split("#")[0];
-  }
+  console.log(path);
   
   return (
     <div className="popup right">
       <div className="popupchild">
         <header className="popup_up">
-          <button className="close-button" onClick={close} > X </button>
+          <button className="close-button" onClick={LeaveChat} > X </button>
           <div className="texte">
-            {ChannelDescriptor.name}
+            {path.path}
           </div>
         </header>
         <div className="popup_corps">
           {getChanels()}
           <div className="messages">
-            {getMessages(ChannelDescriptor, isOpen, setIsOpen)}
+            {getMessages(path.path, isOpen, setIsOpen)}
             <div className="popup_input" >
                 <input type="input" placeholder="Message à envoyer"  value={prompt} onChange={handleMessageChange}></input>
                  <button type="submit" onClick={sendMessage}>

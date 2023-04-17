@@ -19,7 +19,7 @@ export default function CV( {name, photoUrl, isFriend, isMe } : {name:string, ph
     };
 
     retu.push(
-        <div>
+        <div key={"image"}>
             <img className='circle-image' src={image} alt="selected" />
             <br/> <br/>
         </div>
@@ -27,13 +27,13 @@ export default function CV( {name, photoUrl, isFriend, isMe } : {name:string, ph
     
     if (isMe) {
         retu.push(
-            <input type="file" onChange={handleImageChange} />
+            <input type="file" onChange={handleImageChange} key={"changeImage"}/>
         )
     }
 
     if (!isFriend && !isMe) {
         retu.push(
-            <button>
+            <button key={"buttonFriend"}>
                 Ajouter en ami
             </button>
         )
@@ -41,7 +41,7 @@ export default function CV( {name, photoUrl, isFriend, isMe } : {name:string, ph
 
     if (isFriend && !isMe) {
         retu.push(
-            <button>
+            <button key={"buttonInvite"}>
                 Inviter à une partie
             </button>
         )

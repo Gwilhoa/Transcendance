@@ -1,4 +1,3 @@
-import Template from "../template/template"
 import './popupHisto.css'
 
 
@@ -48,6 +47,7 @@ const Add = () => {
                 text={"Victoire contre " + ListOfScore[i].ennemy}
                 score1={String(ListOfScore[i].scoreMe)}
                 score2={String(ListOfScore[i].scoreEnnemy)}
+                key={i}
                 />
             )
         }
@@ -57,6 +57,7 @@ const Add = () => {
                 text={"Tu es faible face à " + ListOfScore[i].ennemy}
                 score1={String(ListOfScore[i].scoreMe)}
                 score2={String(ListOfScore[i].scoreEnnemy)}
+                key={i}
                 />
             )
             }

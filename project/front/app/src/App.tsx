@@ -4,38 +4,39 @@ import AuthToken from './pages/AuthToken';
 import NotFound from './pages/NotFound';
 import Game from './pages/game';
 import Accueil from './pages/accueil';
-import { useEffect, useState } from "react";
 import PopupChat from "./popup/popupChat";
+import { DynamicIsInAChat, KnowMyChannel } from "./chatManager";
 
-function App() {
-	const [showChat, setShowChat] = useState(false);
 
-  useEffect(() => {
-    if (window.location.hash === '/chat') {
-      setShowChat(true);
-    }
-  }, []);
-
-  const handleButtonClick = () => {
-    setShowChat(true);
-    window.location.hash = 'chat';
-  };
+const AppInsideBrowser = () => {
 
 	return (
-		<BrowserRouter>
-			<Routes>
+			<>
+				<Routes>
 				<Route path="/" Component={Auth}/>
 				<Route path="/auth" Component={AuthToken}/>
 				<Route path="*" Component={NotFound}/>
-				<Route path="/accueil" Component={Accueil} />
-      			<Route path="/game" Component={Game} />
+				<Route path="/accueil/*" Component={Accueil} />
+				<Route path="/game/*" Component={Game} />
+				
+				</Routes>
+				{DynamicIsInAChat() && 
+					<PopupChat path={KnowMyChannel()}/>
+				}
+			</>
 
-				  {showChat && (
-				<Route path="/chat">
-					 <PopupChat/>
-				</Route>
-      )}
-			</Routes>
+	);
+}
+
+
+
+
+function App() {
+
+
+	return (
+		<BrowserRouter>
+		<AppInsideBrowser/>
 		</BrowserRouter>
 	);
 

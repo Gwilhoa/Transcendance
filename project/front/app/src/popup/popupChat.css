@@ -22,9 +22,8 @@
     text-align: center; 
 }
 
-
-.popup.left {
-    left: 0;
+.popup.right {
+    right: 0;
 }
 
 .popupchild {
@@ -62,11 +61,10 @@
 }
 
 .messagePannel {
-    
     top: 0px;
     max-width: 100%;
     height: calc(100% - 40px);
-    overflow: scroll;
+    overflow-y: auto;
     display: flex;
     flex-direction: column;
 }

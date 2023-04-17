@@ -1,27 +1,17 @@
 import { Link } from "react-router-dom";
 import './template.css'
-import PopupChat from "../popup/popupChat"
 import { useState } from "react";
 import Modal from "../profil/modal";
 import PopupHisto from "../popup/popupHisto"
 import CV from "../profil/CV";
-
+import { JoinChat } from "../chatManager";
 
 const Head = () => {
-  const [showPopupChat, setShowPopupChat] = useState(false);
-  const handlePopupCloseChat = () => {
-    setShowPopupChat(false);
-  };
 
   const [showPopupHisto, setShowPopupHisto] = useState(false);  
   const handlePopupCloseHisto = () => {
     setShowPopupHisto(false);
   };
-  const chatPop = () => {
-    window.location.href = window.location + "/chat";
-  }
-
-
 
   const [isOpen, setIsOpen] = useState(false)
 
@@ -35,10 +25,9 @@ const Head = () => {
             <Link to="/accueil" className="navbar__link">
               Accueil
             </Link>
-            <button onClick={chatPop} className="navbar__link">
+            <button onClick={JoinChat} className="navbar__link">
               <h3>Chat</h3>
             </button>
-            {showPopupChat && <PopupChat/>}
             <Link to="/game" className="navbar__link">
               Jeu
             </Link>
