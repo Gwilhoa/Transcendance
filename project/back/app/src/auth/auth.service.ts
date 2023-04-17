@@ -53,12 +53,15 @@ export class AuthService {
         }
     }
 
-    public async signJwtToken(userId: number, email: string): Promise<{acess_token: string}> {
-        const payload = { sub: userId, email };
+    public async signJwtToken(userId: number, isauth: boolean): Promise<{acess_token: string}> {
+        var expiresTime = '10m';
+        if (isauth == true)
+            expiresTime = '2h';
+        const payload = { sub: userId, isauth: isauth };
         console.log(process.env.JWT_SECRET);
         
         return {
-            acess_token: await this.jwt.signAsync(payload, { expiresIn: '2h', secret: process.env.JWT_SECRET})
+            acess_token: await this.jwt.signAsync(payload, { expiresIn: expiresTime, secret: process.env.JWT_SECRET})
         };
     }
 

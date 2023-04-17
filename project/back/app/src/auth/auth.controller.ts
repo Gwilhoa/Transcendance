@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Query, Redirect, Req, Res, Post, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { AuthService } from './auth.service';
-import { JwtAuthGuard } from './guard/jwt.guard';
+import { JwtAuthGuard, JwtIsAuthGuard } from './guard/jwt.guard';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from './decorator/auth.decorator';
 import { authenticator, totp } from 'otplib';
@@ -25,9 +25,7 @@ export class AuthController {
       // console.log(id.code);
       
       var user = await this.userService.createUsers(id.code);
-      // if (user.enable2FA)
-      //   return res.redirect('http://localhost:3000/2fa/authenticate');
-      var code = await this.authService.signJwtToken(parseInt(user.id), user.email);
+      var code = await this.authService.signJwtToken(parseInt(user.id), false);
       res.redirect('http://localhost:3000/auth?access_token=' + code.acess_token);
       // var code = await this.authService.signJwtToken(parseInt(user.id), user.email);
       // res.redirect('http://localhost:3000/auth?access_token=' + code.acess_token);
@@ -41,8 +39,8 @@ export class AuthController {
 
     
     // TODO : change authenticator
-    
-    @UseGuards(JwtAuthGuard)
+
+    @UseGuards(JwtIsAuthGuard)
     @Get('2fa/create')
     async create2fa(@GetUser() user ,@Res() res) {
       if (user.enable2FA != true)
@@ -59,7 +57,7 @@ export class AuthController {
       // }
     }
 
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtIsAuthGuard)
     @Get('2fa/enable')
     async turnOn2FA(@GetUser('sub') id) {
       var user = await this.userService.getUserById(id);
@@ -78,23 +76,28 @@ export class AuthController {
     // @Get('2fa/turnOff')
     
     @UseGuards(JwtAuthGuard)
-    @Get('2fa/authenticate')
-    async authenticate2FA(@GetUser('sub') id) {
+    @Get('authenticate')
+    async authenticate2FA(@GetUser() jwtUser, @Res() res) {
+      var id = jwtUser.sub;
       var user = await this.userService.getUserById(id);
-      if (user.enable2FA == null)
-      throw new UnauthorizedException('no active two factor authentication')
-      var code2FA = '278'; // TODO : tmp
-      const isValid: boolean = await this.authService.verify2FA(user.secret2FA, code2FA) // TODO : voir comment on recup le code
-      
-      if (!isValid)
-      throw new UnauthorizedException('Wrong two factor authentication code');
-      // await this.authService.loginWith2fa(id) // TODO
-      // var code = await this.authService.signJwtToken(parseInt(user.id), user.email);
-      // res.redirect('http://localhost:3000/auth?access_token=' + code.acess_token);
+      if (user.enable2FA != null) {
+        var code2FA = '278'; // TODO : tmp, voir comment on recup le code
+        if (code2FA == null)
+          throw new UnauthorizedException('Wrong two factor authentication code')
+        const isValid: boolean = await this.authService.verify2FA(user.secret2FA, code2FA)
+        
+        if (!isValid)
+          throw new UnauthorizedException('Wrong two factor authentication code');
+        // res.redirect('http://localhost:3000/auth?access_token=' + await this.authService.signJwtToken(parseInt(user.id), true)); //TODO : expire the old one
+        // return;
+      }
+      res.redirect('http://localhost:3000/auth?access_token=' + await this.authService.signJwtToken(parseInt(user.id), true));
+      // TODO : return current jwt token
+        // throw new UnauthorizedException('no active two factor authentication')
     }
     
     // https://dev.to/hahnmatthieu/2fa-with-nestjs-passeport-using-google-authenticator-1l32
-    @UseGuards(JwtAuthGuard) // TODO : +2FA guard
+    @UseGuards(JwtIsAuthGuard) // TODO : +2FA guard
     @Get('2fa/disable')
     async turnOff2FA(@GetUser('sub') id) {
       var user = await this.userService.getUserById(id);
@@ -105,7 +108,7 @@ export class AuthController {
     
     @UseGuards(JwtAuthGuard) // TODO : +2FA guard
     @Post('logout')
-    async logout(@Req() req, @Res() res) {
+    async logout(@Req() req, @Res() res) { // TODO : voir pour les 2 token
       req.logout();
       res.redirect('/');
     }

@@ -1,9 +1,9 @@
 import { Body, Controller, Get, Post, Res, UseGuards } from '@nestjs/common';
 import { GetUser } from 'src/auth/decorator/auth.decorator';
-import { JwtAuthGuard } from 'src/auth/guard/jwt.guard';
+import { JwtIsAuthGuard } from 'src/auth/guard/jwt.guard';
 import { ChannelService } from './channel.service';
 
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtIsAuthGuard)
 @Controller('channel')
 export class ChannelController {
     constructor(private readonly channelService: ChannelService) {}
