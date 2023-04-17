@@ -2,13 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { Repository } from 'typeorm';
+import { authenticator, totp } from 'otplib';
 // import { Token } from './token.entity';
 
 
 @Injectable()
 export class AuthService {
     // constructor(private jwt: JwtService, private config: ConfigService, private tokenRepository: Repository<Token>) {}
-    constructor(private jwt: JwtService, private config: ConfigService) {}
+    constructor(private jwt: JwtService) {}
 
     public async getUserIntra(token) {
         const axios = require('axios');
@@ -52,12 +53,15 @@ export class AuthService {
         }
     }
 
-    async signJwtToken(userId: number, email: string): Promise<{acess_token: string}> {
-        const payload = { sub: userId, email };
+    public async signJwtToken(userId: number, isauth: boolean): Promise<{acess_token: string}> {
+        var expiresTime = '10m';
+        if (isauth == true)
+            expiresTime = '2h';
+        const payload = { sub: userId, isauth: isauth };
         console.log(process.env.JWT_SECRET);
         
         return {
-            acess_token: await this.jwt.signAsync(payload, { expiresIn: '2h', secret: process.env.JWT_SECRET})
+            acess_token: await this.jwt.signAsync(payload, { expiresIn: expiresTime, secret: process.env.JWT_SECRET})
         };
     }
 
@@ -65,7 +69,11 @@ export class AuthService {
         const payload = this.jwt.verify(token, { secret: process.env.JWT_SECRET});
         return payload.sub;
     }
-    // async checkJwtToken(token: string): Promise<any> {
-    // async deleteJwtToken(token: string): Promise<any> {
-    // async addJwtToken(token: string): Promise<any> {
+
+    public async verify2FA(secret2FA: string, code2FA: string): Promise<boolean> {
+        return authenticator.verify({
+            token: code2FA,
+            secret: secret2FA,
+        });
+    }
 }

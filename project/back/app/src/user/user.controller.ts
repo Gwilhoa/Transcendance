@@ -2,13 +2,13 @@ import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, 
 import { User } from './user.entity';
 import { UserService } from './user.service';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { JwtAuthGuard } from '../auth/guard/jwt.guard';
+import { JwtIsAuthGuard } from '../auth/guard/jwt.guard';
 import { GetUser } from '../auth/decorator/auth.decorator';
 import { rmSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { extname } from 'path';
 
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtIsAuthGuard)
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}

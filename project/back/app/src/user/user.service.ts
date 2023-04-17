@@ -283,4 +283,28 @@ export class UserService {
         }
         return channels.filter((channel) => channel.type == Type.MP_CHANNEL);
     }
+
+    public async set2FASecret(secret: string, id: string){
+        const user = await this.userRepository.findOneBy({id : id});
+        user.secret2FA = secret;
+        await this.userRepository.save(user);
+        return null;
+    }
+
+    public async enabled2FA(id: string)
+    {
+        const user = await this.userRepository.findOneBy({id : id});
+        user.enable2FA = true;
+        await this.userRepository.save(user);
+        return null;
+    }
+
+    public async disabled2FA(id: string)
+    {
+        const user = await this.userRepository.findOneBy({id : id});
+        user.enable2FA = false;
+        user.secret2FA = null;
+        await this.userRepository.save(user);
+        return null;
+    }
 }
