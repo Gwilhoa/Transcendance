@@ -334,7 +334,7 @@ import { CreateGameDTO } from 'src/dto/create-game.dto';
           var create_game = await this.gameService.createGame(gameinfo);
           //TODO: create game
           await this.userService.changeStatus(user1.id, Status.IN_GAME); // TODO: status in game
-          await this.userService.changeStatus(random_player.id, Status.IN_GAME); // TODO: status in game'
+          await this.userService.changeStatus(random_player.id, Status.IN_GAME); // TODO: status in game
           this.clients[user1.id].join(create_game.id);
           this.clients[random_player.id].join(create_game.id);
           await this.clients[user1.id].emit('game_created', create_game.id);

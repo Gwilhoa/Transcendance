@@ -18,7 +18,7 @@ export class AuthController {
     }
     
 
-    @Get('login/token')
+    @Get('callback')
     async getLogin(@Query() id, @Res() res, @Body() body) {
       if (id.code == null) {
         res.status(400).send('Bad Request');
@@ -27,11 +27,11 @@ export class AuthController {
       
       var user = await this.userService.createUsers(id.code);
       var code = await this.authService.signJwtToken(parseInt(user.id), false);
-      res.redirect('http://localhost:3000/auth?access_token=' + code.acess_token);
+      res.redirect('http://localhost:8080/auth?access_token=' + code.acess_token);
       // var code = await this.authService.signJwtToken(parseInt(user.id), user.email);
-      // res.redirect('http://localhost:3000/auth?access_token=' + code.acess_token);
+      // res.redirect('http://localhost:8080/auth?access_token=' + code.acess_token);
       return;
-      // res.redirect('http://localhost:6200?code=' + await this.authService.signJwtToken(parseInt(user.id), user.email));
+      // res.redirect('http://localhost:3000?code=' + await this.authService.signJwtToken(parseInt(user.id), user.email));
       // res.redirect('https://intra.42.fr?code=comingSoon');
       // res.redirect('https://intra.42.fr');
       //res.status(200).send('OK');
@@ -89,11 +89,11 @@ export class AuthController {
         
         if (!isValid)
           throw new UnauthorizedException('Wrong two factor authentication code');
-        // res.redirect('http://localhost:3000/auth?access_token=' + await this.authService.signJwtToken(parseInt(user.id), true)); //TODO : expire the old one
+        // res.redirect('http://localhost:8080/auth?access_token=' + await this.authService.signJwtToken(parseInt(user.id), true)); //TODO : expire the old one
         // return;
       }
       await this.userService.changeStatus(id, Status.CONNECTED);
-      res.redirect('http://localhost:3000/auth?access_token=' + await this.authService.signJwtToken(parseInt(user.id), true));
+      res.redirect('http://localhost:8080/auth?access_token=' + await this.authService.signJwtToken(parseInt(user.id), true));
       // TODO : return current jwt token
         // throw new UnauthorizedException('no active two factor authentication')
     }

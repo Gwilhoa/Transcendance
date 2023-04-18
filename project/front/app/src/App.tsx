@@ -23,13 +23,13 @@ function App() {
 		<h1>Transcendence</h1>
 		<a
 		className="api42-link"
-		href="http://localhost:6200/auth/login"
+		href="http://localhost:3000/auth/login"
 		target="_blank"
 		rel="noopener noreferrer"
 		>
 			Authentification
 		</a>
-			<GetTokenUser url="http://localhost:6200/auth/login"/>
+			<GetTokenUser url="http://localhost:3000/auth/login"/>
     </div>
   );
 }

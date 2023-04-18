@@ -22,7 +22,7 @@ services:
   back:
     init: true
     ports:
-      - "6200:6200"
+      - "3000:3000"
     container_name:
       back
     depends_on:
@@ -54,7 +54,7 @@ services:
     networks:
       - transnet
     ports:
-      - "3000:3000"
+      - "8080:8080"
 
 # volumes:
 #   temp:
