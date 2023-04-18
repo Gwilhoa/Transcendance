@@ -1,4 +1,4 @@
-import {useLocation } from "react-router-dom";
+import {useLocation, useNavigate } from "react-router-dom";
 
 
 function URLgetChat(str:string):boolean {
@@ -6,7 +6,6 @@ function URLgetChat(str:string):boolean {
     if (segments.length > 2) {
 
         const lastSegment = segments[2];
-        console.log(segments.length);
         
         if (lastSegment.startsWith("chat")) {
             return true
@@ -36,6 +35,8 @@ export function JoinChat() {
     if (!IsInAChat()) {
         var str = location.pathname.split('/')[1];
         str += "/chat";
+        //const history = useNavigate();
+        //history('/chat/');
         window.location.pathname = str;
     }
 }

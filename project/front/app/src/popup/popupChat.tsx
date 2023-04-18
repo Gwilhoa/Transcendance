@@ -100,7 +100,6 @@ const PopupChat: React.FC<{path:string}> = (path) => {
     
    setMessage('');
   }
-  console.log(path);
   
   return (
     <div className="popup right">
