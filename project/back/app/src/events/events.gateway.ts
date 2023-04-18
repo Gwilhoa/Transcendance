@@ -14,11 +14,12 @@ import { AuthService } from 'src/auth/auth.service';
 import { identity } from 'rxjs';
 import { ChannelService } from 'src/channel/channel.service';
 import { sendMessageDTO } from 'src/dto/sendmessage.dto';
-export enum Status {
-  CONNECTED = 0,
-  DISCONNECTED = 1,
-  IN_GAME = 2,
-}
+import { sleep } from '../utils/sleep'
+import { User } from '../user/user.entity';
+import { GameService } from 'src/game/game.service';
+import { Status } from '../utils/status.enum';
+import { CreateGameDTO } from 'src/dto/create-game.dto';
+
  @WebSocketGateway({
    cors: {
      origin: '*',
@@ -27,9 +28,18 @@ export enum Status {
 
  
  export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
-  constructor(private userService: UserService, private authService: AuthService, private channelService: ChannelService) {
-    this.clients.set("1", "test");
+  constructor(private userService: UserService, private authService: AuthService, private channelService: ChannelService, private gameService: GameService) {
+    const check = async () => {
+      while (true) {
+        await this.check_matchmaking();
+        await sleep(10000);
+          }               
+      }
+      check();
   }
+
+  private clients: Map<string, string> = new Map<string, string>();
+  private matchmaking: Array<User> = Array();
 
   verifyToken(token: string, client: Socket) {
     try {
@@ -50,7 +60,6 @@ export enum Status {
     return list;
   }
 
-  private clients: Map<string, string> = new Map<string, string>();
 
   afterInit(server: Server) {
     this.logger.log('Socket server initialized');
@@ -287,5 +296,51 @@ export enum Status {
     this.server.to(channel_id).emit('user_leave', send);
   }
 
-  
+  //
+  //
+  //
+
+  @SubscribeMessage('join_matchmaking')
+  async join_matchmaking(client: Socket, payload: any)
+  {
+    var id;
+    var user;
+    try {
+      id = await this.authService.getIdFromToken(payload.token);
+      user = await this.userService.getUserById(id);
+    } catch (error) {
+      await client.emit('connection_error', "Invalid token");
+      await client.disconnect();
+      return;
+    }
+    this.matchmaking.push(user);
+    await client.emit('message_code', 'ok');
+  }
+
+  async check_matchmaking()
+  {
+    var matchmaking_len = this.matchmaking.length;
+    while (matchmaking_len > 1)
+    {
+      this.matchmaking.forEach(user1 => async () => {
+        var authorized_player = this.matchmaking.filter(user2 => async () => { user1.id != user2.id && await this.userService.OneOfTwoBlocked(user1.id, user2.id) == false});
+        var len_authorized_player = authorized_player.length;
+        if (len_authorized_player > 1){
+          var random_player = authorized_player[Math.floor(Math.random() * authorized_player.length)];
+          var gameinfo = new CreateGameDTO;
+          gameinfo.user1_id = user1.id;
+          gameinfo.user2_id = random_player.id;
+
+          var create_game = await this.gameService.createGame(gameinfo);
+          //TODO: create game
+          await this.userService.changeStatus(user1.id, Status.IN_GAME); // TODO: status in game
+          await this.userService.changeStatus(random_player.id, Status.IN_GAME); // TODO: status in game'
+          this.clients[user1.id].join(create_game.id);
+          this.clients[random_player.id].join(create_game.id);
+          await this.clients[user1.id].emit('game_created', create_game.id);
+        }
+      });
+      matchmaking_len = this.matchmaking.length;
+    }
+  }  
 }

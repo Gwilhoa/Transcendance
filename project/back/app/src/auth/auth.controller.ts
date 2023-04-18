@@ -6,6 +6,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from './decorator/auth.decorator';
 import { authenticator, totp } from 'otplib';
 import { toDataURL } from 'qrcode';
+import { Status } from '../utils/status.enum';
 
 @Controller('auth')
 export class AuthController {
@@ -91,6 +92,7 @@ export class AuthController {
         // res.redirect('http://localhost:3000/auth?access_token=' + await this.authService.signJwtToken(parseInt(user.id), true)); //TODO : expire the old one
         // return;
       }
+      await this.userService.changeStatus(id, Status.CONNECTED);
       res.redirect('http://localhost:3000/auth?access_token=' + await this.authService.signJwtToken(parseInt(user.id), true));
       // TODO : return current jwt token
         // throw new UnauthorizedException('no active two factor authentication')
@@ -107,8 +109,9 @@ export class AuthController {
     }
     
     @UseGuards(JwtAuthGuard) // TODO : +2FA guard
-    @Post('logout')
-    async logout(@Req() req, @Res() res) { // TODO : voir pour les 2 token
+    @Get('logout')
+    async logout(@GetUser('sub') id, @Req() req, @Res() res) { // TODO : voir pour les 2 token
+      await this.userService.changeStatus(id, Status.DISCONNECTED);
       req.logout();
       res.redirect('/');
     }

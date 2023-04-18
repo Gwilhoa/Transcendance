@@ -286,6 +286,9 @@ export class UserService {
 
     public async set2FASecret(secret: string, id: string){
         const user = await this.userRepository.findOneBy({id : id});
+        if (user == null) {
+            return null;
+        }
         user.secret2FA = secret;
         await this.userRepository.save(user);
         return null;
@@ -294,6 +297,9 @@ export class UserService {
     public async enabled2FA(id: string)
     {
         const user = await this.userRepository.findOneBy({id : id});
+        if (user == null) {
+            return null;
+        }
         user.enable2FA = true;
         await this.userRepository.save(user);
         return null;
@@ -302,9 +308,61 @@ export class UserService {
     public async disabled2FA(id: string)
     {
         const user = await this.userRepository.findOneBy({id : id});
+        if (user == null) {
+            return null;
+        }
         user.enable2FA = false;
         user.secret2FA = null;
         await this.userRepository.save(user);
         return null;
+    }
+
+    public async isBlocked(myuser_id : string, user_id: string): Promise<boolean>
+    {
+        const myuser = await this.getUserById(myuser_id);
+        const user = await this.getUserById(user_id);
+        if (user == null && myuser == null) {
+            return null;
+        }
+        myuser.blockedUsers.forEach(element => {
+            if (element.id == user.id)
+                return true;
+        });
+        return false;
+    }
+
+    public async OneOfTwoBlocked(myuser_id: string, user_id: string): Promise<boolean>
+    {
+        const myuser = await this.getUserById(myuser_id);
+        const user = await this.getUserById(user_id);
+        if (user == null && myuser == null) {
+            return null;
+        }
+        myuser.blockedUsers.forEach(element => {
+            if (element.id == user.id)
+                return true;
+        });
+        user.blockedUsers.forEach(element => {
+            if (element.id == myuser.id)
+                return true;
+        });
+        return false;
+    }
+
+    public async getGame(id: string) {
+        const user = await this.userRepository.findOneBy({id : id});
+        if (user == null) {
+            return null;
+        }
+        return user.games;
+    }
+
+    public async changeStatus(id:string, status: number) {
+        const user = await this.userRepository.findOneBy({id : id});
+        if (user == null) {
+            return null;
+        }
+        user.status = status;
+        await this.userRepository.save(user);
     }
 }
