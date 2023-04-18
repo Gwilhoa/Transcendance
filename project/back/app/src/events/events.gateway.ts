@@ -14,6 +14,8 @@ import { AuthService } from 'src/auth/auth.service';
 import { identity } from 'rxjs';
 import { ChannelService } from 'src/channel/channel.service';
 import { sendMessageDTO } from 'src/dto/sendmessage.dto';
+import { sleep } from '../utils/sleep'
+import { User } from './user.entity';
 export enum Status {
   CONNECTED = 0,
   DISCONNECTED = 1,
@@ -28,8 +30,17 @@ export enum Status {
  
  export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   constructor(private userService: UserService, private authService: AuthService, private channelService: ChannelService) {
-    this.clients.set("1", "test");
+    const check = async () => {
+      while (true) {
+        await this.check_matchmaking();
+        await sleep(10000);
+          }               
+      }
+      check();
   }
+
+  private clients: Map<string, string> = new Map<string, string>();
+  private matchmaking: Array<User> = Array();
 
   verifyToken(token: string, client: Socket) {
     try {
@@ -50,7 +61,6 @@ export enum Status {
     return list;
   }
 
-  private clients: Map<string, string> = new Map<string, string>();
 
   afterInit(server: Server) {
     this.logger.log('Socket server initialized');
@@ -287,5 +297,41 @@ export enum Status {
     this.server.to(channel_id).emit('user_leave', send);
   }
 
-  
+  //
+  //
+  //
+
+  @SubscribeMessage('join_matchmaking')
+  async join_matchmaking(client: Socket, payload: any)
+  {
+    var id;
+    var user;
+    try {
+      id = await this.authService.getIdFromToken(payload.token);
+      user = await this.userService.getUserById(id);
+    } catch (error) {
+      await client.emit('connection_error', "Invalid token");
+      await client.disconnect();
+      return;
+    }
+    this.matchmaking.push(user);
+    await client.emit('message_code', 'ok');
+  }
+
+  async check_matchmaking()
+  {
+    var matchmaking_len = this.matchmaking.length;
+    while (matchmaking_len > 1)
+    {
+      this.matchmaking.forEach(user1 => {
+        var authorized_player = this.matchmaking.filter(user2 => { user1.id != user2.id && await this.userService.OneOfTwoBlocked(user1.id, user2.id) == false});
+        var len_authorized_player = authorized_player.length;
+        if (len_authorized_player > 1){
+          var random_player = authorized_player[Math.floor(Math.random() * authorized_player.length)];
+          //TODO: create game
+        }
+      });
+      matchmaking_len = this.matchmaking.length;
+    }
+  }  
 }

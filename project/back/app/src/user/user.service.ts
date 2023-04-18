@@ -307,4 +307,30 @@ export class UserService {
         await this.userRepository.save(user);
         return null;
     }
+
+    public async isBlocked(myuser_id : string, user_id: string): Promise<boolean>
+    {
+        const myuser = await this.getUserById(myuser_id);
+        const user = await this.getUserById(user_id);
+        myuser.blockedUsers.forEach(element => {
+            if (element.id == user.id)
+                return true;
+        });
+        return false;
+    }
+
+    public async OneOfTwoBlocked(myuser_id: string, user_id: string): Promise<boolean>
+    {
+        const myuser = await this.getUserById(myuser_id);
+        const user = await this.getUserById(user_id);
+        myuser.blockedUsers.forEach(element => {
+            if (element.id == user.id)
+                return true;
+        });
+        user.blockedUsers.forEach(element => {
+            if (element.id == myuser.id)
+                return true;
+        });
+        return false;
+    }
 }
