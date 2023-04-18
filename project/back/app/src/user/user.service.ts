@@ -286,6 +286,9 @@ export class UserService {
 
     public async set2FASecret(secret: string, id: string){
         const user = await this.userRepository.findOneBy({id : id});
+        if (user == null) {
+            return null;
+        }
         user.secret2FA = secret;
         await this.userRepository.save(user);
         return null;
@@ -294,6 +297,9 @@ export class UserService {
     public async enabled2FA(id: string)
     {
         const user = await this.userRepository.findOneBy({id : id});
+        if (user == null) {
+            return null;
+        }
         user.enable2FA = true;
         await this.userRepository.save(user);
         return null;
@@ -302,6 +308,9 @@ export class UserService {
     public async disabled2FA(id: string)
     {
         const user = await this.userRepository.findOneBy({id : id});
+        if (user == null) {
+            return null;
+        }
         user.enable2FA = false;
         user.secret2FA = null;
         await this.userRepository.save(user);
@@ -312,6 +321,9 @@ export class UserService {
     {
         const myuser = await this.getUserById(myuser_id);
         const user = await this.getUserById(user_id);
+        if (user == null && myuser == null) {
+            return null;
+        }
         myuser.blockedUsers.forEach(element => {
             if (element.id == user.id)
                 return true;
@@ -323,6 +335,9 @@ export class UserService {
     {
         const myuser = await this.getUserById(myuser_id);
         const user = await this.getUserById(user_id);
+        if (user == null && myuser == null) {
+            return null;
+        }
         myuser.blockedUsers.forEach(element => {
             if (element.id == user.id)
                 return true;
@@ -340,5 +355,14 @@ export class UserService {
             return null;
         }
         return user.games;
+    }
+
+    public async changeStatus(id:string, status: number) {
+        const user = await this.userRepository.findOneBy({id : id});
+        if (user == null) {
+            return null;
+        }
+        user.status = status;
+        await this.userRepository.save(user);
     }
 }

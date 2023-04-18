@@ -9,10 +9,12 @@ import { UserService } from "src/user/user.service";
 import { EventsGateway } from "./events.gateway";
 import { Channel } from "src/channel/channel.entity";
 import { ChannelService } from "src/channel/channel.service";
+import { GameService } from "src/game/game.service";
+import { Game } from "src/game/game.entity";
 
 @Module({
-    imports: [TypeOrmModule.forFeature([User]), ConfigModule, AuthModule, TypeOrmModule.forFeature([Channel])],
+    imports: [TypeOrmModule.forFeature([User]), ConfigModule, AuthModule, TypeOrmModule.forFeature([Channel]), TypeOrmModule.forFeature([Game])],
     controllers: [],
-    providers: [EventsGateway, UserService, AuthService, JwtService ,ConfigService, ChannelService],
+    providers: [EventsGateway, UserService, AuthService, JwtService ,ConfigService, ChannelService, GameService],
 })
 export class EventModule {}
