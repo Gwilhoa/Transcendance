@@ -333,4 +333,12 @@ export class UserService {
         });
         return false;
     }
+
+    public async getGame(id: string) {
+        const user = await this.userRepository.findOneBy({id : id});
+        if (user == null) {
+            return null;
+        }
+        return user.games;
+    }
 }

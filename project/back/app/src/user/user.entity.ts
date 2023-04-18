@@ -2,6 +2,7 @@ import { Channel } from 'src/channel/channel.entity';
 import { Message } from 'src/channel/message.entity';
 import { Column, Double, Entity, JoinTable, ManyToMany, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
 import { RequestFriend } from './requestfriend.entity';
+import { Game } from 'src/game/game.entity';
 
 
 @Entity({name: 'users'})
@@ -51,4 +52,7 @@ export class User {
 
     @Column({default: false})
     enable2FA: boolean;
+
+    @OneToMany(type => Game, game => game.user1 || game.user2)
+    games: Game[];
 }
