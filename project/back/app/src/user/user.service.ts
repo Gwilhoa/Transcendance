@@ -6,11 +6,25 @@ import { User } from './user.entity';
 import fetch from 'node-fetch';
 import { use } from 'passport';
 import { RequestFriend } from './requestfriend.entity';
+import { Type } from 'src/channel/channel.entity';
 
 
 @Injectable()
 export class UserService {
     constructor(@InjectRepository(User) private userRepository: Repository<User>, private authService: AuthService) {}
+
+    public async getPathImage(id: string) {
+        console.log(id);
+        const path = require('path');
+        const fs = require('fs');
+        const imageDir = path.join(__dirname, '..', '..', '..', 'images');
+        const files = await fs.promises.readdir(imageDir);
+        const matchingFiles = files.filter((file) => file.startsWith(id));
+        if (matchingFiles.length == 0) {
+            return null;
+        }
+        return path.join(imageDir, matchingFiles[0]);
+    }
 
     public asfriendrequestby(user: User, friend: User) {
         if (user.requestsReceived == null) {
@@ -53,25 +67,13 @@ export class UserService {
         user.username = retUser.login;
         user.email = retUser.email;
         var avatar_url = retUser.image.link;
-
-        
-
-
         var request = await fetch(avatar_url);
         var buffer = await request.buffer();
-        var fs = require('fs');
         fs.mkdirSync(__dirname+'/../../../images', { recursive: true });
-        var path = __dirname+'/../../../images/' + user.id + '.jpg';
-        console.log(path);
-        fs.writeFile(path, buffer, (err) => {
-            if (err) throw err;
-            console.log('Image downloaded successfully!');
-          });
-        
-        
-
-
-
+        var image = await this.setAvatar(user.id, buffer, '.jpg');
+        if (image == null ) {
+            return null;
+        }
         if (await this.userRepository.findOneBy({id : user.id}) != null) {
             return user;
         }
@@ -94,7 +96,6 @@ export class UserService {
         }
         var path = __dirname+'/../../../images/' + user.id + '.jpg';
         return path;
-
     }
     
     public async addFriend(id: string, friend_id: string) {
@@ -229,5 +230,81 @@ export class UserService {
         await this.userRepository.save(user);
         await this.userRepository.save(friend);
         return user;
+    }
+
+    public async setName(id: string, name: string) {
+        var user = await this.userRepository.findOneBy({id : id});
+        if (user == null) {
+            return null;
+        }
+        user.username = name;
+        await this.userRepository.save(user);
+        return user;
+    }
+
+    public async setAvatar(id, buffer, extname) {
+        const fs = require('fs').promises;
+        const path = require('path');
+        const lastimage = await this.getPathImage(id);
+        if (lastimage != null) {
+            fs.unlink(lastimage);
+        }
+        const imagePath = path.join(__dirname, '..', '..', '..', 'images', `${id}${extname}`);
+        try {
+            await fs.access(path.dirname(imagePath));
+        } catch (error) {
+            await fs.mkdir(path.dirname(imagePath), { recursive: true });
+        }
+        try {
+        await fs.writeFile(imagePath, buffer);
+            console.log(id + ' image updated');
+            return imagePath;
+        } catch (error) {
+            return null;
+        }
+    }
+
+    public async isfriendReq(id: string, friend_id: string) {
+        var user = await this.userRepository.findOneBy({id : id});
+        var friend = await this.userRepository.findOneBy({id : friend_id});
+        if (user == null || friend == null) {
+            return false;
+        }
+        if (user == friend) {
+            return false;
+        }
+        return this.isfriend(user, friend);
+    }
+
+    public async getMpChannels(id: string) {
+        const channels = await this.getChannels(id);
+        if (channels == null) {
+            return null;
+        }
+        return channels.filter((channel) => channel.type == Type.MP_CHANNEL);
+    }
+
+    public async set2FASecret(secret: string, id: string){
+        const user = await this.userRepository.findOneBy({id : id});
+        user.secret2FA = secret;
+        await this.userRepository.save(user);
+        return null;
+    }
+
+    public async enabled2FA(id: string)
+    {
+        const user = await this.userRepository.findOneBy({id : id});
+        user.enable2FA = true;
+        await this.userRepository.save(user);
+        return null;
+    }
+
+    public async disabled2FA(id: string)
+    {
+        const user = await this.userRepository.findOneBy({id : id});
+        user.enable2FA = false;
+        user.secret2FA = null;
+        await this.userRepository.save(user);
+        return null;
     }
 }
