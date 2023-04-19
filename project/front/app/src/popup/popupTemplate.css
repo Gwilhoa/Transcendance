@@ -19,7 +19,7 @@
     top: 10vh;
     bottom: 10vh;
     width: 400px;
-    background-color: rgb(146, 146, 146);
+    background-color: rgba(255, 193, 211, 0.669);
     border-left: 1px solid var(--colorside);
     border-right: 1px solid var (--colorside);
 }
