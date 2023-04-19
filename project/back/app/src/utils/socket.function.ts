@@ -16,6 +16,7 @@ export function getKeys(map: Map<any, any>)
     map.forEach((key, value) => {
         list.push(key);
     });
+    return list;
 }
 
 export function wrongtoken(client: Socket) {
@@ -32,5 +33,6 @@ export function send_connection_server(connected: Map<string, string>, ingame: M
     "connected": connectedlist,
     "ingame": ingamelist
   }
+  console.log(send);
   server.emit('connection_server', send);
 }

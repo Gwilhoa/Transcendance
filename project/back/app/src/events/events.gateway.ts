@@ -57,12 +57,12 @@ sendconnected() {
    }
   
    handleDisconnect(client: Socket) {
-     console.log(`Client disconnected: ${client.id}`);
-     this.clients.delete(client.id);
-     if (this.ingame.has(client.id)) {
-       this.ingame.delete(client.id);
-     }
-     this.sendconnected();
+    this.logger.log(`Client disconnected: ${client.id}`);
+    this.clients.delete(client.id);
+    if (this.ingame.has(client.id)) {
+      this.ingame.delete(client.id);
+    }
+    this.sendconnected();
    }
   
    //on connection
@@ -91,6 +91,7 @@ sendconnected() {
       });  //le message "connection" doit etre envoyé à la connection du client
     }
  
+  //on friend request
   @SubscribeMessage('friend_request') //reception d'une demande d'ami / accepter une demande d'ami
   async handleFriendRequest(client: Socket, payload: any) {
     var token = payload.token;
@@ -146,6 +147,8 @@ sendconnected() {
     client.emit('friend_code', ret);
   }
 
+
+  //on send message
   @SubscribeMessage('send_message')
   async handleMessage(client: Socket, payload: any) {
     if (payload.token == null || payload.channel_id == null || payload.content == null) {

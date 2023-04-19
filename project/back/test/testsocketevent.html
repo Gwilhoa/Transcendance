@@ -10,7 +10,7 @@
 
 		socket.on('connect', () => {
 			console.log('Connected to server');
-			socket.emit('connection', { token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjkyMDAwLCJlbWFpbCI6ImdjaGF0YWluQHN0dWRlbnQuNDJseW9uLmZyIiwiaWF0IjoxNjgwNjMxMjQzLCJleHAiOjE2ODA2Mzg0NDN9.dJx1YNtxGz3SbCFJhvtXuBQppgZYPP2GpnKX0GCXeEI' });
+			socket.emit('connection', { token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjkyMDAwLCJpc2F1dGgiOmZhbHNlLCJpYXQiOjE2ODE5MjA4MjgsImV4cCI6MTY4MTkyMTQyOH0.Qbgv-A5_VxlX4rV9DDE0LZ3Jb8r-UGRx8QnkZqWeJ7A' });
 		});
 
 		socket.on('disconnect', () => {
