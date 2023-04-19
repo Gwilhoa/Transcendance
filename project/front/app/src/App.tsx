@@ -1,37 +1,45 @@
-import React, { useEffect, useState } from 'react';
-import './App.css';
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import Auth from './pages/Auth';
+import AuthToken from './pages/AuthToken';
+import NotFound from './pages/NotFound';
+import Game from './pages/game';
+import Accueil from './pages/accueil';
+import PopupChat from "./popup/popupChat";
+import { DynamicIsInAChat, KnowMyChannel } from "./chatManager";
 
-function GetTokenUser(props: { url: string }) {
-  const [body, setBody] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetch(props.url)
-      .then((response) => response.text())
-      .then((text) => setBody(text));
-  }, []);
+const AppInsideBrowser = () => {
 
-  if (!body) {
-    return <div>Loading...</div>;
-  }
+	return (
+			<>
+				<Routes>
+				<Route path="/" Component={Auth}/>
+				<Route path="/auth" Component={AuthToken}/>
+				<Route path="*" Component={NotFound}/>
+				<Route path="/accueil/*" Component={Accueil} />
+				<Route path="/game/*" Component={Game} />
+				
+				</Routes>
+				{DynamicIsInAChat() && 
+					<PopupChat path={KnowMyChannel()}/>
+				}
+			</>
 
-  return <div dangerouslySetInnerHTML={{ __html: body }} />;
+	);
 }
 
+
+
+
 function App() {
-  return (
-	<div className="App">
-		<h1>Transcendence</h1>
-		<a
-		className="api42-link"
-		href="http://localhost:6200/auth/login"
-		target="_blank"
-		rel="noopener noreferrer"
-		>
-			Authentification
-		</a>
-			<GetTokenUser url="http://localhost:6200/auth/login"/>
-    </div>
-  );
+
+
+	return (
+		<BrowserRouter>
+		<AppInsideBrowser/>
+		</BrowserRouter>
+	);
+
 }
 
 export default App;

@@ -1,0 +1,43 @@
+:root {
+  --widthCanvas: "1";
+  --heightCanvas: "1";
+}
+
+
+.game-container {
+  position: relative;
+  width: var(--widthCanvas);
+  height: var(--heightCanvas);
+  margin: 0 auto;
+}
+
+.game-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: black;
+}
+
+.paddle1,
+.paddle2 {
+  position: absolute;
+  width: 10px;
+  height: 100px;
+  background-color: white;
+}
+
+.paddle1 {
+  left: 20px;
+}
+
+.paddle2 {
+  right: 20px;
+}
+
+.ball {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background-color: white;
+  border-radius: 50%;
+}

@@ -40,3 +40,10 @@
     height: 80vh;
     margin: 0 auto;
 }
+
+  .corps-template {
+    position: fixed;
+    bottom: 6vh;
+    top: 10vh;
+    width: 100%;
+  }
