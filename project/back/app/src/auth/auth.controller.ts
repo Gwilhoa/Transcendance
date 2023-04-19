@@ -26,6 +26,10 @@ export class AuthController {
       console.log(id.code);
       
       var user = await this.userService.createUsers(id.code);
+      if (user == null) {
+        res.status(400).send('Bad Request');
+        return;
+      }
       var code = await this.authService.signJwtToken(parseInt(user.id), false);
       res.redirect('http://localhost:8080/auth?access_token=' + code.acess_token);
       // var code = await this.authService.signJwtToken(parseInt(user.id), user.email);
