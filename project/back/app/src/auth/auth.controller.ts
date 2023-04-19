@@ -81,7 +81,7 @@ export class AuthController {
     async authenticate2FA(@GetUser() jwtUser, @Res() res) {
       var id = jwtUser.sub;
       var user = await this.userService.getUserById(id);
-      if (user.enable2FA != null) {
+      if (user.enable2FA == true) {
         var code2FA = '278'; // TODO : tmp, voir comment on recup le code
         if (code2FA == null)
           throw new UnauthorizedException('Wrong two factor authentication code')
