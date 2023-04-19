@@ -1,0 +1,13 @@
+.notific 
+{ 
+    background-color: red;
+    color: white; 
+    padding: 1em;
+    top:10vh;
+    left:50%;
+    z-index: 1;
+    transform: translate(-50%);
+    position: relative;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+}
