@@ -23,7 +23,7 @@ export class AuthController {
       if (id.code == null) {
         res.status(400).send('Bad Request');
       }
-      // console.log(id.code);
+      console.log(id.code);
       
       var user = await this.userService.createUsers(id.code);
       var code = await this.authService.signJwtToken(parseInt(user.id), false);
