@@ -17,8 +17,11 @@ import { sendMessageDTO } from 'src/dto/sendmessage.dto';
 import { sleep } from '../utils/sleep'
 import { User } from '../user/user.entity';
 import { GameService } from 'src/game/game.service';
-import { Status } from '../utils/status.enum';
 import { CreateGameDTO } from 'src/dto/create-game.dto';
+import { ChannelType } from 'src/utils/channel.enum';
+import { UserStatus } from 'src/utils/user.enum';
+import { getKeys, send_connection_server, verifyToken, wrongtoken } from 'src/utils/socket.function';
+import { FriendCode, messageCode } from 'src/utils/requestcode.enum';
 
  @WebSocketGateway({
    cors: {
@@ -39,57 +42,45 @@ import { CreateGameDTO } from 'src/dto/create-game.dto';
   }
 
   private clients: Map<string, string> = new Map<string, string>();
+  private ingame: Map<string, string> = new Map<string, string>();
   private matchmaking: Array<User> = Array();
 
-  verifyToken(token: string, client: Socket) {
-    try {
-      var id = this.authService.getIdFromToken(token);
-      return id;
-    }
-    catch (error) {
-      client.emit('connection_error', "Invalid token");
-      return null;
-    }
-  }
+sendconnected() {
+  send_connection_server(this.clients, this.ingame, this.server);
+}
 
-  getConnectedUsers() {
-    var list = [];
-    this.clients.forEach((value, key) => {
-      list.push(value);
-    });
-    return list;
-  }
-
+  @WebSocketServer() server: Server;
+  private logger: Logger = new Logger('EventsGateway');
 
   afterInit(server: Server) {
     this.logger.log('Socket server initialized');
    }
   
    handleDisconnect(client: Socket) {
-     this.logger.log(`Client disconnected: ${client.id}`);
+     console.log(`Client disconnected: ${client.id}`);
      this.clients.delete(client.id);
+     if (this.ingame.has(client.id)) {
+       this.ingame.delete(client.id);
+     }
+     this.sendconnected();
    }
   
+   //on connection
     async handleConnection(client: Socket, ...args: any[]) {
-      this.logger.log(`Client connected: ${client.id}`);
+      console.log("[Socket] new client connected");
       var id;
       await client.on('connection', async (data) => {
-        this.logger.log(`Received data from client: ${data.token}`);
         try {
           id = this.authService.getIdFromToken(data.token);
         } catch (error) {
-          client.emit('connection_error', "Invalid token");
-          client.disconnect();
+          wrongtoken(client);
           return;
         }
+        this.userService.changeStatus(id, UserStatus.CONNECTED);
         this.clients.set(client.id, id);
-        var list = this.getConnectedUsers();
-        var sendserver = {
-          "connected": list,
-          "inGame": []
-       }
-       var channels;
-       var user_chan = await this.userService.getChannels(id);
+        this.sendconnected();
+        var channels;
+        var user_chan = await this.userService.getChannels(id);
         if (user_chan != null) {
           user_chan.forEach(element => {
             channels.push(element.id);
@@ -97,24 +88,16 @@ import { CreateGameDTO } from 'src/dto/create-game.dto';
         }
         if (channels != null && channels.length < 0)
           client.join(channels);
-        this.server.emit('connection_server', sendserver);
-      });
+      });  //le message "connection" doit etre envoyé à la connection du client
     }
-
-    
-  @WebSocketServer() server: Server;
-  private logger: Logger = new Logger('EventsGateway');
  
-  @SubscribeMessage('friend_request')
+  @SubscribeMessage('friend_request') //reception d'une demande d'ami / accepter une demande d'ami
   async handleFriendRequest(client: Socket, payload: any) {
     var token = payload.token;
     var friend_id = payload.friend_id;
-    var user_id = this.verifyToken(token, client);
+    var user_id = verifyToken(token, client);
     if (user_id == null) {
-      var erro = {
-        "code": 401
-      }
-      client.emit('friend_code', erro);
+      client.emit('friend_code', FriendCode.UNAUTHORIZED);
       return;
     }
     var user = await this.userService.getUserById(user_id);
@@ -122,14 +105,13 @@ import { CreateGameDTO } from 'src/dto/create-game.dto';
     var ret;
     if (friend == null) {
       ret = {
-        "code": 1
+        "code": FriendCode.UNEXISTING_USER
       }
-      client.emit('friend_code', ret);
     }
     else if (this.userService.isfriend(user, friend))
     {
       ret = {
-        "code": 3
+        "code": FriendCode.ALREADY_FRIEND
       }
     }
     else if (this.userService.asfriendrequestby(user, friend))
@@ -137,7 +119,7 @@ import { CreateGameDTO } from 'src/dto/create-game.dto';
       await this.userService.removeFriendRequest(user_id, friend_id);
       if (this.clients[friend_id] != null) {
         var send = {
-          "code" : 5,
+          "code" : FriendCode.NEW_FRIEND,
           "id": user.id
         }
         this.server.sockets[this.clients[friend_id]].emit('friend_request', send);
@@ -145,17 +127,17 @@ import { CreateGameDTO } from 'src/dto/create-game.dto';
         await this.userService.addFriend(friend_id, user_id);
       }
       ret = {
-        "code": 2
+        "code": FriendCode.NEW_FRIEND
       }
     }
     else {
       ret = {
-        "code": 0
+        "code": FriendCode.SUCCESS
       }
       await this.userService.addFriendRequest(user_id, friend_id);
       if (this.clients[friend_id] != null) {
         var send = {
-          "code" : 4,
+          "code" : FriendCode.FRIEND_REQUEST,
           "id": user.id
         }
         this.server.sockets[this.clients[friend_id]].emit('friend_request', send);
@@ -166,58 +148,57 @@ import { CreateGameDTO } from 'src/dto/create-game.dto';
 
   @SubscribeMessage('send_message')
   async handleMessage(client: Socket, payload: any) {
+    if (payload.token == null || payload.channel_id == null || payload.content == null) {
+      client.emit('message_code', messageCode.INVALID_FORMAT);
+    }
     var token = payload.token;
     var channel_id = payload.channel_id;
     var message = payload.content;
     var send;
-    var user_id = this.verifyToken(token, client);
-    if (user_id == null) {
-      send = {
-        "code": 401
-      }
-      client.emit('message_code', send);
-      return;
-    }
+    var user_id = verifyToken(token, client);
     var user = await this.userService.getUserById(user_id);
     var channel = await this.channelService.getChannelById(channel_id);
-    if (channel == null) {
+    if (user == null) {
       send = {
-        "code": 1
+        "code": messageCode.UNAUTHORIZED
       }
-      client.emit('message_code', send);
-      return;
     }
-    if (!await this.channelService.isInChannel(user, channel)) {
+    else if (channel == null) {
       send = {
-        "code": 2
+        "code": messageCode.UNEXISTING_CHANNEL
       }
-      client.emit('message_code', send);
-      return;
     }
+    else if (!await this.channelService.isInChannel(user, channel)) {
+      send = {
+        "code": messageCode.UNACCESSIBLE_CHANNEL
+      }
+    }
+    else {
     message = new sendMessageDTO;
     message.content = payload.content;
     message.user = user_id;
     message.channel = channel_id;
     var msg = await this.channelService.sendMessage(message);
     send = {
-      "code": 0
+      "code": messageCode.SUCCESS,
+    }
+    var sendmsg = {
+        "id": msg.id,
+        "content": msg.content,
+        "user": msg.user.id,
+        "channel": msg.channel,
+        "date": msg.date
+      }
+      this.server.to(channel_id).emit('message', sendmsg);
     }
     client.emit('message_code', send);
-    var sendmsg = {
-      "id": msg.id,
-      "content": msg.content,
-      "user": msg.user.id,
-      "channel": msg.channel,
-      "date": msg.date
-    }
-    this.server.to(channel_id).emit('message', sendmsg);
   }
 
   @SubscribeMessage('join_channel')
   async handleJoinChannel(client: Socket, payload: any) {
     var token = payload.token;
     var channel_id = payload.channel_id;
-    var user_id = this.verifyToken(token, client);
+    var user_id = verifyToken(token, client);
     if (user_id == null) {
       var erro = {
         "code": 401
@@ -258,7 +239,7 @@ import { CreateGameDTO } from 'src/dto/create-game.dto';
   async handleLeaveChannel(client: Socket, payload: any) {
     var token = payload.token;
     var channel_id = payload.channel_id;
-    var user_id = this.verifyToken(token, client);
+    var user_id = verifyToken(token, client);
     if (user_id == null) {
       var erro = {
         "code": 401
@@ -333,8 +314,8 @@ import { CreateGameDTO } from 'src/dto/create-game.dto';
 
           var create_game = await this.gameService.createGame(gameinfo);
           //TODO: create game
-          await this.userService.changeStatus(user1.id, Status.IN_GAME); // TODO: status in game
-          await this.userService.changeStatus(random_player.id, Status.IN_GAME); // TODO: status in game
+          await this.userService.changeStatus(user1.id, UserStatus.IN_GAME); // TODO: status in game
+          await this.userService.changeStatus(random_player.id, UserStatus.IN_GAME); // TODO: status in game
           this.clients[user1.id].join(create_game.id);
           this.clients[random_player.id].join(create_game.id);
           await this.clients[user1.id].emit('game_created', create_game.id);

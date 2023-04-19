@@ -1,13 +1,9 @@
 import { User } from "src/user/user.entity";
 import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Message } from "./message.entity";
+import { ChannelType } from "src/utils/channel.enum";
 
-export enum Type {
-    PRIVATE_CHANNEL = 0,
-    PUBLIC_CHANNEL = 1,
-    PROTECTED_CHANNEL = 2,
-    MP_CHANNEL = 3,
-}
+
 @Entity('channels')
 export class Channel {
 
@@ -36,7 +32,7 @@ export class Channel {
     topic: string;
 
     @Column()
-    type: Type;
+    type: ChannelType;
 
     @Column({nullable: true})
     pwd: string;

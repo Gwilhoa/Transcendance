@@ -6,7 +6,7 @@ import { User } from './user.entity';
 import fetch from 'node-fetch';
 import { use } from 'passport';
 import { RequestFriend } from './requestfriend.entity';
-import { Type } from 'src/channel/channel.entity';
+import { ChannelType } from 'src/utils/channel.enum';
 
 
 @Injectable()
@@ -281,7 +281,7 @@ export class UserService {
         if (channels == null) {
             return null;
         }
-        return channels.filter((channel) => channel.type == Type.MP_CHANNEL);
+        return channels.filter((channel) => channel.type == ChannelType.MP_CHANNEL);
     }
 
     public async set2FASecret(secret: string, id: string){
@@ -364,5 +364,13 @@ export class UserService {
         }
         user.status = status;
         await this.userRepository.save(user);
+    }
+
+    public async getstatus(id:string) {
+        const user = await this.userRepository.findOneBy({id : id});
+        if (user == null) {
+            return null;
+        }
+        return user.status;
     }
 }

@@ -8,8 +8,9 @@ import { sendMessageDTO } from 'src/dto/sendmessage.dto';
 import { User } from 'src/user/user.entity';
 import { UserService } from 'src/user/user.service';
 import { Repository } from 'typeorm';
-import { Channel, Type } from './channel.entity';
+import { Channel} from './channel.entity';
 import { Message } from './message.entity';
+import { ChannelType } from 'src/utils/channel.enum';
 
 @Injectable()
 export class ChannelService {
@@ -29,7 +30,7 @@ export class ChannelService {
             return null;
         chan.users.push(user);
         chan.admins.push(user);
-        if (body.type == Type.PROTECTED_CHANNEL)
+        if (body.type == ChannelType.PROTECTED_CHANNEL)
             chan.pwd = body.password;
         await this.channelRepository.save(chan);
         return chan;
@@ -41,7 +42,7 @@ export class ChannelService {
         chan.admins = [];
         chan.bannedUsers = [];
         chan.users = [];
-        chan.type = Type.MP_CHANNEL;
+        chan.type = ChannelType.MP_CHANNEL;
         var user = await this.userService.getUserById(user_id);
         var user1 = await this.userService.getUserById(user_id1);
         chan.users.push(user);
@@ -75,7 +76,7 @@ export class ChannelService {
         var user = await this.userService.getUserById(body.user_id);
         if (user == null)
             return null;
-        if (chan.type == Type.PROTECTED_CHANNEL && chan.pwd != body.password)
+        if (chan.type == ChannelType.PROTECTED_CHANNEL && chan.pwd != body.password)
             return null;
         if ( chan.bannedUsers != null && chan.bannedUsers.includes(user))
             return null;
