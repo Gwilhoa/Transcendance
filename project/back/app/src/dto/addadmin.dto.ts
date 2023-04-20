@@ -1,4 +1,4 @@
 export class addAdminDTO {
-    user_id: string;
-    channel_id: string;
+	user_id: string;
+	channel_id: string;
 }
