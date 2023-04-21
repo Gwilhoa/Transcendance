@@ -8,6 +8,7 @@ import PopupChat from "./popup/popupChat";
 import { DynamicIsInAChat, KnowMyChannel } from "./chatManager";
 
 
+
 const AppInsideBrowser = () => {
 
 	return (

@@ -11,13 +11,13 @@ const Template = (props: Props) => {
 
     return (
       <div>
+          <div className="form-container">
+            <main>{props.children}</main>
+          </div>
         <header>
             <Head/>
             <Notification channel="yo" message="Nouveau message"/> 
         </header>
-          <div className="form-container">
-            <main>{props.children}</main>
-          </div>
         <footer>
             <Foot/>
         </footer>

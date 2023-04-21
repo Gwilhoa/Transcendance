@@ -4,7 +4,6 @@ import { useState } from "react";
 import Modal from "../profil/modal";
 import PopupHisto from "../popup/popupHisto"
 import CV from "../profil/CV";
-import { JoinChat } from "../chatManager";
 
 const Head = () => {
 
@@ -25,9 +24,10 @@ const Head = () => {
             <Link to="/accueil" className="navbar__link">
               Accueil
             </Link>
-            <button onClick={JoinChat} className="navbar__link">
-              <h3>Chat</h3>
-            </button>
+
+            <Link to="chat" className="navbar__link">
+              Chat
+            </Link>
             <Link to="/game" className="navbar__link">
               Jeu
             </Link>

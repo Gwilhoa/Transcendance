@@ -4,17 +4,22 @@ import { useState } from 'react';
 import Modal from '../profil/modal';
 import CV from '../profil/CV';
 import { ChangeChannel, LeaveChat } from '../chatManager';
+import { Link } from 'react-router-dom';
+import axios from '../API';
 
 
 interface showMessage {
   contain: string,
-  author: string
+  author: string, 
+  date: string
 }
 
 function takeMessagesToBack(name:string): showMessage[] {
-  const ret = [{author: "", contain:"dskdjfdddsj"}, {author:"sd ddsds", contain:"sodjgggg"},{author: "", contain:"dsvvvvvvvvvvvvvvvvkdjsj"}, {author:"s ddsds", contain:"sodjgggggggggggggggggggg"}]
+  const ret = [{author: "", contain:"dskdjfdddsj", date: ""}, {author:"sd ddsds", contain:"sodjgggg", date: ""},{author: "", contain:"dsvvvvvvvvvvvvvvvvkdjsj", date: ""}, {author:"s ddsds", contain:"sodjgggggggggggggggggggg", date: ""}]
   //////Bonne chance !!
-
+  axios.get('https://localhost:3000/' + name + '/message')
+    .then(response => console.log(response.data))
+    .catch(error => console.error(error));
     
   return (ret);
 }
@@ -105,7 +110,7 @@ const PopupChat: React.FC<{path:string}> = (path) => {
     <div className="popup right">
       <div className="popupchild">
         <header className="popup_up">
-          <button className="close-button" onClick={LeaveChat} > X </button>
+          <Link to="../" className="close-button" > X </Link>
           <div className="texte">
             {path.path}
           </div>
