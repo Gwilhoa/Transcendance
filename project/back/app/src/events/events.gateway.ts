@@ -6,6 +6,7 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
+import { Game } from '../events/Game.class';
 import { Logger } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { UserService } from 'src/user/user.service';
@@ -35,6 +36,7 @@ export class EventsGateway
   @WebSocketServer() server: Server;
   private clients: Map<string, string> = new Map<string, string>();
   private ingame: Map<string, string> = new Map<string, string>();
+  private games: Map<string, Game> = new Map<string, Game>();
   private matchmaking: Array<User> = [];
   private logger: Logger = new Logger('EventsGateway');
 
@@ -335,10 +337,23 @@ export class EventsGateway
           ); // TODO: status in game
           this.clients[user1.id].join(create_game.id);
           this.clients[random_player.id].join(create_game.id);
-          await this.clients[user1.id].emit('game_created', create_game.id);
+          this.server.emit(create_game.id, 'game_created', create_game.id);
+          this.games.set(create_game.id, new Game(create_game.id, user1.id, random_player.id));
         }
       });
       matchmaking_len = this.matchmaking.length;
     }
+  }
+
+  @SubscribeMessage('input_game')
+  async input_game(client: Socket, payload: any) {
+    const token = payload.token;
+    const game_id = payload.game_id;
+    const position = payload.position;
+    if (position > 100 || position < 0) {
+        return;
+    }
+    this.games[game_id].updateRacket(position, game_id);
+    this.server.to(game_id).emit('update_game', this.games[game_id].getGameInfo());
   }
 }
