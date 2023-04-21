@@ -4,13 +4,13 @@
 	<title>Test WebSocket</title>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.2/socket.io.js"></script>
 	<script>
-		const socket = io('http://localhost:6200', {
+		const socket = io('http://localhost:3000', {
 			transports: ['websocket']
 		});
 
 		socket.on('connect', () => {
 			console.log('Connected to server');
-			socket.emit('connection', { token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjkyMDAwLCJlbWFpbCI6ImdjaGF0YWluQHN0dWRlbnQuNDJseW9uLmZyIiwiaWF0IjoxNjgwNjMxMjQzLCJleHAiOjE2ODA2Mzg0NDN9.dJx1YNtxGz3SbCFJhvtXuBQppgZYPP2GpnKX0GCXeEI' });
+			socket.emit('connection', { token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjkyMDAwLCJpc2F1dGgiOnRydWUsImlhdCI6MTY4MTkyMzYyMywiZXhwIjoxNjgxOTMwODIzfQ.L-Kzi-PBfmRq4I1TQNuDFiPabS8aT73yH8BjwJ69w7Q' });
 		});
 
 		socket.on('disconnect', () => {
