@@ -6,6 +6,7 @@ import Game from './pages/game';
 import Accueil from './pages/accueil';
 import PopupChat from "./popup/popupChat";
 import { DynamicIsInAChat, KnowMyChannel } from "./chatManager";
+import TokenPage from "./pages/authenticate";
 
 
 const AppInsideBrowser = () => {
@@ -18,6 +19,7 @@ const AppInsideBrowser = () => {
 				<Route path="*" Component={NotFound}/>
 				<Route path="/accueil/*" Component={Accueil} />
 				<Route path="/game/*" Component={Game} />
+					<Route path="/authenticate" Component={TokenPage} />
 				
 				</Routes>
 				{DynamicIsInAChat() && 

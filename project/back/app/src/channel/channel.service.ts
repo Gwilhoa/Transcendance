@@ -144,7 +144,7 @@ export class ChannelService {
       .where('channel.id = :id', { id: body.channel_id })
       .getOne();
     if (channel == null) return null;
-    message.channel = channel.id;
+    message.channel = channel;
     message.user = user;
     console.log(message);
     if (channel.messages == null) channel.messages = [];
