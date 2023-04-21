@@ -20,7 +20,6 @@ function takeMessagesToBack(name:string): showMessage[] {
   axios.get('https://localhost:3000/' + name + '/message')
     .then(response => console.log(response.data))
     .catch(error => console.error(error));
-    
   return (ret);
 }
 
