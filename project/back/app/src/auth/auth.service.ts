@@ -53,14 +53,14 @@ export class AuthService {
   public async signJwtToken(
     userId: number,
     isauth: boolean,
-  ): Promise<{ acess_token: string }> {
+  ): Promise<{ access_token: string }> {
     let expiresTime = '10m';
     if (isauth == true) expiresTime = '2h';
     const payload = { sub: userId, isauth: isauth };
     console.log(process.env.JWT_SECRET);
 
     return {
-      acess_token: await this.jwt.signAsync(payload, {
+      access_token: await this.jwt.signAsync(payload, {
         expiresIn: expiresTime,
         secret: process.env.JWT_SECRET,
       }),

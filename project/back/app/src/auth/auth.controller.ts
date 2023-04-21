@@ -47,10 +47,8 @@ export class AuthController {
       return;
     }
     const code = await this.authService.signJwtToken(parseInt(user.id), false);
-    res.send(code);
-    return;
     res.redirect(
-      'http://localhost:8080/authenticate?access_token=' + code.acess_token,
+      'http://localhost:8080/authenticate?access_token=' + code.access_token,
     );
     // var code = await this.authService.signJwtToken(parseInt(user.id), user.email);
     // res.redirect('http://localhost:8080/auth?access_token=' + code.acess_token);
@@ -129,12 +127,9 @@ export class AuthController {
       // return;
     }
     await this.userService.changeStatus(id, UserStatus.CONNECTED);
-    res.redirect(
-      'http://localhost:8080/auth?access_token=' +
-        (await (
-          await this.authService.signJwtToken(parseInt(user.id), true)
-        ).acess_token),
-    );
+    const token = await this.authService.signJwtToken(parseInt(user.id), true);
+    res.send(token);
+    return;
     // TODO : return current jwt token
     // throw new UnauthorizedException('no active two factor authentication')
   }

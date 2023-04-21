@@ -25,5 +25,5 @@ export class Message {
 
   @ManyToOne((type) => Channel, (channel) => channel.messages)
   @JoinColumn({ name: 'channel_id' })
-  channel: string;
+  channel: Channel;
 }
