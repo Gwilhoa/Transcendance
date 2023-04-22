@@ -1,1 +1,1 @@
-curl http://localhost:3000/channel -H "authorization: bearer $ACCESS_TOKEN"
+curl http://localhost:3000/channel -H "authorization: bearer $1"

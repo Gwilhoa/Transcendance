@@ -46,12 +46,7 @@ export class ChannelController {
   @Get('message')
   async getMessages(@Body() body, @GetUser('sub') id: string, @Res() resp) {
     let ret = null;
-    try {
       ret = await this.channelService.getMessage(body.channel_id, id);
-    } catch (e) {
-      resp.status(401).send('unauthorized');
-      return;
-    }
     if (ret == null) {
       resp.status(204).send('No content');
       return;
