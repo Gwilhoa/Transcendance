@@ -11,9 +11,10 @@ import {Channel} from "src/channel/channel.entity";
 import {ChannelService} from "src/channel/channel.service";
 import {GameService} from "src/game/game.service";
 import {Game} from "src/game/game.entity";
+import {Message} from "../channel/message.entity";
 
 @Module({
-	imports: [TypeOrmModule.forFeature([User]), ConfigModule, AuthModule, TypeOrmModule.forFeature([Channel]), TypeOrmModule.forFeature([Game])],
+	imports: [TypeOrmModule.forFeature([Message]), TypeOrmModule.forFeature([User]), ConfigModule, AuthModule, TypeOrmModule.forFeature([Channel]), TypeOrmModule.forFeature([Game])],
 	controllers: [],
 	providers: [EventsGateway, UserService, AuthService, JwtService, ConfigService, ChannelService, GameService],
 })

@@ -4,7 +4,18 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d4c22c1a-30ce-4167-98e2-3bd0de69eb23" name="Changes" comment="test" />
+    <list default="true" id="d4c22c1a-30ce-4167-98e2-3bd0de69eb23" name="Changes" comment="test">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/back/app/src/channel/channel.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/src/channel/channel.controller.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/back/app/src/channel/channel.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/src/channel/channel.module.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/back/app/src/channel/channel.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/src/channel/channel.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/back/app/src/events/Game.class.ts" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/src/events/Game.class.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/back/app/src/events/event.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/src/events/event.module.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/back/test/createchannels.sh" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/test/createchannels.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/back/test/getMessagByChannelId.sh" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/test/getMessagByChannelId.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/back/test/getchannels.sh" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/test/getchannels.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/back/test/sendMessage.sh" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/test/sendMessage.sh" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -54,14 +65,14 @@
     "nodejs_package_manager_path": "npm",
     "run.code.analysis.last.selected.profile": "pProject Default",
     "settings.editor.selected.configurable": "discord-project",
-    "ts.external.directory.path": "/Users/guilheimchataing/Library/Application Support/JetBrains/Toolbox/apps/WebStorm/ch-0/231.8109.174/WebStorm.app/Contents/plugins/javascript-impl/jsLanguageServicesImpl/external",
+    "ts.external.directory.path": "/Users/guilheimchataing/Transcendance/project/back/app/node_modules/typescript/lib",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
   <component name="RunDashboard">
     <option name="openRunningConfigInTab" value="true" />
   </component>
-  <component name="RunManager" selected="npm.dev">
+  <component name="RunManager" selected="Docker.docker-compose.yml: Compose Deployment">
     <configuration default="true" type="docker-deploy" factoryName="docker-compose.yml" temporary="true">
       <deployment type="docker-compose.yml">
         <settings />
@@ -126,9 +137,9 @@
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Docker.docker-compose.yml: Compose Deployment" />
         <item itemvalue="npm.dev" />
         <item itemvalue="Docker.docker-compose.yml.db: Compose Deployment" />
-        <item itemvalue="Docker.docker-compose.yml: Compose Deployment" />
         <item itemvalue="Docker.docker-compose.yml: Compose Deployment (1)" />
         <item itemvalue="Docker.docker-compose.yml: Compose Deployment" />
       </list>

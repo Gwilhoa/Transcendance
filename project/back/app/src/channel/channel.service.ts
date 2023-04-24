@@ -15,6 +15,7 @@ import { ChannelType } from 'src/utils/channel.enum';
 export class ChannelService {
   constructor(
     @InjectRepository(Channel) private channelRepository: Repository<Channel>,
+    @InjectRepository(Message) private messageRepository: Repository<Message>,
     private readonly userService: UserService,
   ) {}
 
@@ -121,13 +122,14 @@ export class ChannelService {
   public async getMessage(channel_id, user_id) {
     const user = await this.userService.getUserById(user_id);
     if (user == null) return null;
-    const chan = await this.channelRepository.findOneBy({ id: channel_id });
+    const chan = await this.channelRepository
+      .createQueryBuilder('channel')
+      .leftJoinAndSelect('channel.messages', 'messages')
+      .leftJoinAndSelect('messages.user', 'user')
+      .where('channel.id = :id', { id: channel_id })
+      .getOne();
+    console.log(chan);
     if (chan == null) return null;
-    if (chan.users.includes(user) == false)
-      throw new Error('User is not in channel');
-    chan.messages = chan.messages.sort(
-      (a, b) => a.date.getMilliseconds() - b.date.getMilliseconds(),
-    );
     return chan.messages;
   }
 
@@ -150,6 +152,8 @@ export class ChannelService {
     if (channel.messages == null) channel.messages = [];
     channel.messages.push(message);
     await this.channelRepository.save(channel);
-    return message;
+    const ret = await this.messageRepository.save(message);
+    ret.channel = null;
+    return ret;
   }
 }
