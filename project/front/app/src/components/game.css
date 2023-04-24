@@ -5,17 +5,20 @@
 
 
 .game-container {
-  position: relative;
-  width: var(--widthCanvas);
-  height: var(--heightCanvas);
+  position: absolute;
+  justify-content: center;
+  align-items: center;
   margin: 0 auto;
+  top:10vh;
+  left:400px;
 }
 
 .game-canvas {
   position: absolute;
-  top: 0;
-  left: 0;
+  justify-content: center;
+  align-items: center;
   background-color: black;
+
 }
 
 .paddle1,
