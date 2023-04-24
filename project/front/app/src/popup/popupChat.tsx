@@ -3,24 +3,16 @@ import './popupChat.css'
 import { useState } from 'react';
 import Modal from '../profil/modal';
 import CV from '../profil/CV';
-import { ChangeChannel, LeaveChat } from '../chatManager';
-import { Link } from 'react-router-dom';
-import axios from '../API';
+import { ChangeChannel, JoinChat, LeaveChat } from '../chatManager';
+import { Link, Navigate } from 'react-router-dom';
+import { canJoinChannel, getMessages } from '../API';
+import '../template/template.css';
+import { useNavigate } from "react-router-dom";
 
-
-interface showMessage {
-  contain: string,
-  author: string, 
-  date: string
-}
-
-function takeMessagesToBack(name:string): showMessage[] {
-  const ret = [{author: "", contain:"dskdjfdddsj", date: ""}, {author:"sd ddsds", contain:"sodjgggg", date: ""},{author: "", contain:"dsvvvvvvvvvvvvvvvvkdjsj", date: ""}, {author:"s ddsds", contain:"sodjgggggggggggggggggggg", date: ""}]
-  //////Bonne chance !!
-  axios.get('https://localhost:3000/' + name + '/message')
-    .then(response => console.log(response.data))
-    .catch(error => console.error(error));
-  return (ret);
+type ChannelItem = {
+  id: number;
+  URL:string
+  name:string
 }
 
 
@@ -32,9 +24,9 @@ const sendCommandToBack = (message:string) => {
   //////Chao !!
 }
 
-const getMessages = (chan:string, isOpen:boolean, setIsOpen: (checked: boolean) => void) => {
+const addMessages = (chan:string, isOpen:boolean, setIsOpen: (checked: boolean) => void) => {
   const messagesRet = [];
-  const listMessageGet = takeMessagesToBack(chan);
+  const listMessageGet = getMessages(chan);
 
   for(let i = 0; i < listMessageGet.length; i++) {
     
@@ -50,7 +42,7 @@ const getMessages = (chan:string, isOpen:boolean, setIsOpen: (checked: boolean) 
       messagesRet.push(
         <li key={i}>
             {"de : "}
-            <a href="#" onClick={() => setIsOpen(true)} className=""> 
+            <a  onClick={() => setIsOpen(true)} className=""> 
               {listMessageGet[i].author}
             </a>
             <Modal open={isOpen} onClose={() => setIsOpen(false)}>
@@ -66,31 +58,65 @@ const getMessages = (chan:string, isOpen:boolean, setIsOpen: (checked: boolean) 
     return <div className="messagePannel"> {messagesRet} </div>;
   }
   
-const getChanels = () => {
-  var ListOfChanel:string[] = ["hdh", "sdjs", "dsdsdssddsddssdds"];
   
-  //// <<<<<<<<<<<<<<<  The true list
-
-  const chanels = [];
-  for(let i = 0; i < ListOfChanel.length; i++) {
-    chanels.push(
-        <li className="chanel" key={i}>
-          <a href={"#"} onClick={() => ChangeChannel(ListOfChanel[i])}>
-            {ListOfChanel[i]}
-          </a>
-        </li>
-    )
-  } 
-  return <div className="popup_list_of_chanel">{chanels}</div>
-}
-
-
+  
 const PopupChat: React.FC<{path:string}> = (path) => {
+
+  let Navigate = useNavigate();
+    const [buttonAddChannel, setButtonChannel] = useState(true)
+    const [channelList, setChannelList] = useState<ChannelItem[]>([])
+    const [channelPrompt, changeChannelPrompt] = useState("");
+
+    const finalPath = channelList.find((channel) => channel.name === path.path);
+
+    
+    const NewChan = (name:string) => {
+      if (canJoinChannel(name)) {
+        const newItem:ChannelItem  = {
+          id: channelList.length + 1,
+          name: name,
+          URL: ChangeChannel(name)
+        };
+        setChannelList([...channelList, newItem]); 
+        Navigate(ChangeChannel(name));
+        return true
+      }
+      return false
+    }
+    
+    if (!finalPath && !NewChan(path.path))
+    {
+      Navigate(JoinChat());
+    }
+    
+    const handleChannelKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+      if (event.key === 'Enter') {
+        NewChan(channelPrompt);
+        changeChannelPrompt("")
+        ConvertButton()
+      }
+    };
+
+    const ChannelPromptChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      changeChannelPrompt(event.target.value);
+    }
+
+    const ConvertButton = () => {
+      setButtonChannel(!buttonAddChannel);
+    }
+
+
   const [isOpen, setIsOpen] = useState(false)
   const [prompt, setMessage] = useState('');
 
   const handleMessageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setMessage(event.target.value);
+  };
+
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      sendMessage();
+    }
   };
 
   const sendMessage = () => {
@@ -109,20 +135,49 @@ const PopupChat: React.FC<{path:string}> = (path) => {
     <div className="popup right">
       <div className="popupchild">
         <header className="popup_up">
-          <Link to="../" className="close-button" > X </Link>
+          <Link to={LeaveChat()} className="close-button" > X </Link>
           <div className="texte">
             {path.path}
           </div>
         </header>
         <div className="popup_corps">
-          {getChanels()}
+          <div className='popup_list_of_chanel'>
+            {channelList.map(item => (
+              <li className="chanel" key={item.id}>
+                <Link to={item.URL}>
+                  {item.name}
+                </Link>
+              </li> 
+            ))}
+
+          { buttonAddChannel &&
+            <button className='button_channel' onClick={ConvertButton}>
+            +
+            </button>}
+          { !buttonAddChannel
+             &&
+           <input className='button_channel'
+                  type='text'
+                  placeholder='ajout channel'
+                  onKeyDown={handleChannelKeyDown}
+                  value={channelPrompt}
+                  onChange={ChannelPromptChange}
+                  maxLength={10}/>}
+
+          </div>
           <div className="messages">
-            {getMessages(path.path, isOpen, setIsOpen)}
+            {addMessages(path.path, isOpen, setIsOpen)}
             <div className="popup_input" >
-                <input type="input" placeholder="Message à envoyer"  value={prompt} onChange={handleMessageChange}></input>
-                 <button type="submit" onClick={sendMessage}>
+                <input 
+                  type="input" 
+                  placeholder="Message à envoyer"
+                  value={prompt}
+                  onChange={handleMessageChange}
+                  onKeyDown={handleKeyPress}
+                  maxLength={144}/>
+                <button type="submit" onClick={sendMessage}>
                      Envoyer
-               </button>
+                </button>
             </div>
           </div>
         </div>

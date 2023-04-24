@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes} from "react-router-dom";
 import Auth from './pages/Auth';
 import AuthToken from './pages/AuthToken';
 import NotFound from './pages/NotFound';
@@ -7,8 +7,6 @@ import Accueil from './pages/accueil';
 import PopupChat from "./popup/popupChat";
 import { DynamicIsInAChat, KnowMyChannel } from "./chatManager";
 import TokenPage from "./pages/authenticate";
-
-
 
 const AppInsideBrowser = () => {
 

@@ -1,4 +1,4 @@
-import {useLocation, useNavigate } from "react-router-dom";
+import {useLocation} from "react-router-dom";
 
 
 function URLgetChat(str:string):boolean {
@@ -26,8 +26,9 @@ export function DynamicIsInAChat(): boolean {
 export function LeaveChat() {
     const location = window.location;
     if (IsInAChat()) {
-        window.location.pathname = location.pathname.substring(0, location.pathname.indexOf('/', location.pathname.indexOf('/') + 1));
+        return location.pathname.substring(0, location.pathname.indexOf('/', location.pathname.indexOf('/') + 1));
     }
+    return location
 }
 
 export function JoinChat() {
@@ -37,8 +38,9 @@ export function JoinChat() {
         str += "/chat";
         //const history = useNavigate();
         //history('/chat/');
-        window.location.pathname = str;
+        return (str);
     }
+    return location.pathname;
 }
 
 export function KnowMyChannel():string {
@@ -49,16 +51,16 @@ export function KnowMyChannel():string {
         const lastSegment = segments[3];
         return lastSegment;
     }
-    return '/'
+    return 'General'
 }
 
 
 export function ChangeChannel(str:string) {
-    {
+    
         const location = window.location;
         var next = location.pathname.split('/')[1];
         next += "/chat/";
         next += str;
-        window.location.pathname = next;
-    }
+        return next
+    
 }

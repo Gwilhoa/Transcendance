@@ -100,3 +100,9 @@
     border-top: 1px solid var(--colorside);
     width: 100%;
 }
+
+.button_channel {
+    left: 110px;
+    background-color: rgb(156, 102, 138);
+    width:100%
+}
