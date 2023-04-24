@@ -6,7 +6,7 @@ import { JoinChannelDto } from 'src/dto/join-channel.dto';
 import { LeaveChannelDto } from 'src/dto/leave-channel.dto';
 import { sendMessageDTO } from 'src/dto/sendmessage.dto';
 import { UserService } from 'src/user/user.service';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { Channel } from './channel.entity';
 import { Message } from './message.entity';
 import { ChannelType } from 'src/utils/channel.enum';
@@ -155,5 +155,15 @@ export class ChannelService {
     const ret = await this.messageRepository.save(message);
     ret.channel = null;
     return ret;
+  }
+
+  async getChannelsByName(name: string) {
+    const channels = await this.channelRepository.find({
+      where:
+        name: Like(`${name}%`),
+      },
+    });
+    channels.filter((c) => c.type != ChannelType.MP_CHANNEL);
+    return channels;
   }
 }

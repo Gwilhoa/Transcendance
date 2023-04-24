@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Res, UseGuards } from '@nestjs/common';
+import {Body, Controller, Get, Param, Post, Res, UseGuards} from '@nestjs/common';
 import { GetUser } from 'src/auth/decorator/auth.decorator';
 import { JwtIsAuthGuard } from 'src/auth/guard/jwt.guard';
 import { ChannelService } from './channel.service';
@@ -63,5 +63,13 @@ export class ChannelController {
   @Post('createmp')
   async createMp(@Body() body, @GetUser('sub') id: string) {
     return await this.channelService.createMPChannel(id, body.user_id);
+  }
+
+  @Get('channel/name/:name')
+  async getChannelsByName(@Param('name') name: string, @Res() resp) {
+    const channels = await this.channelService.getChannelsByName(name);
+    if (channels == null) {
+      resp.status(204).send('No content');
+    }
   }
 }
