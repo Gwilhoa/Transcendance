@@ -90,7 +90,7 @@ const PopupChat: React.FC<{path:string}> = (path) => {
     }
     
     const handleChannelKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-      if (event.key === 'Enter') {
+      if (event.key === 'Enter' && channelPrompt.length > 0) {
         NewChan(channelPrompt);
         changeChannelPrompt("")
         ConvertButton()
@@ -98,7 +98,10 @@ const PopupChat: React.FC<{path:string}> = (path) => {
     };
 
     const ChannelPromptChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-      changeChannelPrompt(event.target.value);
+      const alphaNumRegex = /^[a-zA-Z0-9]*$/;
+      if (alphaNumRegex.test(event.target.value)) {
+        changeChannelPrompt(event.target.value);
+      }
     }
 
     const ConvertButton = () => {
