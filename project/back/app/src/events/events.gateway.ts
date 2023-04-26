@@ -209,38 +209,38 @@ export class EventsGateway
 
   @SubscribeMessage('join_channel')
   async handleJoinChannel(client: Socket, payload: any) {
-    let erro;
+    let send;
     const token = payload.token;
     const channel_id = payload.channel_id;
     const user_id = verifyToken(token, client);
     if (user_id == null) {
-      erro = {
+      send = {
         code: 401,
       };
-      client.emit('join_code', erro);
+      client.emit('join_code', send);
       return;
     }
     const user = await this.userService.getUserById(user_id);
     const channel = await this.channelService.getChannelById(channel_id);
-    erro = {
+    send = {
       code: 0,
     };
     if (channel == null) {
-      erro = {
+      send = {
         code: 1,
       };
     } else if (!(await this.channelService.isInChannel(user, channel))) {
-      erro = {
+      send = {
         code: 2,
       };
     } else {
       client.join(channel_id);
-      erro = {
+      send = {
         code: 0,
       };
     }
-    client.emit('join_code', erro);
-    const send = {
+    client.emit('join_code', send);
+    send = {
       user_id: user.id,
       channel_id: channel_id,
     };
@@ -249,47 +249,43 @@ export class EventsGateway
 
   @SubscribeMessage('leave_channel')
   async handleLeaveChannel(client: Socket, payload: any) {
-    let erro;
+    let send;
     const token = payload.token;
     const channel_id = payload.channel_id;
     const user_id = verifyToken(token, client);
     if (user_id == null) {
-      erro = {
+      send = {
         code: 401,
       };
-      client.emit('leave_code', erro);
+      client.emit('leave_code', send);
       return;
     }
     const user = await this.userService.getUserById(user_id);
     const channel = await this.channelService.getChannelById(channel_id);
-    erro = {
+    send = {
       code: 0,
     };
     if (channel == null) {
-      erro = {
+      send = {
         code: 1,
       };
     } else if (!(await this.channelService.isInChannel(user, channel))) {
-      erro = {
+      send = {
         code: 2,
       };
     } else {
       client.leave(channel_id);
-      erro = {
+      send = {
         code: 0,
       };
     }
-    client.emit('leave_code', erro);
-    const send = {
+    client.emit('leave_code', send);
+    send = {
       user_id: user.id,
       channel_id: channel_id,
     };
     this.server.to(channel_id).emit('user_leave', send);
   }
-
-  //
-  //
-  //
 
   @SubscribeMessage('join_matchmaking')
   async join_matchmaking(client: Socket, payload: any) {
@@ -299,12 +295,12 @@ export class EventsGateway
       id = await this.authService.getIdFromToken(payload.token);
       user = await this.userService.getUserById(id);
     } catch (error) {
-      await client.emit('connection_error', 'Invalid token');
-      await client.disconnect();
+      client.emit('connection_error', 'Invalid token');
+      client.disconnect();
       return;
     }
     this.matchmaking.push(user);
-    await client.emit('message_code', 'ok');
+    client.emit('message_code', 'ok');
   }
 
   async check_matchmaking() {
@@ -312,11 +308,10 @@ export class EventsGateway
     while (matchmaking_len > 1) {
       this.matchmaking.forEach((user1) => async () => {
         const authorized_player = this.matchmaking.filter(
-          (user2) => async () => {
-            user1.id != user2.id &&
-              (await this.userService.OneOfTwoBlocked(user1.id, user2.id)) ==
-                false;
-          },
+          async (user2) =>
+            user2.id !== user1.id &&
+            (await this.userService.OneOfTwoBlocked(user1.id, user2.id)) ===
+              false,
         );
         const len_authorized_player = authorized_player.length;
         if (len_authorized_player > 1) {
@@ -338,7 +333,10 @@ export class EventsGateway
           this.clients[user1.id].join(create_game.id);
           this.clients[random_player.id].join(create_game.id);
           this.server.emit(create_game.id, 'game_created', create_game.id);
-          this.games.set(create_game.id, new Game(create_game.id, user1.id, random_player.id));
+          this.games.set(
+            create_game.id,
+            new Game(create_game.id, user1.id, random_player.id, this.server),
+          );
         }
       });
       matchmaking_len = this.matchmaking.length;
@@ -347,13 +345,14 @@ export class EventsGateway
 
   @SubscribeMessage('input_game')
   async input_game(client: Socket, payload: any) {
-    const token = payload.token;
     const game_id = payload.game_id;
     const position = payload.position;
     if (position > 100 || position < 0) {
-        return;
+      return;
     }
     this.games[game_id].updateRacket(position, game_id);
-    this.server.to(game_id).emit('update_game', this.games[game_id].getGameInfo());
+    this.server
+      .to(game_id)
+      .emit('update_game', this.games[game_id].getGameInfo());
   }
 }

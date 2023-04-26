@@ -39,7 +39,6 @@ export class AuthController {
     if (id.code == null) {
       res.status(400).send('Bad Request');
     }
-    console.log(id.code);
 
     const user = await this.userService.createUsers(id.code);
     if (user == null) {

@@ -158,12 +158,8 @@ export class ChannelService {
   }
 
   async getChannelsByName(name: string) {
-    const channels = await this.channelRepository.find({
-      where:
-        name: Like(`${name}%`),
-      },
+    return await this.channelRepository.find({
+      where: { name: Like(`%${name}%`) },
     });
-    channels.filter((c) => c.type != ChannelType.MP_CHANNEL);
-    return channels;
   }
 }
