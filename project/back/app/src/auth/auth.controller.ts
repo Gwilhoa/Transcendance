@@ -8,13 +8,14 @@ import {
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import { UserService } from '../user/user.service';
+// import { UserService } from '../user/user.service';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard, JwtIsAuthGuard } from './guard/jwt.guard';
 import { GetUser } from './decorator/auth.decorator';
 import { authenticator } from 'otplib';
 import { toDataURL } from 'qrcode';
 import { UserStatus } from '../utils/user.enum';
+import { UserService } from 'src/user/user.service';
 
 @Controller('auth')
 export class AuthController {
@@ -45,14 +46,14 @@ export class AuthController {
       res.status(400).send('Bad Request');
       return;
     }
-    const code = await this.authService.signJwtToken(parseInt(user.id), false);
+    const code = await this.authService.signJwtToken(user.id, false);
     res.redirect(
       'http://localhost:8080/authenticate?access_token=' + code.access_token,
     );
-    // var code = await this.authService.signJwtToken(parseInt(user.id), user.email);
+    // var code = await this.authService.signJwtToken(user.id, user.email);
     // res.redirect('http://localhost:8080/auth?access_token=' + code.acess_token);
     return;
-    // res.redirect('http://localhost:3000?code=' + await this.authService.signJwtToken(parseInt(user.id), user.email));
+    // res.redirect('http://localhost:3000?code=' + await this.authService.signJwtToken(user.id, user.email));
     // res.redirect('https://intra.42.fr?code=comingSoon');
     // res.redirect('https://intra.42.fr');
     //res.status(200).send('OK');
@@ -64,7 +65,7 @@ export class AuthController {
   @UseGuards(JwtIsAuthGuard)
   @Get('2fa/create')
   async create2fa(@GetUser() user, @Res() res) {
-    if (user.enable2FA != true)
+    if (user.enabled2FA != true)
       throw new UnauthorizedException(
         'You already have a two factor authentication enabled',
       );
@@ -111,7 +112,7 @@ export class AuthController {
   async authenticate2FA(@GetUser() jwtUser, @Res() res) {
     const id = jwtUser.sub;
     const user = await this.userService.getUserById(id);
-    if (user.enable2FA == true) {
+    if (user.enabled2FA == true) {
       const code2FA = '278'; // TODO : tmp, voir comment on recup le code
       if (code2FA == null)
         throw new UnauthorizedException('Wrong two factor authentication code');
@@ -122,11 +123,11 @@ export class AuthController {
 
       if (!isValid)
         throw new UnauthorizedException('Wrong two factor authentication code');
-      // res.redirect('http://localhost:8080/auth?access_token=' + await this.authService.signJwtToken(parseInt(user.id), true)); //TODO : expire the old one
+      // res.redirect('http://localhost:8080/auth?access_token=' + await this.authService.signJwtToken(user.id, true)); //TODO : expire the old one
       // return;
     }
     await this.userService.changeStatus(id, UserStatus.CONNECTED);
-    const token = await this.authService.signJwtToken(parseInt(user.id), true);
+    const token = await this.authService.signJwtToken(user.id, true);
     res.send(token);
     return;
     // TODO : return current jwt token

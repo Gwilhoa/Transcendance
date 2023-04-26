@@ -305,7 +305,7 @@ export class UserService {
   public async set2FASecret(secret: string, id: string) {
     const user = await this.userRepository.findOneBy({ id: id });
     if (user == null) {
-      return null;
+      return null; // TODO : return erreur
     }
     user.secret2FA = secret;
     await this.userRepository.save(user);
@@ -315,9 +315,9 @@ export class UserService {
   public async enabled2FA(id: string) {
     const user = await this.userRepository.findOneBy({ id: id });
     if (user == null) {
-      return null;
+      return null; // TODO : return erreur
     }
-    user.enable2FA = true;
+    user.enabled2FA = true;
     await this.userRepository.save(user);
     return null;
   }
@@ -325,9 +325,9 @@ export class UserService {
   public async disabled2FA(id: string) {
     const user = await this.userRepository.findOneBy({ id: id });
     if (user == null) {
-      return null;
+      return null; // TODO : return erreur
     }
-    user.enable2FA = false;
+    user.enabled2FA = false;
     user.secret2FA = null;
     await this.userRepository.save(user);
     return null;
@@ -337,7 +337,7 @@ export class UserService {
     const myuser = await this.getUserById(myuser_id);
     const user = await this.getUserById(user_id);
     if (user == null && myuser == null) {
-      return null;
+      return false; // TODO : return erreur
     }
     myuser.blockedUsers.forEach((element) => {
       if (element.id == user.id) return true;
@@ -352,7 +352,7 @@ export class UserService {
     const myuser = await this.getUserById(myuser_id);
     const user = await this.getUserById(user_id);
     if (user == null && myuser == null) {
-      return null;
+      return false; // TODO : return erreur
     }
     myuser.blockedUsers.forEach((element) => {
       if (element.id == user.id) return true;
@@ -366,7 +366,7 @@ export class UserService {
   public async getGame(id: string) {
     const user = await this.userRepository.findOneBy({ id: id });
     if (user == null) {
-      return null;
+      return null; // TODO : return erreur
     }
     return user.games;
   }
@@ -374,7 +374,7 @@ export class UserService {
   public async changeStatus(id: string, status: number) {
     const user = await this.userRepository.findOneBy({ id: id });
     if (user == null) {
-      return null;
+      return null; // TODO : return erreur
     }
     user.status = status;
     await this.userRepository.save(user);
@@ -383,8 +383,16 @@ export class UserService {
   public async getstatus(id: string) {
     const user = await this.userRepository.findOneBy({ id: id });
     if (user == null) {
-      return null;
+      return null;  // TODO : return erreur
     }
     return user.status;
+  }
+
+  public async check2FAenabled(id: string) {
+    const user = await this.userRepository.findOneBy({ id: id });
+    if (user == null) {
+      return null;  // TODO : return erreur
+    }
+    return user.enabled2FA;
   }
 }
