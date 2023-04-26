@@ -1,8 +1,4 @@
-@import url("popupTemplate.css");
 
-:root {
-    --colorside: #5b5b5b;
-}
 
 .form-container form {
     text-align: center;
@@ -27,7 +23,7 @@
 }
 
 .popupchild {
-    width: calc(100% - 7px);
+    width: calc(100%);
     height: 100%;
 }
 
@@ -35,8 +31,7 @@
 .popup_corps {
     bottom: 0px;
     width: 100%;
-    height: 94%;
-    
+    height: 94%;    
 }
  
 .popup_list_of_chanel {

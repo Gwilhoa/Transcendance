@@ -5,7 +5,7 @@ import NotFound from './pages/NotFound';
 import Game from './pages/game';
 import Accueil from './pages/accueil';
 import PopupChat from "./popup/popupChat";
-import { DynamicIsInAChat, KnowMyChannel } from "./chatManager";
+import { DynamicIsInAChat, KnowMyChannel } from "./popup/chatManager";
 import TokenPage from "./pages/authenticate";
 
 const AppInsideBrowser = () => {

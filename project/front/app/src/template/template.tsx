@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import Head from "./header";
 import Foot from "./footer";
 import Notification from "../notification/notif";
+import  '../general.css'
 
 type Props = {
     children: ReactNode;
@@ -9,15 +10,13 @@ type Props = {
 
 const Template = (props: Props) => {
 
+  //<Notification channel="yo" message="Nouveau message"/> 
     return (
       <div>
-          <div className="form-container">
-            <main>{props.children}</main>
-          </div>
-        <header>
             <Head/>
-            <Notification channel="yo" message="Nouveau message"/> 
-        </header>
+          
+            <main className="main-template">{props.children}</main>
+
         <footer>
             <Foot/>
         </footer>

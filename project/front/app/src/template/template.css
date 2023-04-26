@@ -1,12 +1,12 @@
 .navbar {
-    position: fixed;
+    position:absolute;
     width: 100%;
+    height: var(--header-size);
     top:0px;
     background-color: #333;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 10vh;
     padding: 0 20px;
   }
   
@@ -27,19 +27,19 @@
     position: fixed;
     width: 100%;
     background-color: #333;
-    height: 6vh;
+    height: var(--footer-size);
     bottom: 0px;
     text-align: center;
-    padding: 20px;
+  }
+  
+  .main-template {
+    height: calc(100vh - (var(--footer-size) + var(--header-size)));
+    top:var(--header-size);
+    position: absolute; 
+    left: 401px;
+    width: calc(100% - 802px);
   }
 
-  .form-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 80vh;
-    margin: 0 auto;
-}
 
   .corps-template {
     position: fixed;

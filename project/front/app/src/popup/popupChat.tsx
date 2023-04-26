@@ -3,7 +3,7 @@ import './popupChat.css'
 import { useState } from 'react';
 import Modal from '../profil/modal';
 import CV from '../profil/CV';
-import { ChangeChannel, JoinChat, LeaveChat } from '../chatManager';
+import { ChangeChannel, JoinChat, LeaveChat } from './chatManager';
 import { Link, Navigate } from 'react-router-dom';
 import { canJoinChannel, getMessages } from '../API';
 import '../template/template.css';
@@ -83,7 +83,7 @@ const PopupChat: React.FC<{path:string}> = (path) => {
       }
       return false
     }
-    
+
     if (!finalPath && !NewChan(path.path))
     {
       Navigate(JoinChat());

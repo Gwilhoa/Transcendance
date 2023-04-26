@@ -8,7 +8,7 @@ import React, { useState, useEffect, useRef } from "react";
 const Game: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const Height = document.documentElement.clientHeight * 0.8;
-  const Width = document.documentElement.clientWidth - 800;
+  const Width = document.documentElement.clientWidth - 802;
   const [ball, setBall] = useState({ x: Width/2, y: Height/2, vx: 5, vy: 5 });
   const [paddle1, setPaddle1] = useState({ y: 250 });
   const [paddle2, setPaddle2] = useState({ y: 250 });
@@ -36,19 +36,20 @@ const Game: React.FC = () => {
         left: "100px",
       };
 
+      const canvasWidth = `calc(100%)`;
+
     return (
       <Template>
-        <div className='game-container'>
+    
           <canvas
             ref={canvasRef}
             className="game-canvas"
-            width={Width}
-            height={Height}
-            />
+            width={canvasWidth}
+            height={Height}/>
           <div className="paddle1" style={{ top: paddle1.y }} />
           <div className="paddle2" style={{ top: paddle2.y }} />
           <div className="ball" style={{ top: ball.y, left: ball.x }} />
-        </div>
+      
         </Template>
     );
 }
