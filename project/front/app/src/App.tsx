@@ -7,6 +7,7 @@ import Accueil from './pages/accueil';
 import PopupChat from "./popup/popupChat";
 import { DynamicIsInAChat, KnowMyChannel } from "./chatManager";
 import TokenPage from "./pages/authenticate";
+import { useCookies, Cookies } from "react-cookie";
 
 const AppInsideBrowser = () => {
 
@@ -34,10 +35,9 @@ const AppInsideBrowser = () => {
 
 function App() {
 
-
 	return (
 		<BrowserRouter>
-		<AppInsideBrowser/>
+			<AppInsideBrowser/>
 		</BrowserRouter>
 	);
 
