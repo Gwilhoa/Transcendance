@@ -14,9 +14,10 @@ import { UserModule } from 'src/user/user.module';
 @Module({
   // imports:[TypeOrmModule.forFeature([User]), ConfigModule],
   // imports: [TypeOrmModule.forFeature([User]), JwtModule.register({}), ConfigModule, TypeOrmModule.forFeature([Token])],
+  
   imports: [
     TypeOrmModule.forFeature([User]),
-    JwtModule.register({}),
+    JwtModule.register({}), // TODO : check register
     ConfigModule,
   ],
   providers: [

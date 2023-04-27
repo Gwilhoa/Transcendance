@@ -8,7 +8,7 @@ import { UserService } from '../user/user.service';
 @Injectable()
 export class AuthService {
   // constructor(private jwt: JwtService, private config: ConfigService, private tokenRepository: Repository<Token>) {}
-//   constructor(private readonly userService: UserService, private jwt: JwtService) {}
+  // constructor(private readonly userService: UserService, private jwt: JwtService) {}
   constructor(private jwt: JwtService) {}
 
   public async getUserIntra(token) {
