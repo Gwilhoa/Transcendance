@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { addAdminDto } from 'src/dto/add-admin.dto';
 import { CreateChannelDto } from 'src/dto/create-channel.dto';
 import { JoinChannelDto } from 'src/dto/join-channel.dto';
-import { LeaveChannelDto } from 'src/dto/leave-channel.dto';
 import { sendMessageDTO } from 'src/dto/sendmessage.dto';
 import { UserService } from 'src/user/user.service';
 import { Like, Repository } from 'typeorm';
@@ -155,10 +154,16 @@ export class ChannelService {
     if (!chan.users.includes(user))
       throw new Error('User is not in this channel');
     if (chan.messages == null || chan.messages.length == 0) return null;
+    const messages = chan.messages.filter(
+      async (m) =>
+        (await this.userService.isBlocked(user.id, m.user.id)) == false,
+    );
     return chan.messages;
   }
 
   public async sendMessage(body: sendMessageDTO, user_id) {
+    if (body.content.length > 4242 || body.content.length <= 0)
+      throw new Error('Message too long (max 4242) or empty');
     const message = new Message();
     message.content = body.content;
     message.date = new Date();
@@ -184,5 +189,25 @@ export class ChannelService {
     return await this.channelRepository.find({
       where: { name: Like(`%${name}%`) },
     });
+  }
+
+  async getAccessibleChannels(user_id: string) {
+    const user = await this.userService.getUserById(user_id);
+    if (user == null) throw new Error('User not found');
+    const channels = await this.channelRepository.find();
+    return channels.filter((c) => c.users.includes(user));
+  }
+
+  async getAvailableChannels(id: string) {
+    const user = await this.userService.getUserById(id);
+    if (user == null) throw new Error('User not found');
+    const channels = await this.channelRepository.find();
+    if (channels == null) return null;
+    channels.filter((c) => !c.users.includes(user));
+    channels.filter((c) => c.type != ChannelType.PRIVATE_CHANNEL);
+    channels.filter((c) => c.bannedUsers.includes(user));
+    channels.filter((c) => c.type != ChannelType.MP_CHANNEL);
+    if (channels.length == 0) return null;
+    return channels;
   }
 }
