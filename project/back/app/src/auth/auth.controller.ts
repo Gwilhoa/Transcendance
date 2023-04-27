@@ -46,14 +46,14 @@ export class AuthController {
       res.status(400).send('Bad Request');
       return;
     }
-    const code = await this.authService.signJwtToken(user.id, false);
+    const code = await this.userService.signJwtToken(user.id, false);
     res.redirect(
       'http://localhost:8080/authenticate?access_token=' + code.access_token,
     );
-    // var code = await this.authService.signJwtToken(user.id, user.email);
+    // var code = await this.userService.signJwtToken(user.id, user.email);
     // res.redirect('http://localhost:8080/auth?access_token=' + code.acess_token);
     return;
-    // res.redirect('http://localhost:3000?code=' + await this.authService.signJwtToken(user.id, user.email));
+    // res.redirect('http://localhost:3000?code=' + await this.userService.signJwtToken(user.id, user.email));
     // res.redirect('https://intra.42.fr?code=comingSoon');
     // res.redirect('https://intra.42.fr');
     //res.status(200).send('OK');
@@ -123,11 +123,11 @@ export class AuthController {
 
       if (!isValid)
         throw new UnauthorizedException('Wrong two factor authentication code');
-      // res.redirect('http://localhost:8080/auth?access_token=' + await this.authService.signJwtToken(user.id, true)); //TODO : expire the old one
+      // res.redirect('http://localhost:8080/auth?access_token=' + await this.userService.signJwtToken(user.id, true)); //TODO : expire the old one
       // return;
     }
     await this.userService.changeStatus(id, UserStatus.CONNECTED);
-    const token = await this.authService.signJwtToken(user.id, true);
+    const token = await this.userService.signJwtToken(user.id, true);
     res.send(token);
     return;
     // TODO : return current jwt token

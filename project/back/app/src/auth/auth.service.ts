@@ -52,24 +52,6 @@ export class AuthService {
     }
   }
 
-  public async signJwtToken(
-    userId: string,
-    isauth: boolean,
-  ): Promise<{ access_token: string }> {
-    let expiresTime = '10m';
-    if (isauth == true) expiresTime = '2h';
-    // const payload = { sub: parseInt(userId), isauth: isauth ,enabled2FA: this.userService.check2FAenabled(userId)};
-    const payload = { sub: parseInt(userId), isauth: isauth ,enabled2FA: 1};
-    console.log(process.env.JWT_SECRET);
-
-    return {
-      access_token: await this.jwt.signAsync(payload, {
-        expiresIn: expiresTime,
-        secret: process.env.JWT_SECRET,
-      }),
-    };
-  }
-
   getIdFromToken(token: string) {
     const payload = this.jwt.verify(token, { secret: process.env.JWT_SECRET });
     return payload.sub;

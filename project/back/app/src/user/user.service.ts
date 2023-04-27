@@ -6,10 +6,12 @@ import { User } from './user.entity';
 import fetch from 'node-fetch';
 import { RequestFriend } from './requestfriend.entity';
 import { ChannelType } from 'src/utils/channel.enum';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UserService {
   constructor(
+    private jwt: JwtService,
     @InjectRepository(User) private userRepository: Repository<User>,
     private authService: AuthService,
   ) {}
@@ -394,5 +396,23 @@ export class UserService {
       return null;  // TODO : return erreur
     }
     return user.enabled2FA;
+  }
+
+  async signJwtToken(
+    userId: string,
+    isauth: boolean,
+  ): Promise<{ access_token: string }> {
+    let expiresTime = '10m';
+    if (isauth == true) expiresTime = '2h';
+    const payload = { sub: parseInt(userId), isauth: isauth ,enabled2FA: await this.check2FAenabled(userId)};
+    // const payload = { sub: parseInt(userId), isauth: isauth ,enabled2FA: 1};
+    console.log(process.env.JWT_SECRET);
+
+    return {
+      access_token: await this.jwt.signAsync(payload, {
+        expiresIn: expiresTime,
+        secret: process.env.JWT_SECRET,
+      }),
+    };
   }
 }

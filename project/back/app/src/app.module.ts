@@ -21,9 +21,8 @@ import { User } from './user/user.entity';
     ChannelModule,
     EventModule,
     GameModule,
-    TypeOrmModule.forFeature([User]),
   ],
   controllers: [AppController],
-  providers: [AppService, AuthService, JwtService, UserService],
+  providers: [AppService],
 })
 export class AppModule {}
