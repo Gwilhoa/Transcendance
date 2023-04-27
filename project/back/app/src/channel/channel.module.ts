@@ -10,11 +10,12 @@ import {AuthService} from 'src/auth/auth.service';
 import {JwtService} from '@nestjs/jwt';
 import {AuthModule} from 'src/auth/auth.module';
 import {ConfigModule, ConfigService} from '@nestjs/config';
+import {Message} from "./message.entity";
 
 @Module({
 	providers: [ChannelService, AuthService, JwtService, ConfigService, UserService],
 	controllers: [ChannelController],
-	imports: [TypeOrmModule.forFeature([Channel]), TypeOrmModule.forFeature([User]), AuthModule, ConfigModule, UserModule]
+	imports: [TypeOrmModule.forFeature([Message]), TypeOrmModule.forFeature([Channel]), TypeOrmModule.forFeature([User]), AuthModule, ConfigModule, UserModule]
 })
 export class ChannelModule {
 }

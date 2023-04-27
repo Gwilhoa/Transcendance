@@ -52,7 +52,7 @@ export class User {
 	secret2FA: string;
 
 	@Column({default: false})
-	enable2FA: boolean;
+	enabled2FA: boolean;
 
 	@OneToMany(type => Game, game => game.user1 || game.user2)
 	games: Game[];

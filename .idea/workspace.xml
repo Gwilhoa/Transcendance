@@ -4,7 +4,27 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d4c22c1a-30ce-4167-98e2-3bd0de69eb23" name="Changes" comment="test" />
+    <list default="true" id="d4c22c1a-30ce-4167-98e2-3bd0de69eb23" name="Changes" comment="fin loop game, fix setName&amp;User">
+      <change afterPath="$PROJECT_DIR$/project/back/app/src/dto/add-admin.dto.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/project/back/app/src/dto/ban-user.dto.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/project/back/app/src/dto/get-message.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/back/app/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/back/app/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/back/app/src/app.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/src/app.controller.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/back/app/src/auth/auth.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/src/auth/auth.module.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/back/app/src/auth/auth.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/src/auth/auth.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/back/app/src/channel/channel.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/src/channel/channel.controller.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/back/app/src/channel/channel.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/src/channel/channel.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/back/app/src/dto/addadmin.dto.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/back/app/src/dto/create-channel.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/src/dto/create-channel.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/back/app/src/dto/join-channel.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/src/dto/join-channel.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/back/app/src/dto/leave-channel.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/src/dto/leave-channel.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/back/app/src/dto/sendmessage.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/src/dto/sendmessage.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/back/app/src/events/events.gateway.ts" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/src/events/events.gateway.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/back/app/src/main.ts" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/src/main.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/back/app/src/utils/socket.function.ts" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/src/utils/socket.function.ts" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -26,7 +46,7 @@
     </favorite-branches>
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="assembly_front-back" />
+        <entry key="$PROJECT_DIR$" value="main" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -44,24 +64,29 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
+    "git-widget-placeholder": "back__2",
+    "javascript.nodejs.core.library.configured.version": "19.8.1",
+    "javascript.nodejs.core.library.typings.version": "18.16.1",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
+    "prettierjs.PrettierConfiguration.Package": "/Users/guilheimchataing/Transcendance/project/back/app/node_modules/prettier",
     "run.code.analysis.last.selected.profile": "pProject Default",
     "settings.editor.selected.configurable": "discord-project",
-    "ts.external.directory.path": "/Users/guilheimchataing/Library/Application Support/JetBrains/Toolbox/apps/WebStorm/ch-0/231.8109.174/WebStorm.app/Contents/plugins/javascript-impl/jsLanguageServicesImpl/external",
+    "ts.external.directory.path": "/Users/guilheimchataing/Transcendance/project/back/app/node_modules/typescript/lib",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
   <component name="RunDashboard">
     <option name="openRunningConfigInTab" value="true" />
   </component>
-  <component name="RunManager" selected="npm.dev">
+  <component name="RunManager" selected="Docker.docker-compose.yml: Compose Deployment">
     <configuration default="true" type="docker-deploy" factoryName="docker-compose.yml" temporary="true">
       <deployment type="docker-compose.yml">
         <settings />
@@ -126,9 +151,9 @@
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Docker.docker-compose.yml: Compose Deployment" />
         <item itemvalue="npm.dev" />
         <item itemvalue="Docker.docker-compose.yml.db: Compose Deployment" />
-        <item itemvalue="Docker.docker-compose.yml: Compose Deployment" />
         <item itemvalue="Docker.docker-compose.yml: Compose Deployment (1)" />
         <item itemvalue="Docker.docker-compose.yml: Compose Deployment" />
       </list>
@@ -144,6 +169,7 @@
       <updated>1681992429134</updated>
       <workItem from="1681992430256" duration="11524000" />
       <workItem from="1682086786531" duration="3216000" />
+      <workItem from="1682537444756" duration="10531000" />
     </task>
     <task id="LOCAL-00001" summary="modifications .env + reformat">
       <created>1681994250786</created>
@@ -173,7 +199,21 @@
       <option name="project" value="LOCAL" />
       <updated>1682092028060</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="test">
+      <created>1682356340147</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1682356340147</updated>
+    </task>
+    <task id="LOCAL-00006" summary="fin loop game, fix setName&amp;User">
+      <created>1682514626956</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1682514626956</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -206,6 +246,7 @@
     <MESSAGE value="modifications .env + reformat" />
     <MESSAGE value="ajout auth front get token" />
     <MESSAGE value="test" />
-    <option name="LAST_COMMIT_MESSAGE" value="test" />
+    <MESSAGE value="fin loop game, fix setName&amp;User" />
+    <option name="LAST_COMMIT_MESSAGE" value="fin loop game, fix setName&amp;User" />
   </component>
 </project>

@@ -6,6 +6,7 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
+import { Game } from '../events/Game.class';
 import { Logger } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { UserService } from 'src/user/user.service';
@@ -35,6 +36,7 @@ export class EventsGateway
   @WebSocketServer() server: Server;
   private clients: Map<string, string> = new Map<string, string>();
   private ingame: Map<string, string> = new Map<string, string>();
+  private games: Map<string, Game> = new Map<string, Game>();
   private matchmaking: Array<User> = [];
   private logger: Logger = new Logger('EventsGateway');
 
@@ -189,7 +191,7 @@ export class EventsGateway
       message.content = payload.content;
       message.user = user_id;
       message.channel = channel_id;
-      const msg = await this.channelService.sendMessage(message);
+      const msg = await this.channelService.sendMessage(message, user_id);
       send = {
         code: messageCode.SUCCESS,
       };
@@ -207,38 +209,38 @@ export class EventsGateway
 
   @SubscribeMessage('join_channel')
   async handleJoinChannel(client: Socket, payload: any) {
-    let erro;
+    let send;
     const token = payload.token;
     const channel_id = payload.channel_id;
     const user_id = verifyToken(token, client);
     if (user_id == null) {
-      erro = {
+      send = {
         code: 401,
       };
-      client.emit('join_code', erro);
+      client.emit('join_code', send);
       return;
     }
     const user = await this.userService.getUserById(user_id);
     const channel = await this.channelService.getChannelById(channel_id);
-    erro = {
+    send = {
       code: 0,
     };
     if (channel == null) {
-      erro = {
+      send = {
         code: 1,
       };
     } else if (!(await this.channelService.isInChannel(user, channel))) {
-      erro = {
+      send = {
         code: 2,
       };
     } else {
       client.join(channel_id);
-      erro = {
+      send = {
         code: 0,
       };
     }
-    client.emit('join_code', erro);
-    const send = {
+    client.emit('join_code', send);
+    send = {
       user_id: user.id,
       channel_id: channel_id,
     };
@@ -247,47 +249,43 @@ export class EventsGateway
 
   @SubscribeMessage('leave_channel')
   async handleLeaveChannel(client: Socket, payload: any) {
-    let erro;
+    let send;
     const token = payload.token;
     const channel_id = payload.channel_id;
     const user_id = verifyToken(token, client);
     if (user_id == null) {
-      erro = {
+      send = {
         code: 401,
       };
-      client.emit('leave_code', erro);
+      client.emit('leave_code', send);
       return;
     }
     const user = await this.userService.getUserById(user_id);
     const channel = await this.channelService.getChannelById(channel_id);
-    erro = {
+    send = {
       code: 0,
     };
     if (channel == null) {
-      erro = {
+      send = {
         code: 1,
       };
     } else if (!(await this.channelService.isInChannel(user, channel))) {
-      erro = {
+      send = {
         code: 2,
       };
     } else {
       client.leave(channel_id);
-      erro = {
+      send = {
         code: 0,
       };
     }
-    client.emit('leave_code', erro);
-    const send = {
+    client.emit('leave_code', send);
+    send = {
       user_id: user.id,
       channel_id: channel_id,
     };
     this.server.to(channel_id).emit('user_leave', send);
   }
-
-  //
-  //
-  //
 
   @SubscribeMessage('join_matchmaking')
   async join_matchmaking(client: Socket, payload: any) {
@@ -297,12 +295,15 @@ export class EventsGateway
       id = await this.authService.getIdFromToken(payload.token);
       user = await this.userService.getUserById(id);
     } catch (error) {
-      await client.emit('connection_error', 'Invalid token');
-      await client.disconnect();
+      client.emit('connection_error', 'Invalid token');
+      client.disconnect();
       return;
     }
     this.matchmaking.push(user);
-    await client.emit('message_code', 'ok');
+    const send = {
+      code: 0,
+    };
+    client.emit('matchmaking_code', send);
   }
 
   async check_matchmaking() {
@@ -310,11 +311,10 @@ export class EventsGateway
     while (matchmaking_len > 1) {
       this.matchmaking.forEach((user1) => async () => {
         const authorized_player = this.matchmaking.filter(
-          (user2) => async () => {
-            user1.id != user2.id &&
-              (await this.userService.OneOfTwoBlocked(user1.id, user2.id)) ==
-                false;
-          },
+          async (user2) =>
+            user2.id !== user1.id &&
+            (await this.userService.OneOfTwoBlocked(user1.id, user2.id)) ===
+              false,
         );
         const len_authorized_player = authorized_player.length;
         if (len_authorized_player > 1) {
@@ -335,10 +335,31 @@ export class EventsGateway
           ); // TODO: status in game
           this.clients[user1.id].join(create_game.id);
           this.clients[random_player.id].join(create_game.id);
-          await this.clients[user1.id].emit('game_created', create_game.id);
+          const send = {
+            game_id: create_game.id,
+          };
+          this.server.to(create_game.id).emit('create_game', send);
+          this.games.set(
+            create_game.id,
+            new Game(create_game.id, user1.id, random_player.id, this.server),
+          );
         }
       });
       matchmaking_len = this.matchmaking.length;
     }
+  }
+
+  @SubscribeMessage('input_game')
+  async input_game(client: Socket, payload: any) {
+    const game_id = payload.game_id;
+    const position = payload.position;
+    const user_id = verifyToken(payload.token, client);
+    if (position > 100 || position < 0) {
+      return;
+    }
+    this.games[game_id].updateRacket(user_id, position);
+    this.server
+      .to(game_id)
+      .emit('update_game', this.games[game_id].getGameInfo());
   }
 }

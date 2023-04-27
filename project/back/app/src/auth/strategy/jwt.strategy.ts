@@ -16,7 +16,7 @@ export class JwtIsAuthStrategy extends PassportStrategy(Strategy, 'jwtIsAuth') {
   async validate(payload: any) {
     const user = await this.userService.getUserById(payload.sub);
     if (user.status == UserStatus.DISCONNECTED) return null;
-    // if (!user.enable2FA)
+    // if (!user.enabled2FA)
     //     return payload;
     // if (payload.is2FA)
     //     return payload;
