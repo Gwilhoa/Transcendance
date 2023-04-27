@@ -32,7 +32,7 @@ export class Game {
   private _maxX;
   private _minY;
   private _maxY;
-  private _victorygoal: number
+  private _victorygoal: number;
 
   public constructor(id: string, user1: string, user2: string, io: Server) {
     this._id = id;
@@ -51,7 +51,7 @@ export class Game {
     this._minY = 0;
     this._maxY = 0;
     this._racklenght = 10;
-    this._rackhalflenght = this._racklenght/2;
+    this._rackhalflenght = this._racklenght / 2;
     this._rackwidth = 2;
     this._victorygoal = 3;
     this.start();
@@ -126,45 +126,45 @@ export class Game {
     this._ballx += this._dx;
     this._bally += this._dy;
     //calculate colision racket // // 2% pas pris en compte
-    if (this._ballx = this._minX + this._rackwidth)
-    {
-      if(this._bally <= this._rack1y + this._rackhalflenght && this._bally >= this._rack1y - this._rackhalflenght)
+    if ((this._ballx = this._minX + this._rackwidth)) {
+      if (
+        this._bally <= this._rack1y + this._rackhalflenght &&
+        this._bally >= this._rack1y - this._rackhalflenght
+      )
         this._dx *= -1;
     }
-    if (this._ballx = this._maxX - this._rackwidth)
-    {
-      if(this._bally <= this._rack2y + this._rackhalflenght && this._bally >= this._rack2y - this._rackhalflenght)
+    if ((this._ballx = this._maxX - this._rackwidth)) {
+      if (
+        this._bally <= this._rack2y + this._rackhalflenght &&
+        this._bally >= this._rack2y - this._rackhalflenght
+      )
         this._dx *= -1;
     }
 
     //calculate colision wall
     if (this._ballx < this._minX || this._ballx > this._maxX) {
-      if(this._ballx < this._minX)
-      {
+      if (this._ballx < this._minX) {
         this._score1++;
         this.start();
       }
-        if(this._ballx > this._maxX)
-        {
-          this._score2++;
-          this.start();
-        }
+      if (this._ballx > this._maxX) {
+        this._score2++;
+        this.start();
+      }
     }
     if (this._bally < this._minY || this._bally > this._maxY) {
       this._dy *= -1;
     }
 
-    if (this._score1 == this._victorygoal)
-    {
+    if (this._score1 == this._victorygoal) {
       this._io.to(this._id).emit('player1won', this.getGameInfo());
       clearInterval(this._loopid);
-      return ;
+      return;
     }
-    if (this._score2 == this._victorygoal)
-    {
+    if (this._score2 == this._victorygoal) {
       this._io.to(this._id).emit('player2won', this.getGameInfo());
       clearInterval(this._loopid);
-      return ;
+      return;
     }
     // TODO stoquer les gagnant dans la db
     this._io.to(this._id).emit('update_game', this.getGameInfo());

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { addAdminDTO } from 'src/dto/addadmin.dto';
+import { addAdminDto } from 'src/dto/add-admin.dto';
 import { CreateChannelDto } from 'src/dto/create-channel.dto';
 import { JoinChannelDto } from 'src/dto/join-channel.dto';
 import { LeaveChannelDto } from 'src/dto/leave-channel.dto';
@@ -10,6 +10,7 @@ import { Like, Repository } from 'typeorm';
 import { Channel } from './channel.entity';
 import { Message } from './message.entity';
 import { ChannelType } from 'src/utils/channel.enum';
+import { BanUserDto } from '../dto/ban-user.dto';
 
 @Injectable()
 export class ChannelService {
@@ -20,20 +21,22 @@ export class ChannelService {
   ) {}
 
   public async createChannel(body: CreateChannelDto) {
-    const chan = new Channel();
+    let chan = new Channel();
     chan.name = body.name;
     chan.admins = [];
     chan.bannedUsers = [];
     chan.users = [];
     chan.type = body.type;
-    console.log(body);
     const user = await this.userService.getUserById(body.creator_id);
-    console.log(body.creator_id);
-    if (user == null) return null;
+    if (user == null) throw new Error('User not found');
     chan.users.push(user);
     chan.admins.push(user);
-    if (body.type == ChannelType.PROTECTED_CHANNEL) chan.pwd = body.password;
-    await this.channelRepository.save(chan);
+    if (body.type == ChannelType.PROTECTED_CHANNEL) {
+      if (body.password == null)
+        throw new Error('Password is required for PROTECTED_CHANNEL');
+      chan.pwd = body.password;
+    }
+    chan = await this.channelRepository.save(chan);
     return chan;
   }
 
@@ -65,90 +68,110 @@ export class ChannelService {
   }
 
   public async getChannels() {
-    return await this.channelRepository.find();
+    const channels = await this.channelRepository.find();
   }
 
   public async joinChannel(body: JoinChannelDto) {
-    const chan = await this.channelRepository.findOneBy({
+    let chan = await this.channelRepository.findOneBy({
       id: body.channel_id,
     });
-    if (chan == null) return null;
+    if (chan == null) throw new Error('Channel not found');
     const user = await this.userService.getUserById(body.user_id);
-    if (user == null) return null;
-    if (chan.type == ChannelType.PROTECTED_CHANNEL && chan.pwd != body.password)
-      return null;
+    if (user == null) throw new Error('User not found');
+    if (chan.type == ChannelType.PROTECTED_CHANNEL) {
+      if (body.password == null)
+        throw new Error('Password is required for PROTECTED_CHANNEL');
+      if (chan.pwd != body.password) throw new Error('Wrong password');
+    }
     if (chan.bannedUsers != null && chan.bannedUsers.includes(user))
-      return null;
+      throw new Error('User is banned');
     chan.users.push(user);
-    await this.channelRepository.save(chan);
+    chan = await this.channelRepository.save(chan);
     return chan;
   }
 
-  public async leaveChannel(body: LeaveChannelDto) {
+  public async leaveChannel(user_id, channel_id) {
     const chan = await this.channelRepository.findOneBy({
-      id: body.channel_id,
+      id: channel_id,
     });
-    if (chan == null) return null;
-    const user = await this.userService.getUserById(body.user_id);
-    if (user == null) return null;
+    if (chan == null) throw new Error('Channel not found');
+    const user = await this.userService.getUserById(user_id);
+    if (user == null) throw new Error('User not found');
+    if (!chan.users.includes(user)) throw new Error('User not in channel');
     chan.users = chan.users.filter((u) => u.id != user.id);
+    await this.channelRepository.save(chan);
+    return user;
   }
 
-  public async addAdmin(body: addAdminDTO) {
-    const user = await this.userService.getUserById(body.user_id);
-    if (user == null) return null;
-    const chan = await this.channelRepository.findOneBy({
+  public async addAdmin(body: addAdminDto, user_id) {
+    const target = await this.userService.getUserById(body.user_id);
+    const user = await this.userService.getUserById(user_id);
+    if (user == null || target == null) throw new Error('User not found');
+    let chan = await this.channelRepository.findOneBy({
       id: body.channel_id,
     });
-    if (chan == null) return null;
-    chan.admins.push(user);
-    await this.channelRepository.save(chan);
+    if (chan == null) throw new Error('Channel not found');
+    if (!chan.admins.includes(user))
+      throw new Error('User is not admin of this channel');
+    if (chan.admins.includes(target))
+      throw new Error('User is already admin of this channel');
+    if (!chan.users.includes(target))
+      throw new Error('User is not in this channel');
+    chan.admins.push(target);
+    chan = await this.channelRepository.save(chan);
     return chan;
   }
 
-  public async banUser(body: addAdminDTO) {
-    const user = await this.userService.getUserById(body.user_id);
+  public async banUser(body: BanUserDto, user_id) {
+    const target = await this.userService.getUserById(body.user_id);
+    const user = await this.userService.getUserById(user_id);
 
-    if (user == null) return null;
+    if (user == null || target == null) throw new Error('User not found');
     const chan = await this.channelRepository.findOneBy({
       id: body.channel_id,
     });
-    if (chan == null) return null;
-    await chan.bannedUsers.push(user);
-    await chan.users.filter((u) => u.id != user.id);
-    await this.channelRepository.save(chan);
+    if (chan == null) throw new Error('Channel not found');
+    if (!chan.admins.includes(user))
+      throw new Error('User is not admin of this channel');
+    if (!chan.users.includes(target))
+      throw new Error('User is not in this channel');
+    if (chan.admins.includes(target))
+      throw new Error('User is admin of this channel');
+    chan.bannedUsers.push(user);
+    chan.users.filter((u) => u.id != user.id);
+    return await this.channelRepository.save(chan);
   }
 
   public async getMessage(channel_id, user_id) {
     const user = await this.userService.getUserById(user_id);
-    if (user == null) return null;
+    if (user == null) throw new Error('User not found');
     const chan = await this.channelRepository
       .createQueryBuilder('channel')
       .leftJoinAndSelect('channel.messages', 'messages')
       .leftJoinAndSelect('messages.user', 'user')
       .where('channel.id = :id', { id: channel_id })
       .getOne();
-    console.log(chan);
-    if (chan == null) return null;
+    if (chan == null) throw new Error('Channel not found');
+    if (!chan.users.includes(user))
+      throw new Error('User is not in this channel');
+    if (chan.messages == null || chan.messages.length == 0) return null;
     return chan.messages;
   }
 
-  public async sendMessage(body: sendMessageDTO) {
+  public async sendMessage(body: sendMessageDTO, user_id) {
     const message = new Message();
     message.content = body.content;
     message.date = new Date();
-    const user = await this.userService.getUserById(body.user_id);
-    if (user == null) return null;
-
+    const user = await this.userService.getUserById(user_id);
+    if (user == null) throw new Error('User not found');
     const channel = await this.channelRepository
       .createQueryBuilder('channel')
       .leftJoinAndSelect('channel.messages', 'messages')
       .where('channel.id = :id', { id: body.channel_id })
       .getOne();
-    if (channel == null) return null;
+    if (channel == null) throw new Error('Channel not found');
     message.channel = channel;
     message.user = user;
-    console.log(message);
     if (channel.messages == null) channel.messages = [];
     channel.messages.push(message);
     await this.channelRepository.save(channel);

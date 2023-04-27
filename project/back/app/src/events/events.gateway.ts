@@ -191,7 +191,7 @@ export class EventsGateway
       message.content = payload.content;
       message.user = user_id;
       message.channel = channel_id;
-      const msg = await this.channelService.sendMessage(message);
+      const msg = await this.channelService.sendMessage(message, user_id);
       send = {
         code: messageCode.SUCCESS,
       };
@@ -300,7 +300,10 @@ export class EventsGateway
       return;
     }
     this.matchmaking.push(user);
-    client.emit('message_code', 'ok');
+    const send = {
+      code: 0,
+    };
+    client.emit('matchmaking_code', send);
   }
 
   async check_matchmaking() {
@@ -332,7 +335,10 @@ export class EventsGateway
           ); // TODO: status in game
           this.clients[user1.id].join(create_game.id);
           this.clients[random_player.id].join(create_game.id);
-          this.server.emit(create_game.id, 'game_created', create_game.id);
+          const send = {
+            game_id: create_game.id,
+          };
+          this.server.to(create_game.id).emit('create_game', send);
           this.games.set(
             create_game.id,
             new Game(create_game.id, user1.id, random_player.id, this.server),
@@ -347,10 +353,11 @@ export class EventsGateway
   async input_game(client: Socket, payload: any) {
     const game_id = payload.game_id;
     const position = payload.position;
+    const user_id = verifyToken(payload.token, client);
     if (position > 100 || position < 0) {
       return;
     }
-    this.games[game_id].updateRacket(position, game_id);
+    this.games[game_id].updateRacket(user_id, position);
     this.server
       .to(game_id)
       .emit('update_game', this.games[game_id].getGameInfo());
