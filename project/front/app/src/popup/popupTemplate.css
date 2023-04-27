@@ -28,7 +28,7 @@
 .popup_up {
     border-bottom: 1px solid var(--colorside);
     margin-top: 10px;
-    height: 4%;
+    height: 30px;
     width: 100%;
     display: flex;
     justify-content: center;

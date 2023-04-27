@@ -8,6 +8,7 @@ import { Link, Navigate } from 'react-router-dom';
 import { canJoinChannel, getMessages } from '../API';
 import '../template/template.css';
 import { useNavigate } from "react-router-dom";
+import { ButtonInputToggle } from '../inputButton';
 
 type ChannelItem = {
   id: number;
@@ -84,8 +85,7 @@ const PopupChat: React.FC<{path:string}> = (path) => {
       return false
     }
 
-    if (!finalPath && !NewChan(path.path))
-    {
+    if (!finalPath && !NewChan(path.path)){
       Navigate(JoinChat());
     }
     
@@ -138,7 +138,7 @@ const PopupChat: React.FC<{path:string}> = (path) => {
     <div className="popup right">
       <div className="popupchild">
         <header className="popup_up">
-          <Link to={LeaveChat()} className="close-button" > X </Link>
+          <Link to={LeaveChat()} style={{ textDecoration: 'none' }} className="close-button" > X </Link>
           <div className="texte">
             {path.path}
           </div>
@@ -153,7 +153,20 @@ const PopupChat: React.FC<{path:string}> = (path) => {
               </li> 
             ))}
 
-          { buttonAddChannel &&
+            <ButtonInputToggle
+            button={<button className='button_channel' onClick={ConvertButton}>
+            +
+            </button>}
+            input={<input className='button_channel'
+            type='text'
+            placeholder='ajout channel'
+            onKeyDown={handleChannelKeyDown}
+            value={channelPrompt}
+            onChange={ChannelPromptChange}
+            maxLength={10}/>}
+            onInputSubmit={NewChan}/>
+
+          {/* { buttonAddChannel &&
             <button className='button_channel' onClick={ConvertButton}>
             +
             </button>}
@@ -165,8 +178,7 @@ const PopupChat: React.FC<{path:string}> = (path) => {
                   onKeyDown={handleChannelKeyDown}
                   value={channelPrompt}
                   onChange={ChannelPromptChange}
-                  maxLength={10}/>}
-
+                  maxLength={10}/>} */}
           </div>
           <div className="messages">
             {addMessages(path.path, isOpen, setIsOpen)}

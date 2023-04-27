@@ -33,10 +33,14 @@ export function getMessages(name:string) : Message[] {
         //for (let i = 0; i < data.
     }
 
-    axios.get('https://localhost:3000/' + name + '/message')
+    const datas = {
+        channel_id: name
+    };
+
+    axios.get('https://localhost:3000/channel/message', datas)
     .then(response => {
 
-      parseMessage(response);
+      parseMessage(response.data);
     }
       )
     .catch(error => 
