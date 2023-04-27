@@ -1,7 +1,7 @@
-import axios, { AxiosResponse } from 'axios';
-const token = "775ce06e806d0bdfd9ed04e121f3f727c4be6f292470cc9b45e6335e0c7b035c";
+import axios, { AxiosResponse, AxiosRequestConfig } from 'axios';
+import { bigToken } from './pages/authenticate';
 axios.defaults.baseURL = 'http://localhost:3000/'
-axios.defaults.headers.common = {'Authorization': `bearer ${token}`}
+axios.defaults.headers.common = {'Authorization': `bearer ${bigToken}`}
 
 
 export default axios;
@@ -27,22 +27,24 @@ export function sendMessage(prompt:string) {
 }
 
 export function getMessages(name:string) : Message[] {
+    
+    const config: AxiosRequestConfig = {
+        method: 'get',
+        url: 'https://localhost:3000/channel/message',
+        params: {
+          channel_id: name,
+        },
+      };
 
     const parseMessage = (data:AxiosResponse) => {
         console.log(data);
-        //for (let i = 0; i < data.
     }
 
-    const datas = {
-        channel_id: name
-    };
 
-    axios.get('https://localhost:3000/channel/message', datas)
-    .then(response => {
-
-      parseMessage(response.data);
-    }
-      )
+    axios(config)
+        .then(response => {
+            parseMessage(response.data);
+          })
     .catch(error => 
       console.error(error)
       );

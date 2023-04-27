@@ -48,13 +48,7 @@ const Game: React.FC = () => {
 
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
-  
-    const canvas = canvasRef.current;
-    if (canvas) {
-      const width = canvas.width;
-      const height = canvas.height;
-      console.log(`La taille du canvas est ${width} x ${height}.`);
-    }
+
   }, []);
 
 

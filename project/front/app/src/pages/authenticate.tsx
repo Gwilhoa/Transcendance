@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-function TokenPage() {
+
+export var bigToken:string;
+
+export function TokenPage() {
 	const [accessToken, setAccessToken] = useState("");
 
 	useEffect(() => {
@@ -15,6 +18,7 @@ function TokenPage() {
 			},
 		})
 			.then((response) => {
+				bigToken = response.data.access_token;
 				setAccessToken(response.data.access_token);
 			})
 			.catch((error) => {
@@ -28,5 +32,6 @@ function TokenPage() {
 		</div>
 	);
 }
+
 
 export default TokenPage;

@@ -18,7 +18,7 @@ const AppInsideBrowser = () => {
 				<Route path="*" Component={NotFound}/>
 				<Route path="/accueil/*" Component={Accueil} />
 				<Route path="/game/*" Component={Game} />
-					<Route path="/authenticate" Component={TokenPage} />
+				<Route path="/authenticate" Component={TokenPage} />
 				
 				</Routes>
 				{DynamicIsInAChat() && 
