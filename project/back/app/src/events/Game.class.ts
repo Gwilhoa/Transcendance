@@ -18,7 +18,7 @@ export class Game {
   private _user1: string;
   private _user2: string;
   private _racklenght: number;
-  private _rackhalflenght: number;
+  // private _rackhalflenght: number;
   private _rackwidth: number;
   private _rack1y: number;
   private _rack2y: number;
@@ -51,7 +51,7 @@ export class Game {
     this._minY = 0;
     this._maxY = 0;
     this._racklenght = 10;
-    this._rackhalflenght = this._racklenght / 2;
+    // this._rackhalflenght = this._racklenght / 2;
     this._rackwidth = 2;
     this._victorygoal = 3;
     this.start();
@@ -125,18 +125,17 @@ export class Game {
   public gameLoop() {
     this._ballx += this._dx;
     this._bally += this._dy;
-    //calculate colision racket // // 2% pas pris en compte
+
+    //calculate colision racket
     if ((this._ballx = this._minX + this._rackwidth)) {
       if (
-        this._bally <= this._rack1y + this._rackhalflenght &&
-        this._bally >= this._rack1y - this._rackhalflenght
+        this._bally >= this._rack1y  && this._bally <= this._rack1y + this._racklenght
       )
         this._dx *= -1;
     }
     if ((this._ballx = this._maxX - this._rackwidth)) {
       if (
-        this._bally <= this._rack2y + this._rackhalflenght &&
-        this._bally >= this._rack2y - this._rackhalflenght
+        this._bally >= this._rack2y && this._bally <= this._rack2y + this._racklenght
       )
         this._dx *= -1;
     }
