@@ -1,12 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { authenticator } from 'otplib';
+import { UserService } from '../user/user.service';
 
 // import { Token } from './token.entity';
 
 @Injectable()
 export class AuthService {
   // constructor(private jwt: JwtService, private config: ConfigService, private tokenRepository: Repository<Token>) {}
+  // constructor(private readonly userService: UserService, private jwt: JwtService) {}
   constructor(private jwt: JwtService) {}
 
   public async getUserIntra(token) {
@@ -48,23 +50,6 @@ export class AuthService {
       console.error(error);
       return null;
     }
-  }
-
-  public async signJwtToken(
-    userId: number,
-    isauth: boolean,
-  ): Promise<{ access_token: string }> {
-    let expiresTime = '10m';
-    if (isauth == true) expiresTime = '2h';
-    const payload = { sub: userId, isauth: isauth };
-    console.log(process.env.JWT_SECRET);
-
-    return {
-      access_token: await this.jwt.signAsync(payload, {
-        expiresIn: expiresTime,
-        secret: process.env.JWT_SECRET,
-      }),
-    };
   }
 
   getIdFromToken(token: string) {
