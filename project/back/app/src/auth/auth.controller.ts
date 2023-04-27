@@ -88,7 +88,7 @@ export class AuthController {
   @UseGuards(JwtIsAuthGuard)
   @Get('2fa/enable')
   async turnOn2FA(@GetUser('sub') id) {
-    const user = await this.userService.getUserById(id);
+    const user = await this.userService.getUserById(id);// TODO : check si user exist dans toutes les fonctions
     if (user.secret2FA == null)
       throw new UnauthorizedException(
         'You need to create a two factor authentication secret first',
@@ -103,6 +103,13 @@ export class AuthController {
       throw new UnauthorizedException('Wrong two factor authentication code');
     await this.userService.enabled2FA(id);
   }
+
+  @UseGuards(JwtIsAuthGuard)
+  @Get('2fa/is2FA')
+  async is2FA(@GetUser() user) {
+    return (user.is2FA);
+  }
+
 
   // @UseGuards(JwtAuthGuard)
   // @Get('2fa/turnOff')
