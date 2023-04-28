@@ -47,6 +47,7 @@ export class AuthController {
       return;
     }
     const code = await this.userService.signJwtToken(user.id, false);
+    await this.userService.changeStatus(id, UserStatus.IN_CONNECTION);
     res.redirect('http://localhost:8080/authenticate?access_token=' + code.access_token);
     return;
   }
