@@ -5,7 +5,6 @@ import {
   Query,
   Req,
   Res,
-  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 // import { UserService } from '../user/user.service';
@@ -48,7 +47,9 @@ export class AuthController {
     }
     const code = await this.userService.signJwtToken(user.id, false);
     await this.userService.changeStatus(id, UserStatus.IN_CONNECTION);
-    res.redirect('http://localhost:8080/authenticate?access_token=' + code.access_token);
+    res.redirect(
+      'http://localhost:8080/authenticate?access_token=' + code.access_token,
+    );
     return;
   }
 
@@ -56,18 +57,25 @@ export class AuthController {
   @Get('2fa/create')
   async create2fa(@GetUser() user, @Res() res) {
     if (user.enabled2FA != true) {
-      res.status(400).send('Bad Request : You already have a two factor authentication enabled');
+      res
+        .status(400)
+        .send(
+          'Bad Request : You already have a two factor authentication enabled',
+        );
       return;
     }
     const secret = await authenticator.generateSecret();
 
-    const otpauthUrl = await authenticator.keyuri(
+    const otpauthUrl = authenticator.keyuri(
       user.email,
       'Transcendence',
       secret,
-    ); // TODO : check if it can return an erreur
+    ); // TODO : check if it can return an erreur // TODO : ça renvoie une erreur, mais...
 
-    await await this.userService.set2FASecret(secret, user.sub);
+    if ((await this.userService.set2FASecret(secret, user.sub)) == null) {
+      res.status(400).send('Bad Request : Error while saving secret');
+      return;
+    }
     res.redirect(await toDataURL(otpauthUrl));
     // return {
     //   secret,
@@ -77,24 +85,33 @@ export class AuthController {
 
   @UseGuards(JwtIsAuthGuard)
   @Get('2fa/enable')
-  async turnOn2FA(@GetUser('sub') id, @Res() res) {
+  async turnOn2FA(@GetUser('sub') id, @Res() res, @Body() body) {
     const user = await this.userService.getUserById(id);
     if (user == null) {
       res.status(400).send('Bad User');
       return;
     }
     if (user.secret2FA == null) {
-      res.status(400).send('Bad Request : You need to create a two factor authentication secret first');
+      res
+        .status(400)
+        .send(
+          'Bad Request : You need to create a two factor authentication secret first',
+        );
       return;
     }
-    const code2FA = '278'; // TODO : tmp
+    const code2FA = body.code;
+    if (code2FA == null) {
+      res.status(400).send('Bad Request : You need to provide a code');
+      return;
+    }
     const isValid: boolean = await this.authService.verify2FA(
       user.secret2FA,
       code2FA,
-    ); // TODO : voir comment on recup le code
-
+    );
     if (!isValid) {
-      res.status(400).send('Bad Request : Wrong two factor authentication code');
+      res
+        .status(400)
+        .send('Bad Request : Wrong two factor authentication code');
       return;
     }
     await this.userService.enabled2FA(id);
@@ -103,12 +120,12 @@ export class AuthController {
   @UseGuards(JwtIsAuthGuard)
   @Get('2fa/is2FA')
   async is2FA(@GetUser() user) {
-    return (user.is2FA);
+    return user.is2FA;
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('authenticate')
-  async authenticate2FA(@GetUser() jwtUser, @Res() res) {
+  async authenticate2FA(@GetUser() jwtUser, @Res() res, @Body() body) {
     const id = jwtUser.sub;
     const user = await this.userService.getUserById(id);
     if (user == null) {
@@ -116,9 +133,11 @@ export class AuthController {
       return;
     }
     if (user.enabled2FA == true) {
-      const code2FA = '278'; // TODO : tmp, voir comment on recup le code
+      const code2FA = body.code;
       if (code2FA == null) {
-        res.status(400).send('Bad Request : Wrong two factor authentication code');
+        res
+          .status(400)
+          .send('Bad Request : Wrong two factor authentication code');
         return;
       }
       const isValid: boolean = await this.authService.verify2FA(
@@ -127,7 +146,9 @@ export class AuthController {
       );
 
       if (!isValid) {
-        res.status(400).send('Bad Request : Wrong two factor authentication code');
+        res
+          .status(400)
+          .send('Bad Request : Wrong two factor authentication code');
         return;
       }
     }
@@ -146,7 +167,11 @@ export class AuthController {
       return;
     }
     if (user.secret2FA == null) {
-      res.status(400).send("Bad Request : You don't have the two factor authentication enabled");
+      res
+        .status(400)
+        .send(
+          "Bad Request : You don't have the two factor authentication enabled",
+        );
       return;
     }
     await this.userService.disabled2FA(id);
