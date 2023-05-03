@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from "react-router-dom";
 
 function Auth() {
   //state
@@ -9,14 +10,13 @@ function Auth() {
   return (
 	<div className="Authentificate">
 		<h1>Transcendence</h1>
-		<a
+		<Link to="http://localhost:3000/auth/login">
+		<button
 		className="api42-link"
-		href="http://localhost:3000/auth/login"
-		target="_blank"
-		rel="noopener noreferrer"
 		>
 			Authentification
-		</a>
+		</button>
+		</Link>
     </div>
   );
 }
