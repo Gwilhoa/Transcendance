@@ -8,6 +8,7 @@ export class Game {
   static default_update = 60;
   static default_racklenght = 10;
   static default_rackwidth = 2;
+  static default_steprack = 1;
   static default_radiusball = 1;
   static default_size_ball = 10;
   static default_sizeMinX = 0;
@@ -124,14 +125,30 @@ export class Game {
     this._ballx += this._dx;
     this._bally += this._dy;
 
+    //check if ball will be in racket // TODO: check si ca marche
+    if ((this._ballx < this._minX + Game.default_rackwidth + Game.default_radiusball)) {
+      if (
+        this._bally > this._rack1y  && this._bally <= this._rack1y + Game.default_racklenght
+      )
+        this._rack1y -= Game.default_steprack;
+
+    }
+    if ((this._ballx > this._maxX - Game.default_rackwidth - Game.default_radiusball)) {
+      if (
+        this._bally > this._rack2y && this._bally <= this._rack2y + Game.default_racklenght
+      )
+      this._rack2y -= Game.default_steprack;
+    }
+
+
     //calculate colision racket
-    if ((this._ballx = this._minX + Game.default_rackwidth + Game.default_radiusball)) {
+    if ((this._ballx <= this._minX + Game.default_rackwidth + Game.default_radiusball)) {
       if (
         this._bally >= this._rack1y  && this._bally <= this._rack1y + Game.default_racklenght
       )
         this._dx *= -1;
     }
-    if ((this._ballx = this._maxX - Game.default_rackwidth - Game.default_radiusball)) {
+    if ((this._ballx >= this._maxX - Game.default_rackwidth - Game.default_radiusball)) {
       if (
         this._bally >= this._rack2y && this._bally <= this._rack2y + Game.default_racklenght
       )
