@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export function ButtonInputToggle({ button, input, onInputSubmit }: { button: React.ReactNode, input: React.ReactNode, onInputSubmit: (value: string) => void }) {
+export function ButtonInputToggle({ onInputSubmit, textInButton, placeHolder, classInput, classButton }: {onInputSubmit: (value: string) => void, textInButton:string, placeHolder:string, classInput:string, classButton:string }) {
   const [showInput, setShowInput] = useState(false);
   const [inputValue, setInputValue] = useState('');
 
@@ -26,11 +26,19 @@ export function ButtonInputToggle({ button, input, onInputSubmit }: { button: Re
   return (
     <>
       {showInput ? (
-        input
+        <input className={classInput}
+        maxLength={10} 
+        type='text' 
+        onKeyDown={handleInputKeyPress}
+        value={inputValue}
+        onChange={handleInputChange}
+        placeholder={placeHolder}
+        >
+
+        </input>
       ) : (
-        <button onClick={handleButtonClick}>{button}</button>
+        <button onClick={handleButtonClick} className={classButton}> {textInButton}</button>
       )}
-      {showInput && input}
     </>
   );
 }

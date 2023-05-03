@@ -7,22 +7,28 @@ import Accueil from './pages/accueil';
 import PopupChat from "./popup/popupChat";
 import { DynamicIsInAChat, KnowMyChannel } from "./popup/chatManager";
 import TokenPage from "./pages/authenticate";
+import Template from "./template/template";
+import { ReactNode } from "react";
 
-const AppInsideBrowser = () => {
+export interface MyComponentProps {
+	openModal: (param: boolean) => void;
+	setContent: (param: ReactNode) => void;
+}
 
+const AppInsideBrowser = ({ openModal, setContent }: MyComponentProps) => {
 	return (
 			<>
-				<Routes>
+			<Routes>
 				<Route path="/" Component={Auth}/>
 				<Route path="/auth" Component={AuthToken}/>
 				<Route path="*" Component={NotFound}/>
-				<Route path="/accueil/*" Component={Accueil} />
-				<Route path="/game/*" Component={Game} />
 				<Route path="/authenticate" Component={TokenPage} />
-				
-				</Routes>
+				<Route path="/accueil/*" element={<Template openModal={openModal} setContent={setContent} child={Accueil}/>} />
+				<Route path="/game/*" element={<Template openModal={openModal} setContent={setContent} child={Game}/>} />
+			</Routes>
+			
 				{DynamicIsInAChat() && 
-					<PopupChat path={KnowMyChannel()}/>
+					<PopupChat path={KnowMyChannel()} openModal={openModal} setContent={setContent}/>
 				}
 			</>
 
@@ -32,12 +38,10 @@ const AppInsideBrowser = () => {
 
 
 
-function App() {
-
-
+function App({ openModal, setContent }: MyComponentProps) {
 	return (
 		<BrowserRouter>
-		<AppInsideBrowser/>
+		<AppInsideBrowser openModal={openModal} setContent={setContent} />
 		</BrowserRouter>
 	);
 

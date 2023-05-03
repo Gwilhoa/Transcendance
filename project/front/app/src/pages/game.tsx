@@ -5,7 +5,7 @@ import React, { useState, useEffect, useRef } from "react";
 
 
 
-const Game: React.FC = () => {
+const Game = () => {
 
   const [windowSize, setWindowSize] = useState({
     width: window.innerWidth,
@@ -60,7 +60,7 @@ const Game: React.FC = () => {
    
 
     return (
-      <Template>
+      <>
     
           <canvas
             ref={canvasRef}
@@ -71,8 +71,7 @@ const Game: React.FC = () => {
           <div className="paddle1" style={{ top: paddle1.y + '%' }} />
           <div className="paddle2" style={{ top: paddle2.y + '%'}} />
           <div className="ball" style={{ top: ball.x + '%', left: ball.y + '%' }} />
-
-        </Template>
+      </>
     );
 }
 

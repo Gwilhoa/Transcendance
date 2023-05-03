@@ -3,7 +3,6 @@ import { useState } from 'react';
 
 
 export default function CV( {name, photoUrl, isFriend, isMe } : {name:string, photoUrl:string, isFriend:boolean, isMe:boolean}) {
-    
     const retu = [];
     const [image, setImage] = useState(photoUrl);
 
