@@ -40,17 +40,12 @@ export class AuthController {
       res.status(400).send('Bad Request');
     }
 
-    let user = await this.userService.createUsers(id.code);
+    const user = await this.userService.createUsers(id.code);
     if (user == null) {
       res.status(400).send('Bad User');
       return;
     }
     const code = await this.userService.signJwtToken(user.id, false);
-    user = await this.userService.changeStatus(id, UserStatus.IN_CONNECTION);
-    if (user == null) {
-      res.status(400).send('unrecognized user');
-      return;
-    }
     res.redirect(
       'http://localhost:8080/authenticate?access_token=' + code.access_token,
     );

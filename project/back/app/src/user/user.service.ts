@@ -1,12 +1,13 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { AuthService } from '../auth/auth.service';
-import { Repository } from 'typeorm';
-import { User } from './user.entity';
+import {Injectable} from '@nestjs/common';
+import {InjectRepository} from '@nestjs/typeorm';
+import {AuthService} from '../auth/auth.service';
+import {Repository} from 'typeorm';
+import {User} from './user.entity';
 import fetch from 'node-fetch';
-import { RequestFriend } from './requestfriend.entity';
-import { ChannelType } from 'src/utils/channel.enum';
-import { JwtService } from '@nestjs/jwt';
+import {RequestFriend} from './requestfriend.entity';
+import {ChannelType} from 'src/utils/channel.enum';
+import {JwtService} from '@nestjs/jwt';
+import {UserStatus} from "../utils/user.enum";
 
 @Injectable()
 export class UserService {
@@ -72,6 +73,7 @@ export class UserService {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const fs = require('fs');
     const user = new User();
+    user.status = UserStatus.IN_CONNECTION;
     user.id = retUser.id;
     user.username = login;
     user.email = retUser.email;
@@ -280,10 +282,10 @@ export class UserService {
     try {
       await fs.access(path.dirname(imagePath));
     } catch (error) {
-      await fs.mkdir(path.dirname(imagePath), { recursive: true });
+      fs.mkdirSync(path.dirname(imagePath), { recursive: true });
     }
     try {
-      await fs.writeFile(imagePath, buffer);
+      fs.writeFileSync(imagePath, buffer);
       console.log(id + ' image updated');
       return imagePath;
     } catch (error) {
