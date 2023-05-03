@@ -44,7 +44,7 @@ export function JoinChat() {
 }
 
 export function KnowMyChannel():string {
-    const str = useLocation().pathname;
+    const str = window.location.pathname;
     const segments = str.split('/');
     if (IsInAChat() && segments.length > 3) {
 

@@ -16,9 +16,10 @@
 
 .popup {
     position: fixed;
-    top: 10vh;
-    bottom: 10vh;
+    top: var(--header-size);
+    bottom: var(--footer-size);
     width: 400px;
+    height: calc(100vh - (var(--header-size) + var(--footer-size)));
     background-color: rgba(255, 193, 211, 0.669);
     border-left: 1px solid var(--colorside);
     border-right: 1px solid var (--colorside);
@@ -27,7 +28,7 @@
 .popup_up {
     border-bottom: 1px solid var(--colorside);
     margin-top: 10px;
-    height: 4%;
+    height: 30px;
     width: 100%;
     display: flex;
     justify-content: center;

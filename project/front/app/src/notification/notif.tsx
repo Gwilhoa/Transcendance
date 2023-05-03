@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useEffect } from "react";
 import './notific.css';
-import { ChangeChannel, JoinChat } from "../chatManager";
+import { ChangeChannel, JoinChat } from "../popup/chatManager";
 
 interface NotificationProps {
   message: string;
