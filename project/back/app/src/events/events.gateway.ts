@@ -349,7 +349,7 @@ export class EventsGateway
           this.server.to(create_game.id).emit('create_game', send);
           this.games.set(
             create_game.id,
-            new Game(create_game.id, user1.id, random_player.id, this.server),
+            new Game(create_game.id, user1.id, random_player.id, this.server, this.gameService),
           );
         }
       });

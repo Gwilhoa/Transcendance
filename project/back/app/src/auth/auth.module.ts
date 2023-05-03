@@ -8,15 +8,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtIsAuthStrategy, JwtStrategy } from './strategy';
 
-// import { Token } from './token.entity';
-
 @Module({
-  // imports:[TypeOrmModule.forFeature([User]), ConfigModule],
-  // imports: [TypeOrmModule.forFeature([User]), JwtModule.register({}), ConfigModule, TypeOrmModule.forFeature([Token])],
-
   imports: [
     TypeOrmModule.forFeature([User]),
-    JwtModule.register({}), // TODO: check register
+    JwtModule.register({}),
     ConfigModule,
   ],
   providers: [

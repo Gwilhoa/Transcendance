@@ -418,7 +418,6 @@ export class UserService {
     try {
       check2FA = await this.check2FAenabled(userId);
     } catch (error) {
-      //TODO : return erreur
       check2FA = false;
     }
     const payload = {
