@@ -255,4 +255,15 @@ export class UserController {
     response.status(200).send(ret);
     return;
   }
+
+  @Get('/games')
+  async getGames(@GetUser('sub') id: string, @Res() response) {
+    const ret = await this.userService.getGames(id);
+    if (ret == null) {
+      response.status(204).send('No Games');
+      return;
+    }
+    response.status(200).send(ret);
+    return;
+  }
 }

@@ -65,7 +65,12 @@ export class EventsGateway
 
   async handleDisconnect(client: Socket) {
     const id = this.clients.get(client.id);
-    await this.userService.changeStatus(id, UserStatus.OFFLINE);
+    if ((await this.userService.changeStatus(id, UserStatus.OFFLINE)) == null) {
+      this.logger.error(`Error changing status of user ${id}`);
+      wrongtoken(client);
+      this.clients.delete(client.id);
+      this.sendconnected();
+    }
     this.logger.log(`Client disconnected: ${id}`);
     this.clients.delete(client.id);
     if (this.ingame.has(client.id)) {
@@ -89,7 +94,10 @@ export class EventsGateway
         wrongtoken(client);
         return;
       }
-      await this.userService.changeStatus(id, UserStatus.CONNECTED);
+      if (
+        (await this.userService.changeStatus(id, UserStatus.CONNECTED)) == null
+      )
+        wrongtoken(client);
       this.clients.set(client.id, id);
       this.sendconnected();
       const channels = await this.channelService.getAccessibleChannels(id);
@@ -313,8 +321,7 @@ export class EventsGateway
         const authorized_player = this.matchmaking.filter(
           async (user2) =>
             user2.id !== user1.id &&
-            (await this.userService.OneOfTwoBlocked(user1.id, user2.id)) ===
-              false,
+            (await this.userService.OneOfTwoBlocked(user1.id, user2.id)),
         );
         const len_authorized_player = authorized_player.length;
         if (len_authorized_player > 1) {

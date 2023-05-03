@@ -317,8 +317,7 @@ export class UserService {
       return null; // TODO : return erreur
     }
     user.secret2FA = secret;
-    await this.userRepository.save(user);
-    return null;
+    return await this.userRepository.save(user);
   }
 
   public async enabled2FA(id: string) {
@@ -372,10 +371,14 @@ export class UserService {
     return false;
   }
 
-  public async getGame(id: string) {
-    const user = await this.userRepository.findOneBy({ id: id });
+  public async getGames(id: string) {
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.games', 'games')
+      .where('user.id = :id', { id: id })
+      .getOne();
     if (user == null) {
-      return null; // TODO : return erreur
+      return null;
     }
     return user.games;
   }
@@ -383,16 +386,16 @@ export class UserService {
   public async changeStatus(id: string, status: number) {
     const user = await this.userRepository.findOneBy({ id: id });
     if (user == null) {
-      return null; // TODO : return erreur
+      return null;
     }
     user.status = status;
-    await this.userRepository.save(user);
+    return await this.userRepository.save(user);
   }
 
   public async getstatus(id: string) {
     const user = await this.userRepository.findOneBy({ id: id });
     if (user == null) {
-      return null; // TODO : return erreur
+      return null;
     }
     return user.status;
   }
@@ -400,7 +403,7 @@ export class UserService {
   public async check2FAenabled(id: string) {
     const user = await this.userRepository.findOneBy({ id: id });
     if (user == null) {
-      return null; // TODO : return erreur
+      throw new Error('User not found');
     }
     return user.enabled2FA;
   }
@@ -411,10 +414,17 @@ export class UserService {
   ): Promise<{ access_token: string }> {
     let expiresTime = '5m';
     if (isauth == true) expiresTime = '2h';
+    let check2FA = false;
+    try {
+      check2FA = await this.check2FAenabled(userId);
+    } catch (error) {
+      //TODO : return erreur
+      check2FA = false;
+    }
     const payload = {
       sub: parseInt(userId),
       isauth: isauth,
-      enabled2FA: await this.check2FAenabled(userId),
+      enabled2FA: check2FA,
     };
     // const payload = { sub: parseInt(userId), isauth: isauth ,enabled2FA: 1};
     console.log(process.env.JWT_SECRET);

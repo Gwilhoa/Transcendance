@@ -35,18 +35,22 @@ export class AuthController {
   }
 
   @Get('callback')
-  async getLogin(@Query() id, @Res() res, @Body() body) {
+  async getLogin(@Query() id, @Res() res) {
     if (id.code == null) {
       res.status(400).send('Bad Request');
     }
 
-    const user = await this.userService.createUsers(id.code);
+    let user = await this.userService.createUsers(id.code);
     if (user == null) {
       res.status(400).send('Bad User');
       return;
     }
     const code = await this.userService.signJwtToken(user.id, false);
-    await this.userService.changeStatus(id, UserStatus.IN_CONNECTION);
+    user = await this.userService.changeStatus(id, UserStatus.IN_CONNECTION);
+    if (user == null) {
+      res.status(400).send('unrecognized user');
+      return;
+    }
     res.redirect(
       'http://localhost:8080/authenticate?access_token=' + code.access_token,
     );
@@ -70,13 +74,13 @@ export class AuthController {
       user.email,
       'Transcendence',
       secret,
-    ); // TODO : check if it can return an erreur // TODO : ça renvoie une erreur, mais...
+    );
 
     if ((await this.userService.set2FASecret(secret, user.sub)) == null) {
       res.status(400).send('Bad Request : Error while saving secret');
       return;
     }
-    res.redirect(await toDataURL(otpauthUrl));
+    res.status(200).send(await toDataURL(otpauthUrl));
     // return {
     //   secret,
     //   otpauthUrl
@@ -127,7 +131,7 @@ export class AuthController {
   @Get('authenticate')
   async authenticate2FA(@GetUser() jwtUser, @Res() res, @Body() body) {
     const id = jwtUser.sub;
-    const user = await this.userService.getUserById(id);
+    let user = await this.userService.getUserById(id);
     if (user == null) {
       res.status(400).send('Bad User');
       return;
@@ -152,7 +156,11 @@ export class AuthController {
         return;
       }
     }
-    await this.userService.changeStatus(id, UserStatus.CONNECTED);
+    user = await this.userService.changeStatus(id, UserStatus.CONNECTED);
+    if (user == null) {
+      res.status(400).send('unrecognized user');
+      return;
+    }
     const token = await this.userService.signJwtToken(user.id, true);
     res.send(token);
     return;
@@ -180,7 +188,10 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Get('logout')
   async logout(@GetUser('sub') id, @Req() req, @Res() res) {
-    await this.userService.changeStatus(id, UserStatus.DISCONNECTED);
+    if (
+      (await this.userService.changeStatus(id, UserStatus.DISCONNECTED)) == null
+    )
+      res.status(400).send('Bad User');
     req.logout();
     res.redirect('/');
   }

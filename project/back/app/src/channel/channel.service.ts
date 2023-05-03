@@ -210,4 +210,39 @@ export class ChannelService {
     if (channels.length == 0) return null;
     return channels;
   }
+
+  async getAdmin(body: addAdminDto, id: string) {
+    const channel = await this.channelRepository
+      .createQueryBuilder('channel')
+      .leftJoinAndSelect('channel.admins', 'admins')
+      .where('channel.id = :id', { id: body.channel_id })
+      .getOne();
+    if (channel == null) throw new Error('Channel not found');
+    const user = await this.userService.getUserById(id);
+    if (user == null) throw new Error('User not found');
+    if (!channel.users.includes(user))
+      throw new Error('User is not in this channel');
+    return channel.admins;
+  }
+
+  async deleteAdmin(body: addAdminDto, id: string) {
+    const self_user = await this.userService.getUserById(id);
+    if (self_user == null) throw new Error('User not found');
+    const target = await this.userService.getUserById(body.user_id);
+    if (target == null) throw new Error('User not found');
+    const channel = await this.channelRepository
+      .createQueryBuilder('channel')
+      .leftJoinAndSelect('channel.admins', 'admins')
+      .where('channel.id = :id', { id: body.channel_id })
+      .getOne();
+    if (channel == null) throw new Error('Channel not found');
+    if (!channel.users.includes(self_user))
+      throw new Error('User is not in this channel');
+    if (!channel.admins.includes(self_user))
+      throw new Error('User is not admin of this channel');
+    if (!channel.admins.includes(target))
+      throw new Error('User is not admin of this channel');
+    channel.admins.filter((u) => u.id != target.id);
+    return await this.channelRepository.save(channel);
+  }
 }
