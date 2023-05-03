@@ -402,7 +402,7 @@ export class UserService {
     userId: string,
     isauth: boolean,
   ): Promise<{ access_token: string }> {
-    let expiresTime = '10m';
+    let expiresTime = '5m';
     if (isauth == true) expiresTime = '2h';
     const payload = { sub: parseInt(userId), isauth: isauth ,enabled2FA: await this.check2FAenabled(userId)};
     // const payload = { sub: parseInt(userId), isauth: isauth ,enabled2FA: 1};

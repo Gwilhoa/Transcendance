@@ -17,7 +17,8 @@ import { LeaveChannelDto } from '../dto/leave-channel.dto';
 import { addAdminDto } from '../dto/add-admin.dto';
 import { BanUserDto } from '../dto/ban-user.dto';
 import { GetMessageDto } from '../dto/get-message.dto';
-import {sendMessageDTO} from "../dto/sendmessage.dto";
+import { sendMessageDTO } from '../dto/sendmessage.dto';
+import { MpCreateDto } from '../dto/mp-create.dto';
 
 @UseGuards(JwtIsAuthGuard)
 @Controller('channel')
@@ -25,8 +26,18 @@ export class ChannelController {
   constructor(private readonly channelService: ChannelService) {}
 
   @Get()
-  async getChannels() {
-    return await this.channelService.getChannels();
+  async getAccessibleChannels(
+    @GetUser('sub') user_id: string,
+    @Res() response,
+  ) {
+    let ret;
+    try {
+      ret = await this.channelService.getAccessibleChannels(user_id);
+    } catch (e) {
+      response.status(400).send(e.message);
+      return;
+    }
+    response.status(200).send(ret);
   }
 
   @Post('create')
@@ -148,15 +159,35 @@ export class ChannelController {
   }
 
   @Post('/mp/create')
-  async createMp(@Body() body, @GetUser('sub') id: string) {
-    return await this.channelService.createMPChannel(id, body.user_id);
+  async createMp(
+    @Body() body: MpCreateDto,
+    @GetUser('sub') id: string,
+    @Res() resp,
+  ) {
+    let ret;
+    try {
+      ret = await this.channelService.createMPChannel(id, body.user_id);
+    } catch (e) {
+      resp.status(400).send(e.message);
+      return;
+    }
+    resp.status(200).send(ret);
   }
 
-  @Get('channel/name/:name')
+  @Get('/name/:name')
   async getChannelsByName(@Param('name') name: string, @Res() resp) {
     const channels = await this.channelService.getChannelsByName(name);
     if (channels == null) {
       resp.status(204).send('No content');
     }
+  }
+
+  @Get('/available')
+  async getAvailableChannels(@GetUser('sub') id: string, @Res() resp) {
+    const channels = await this.channelService.getAvailableChannels(id);
+    if (channels == null) {
+      resp.status(204).send('No content');
+    }
+    resp.status(200).send(channels);
   }
 }

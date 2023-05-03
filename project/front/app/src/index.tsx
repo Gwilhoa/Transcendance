@@ -4,6 +4,7 @@ import reportWebVitals from './reportWebVitals';
 import { createRoot } from 'react-dom/client';
 import Modal from './profil/modal';
 import { ReactNode, useState } from 'react';
+import { CookiesProvider } from 'react-cookie';
 
 
 function MainComponent() {
@@ -11,10 +12,11 @@ function MainComponent() {
   const [content, setContent] = useState<ReactNode>();
 
   return (
-    <>
+<CookiesProvider>
       <App openModal={setShow} setContent={setContent} />
       <Modal boolModal={show} openModal={setShow} content={content}/> 
-    </>
+    </CookiesProvider>
+  
   );
 }
 

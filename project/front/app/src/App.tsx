@@ -9,6 +9,7 @@ import { DynamicIsInAChat, KnowMyChannel } from "./popup/chatManager";
 import TokenPage from "./pages/authenticate";
 import Template from "./template/template";
 import { ReactNode } from "react";
+import { useCookies, Cookies } from "react-cookie";
 
 export interface MyComponentProps {
 	openModal: (param: boolean) => void;
