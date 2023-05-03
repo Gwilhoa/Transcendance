@@ -17,9 +17,10 @@ export class UserService {
   ) {}
 
   public async getPathImage(id: string) {
-    console.log(id);
-    const path = require('path');
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const fs = require('fs');
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const path = require('path');
     const imageDir = path.join(__dirname, '..', '..', '..', 'images');
     const files = await fs.promises.readdir(imageDir);
     const matchingFiles = files.filter((file) => file.startsWith(id));
@@ -68,6 +69,7 @@ export class UserService {
       login = retUser.login + nbr;
       nbr++;
     }
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const fs = require('fs');
     const user = new User();
     user.id = retUser.id;
@@ -97,12 +99,11 @@ export class UserService {
   }
 
   public async getImageById(id: string) {
-    const user = await this.userRepository.findOneBy({ id: id });
-    if (user == null) {
-      return null;
+    const imagePath = await this.getPathImage(id);
+    if (imagePath == null) {
+      throw new Error('Image not found');
     }
-    const path = __dirname + '/../../../images/' + user.id + '.jpg';
-    return path;
+    return imagePath;
   }
 
   public async addFriend(id: string, friend_id: string) {
@@ -116,6 +117,10 @@ export class UserService {
     }
     if (!user.friends) {
       user.friends = [];
+    }
+    if (!user.requestsReceived.find((e) => e.sender.id == friend.id)) {
+      this.addFriendRequest(id, friend_id);
+      return null;
     }
     user.friends.push(friend);
     await this.userRepository.save(user);
@@ -256,7 +261,9 @@ export class UserService {
   }
 
   public async setAvatar(id, buffer, extname) {
-    const fs = require('fs').promises;
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const fs = require('fs');
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const path = require('path');
     const lastimage = await this.getPathImage(id);
     if (lastimage != null) {
@@ -284,14 +291,14 @@ export class UserService {
     }
   }
 
-  public async isfriendReq(id: string, friend_id: string) {
+  public async isfriendRoute(id: string, friend_id: string) {
     const user = await this.userRepository.findOneBy({ id: id });
     const friend = await this.userRepository.findOneBy({ id: friend_id });
     if (user == null || friend == null) {
-      return false;
+      throw new Error('User not found');
     }
     if (user == friend) {
-      return false;
+      throw new Error('user id and friend id are the same');
     }
     return this.isfriend(user, friend);
   }
@@ -310,8 +317,7 @@ export class UserService {
       return null; // TODO : return erreur
     }
     user.secret2FA = secret;
-    await this.userRepository.save(user);
-    return null;
+    return await this.userRepository.save(user);
   }
 
   public async enabled2FA(id: string) {
@@ -365,10 +371,14 @@ export class UserService {
     return false;
   }
 
-  public async getGame(id: string) {
-    const user = await this.userRepository.findOneBy({ id: id });
+  public async getGames(id: string) {
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.games', 'games')
+      .where('user.id = :id', { id: id })
+      .getOne();
     if (user == null) {
-      return null; // TODO : return erreur
+      return null;
     }
     return user.games;
   }
@@ -376,16 +386,16 @@ export class UserService {
   public async changeStatus(id: string, status: number) {
     const user = await this.userRepository.findOneBy({ id: id });
     if (user == null) {
-      return null; // TODO : return erreur
+      return null;
     }
     user.status = status;
-    await this.userRepository.save(user);
+    return await this.userRepository.save(user);
   }
 
   public async getstatus(id: string) {
     const user = await this.userRepository.findOneBy({ id: id });
     if (user == null) {
-      return null;  // TODO : return erreur
+      return null;
     }
     return user.status;
   }
@@ -393,7 +403,7 @@ export class UserService {
   public async check2FAenabled(id: string) {
     const user = await this.userRepository.findOneBy({ id: id });
     if (user == null) {
-      return null;  // TODO : return erreur
+      throw new Error('User not found');
     }
     return user.enabled2FA;
   }
@@ -404,7 +414,18 @@ export class UserService {
   ): Promise<{ access_token: string }> {
     let expiresTime = '5m';
     if (isauth == true) expiresTime = '2h';
-    const payload = { sub: parseInt(userId), isauth: isauth ,enabled2FA: await this.check2FAenabled(userId)};
+    let check2FA = false;
+    try {
+      check2FA = await this.check2FAenabled(userId);
+    } catch (error) {
+      //TODO : return erreur
+      check2FA = false;
+    }
+    const payload = {
+      sub: parseInt(userId),
+      isauth: isauth,
+      enabled2FA: check2FA,
+    };
     // const payload = { sub: parseInt(userId), isauth: isauth ,enabled2FA: 1};
     console.log(process.env.JWT_SECRET);
 
@@ -414,5 +435,24 @@ export class UserService {
         secret: process.env.JWT_SECRET,
       }),
     };
+  }
+
+  async removeBlocked(id: string, blocked_id: string) {
+    const user = await this.userRepository.findOneBy({ id: id });
+    const blocked_user = await this.userRepository.findOneBy({
+      id: blocked_id,
+    });
+    if (user == null || blocked_user == null) {
+      throw new Error('User not found');
+    }
+    if (
+      user.blockedUsers.find((element) => element.id == blocked_user.id) == null
+    ) {
+      throw new Error('User not blocked');
+    }
+    user.blockedUsers = user.blockedUsers.filter(
+      (element) => element.id != blocked_user.id,
+    );
+    return await this.userRepository.save(user);
   }
 }
