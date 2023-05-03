@@ -1,25 +1,27 @@
 import { Server } from 'socket.io';
+import { GameService } from 'src/game/game.service';
 
 export class Game {
   static default_positionR = 50;
   static default_positionBx = 50;
   static default_positionBy = 50;
   static default_update = 60;
-  static default_size_racket = 10;
+  static default_racklenght = 10;
+  static default_rackwidth = 2;
+  static default_steprack = 1;
+  static default_radiusball = 1;
   static default_size_ball = 10;
   static default_sizeMinX = 0;
   static default_sizeMaxX = 100;
   static default_sizeMinY = 0;
   static default_sizeMaxY = 100;
+  static default_victorygoal: 3;
 
   private _io: Server;
   private _loopid: NodeJS.Timeout;
   private _id: string;
   private _user1: string;
   private _user2: string;
-  private _racklenght: number;
-  // private _rackhalflenght: number;
-  private _rackwidth: number;
   private _rack1y: number;
   private _rack2y: number;
   private _score1: number;
@@ -32,9 +34,9 @@ export class Game {
   private _maxX;
   private _minY;
   private _maxY;
-  private _victorygoal: number;
+  private _gameService: GameService;
 
-  public constructor(id: string, user1: string, user2: string, io: Server) {
+  public constructor(id: string, user1: string, user2: string, io: Server, gameService : GameService) {
     this._id = id;
     this._user1 = user1;
     this._user2 = user2;
@@ -50,13 +52,10 @@ export class Game {
     this._maxX = 0;
     this._minY = 0;
     this._maxY = 0;
-    this._racklenght = 10;
-    // this._rackhalflenght = this._racklenght / 2;
-    this._rackwidth = 2;
-    this._victorygoal = 3;
     this.start();
     this._loopid = setInterval(this.gameLoop, Game.default_update);
     this._io = io;
+    this._gameService = gameService;
   }
 
   public getId() {
@@ -126,16 +125,32 @@ export class Game {
     this._ballx += this._dx;
     this._bally += this._dy;
 
-    //calculate colision racket
-    if ((this._ballx = this._minX + this._rackwidth)) {
+    //check if ball will be in racket // TODO: check si ca marche
+    if ((this._ballx < this._minX + Game.default_rackwidth + Game.default_radiusball)) {
       if (
-        this._bally >= this._rack1y  && this._bally <= this._rack1y + this._racklenght
+        this._bally > this._rack1y  && this._bally <= this._rack1y + Game.default_racklenght
+      )
+        this._rack1y -= Game.default_steprack;
+
+    }
+    if ((this._ballx > this._maxX - Game.default_rackwidth - Game.default_radiusball)) {
+      if (
+        this._bally > this._rack2y && this._bally <= this._rack2y + Game.default_racklenght
+      )
+      this._rack2y -= Game.default_steprack;
+    }
+
+
+    //calculate colision racket
+    if ((this._ballx <= this._minX + Game.default_rackwidth + Game.default_radiusball)) {
+      if (
+        this._bally >= this._rack1y  && this._bally <= this._rack1y + Game.default_racklenght
       )
         this._dx *= -1;
     }
-    if ((this._ballx = this._maxX - this._rackwidth)) {
+    if ((this._ballx >= this._maxX - Game.default_rackwidth - Game.default_radiusball)) {
       if (
-        this._bally >= this._rack2y && this._bally <= this._rack2y + this._racklenght
+        this._bally >= this._rack2y && this._bally <= this._rack2y + Game.default_racklenght
       )
         this._dx *= -1;
     }
@@ -155,17 +170,18 @@ export class Game {
       this._dy *= -1;
     }
 
-    if (this._score1 == this._victorygoal) {
+    if (this._score1 == Game.default_victorygoal) {
       this._io.to(this._id).emit('player1won', this.getGameInfo());
+      this._gameService.finishGame(this._id, this._score1, this._score2);
       clearInterval(this._loopid);
       return;
     }
-    if (this._score2 == this._victorygoal) {
+    if (this._score2 == Game.default_victorygoal) {
       this._io.to(this._id).emit('player2won', this.getGameInfo());
+      this._gameService.finishGame(this._id, this._score1, this._score2);
       clearInterval(this._loopid);
       return;
     }
-    // TODO stoquer les gagnant dans la db
     this._io.to(this._id).emit('update_game', this.getGameInfo());
   }
 }
