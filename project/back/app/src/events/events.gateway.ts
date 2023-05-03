@@ -199,7 +199,16 @@ export class EventsGateway
       message.content = payload.content;
       message.user = user_id;
       message.channel = channel_id;
-      const msg = await this.channelService.sendMessage(message, user_id);
+      let msg;
+      try {
+        msg = await this.channelService.sendMessage(message, user_id);
+      } catch (error) {
+        send = {
+          code: messageCode.INVALID_FORMAT,
+        };
+        client.emit('message_code', send);
+        return;
+      }
       send = {
         code: messageCode.SUCCESS,
       };
@@ -349,7 +358,13 @@ export class EventsGateway
           this.server.to(create_game.id).emit('create_game', send);
           this.games.set(
             create_game.id,
-            new Game(create_game.id, user1.id, random_player.id, this.server, this.gameService),
+            new Game(
+              create_game.id,
+              user1.id,
+              random_player.id,
+              this.server,
+              this.gameService,
+            ),
           );
         }
       });

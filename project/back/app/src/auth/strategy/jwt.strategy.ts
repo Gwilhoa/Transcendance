@@ -38,7 +38,11 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   async validate(payload: any) {
     const user = await this.userService.getUserById(payload.sub);
     if (user == null) return null;
-    if (user.status == UserStatus.IN_CONNECTION || user.status == UserStatus.CONNECTED) return payload;;
+    if (
+      user.status == UserStatus.IN_CONNECTION ||
+      user.status == UserStatus.CONNECTED
+    )
+      return payload;
     return null;
   }
 }

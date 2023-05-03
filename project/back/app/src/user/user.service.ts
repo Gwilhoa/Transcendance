@@ -314,7 +314,7 @@ export class UserService {
   public async set2FASecret(secret: string, id: string) {
     const user = await this.userRepository.findOneBy({ id: id });
     if (user == null) {
-      return null; // TODO : return erreur
+      return null;
     }
     user.secret2FA = secret;
     return await this.userRepository.save(user);
@@ -323,7 +323,7 @@ export class UserService {
   public async enabled2FA(id: string) {
     const user = await this.userRepository.findOneBy({ id: id });
     if (user == null) {
-      return null; // TODO : return erreur
+      return false;
     }
     user.enabled2FA = true;
     await this.userRepository.save(user);
@@ -331,21 +331,21 @@ export class UserService {
   }
 
   public async disabled2FA(id: string) {
-    const user = await this.userRepository.findOneBy({ id: id });
+    let user = await this.userRepository.findOneBy({ id: id });
     if (user == null) {
-      return null; // TODO : return erreur
+      return false;
     }
     user.enabled2FA = false;
     user.secret2FA = null;
-    await this.userRepository.save(user);
-    return null;
+    user = await this.userRepository.save(user);
+    return user != null;
   }
 
   public async isBlocked(myuser_id: string, user_id: string): Promise<boolean> {
     const myuser = await this.getUserById(myuser_id);
     const user = await this.getUserById(user_id);
     if (user == null && myuser == null) {
-      return false; // TODO : return erreur
+      return false;
     }
     myuser.blockedUsers.forEach((element) => {
       if (element.id == user.id) return true;
@@ -360,7 +360,7 @@ export class UserService {
     const myuser = await this.getUserById(myuser_id);
     const user = await this.getUserById(user_id);
     if (user == null && myuser == null) {
-      return false; // TODO : return erreur
+      return false;
     }
     myuser.blockedUsers.forEach((element) => {
       if (element.id == user.id) return true;
@@ -414,7 +414,7 @@ export class UserService {
   ): Promise<{ access_token: string }> {
     let expiresTime = '5m';
     if (isauth == true) expiresTime = '2h';
-    let check2FA = false;
+    let check2FA: boolean;
     try {
       check2FA = await this.check2FAenabled(userId);
     } catch (error) {
