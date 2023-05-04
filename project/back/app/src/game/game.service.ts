@@ -1,33 +1,52 @@
-import {Injectable} from '@nestjs/common';
-import {InjectRepository} from '@nestjs/typeorm';
-import {Game, GameStatus} from './game.entity';
-import {Repository} from 'typeorm';
-import {UserService} from 'src/user/user.service';
-import {CreateGameDTO} from 'src/dto/create-game.dto';
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Game, GameStatus } from './game.entity';
+import { Repository } from 'typeorm';
+import { UserService } from 'src/user/user.service';
+import { CreateGameDTO } from 'src/dto/create-game.dto';
 
 @Injectable()
 export class GameService {
-	constructor(@InjectRepository(Game) private gameRepository: Repository<Game>, private readonly userService: UserService) {
-	}
+  constructor(
+    @InjectRepository(Game) private gameRepository: Repository<Game>,
+    private readonly userService: UserService,
+  ) {}
 
-	async getGames() {
-		return await this.gameRepository.find();
-	}
+  async getGames(id) {
+    return await this.gameRepository.find({
+      where: [{ user1: id }, { user2: id }],
+    });
+  }
 
-	async createGame(body: CreateGameDTO) {
-		const game = new Game();
-		const user1 = await this.userService.getUserById(body.user1_id);
-		const user2 = await this.userService.getUserById(body.user2_id);
-		game.user1 = user1;
-		game.user2 = user2;
-		game.score1 = 0;
-		game.score2 = 0;
-		game.finished = GameStatus.INGAME;
-		return await this.gameRepository.save(game);
-	}
+  async createGame(body: CreateGameDTO) {
+    const game = new Game();
+    const user1 = await this.userService.getUserById(body.user1_id);
+    const user2 = await this.userService.getUserById(body.user2_id);
+    game.user1 = user1;
+    game.user2 = user2;
+    game.score1 = 0;
+    game.score2 = 0;
+    game.finished = GameStatus.INGAME;
+    return await this.gameRepository.save(game);
+  }
 
-	async getGameById(id: string) {
-		return await this.gameRepository.findOneBy({id: id});
-	}
+  async getGameById(id: string) {
+    return await this.gameRepository.findOneBy({ id: id });
+  }
 
+  async finishGame(id: string, score1: number, score2: number) {
+    const game = await this.gameRepository.findOneBy({ id: id });
+    if (game == null) throw new Error('Game not found');
+    game.score1 = score1;
+    game.score2 = score2;
+    game.finished = GameStatus.FINISHED;
+    return await this.gameRepository.save(game);
+  }
+
+  async remakeGame(id: string) {
+    const game = await this.gameRepository.findOneBy({ id: id });
+    if (game == null) throw new Error('Game not found');
+    game.finished = GameStatus.REMAKE;
+    return await this.gameRepository.save(game);
+  }
 }

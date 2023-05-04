@@ -1,23 +1,25 @@
 import { ReactNode } from "react";
 import Head from "./header";
 import Foot from "./footer";
-import Notification from "../notification/notif";
+import  '../general.css'
 
-type Props = {
-    children: ReactNode;
+interface Props {
+    openModal: (param: boolean) => void;
+    child: () => ReactNode;
+    setContent: (param: ReactNode) => void;
 };
 
-const Template = (props: Props) => {
+const Template = ({openModal, setContent, child}:Props) => {
 
     return (
-      <div>
-          <div className="form-container">
-            <main>{props.children}</main>
-          </div>
+      <div className="page">
         <header>
-            <Head/>
-            <Notification channel="yo" message="Nouveau message"/> 
+            <Head openModal={openModal} setContent={setContent}/>
         </header>
+          
+        <main className="main-template">{child()}
+        </main>
+
         <footer>
             <Foot/>
         </footer>

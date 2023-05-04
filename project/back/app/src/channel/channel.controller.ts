@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -98,6 +99,31 @@ export class ChannelController {
     let ret;
     try {
       ret = await this.channelService.addAdmin(body, id);
+    } catch (e) {
+      response.status(400).send(e.message);
+      return;
+    }
+    response.status(200).send(ret);
+    return;
+  }
+
+  @Get('admin')
+  async getAdmin(@Body() body: addAdminDto, @GetUser('sub') id: string) {
+    let ret;
+    try {
+      ret = await this.channelService.getAdmin(body, id);
+    } catch (e) {
+      response.status(400).send(e.message);
+      return;
+    }
+    return ret;
+  }
+
+  @Delete('admin')
+  async deleteAdmin(@Body() body: addAdminDto, @GetUser('sub') id: string) {
+    let ret;
+    try {
+      ret = await this.channelService.deleteAdmin(body, id);
     } catch (e) {
       response.status(400).send(e.message);
       return;

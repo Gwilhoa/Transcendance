@@ -2,7 +2,10 @@ import React, { useState, useEffect } from "react";
 import { useCookies, Cookies } from "react-cookie";
 import axios from "axios";
 
-function TokenPage() {
+
+export var bigToken:string;
+
+export function TokenPage() {
 	const [accessToken, setAccessToken] = useState("");
 	const [cookies, setCookie, removeCookie] = useCookies(['jwtAuthorization']);
 	
@@ -21,6 +24,7 @@ function TokenPage() {
 			},
 		})
 			.then((response) => {
+				bigToken = response.data.access_token;
 				setAccessToken(response.data.access_token);
 				setCookieJwt(response.data.access_token);
 			})
@@ -34,5 +38,6 @@ function TokenPage() {
 		</div>
 	);
 }
+
 
 export default TokenPage;
