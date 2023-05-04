@@ -116,7 +116,7 @@ export class AuthController {
     await this.userService.enabled2FA(id);
   }
 
-  @UseGuards(JwtIsAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Get('2fa/is2FA')
   async is2FA(@GetUser() user) {
     return user.is2FA;
