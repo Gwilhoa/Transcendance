@@ -10,6 +10,7 @@ import {Channel} from './channel.entity';
 import {Message} from './message.entity';
 import {ChannelType} from 'src/utils/channel.enum';
 import {BanUserDto} from '../dto/ban-user.dto';
+import * as argon2 from "argon2";
 
 @Injectable()
 export class ChannelService {
@@ -33,6 +34,11 @@ export class ChannelService {
     if (body.type == ChannelType.PROTECTED_CHANNEL) {
       if (body.password == null)
         throw new Error('Password is required for PROTECTED_CHANNEL');
+        try {
+        chan.pwd = await argon2.hash(body.password);
+        } catch (err) {
+          throw new Error('Can not hash password');
+        }
     }
     chan = await this.channelRepository.save(chan);
     return chan;
@@ -75,6 +81,11 @@ export class ChannelService {
     if (chan.type == ChannelType.PROTECTED_CHANNEL) {
       if (body.password == null)
         throw new Error('Password is required for PROTECTED_CHANNEL');
+        try {
+        if (! await argon2.verify(chan.pwd, body.password)) throw new Error('Wrong password');
+        } catch (err) {
+          throw new Error('Can not verify password');
+        }
     }
     if (chan.bannedUsers != null && chan.bannedUsers.includes(user))
       throw new Error('User is banned');
