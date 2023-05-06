@@ -81,8 +81,14 @@ export class ChannelService {
     if (chan.type == ChannelType.PROTECTED_CHANNEL) {
       if (body.password == null)
         throw new Error('Password is required for PROTECTED_CHANNEL');
-      if (!(await argon2.verify(chan.pwd, body.password)))
-        throw new Error('Wrong password');
+      let isvalid = false;
+      try {
+        isvalid = await argon2.verify(chan.pwd, body.password);
+      } catch (err) {
+        throw new Error('Can not verify password');
+      }
+      if (isvalid == false)
+        throw new Error('Password is not valid for this channel');
     }
     if (chan.bannedUsers != null && chan.bannedUsers.includes(user))
       throw new Error('User is banned');
