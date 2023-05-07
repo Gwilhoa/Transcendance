@@ -36,7 +36,13 @@ export class Game {
   private _maxY;
   private _gameService: GameService;
 
-  public constructor(id: string, user1: string, user2: string, io: Server, gameService : GameService) {
+  public constructor(
+    id: string,
+    user1: string,
+    user2: string,
+    io: Server,
+    gameService: GameService,
+  ) {
     this._id = id;
     this._user1 = user1;
     this._user2 = user2;
@@ -121,36 +127,50 @@ export class Game {
     this._dx = Math.cos(angle);
     this._dy = Math.sin(angle);
   }
-  public gameLoop() {
+  public async gameLoop() {
     this._ballx += this._dx;
     this._bally += this._dy;
 
     //check if ball will be in racket // TODO: check si ca marche
-    if ((this._ballx < this._minX + Game.default_rackwidth + Game.default_radiusball)) {
+    if (
+      this._ballx <
+      this._minX + Game.default_rackwidth + Game.default_radiusball
+    ) {
       if (
-        this._bally > this._rack1y  && this._bally <= this._rack1y + Game.default_racklenght
+        this._bally > this._rack1y &&
+        this._bally <= this._rack1y + Game.default_racklenght
       )
         this._rack1y -= Game.default_steprack;
-
     }
-    if ((this._ballx > this._maxX - Game.default_rackwidth - Game.default_radiusball)) {
+    if (
+      this._ballx >
+      this._maxX - Game.default_rackwidth - Game.default_radiusball
+    ) {
       if (
-        this._bally > this._rack2y && this._bally <= this._rack2y + Game.default_racklenght
+        this._bally > this._rack2y &&
+        this._bally <= this._rack2y + Game.default_racklenght
       )
-      this._rack2y -= Game.default_steprack;
+        this._rack2y -= Game.default_steprack;
     }
-
 
     //calculate colision racket
-    if ((this._ballx <= this._minX + Game.default_rackwidth + Game.default_radiusball)) {
+    if (
+      this._ballx <=
+      this._minX + Game.default_rackwidth + Game.default_radiusball
+    ) {
       if (
-        this._bally >= this._rack1y  && this._bally <= this._rack1y + Game.default_racklenght
+        this._bally >= this._rack1y &&
+        this._bally <= this._rack1y + Game.default_racklenght
       )
         this._dx *= -1;
     }
-    if ((this._ballx >= this._maxX - Game.default_rackwidth - Game.default_radiusball)) {
+    if (
+      this._ballx >=
+      this._maxX - Game.default_rackwidth - Game.default_radiusball
+    ) {
       if (
-        this._bally >= this._rack2y && this._bally <= this._rack2y + Game.default_racklenght
+        this._bally >= this._rack2y &&
+        this._bally <= this._rack2y + Game.default_racklenght
       )
         this._dx *= -1;
     }
@@ -172,13 +192,13 @@ export class Game {
 
     if (this._score1 == Game.default_victorygoal) {
       this._io.to(this._id).emit('player1won', this.getGameInfo());
-      this._gameService.finishGame(this._id, this._score1, this._score2);
+      await this._gameService.finishGame(this._id, this._score1, this._score2);
       clearInterval(this._loopid);
       return;
     }
     if (this._score2 == Game.default_victorygoal) {
       this._io.to(this._id).emit('player2won', this.getGameInfo());
-      this._gameService.finishGame(this._id, this._score1, this._score2);
+      await this._gameService.finishGame(this._id, this._score1, this._score2);
       clearInterval(this._loopid);
       return;
     }

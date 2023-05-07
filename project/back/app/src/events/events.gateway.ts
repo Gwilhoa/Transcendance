@@ -19,6 +19,7 @@ import { GameService } from 'src/game/game.service';
 import { CreateGameDTO } from 'src/dto/create-game.dto';
 import { UserStatus } from 'src/utils/user.enum';
 import {
+  getIdFromSocket,
   send_connection_server,
   verifyToken,
   wrongtoken,
@@ -34,7 +35,7 @@ export class EventsGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
   @WebSocketServer() server: Server;
-  private clients: Map<string, string> = new Map<string, string>();
+  private clients: Map<string, Socket> = new Map<string, Socket>();
   private ingame: Map<string, string> = new Map<string, string>();
   private games: Map<string, Game> = new Map<string, Game>();
   private matchmaking: Array<User> = [];
@@ -64,7 +65,7 @@ export class EventsGateway
   }
 
   async handleDisconnect(client: Socket) {
-    const id = this.clients.get(client.id);
+    const id = getIdFromSocket(client, this.clients);
     if ((await this.userService.changeStatus(id, UserStatus.OFFLINE)) == null) {
       this.logger.error(`Error changing status of user ${id}`);
       wrongtoken(client);
@@ -113,7 +114,7 @@ export class EventsGateway
     let send;
     const token = payload.token;
     const friend_id = payload.friend_id;
-    const user_id = verifyToken(token, client);
+    const user_id = verifyToken(token);
     if (user_id == null) {
       client.emit('friend_code', FriendCode.UNAUTHORIZED);
       return;
@@ -179,7 +180,7 @@ export class EventsGateway
     const channel_id = payload.channel_id;
     let message = payload.content;
     let send;
-    const user_id = verifyToken(token, client);
+    const user_id = verifyToken(token);
     const user = await this.userService.getUserById(user_id);
     const channel = await this.channelService.getChannelById(channel_id);
     if (user == null) {
@@ -229,7 +230,7 @@ export class EventsGateway
     let send;
     const token = payload.token;
     const channel_id = payload.channel_id;
-    const user_id = verifyToken(token, client);
+    const user_id = verifyToken(token);
     if (user_id == null) {
       send = {
         code: 401,
@@ -269,7 +270,7 @@ export class EventsGateway
     let send;
     const token = payload.token;
     const channel_id = payload.channel_id;
-    const user_id = verifyToken(token, client);
+    const user_id = verifyToken(token);
     if (user_id == null) {
       send = {
         code: 401,
@@ -376,7 +377,7 @@ export class EventsGateway
   async input_game(client: Socket, payload: any) {
     const game_id = payload.game_id;
     const position = payload.position;
-    const user_id = verifyToken(payload.token, client);
+    const user_id = verifyToken(payload.token);
     if (position > 100 || position < 0) {
       return;
     }

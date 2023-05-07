@@ -1,13 +1,13 @@
-import {Injectable} from '@nestjs/common';
-import {InjectRepository} from '@nestjs/typeorm';
-import {AuthService} from '../auth/auth.service';
-import {Repository} from 'typeorm';
-import {User} from './user.entity';
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { AuthService } from '../auth/auth.service';
+import { Repository } from 'typeorm';
+import { User } from './user.entity';
 import fetch from 'node-fetch';
-import {RequestFriend} from './requestfriend.entity';
-import {ChannelType} from 'src/utils/channel.enum';
-import {JwtService} from '@nestjs/jwt';
-import {UserStatus} from "../utils/user.enum";
+import { RequestFriend } from './requestfriend.entity';
+import { ChannelType } from 'src/utils/channel.enum';
+import { JwtService } from '@nestjs/jwt';
+import { UserStatus } from '../utils/user.enum';
 
 @Injectable()
 export class UserService {
@@ -121,7 +121,7 @@ export class UserService {
       user.friends = [];
     }
     if (!user.requestsReceived.find((e) => e.sender.id == friend.id)) {
-      this.addFriendRequest(id, friend_id);
+      await this.addFriendRequest(id, friend_id);
       return null;
     }
     user.friends.push(friend);
@@ -170,6 +170,9 @@ export class UserService {
       user.blockedUsers = [];
     }
     user.blockedUsers.push(blocked);
+    if (this.isfriend(user, blocked)) {
+      await this.removeFriend(user, blocked);
+    }
     await this.userRepository.save(user);
     await this.userRepository.save(blocked);
     return user;
@@ -455,5 +458,15 @@ export class UserService {
       (element) => element.id != blocked_user.id,
     );
     return await this.userRepository.save(user);
+  }
+
+  private async removeFriend(user: User, blocked: User) {
+    user.friends = user.friends.filter((element) => element.id != blocked.id);
+    blocked.friends = blocked.friends.filter(
+      (element) => element.id != user.id,
+    );
+    await this.userRepository.save(user);
+    await this.userRepository.save(blocked);
+    return true;
   }
 }

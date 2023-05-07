@@ -4,26 +4,37 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d4c22c1a-30ce-4167-98e2-3bd0de69eb23" name="Changes" comment="fin loop game, fix setName&amp;User">
-      <change afterPath="$PROJECT_DIR$/project/back/app/src/dto/add-admin.dto.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/project/back/app/src/dto/ban-user.dto.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/project/back/app/src/dto/get-message.dto.ts" afterDir="false" />
+    <list default="true" id="d4c22c1a-30ce-4167-98e2-3bd0de69eb23" name="Changes" comment="push protec de git">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/project/back/app/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/project/back/app/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/project/back/app/src/app.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/src/app.controller.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/project/back/app/src/auth/auth.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/src/auth/auth.module.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/project/back/app/src/auth/auth.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/src/auth/auth.service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/project/back/app/src/channel/channel.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/src/channel/channel.controller.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/project/back/app/src/channel/channel.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/src/channel/channel.service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/project/back/app/src/dto/addadmin.dto.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/project/back/app/src/dto/create-channel.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/src/dto/create-channel.dto.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/project/back/app/src/dto/join-channel.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/src/dto/join-channel.dto.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/project/back/app/src/dto/leave-channel.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/src/dto/leave-channel.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/back/app/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/back/app/src/app.controller.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/src/app.controller.spec.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/back/app/src/app.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/src/app.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/back/app/src/auth/auth.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/src/auth/auth.spec.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/back/app/src/channel/channel.service.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/src/channel/channel.service.spec.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/back/app/src/dto/get-message.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/src/dto/get-message.dto.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/project/back/app/src/dto/sendmessage.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/src/dto/sendmessage.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/back/app/src/events/Game.class.ts" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/src/events/Game.class.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/back/app/src/events/event.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/src/events/event.module.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/back/app/src/events/events.gateway.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/src/events/events.gateway.spec.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/project/back/app/src/events/events.gateway.ts" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/src/events/events.gateway.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/back/app/src/game/game.controller.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/src/game/game.controller.spec.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/back/app/src/game/game.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/src/game/game.controller.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/back/app/src/game/game.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/src/game/game.module.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/back/app/src/game/game.service.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/src/game/game.service.spec.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/project/back/app/src/main.ts" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/src/main.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/back/app/src/user/requestfriend.entity.ts" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/src/user/requestfriend.entity.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/back/app/src/user/user.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/src/user/user.controller.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/back/app/src/user/user.entity.ts" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/src/user/user.entity.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/back/app/src/user/user.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/src/user/user.module.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/back/app/src/user/user.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/src/user/user.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/back/app/src/utils/channel.enum.ts" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/src/utils/channel.enum.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/back/app/src/utils/requestcode.enum.ts" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/src/utils/requestcode.enum.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/back/app/src/utils/sleep.ts" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/src/utils/sleep.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/project/back/app/src/utils/socket.function.ts" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/src/utils/socket.function.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/back/app/src/utils/user.enum.ts" beforeDir="false" afterPath="$PROJECT_DIR$/project/back/app/src/utils/user.enum.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/back/package-lock.json" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -62,27 +73,27 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "back__2",
-    "javascript.nodejs.core.library.configured.version": "19.8.1",
-    "javascript.nodejs.core.library.typings.version": "18.16.1",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "prettierjs.PrettierConfiguration.Package": "/Users/guilheimchataing/Transcendance/project/back/app/node_modules/prettier",
-    "run.code.analysis.last.selected.profile": "pProject Default",
-    "settings.editor.selected.configurable": "discord-project",
-    "ts.external.directory.path": "/Users/guilheimchataing/Transcendance/project/back/app/node_modules/typescript/lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;back__2&quot;,
+    &quot;javascript.nodejs.core.library.configured.version&quot;: &quot;19.8.1&quot;,
+    &quot;javascript.nodejs.core.library.typings.version&quot;: &quot;18.16.1&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;prettierjs.PrettierConfiguration.Package&quot;: &quot;/Users/guilheimchataing/Transcendance/project/back/app/node_modules/prettier&quot;,
+    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;discord-project&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/Users/guilheimchataing/Transcendance/project/back/app/node_modules/typescript/lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunDashboard">
     <option name="openRunningConfigInTab" value="true" />
   </component>
@@ -170,6 +181,7 @@
       <workItem from="1681992430256" duration="11524000" />
       <workItem from="1682086786531" duration="3216000" />
       <workItem from="1682537444756" duration="10531000" />
+      <workItem from="1683399816301" duration="5636000" />
     </task>
     <task id="LOCAL-00001" summary="modifications .env + reformat">
       <created>1681994250786</created>
@@ -213,7 +225,28 @@
       <option name="project" value="LOCAL" />
       <updated>1682514626956</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="ajout delete et get ban by channel">
+      <created>1683400902177</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1683400902177</updated>
+    </task>
+    <task id="LOCAL-00008" summary="fix bizarrerie try catch">
+      <created>1683403843085</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1683403843085</updated>
+    </task>
+    <task id="LOCAL-00009" summary="push protec de git">
+      <created>1683452350637</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1683452350637</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -247,6 +280,9 @@
     <MESSAGE value="ajout auth front get token" />
     <MESSAGE value="test" />
     <MESSAGE value="fin loop game, fix setName&amp;User" />
-    <option name="LAST_COMMIT_MESSAGE" value="fin loop game, fix setName&amp;User" />
+    <MESSAGE value="ajout delete et get ban by channel" />
+    <MESSAGE value="fix bizarrerie try catch" />
+    <MESSAGE value="push protec de git" />
+    <option name="LAST_COMMIT_MESSAGE" value="push protec de git" />
   </component>
 </project>

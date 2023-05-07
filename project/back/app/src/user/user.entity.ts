@@ -1,62 +1,74 @@
-import {Channel} from 'src/channel/channel.entity';
-import {Message} from 'src/channel/message.entity';
-import {Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryColumn} from 'typeorm';
-import {RequestFriend} from './requestfriend.entity';
-import {Game} from 'src/game/game.entity';
-import {UserStatus} from 'src/utils/user.enum';
+import { Channel } from 'src/channel/channel.entity';
+import { Message } from 'src/channel/message.entity';
+import {
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  OneToMany,
+  PrimaryColumn,
+} from 'typeorm';
+import { RequestFriend } from './requestfriend.entity';
+import { Game } from 'src/game/game.entity';
+import { UserStatus } from 'src/utils/user.enum';
 
-
-@Entity({name: 'users'})
+@Entity({ name: 'users' })
 export class User {
+  @PrimaryColumn()
+  id: string;
 
-	@PrimaryColumn()
-	id: string;
+  @Column()
+  email: string;
 
-	@Column()
-	email: string;
+  @Column()
+  username: string;
 
-	@Column()
-	username: string;
+  @Column({ default: 0 })
+  experience: number;
 
-	@Column({default: 0})
-	experience: number;
+  @ManyToMany((type) => User, (user) => user.friends)
+  @JoinTable({
+    name: 'friends',
+    joinColumn: { name: 'user_id' },
+    inverseJoinColumn: { name: 'friend_id' },
+  })
+  friends: User[];
 
-	@ManyToMany(type => User, user => user.friends)
-	@JoinTable({name: 'friends', joinColumn: {name: 'user_id'}, inverseJoinColumn: {name: 'friend_id'}})
-	friends: User[];
+  @ManyToMany((type) => User, (user) => user.blockedUsers)
+  @JoinTable({
+    name: 'blocked_users',
+    joinColumn: { name: 'user_id' },
+    inverseJoinColumn: { name: 'blocked_user_id' },
+  })
+  blockedUsers: User[];
 
+  @ManyToMany((type) => Channel, (channel) => channel.users)
+  joinedChannels: Channel[];
 
-	@ManyToMany(type => User, user => user.blockedUsers)
-	@JoinTable({name: 'blocked_users', joinColumn: {name: 'user_id'}, inverseJoinColumn: {name: 'blocked_user_id'}})
-	blockedUsers: User[];
+  @ManyToMany((type) => Channel, (channel) => channel.admins)
+  adminChannels: Channel[];
 
-	@ManyToMany(type => Channel, channel => channel.users)
-	joinedChannels: Channel[];
+  @ManyToMany((type) => Channel, (channel) => channel.bannedUsers)
+  bannedChannels: Channel[];
 
-	@ManyToMany(type => Channel, channel => channel.admins)
-	adminChannels: Channel[];
+  @OneToMany((type) => Message, (message) => message.user)
+  messages: Message[];
 
-	@ManyToMany(type => Channel, channel => channel.bannedUsers)
-	bannedChannels: Channel[];
+  @OneToMany((type) => RequestFriend, (request) => request.sender)
+  requests: RequestFriend[];
 
-	@OneToMany(type => Message, message => message.user)
-	messages: Message[];
+  @OneToMany((type) => RequestFriend, (request) => request.receiver)
+  requestsReceived: RequestFriend[];
 
-	@OneToMany(type => RequestFriend, request => request.sender)
-	requests: RequestFriend[];
+  @Column({ nullable: true })
+  secret2FA: string;
 
-	@OneToMany(type => RequestFriend, request => request.receiver)
-	requestsReceived: RequestFriend[];
+  @Column({ default: false })
+  enabled2FA: boolean;
 
-	@Column({nullable: true})
-	secret2FA: string;
+  @OneToMany((type) => Game, (game) => game.user1 || game.user2)
+  games: Game[];
 
-	@Column({default: false})
-	enabled2FA: boolean;
-
-	@OneToMany(type => Game, game => game.user1 || game.user2)
-	games: Game[];
-
-	@Column({default: 0})
-	status: UserStatus;
+  @Column({ default: 0 })
+  status: UserStatus;
 }
