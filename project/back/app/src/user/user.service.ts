@@ -415,6 +415,7 @@ export class UserService {
 
   async signJwtToken(
     userId: string,
+    email : string,
     isauth: boolean,
   ): Promise<{ access_token: string }> {
     let expiresTime = '5m';
@@ -427,6 +428,7 @@ export class UserService {
     }
     const payload = {
       sub: parseInt(userId),
+      email: email,
       isauth: isauth,
       enabled2FA: check2FA,
     };

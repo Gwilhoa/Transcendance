@@ -45,7 +45,8 @@ export class AuthController {
       res.status(400).send('Bad User');
       return;
     }
-    const code = await this.userService.signJwtToken(user.id, false);
+    const code = await this.userService.signJwtToken(user.id, user.email, false);
+    console.log("first jwt: " + code.access_token);
     res.redirect(
       'http://localhost:8080/authenticate?access_token=' + code.access_token,
     );
@@ -55,14 +56,14 @@ export class AuthController {
   @UseGuards(JwtIsAuthGuard)
   @Get('2fa/create')
   async create2fa(@GetUser() user, @Res() res) {
-    if (user.enabled2FA != true) {
-      res
-        .status(400)
-        .send(
-          'Bad Request : You already have a two factor authentication enabled',
-        );
-      return;
-    }
+    // if (user.enabled2FA != true) {
+    //   res
+    //     .status(400)
+    //     .send(
+    //       'Bad Request : You already have a two factor authentication enabled',
+    //     );
+    //   return;
+    // }
     const secret = await authenticator.generateSecret();
 
     const otpauthUrl = authenticator.keyuri(
@@ -114,6 +115,7 @@ export class AuthController {
       return;
     }
     await this.userService.enabled2FA(id);
+    return true;
   }
 
   @UseGuards(JwtAuthGuard)
@@ -162,7 +164,7 @@ export class AuthController {
       res.status(400).send('unrecognized user');
       return;
     }
-    const token = await this.userService.signJwtToken(user.id, true);
+    const token = await this.userService.signJwtToken(user.id, user.email, true);
     res.send(token);
     return;
   }
@@ -175,6 +177,14 @@ export class AuthController {
       res.status(400).send('Bad User');
       return;
     }
+    if (user.enabled2FA == false) {
+      res
+        .status(400)
+        .send(
+          "Bad Request : You don't have the two factor authentication enabled",
+        );
+      return;
+    }
     if (user.secret2FA == null) {
       res
         .status(400)
@@ -184,9 +194,10 @@ export class AuthController {
       return;
     }
     await this.userService.disabled2FA(id);
+    return true; // TODO : check si le return true ici et celui du enable passe
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard) //TODO: patch logout
   @Get('logout')
   async logout(@GetUser('sub') id, @Req() req, @Res() res) {
     if (
