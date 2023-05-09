@@ -115,7 +115,8 @@ export class AuthController {
       return;
     }
     await this.userService.enabled2FA(id);
-    return true;
+    res.status(200).send(true);
+    return ;
   }
 
   @UseGuards(JwtAuthGuard)
@@ -131,7 +132,7 @@ export class AuthController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('authenticate')
+  @Get('authenticate') // TODO : check pourquoi ca ne marche pas une fois deux
   async authenticate2FA(@GetUser() jwtUser, @Res() res, @Body() body) {
     const id = jwtUser.sub;
     let user = await this.userService.getUserById(id);
@@ -194,10 +195,11 @@ export class AuthController {
       return;
     }
     await this.userService.disabled2FA(id);
-    return true; // TODO : check si le return true ici et celui du enable passe
+    res.status(200).send(true);
+    return ;
   }
 
-  @UseGuards(JwtAuthGuard) //TODO: patch logout
+  @UseGuards(JwtAuthGuard)
   @Get('logout')
   async logout(@GetUser('sub') id, @Req() req, @Res() res) {
     if (
