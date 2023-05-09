@@ -6,7 +6,7 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { Game } from '../events/Game.class';
+import { Game } from './Game.class';
 import { Logger } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { UserService } from 'src/user/user.service';
@@ -52,30 +52,39 @@ export class EventsGateway
         await sleep(10000);
       }
     };
-    check();
+    check().then(() => this.logger.log('check matchmaking started'));
   }
 
   sendconnected() {
     send_connection_server(this.clients, this.ingame, this.server);
   }
 
-  afterInit(server: Server) {
+  afterInit() {
     this.logger.log('Socket server initialized');
   }
 
-  handleDisconnect(client: Socket) {
+  async handleDisconnect(client: Socket) {
     const id = this.clients.get(client.id);
-    this.userService.changeStatus(id, UserStatus.OFFLINE);
+    if ((await this.userService.changeStatus(id, UserStatus.OFFLINE)) == null) {
+      this.logger.error(`Error changing status of user ${id}`);
+      wrongtoken(client);
+      this.clients.delete(client.id);
+      this.sendconnected();
+    }
     this.logger.log(`Client disconnected: ${id}`);
     this.clients.delete(client.id);
     if (this.ingame.has(client.id)) {
-      this.ingame.delete(client.id);
+      const game = await this.gameService.remakeGame(
+        this.ingame.get(client.id),
+      );
+      this.ingame.delete(game.user1.id);
+      this.ingame.delete(game.user2.id);
     }
     this.sendconnected();
   }
 
   //on connection
-  async handleConnection(client: Socket, ...args: any[]) {
+  async handleConnection(client: Socket) {
     console.log('[Socket] new client connected');
     let id;
     await client.on('connection', async (data) => {
@@ -85,18 +94,17 @@ export class EventsGateway
         wrongtoken(client);
         return;
       }
-      await this.userService.changeStatus(id, UserStatus.CONNECTED);
+      if (
+        (await this.userService.changeStatus(id, UserStatus.CONNECTED)) == null
+      )
+        wrongtoken(client);
       this.clients.set(client.id, id);
       this.sendconnected();
-      let channels;
-      const user_chan = await this.userService.getChannels(id);
-      if (user_chan != null) {
-        user_chan.forEach((element) => {
-          channels.push(element.id);
-        });
+      const channels = await this.channelService.getAccessibleChannels(id);
+      for (const channel of channels) {
+        client.join(channel.id);
       }
-      if (channels != null && channels.length < 0) client.join(channels);
-    }); //le message "connection" doit etre envoyé à la connection du client
+    });
   }
 
   //on friend request
@@ -191,7 +199,16 @@ export class EventsGateway
       message.content = payload.content;
       message.user = user_id;
       message.channel = channel_id;
-      const msg = await this.channelService.sendMessage(message, user_id);
+      let msg;
+      try {
+        msg = await this.channelService.sendMessage(message, user_id);
+      } catch (error) {
+        send = {
+          code: messageCode.INVALID_FORMAT,
+        };
+        client.emit('message_code', send);
+        return;
+      }
       send = {
         code: messageCode.SUCCESS,
       };
@@ -313,8 +330,7 @@ export class EventsGateway
         const authorized_player = this.matchmaking.filter(
           async (user2) =>
             user2.id !== user1.id &&
-            (await this.userService.OneOfTwoBlocked(user1.id, user2.id)) ===
-              false,
+            (await this.userService.OneOfTwoBlocked(user1.id, user2.id)),
         );
         const len_authorized_player = authorized_player.length;
         if (len_authorized_player > 1) {
@@ -327,12 +343,13 @@ export class EventsGateway
           gameinfo.user2_id = random_player.id;
 
           const create_game = await this.gameService.createGame(gameinfo);
-          //TODO: create game
-          await this.userService.changeStatus(user1.id, UserStatus.IN_GAME); // TODO: status in game
+          this.ingame.set(user1.id, create_game.id);
+          this.ingame.set(random_player.id, create_game.id);
+          await this.userService.changeStatus(user1.id, UserStatus.IN_GAME);
           await this.userService.changeStatus(
             random_player.id,
             UserStatus.IN_GAME,
-          ); // TODO: status in game
+          );
           this.clients[user1.id].join(create_game.id);
           this.clients[random_player.id].join(create_game.id);
           const send = {
@@ -341,7 +358,13 @@ export class EventsGateway
           this.server.to(create_game.id).emit('create_game', send);
           this.games.set(
             create_game.id,
-            new Game(create_game.id, user1.id, random_player.id, this.server),
+            new Game(
+              create_game.id,
+              user1.id,
+              random_player.id,
+              this.server,
+              this.gameService,
+            ),
           );
         }
       });

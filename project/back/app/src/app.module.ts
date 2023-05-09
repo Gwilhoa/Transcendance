@@ -7,11 +7,6 @@ import { UserModule } from './user/user.module';
 import { ChannelModule } from './channel/channel.module';
 import { EventModule } from './events/event.module';
 import { GameModule } from './game/game.module';
-import { AuthService } from './auth/auth.service';
-import { JwtService } from '@nestjs/jwt';
-import { UserService } from './user/user.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './user/user.entity';
 
 @Module({
   imports: [
