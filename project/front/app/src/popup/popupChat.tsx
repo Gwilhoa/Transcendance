@@ -65,30 +65,27 @@ const addMessages = (chan:string, setIsOpen:(param: boolean) => void, setContent
 const PopupChat: React.FC<{path:string, openModal:(param: boolean) => void, setContent:(param: ReactNode) => void}> = (path) => {
 
   let Navigate = useNavigate();
-    const [channelList, setChannelList] = useState<ChannelItem[]>([])
-  
-    const finalPath = channelList.find((channel) => channel.name === path.path);
-
-    
-    const NewChan = (name:string) => {
-      if (canJoinChannel(name)) {
-        const newItem:ChannelItem  = {
-          id: channelList.length + 1,
-          name: name,
-          URL: ChangeChannel(name)
-        };
-        setChannelList([...channelList, newItem]); 
-        Navigate(ChangeChannel(name));
-        return true
-      }
-      return false
-    }
-
-    if (!finalPath && !NewChan(path.path)){
-      Navigate(JoinChat());
-    }
-
   const [prompt, setMessage] = useState('');
+  const [channelList, setChannelList] = useState<ChannelItem[]>([])
+  const finalPath = channelList.find((channel) => channel.name === path.path);
+
+  const NewChan = (name:string) => {
+    if (canJoinChannel(name)) {
+      const newItem:ChannelItem  = {
+        id: channelList.length + 1,
+        name: name,
+        URL: ChangeChannel(name)
+      };
+      setChannelList([...channelList, newItem]); 
+      Navigate(ChangeChannel(name));
+      return true
+    }
+    return false
+  }
+
+  if (!finalPath && !NewChan(path.path)){
+    Navigate(JoinChat());
+  }
 
   const handleMessageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setMessage(event.target.value);
@@ -108,8 +105,7 @@ const PopupChat: React.FC<{path:string, openModal:(param: boolean) => void, setC
     else {
       sendNewMessageToBack(prompt);
     }
-    
-   setMessage('');
+    setMessage('');
   }
   
   return (
@@ -137,20 +133,6 @@ const PopupChat: React.FC<{path:string, openModal:(param: boolean) => void, setC
             placeHolder='ajout channel'
             classInput='button_channel'
             classButton='button_channel'/>
-
-          {/* { buttonAddChannel &&
-            <button className='button_channel' onClick={ConvertButton}>
-            +
-            </button>}
-          { !buttonAddChannel
-             &&
-           <input className='button_channel'
-                  type='text'
-                  placeholder='ajout channel'
-                  onKeyDown={handleChannelKeyDown}
-                  value={channelPrompt}
-                  onChange={ChannelPromptChange}
-                  maxLength={10}/>} */}
           </div>
           <div className="messages">
             {addMessages(path.path, path.openModal, path.setContent)}

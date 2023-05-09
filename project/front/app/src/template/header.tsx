@@ -4,6 +4,7 @@ import { useState } from "react";
 import PopupHisto from "../popup/popupHisto"
 import CV from "../profil/CV";
 import { MyComponentProps } from "../App";
+import { getName } from "../API";
 
 const Head = ({ openModal, setContent }: MyComponentProps) => {
 
@@ -13,7 +14,7 @@ const Head = ({ openModal, setContent }: MyComponentProps) => {
   };
 
   const profilStart = () => {
-    setContent(<CV name={"Pigi16"} isFriend={false} isMe={true} photoUrl={"https://www.treehugger.com/thmb/9fuOGVoJ23ZwziKRNtAEMHw8opU=/750x0/filters:no_upscale():max_bytes(150000):strip_icc():format(webp)/piglet-grass-dandelions-01-b21d7ef8f881496f8346dbe01859537e.jpg"}/>);
+    setContent(<CV name={getName()} isFriend={false} isMe={true} photoUrl={"https://www.treehugger.com/thmb/9fuOGVoJ23ZwziKRNtAEMHw8opU=/750x0/filters:no_upscale():max_bytes(150000):strip_icc():format(webp)/piglet-grass-dandelions-01-b21d7ef8f881496f8346dbe01859537e.jpg"}/>);
     openModal(true);
   }
 

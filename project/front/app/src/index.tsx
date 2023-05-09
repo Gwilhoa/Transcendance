@@ -12,7 +12,7 @@ function MainComponent() {
   const [content, setContent] = useState<ReactNode>();
 
   return (
-<CookiesProvider>
+    <CookiesProvider>
       <App openModal={setShow} setContent={setContent} />
       <Modal boolModal={show} openModal={setShow} content={content}/> 
     </CookiesProvider>

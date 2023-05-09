@@ -47,3 +47,8 @@
   background-color: rgb(255, 255, 255);
   border-radius: 50%;
 }
+
+.gameimg {
+  width: 150px;
+  height: 150px;
+}

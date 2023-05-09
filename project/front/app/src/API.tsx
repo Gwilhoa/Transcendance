@@ -1,8 +1,9 @@
 import axios, { AxiosResponse, AxiosRequestConfig } from 'axios';
 import { bigToken } from './pages/authenticate';
+import io from "socket.io-client";
 axios.defaults.baseURL = 'http://localhost:3000/'
 axios.defaults.headers.common = {'Authorization': `bearer ${bigToken}`}
-
+export const socket = io("http://localhost:3000");
 
 export default axios;
 
@@ -65,4 +66,25 @@ export function canJoinChannel(Channel:string) : boolean {
 export function getPositionBall() : Vector {
 
     return ({x:0, y:0})
+}
+
+
+export function getTwoFA() : boolean {
+
+
+
+    return (true);
+}
+
+export function setTwoFA(isFa:boolean) {
+    console.log(isFa);
+}
+
+export function getName() : string {
+    return ("Pigi16")
+}
+
+export function setName(str:string) {
+
+    return (true);
 }

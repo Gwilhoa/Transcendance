@@ -38,6 +38,10 @@
     position: absolute; 
     left: 401px;
     width: calc(100% - 802px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
   }
   
   .page {

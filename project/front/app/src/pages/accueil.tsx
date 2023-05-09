@@ -1,5 +1,3 @@
-import Template from "../template/template";
-
 const Accueil = () => {
  
         return (
