@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import Head from "./header";
 import Foot from "./footer";
 import  '../general.css'
+import Notification from "../notification/notif";
 
 interface Props {
     openModal: (param: boolean) => void;
@@ -16,8 +17,9 @@ const Template = ({openModal, setContent, child}:Props) => {
         <header>
             <Head openModal={openModal} setContent={setContent}/>
         </header>
-          
-        <main className="main-template">{child()}
+          <Notification message={"ds"} channel={"sd"}/>
+        <main className="main-template">
+          {child()}
         </main>
 
         <footer>
