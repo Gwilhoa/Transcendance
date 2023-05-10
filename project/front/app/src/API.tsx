@@ -68,7 +68,7 @@ export function getPositionBall() : Vector {
     return ({x:0, y:0})
 }
 
-// export function getJwt(url:string, token:string) : string {
+// export const getJwt = (url:string, token:string | null) : string => {
 // 	const [accessToken, setAccessToken] = useState("");
 // 	axios.get(url, {
 // 			headers: {
@@ -84,3 +84,8 @@ export function getPositionBall() : Vector {
 // 			});
 // 	return (accessToken);
 // }
+//  export function setCookieJwt(jwtToken: string) : void {
+// 	const [cookies, setCookie, removeCookie] = useCookies(['jwtAuthorization']);
+// 	setCookie("jwtAuthorization", jwtToken, { maxAge: 2 * 60 * 60 });
+// 	return ;
+// };
