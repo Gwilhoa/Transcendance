@@ -209,7 +209,8 @@ export class AuthController {
     req.logout((err) => {
       if (err) {
         res.status(400).send(err);
-      };
-    res.redirect('/');
+      }
+        res.redirect('/');
+      });
   }
 }
