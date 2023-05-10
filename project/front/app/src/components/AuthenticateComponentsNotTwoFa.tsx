@@ -7,7 +7,6 @@ import { Navigate } from "react-router-dom";
 
 function AuthenticateComponentsNotTwoFa() {
 	const [error, setError] = useState("");
-	const [accessToken, setAccessToken] = useState("");
 	const [twoFa, setTwoFa] = useState(true);
 	const [cookies, setCookie, removeCookie] = useCookies(['jwtAuthorization']);
 	
@@ -26,7 +25,6 @@ function AuthenticateComponentsNotTwoFa() {
             },
         })
             .then((response) => {
-                setAccessToken(response.data.access_token);
                 setCookieJwt(response.data.access_token);
             })
             .catch((error) => {

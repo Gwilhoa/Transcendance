@@ -16,19 +16,12 @@ function AuthenticateComponentsTwoFa() {
         const setCookieJwt = (jwtToken: string) => {
             setCookie("jwtAuthorization", jwtToken, { maxAge: 2 * 60 * 60 });
         };
-
-        axios.get("http://localhost:3000/auth/2fa/is2FA", {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        })
-            .then((response) => {
-                setTwoFa(response.data);
-                console.log(response.data);
-            })
-            .catch((error) => {
-                console.error(error);
-            });
+		
+		axios.get("http://localhost:3000/auth/authenticate", {
+				headers: {
+						Authorization: `Bearer ${token}`,
+					},
+			})
 
         axios.get(url, {
             headers: {
