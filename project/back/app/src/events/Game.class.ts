@@ -1,4 +1,4 @@
-import { Server } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import { GameService } from 'src/game/game.service';
 
 export class Game {
@@ -20,8 +20,8 @@ export class Game {
   private _io: Server;
   private _loopid: NodeJS.Timeout;
   private _id: string;
-  private _user1: string;
-  private _user2: string;
+  private _user1: Socket;
+  private _user2: Socket;
   private _rack1y: number;
   private _rack2y: number;
   private _score1: number;
@@ -35,8 +35,16 @@ export class Game {
   private _minY;
   private _maxY;
   private _gameService: GameService;
+  private _finishCallback: Array<() => void> = [];
 
-  public constructor(id: string, user1: string, user2: string, io: Server, gameService : GameService) {
+  public constructor(
+    id: string,
+    user1: Socket,
+    user2: Socket,
+    io: Server,
+    gameService: GameService,
+    finishCallback = [],
+  ) {
     this._id = id;
     this._user1 = user1;
     this._user2 = user2;
@@ -52,8 +60,6 @@ export class Game {
     this._maxX = 0;
     this._minY = 0;
     this._maxY = 0;
-    this.start();
-    this._loopid = setInterval(this.gameLoop, Game.default_update);
     this._io = io;
     this._gameService = gameService;
   }
@@ -94,16 +100,14 @@ export class Game {
     return this._bally;
   }
 
-  public updateRacket(id: string, y: number) {
-    if (id == this._user1) this._rack1y = y;
-    else if (id == this._user2) this._rack2y = y;
+  public updateRacket(player: Socket, y: number) {
+    if (player.id == this._user1.id) this._rack1y = y;
+    else if (player.id == this._user2.id) this._rack2y = y;
   }
 
   public getGameInfo() {
     return {
       id: this._id,
-      user1: this._user1,
-      user2: this._user2,
       rack1y: this._rack1y,
       rack2y: this._rack2y,
       score1: this._score1,
@@ -120,37 +124,52 @@ export class Game {
     this._bally = 0;
     this._dx = Math.cos(angle);
     this._dy = Math.sin(angle);
+    this._loopid = setInterval(this.gameLoop, Game.default_update);
   }
-  public gameLoop() {
+  public async gameLoop() {
     this._ballx += this._dx;
     this._bally += this._dy;
 
     //check if ball will be in racket // TODO: check si ca marche
-    if ((this._ballx < this._minX + Game.default_rackwidth + Game.default_radiusball)) {
+    if (
+      this._ballx <
+      this._minX + Game.default_rackwidth + Game.default_radiusball
+    ) {
       if (
-        this._bally > this._rack1y  && this._bally <= this._rack1y + Game.default_racklenght
+        this._bally > this._rack1y &&
+        this._bally <= this._rack1y + Game.default_racklenght
       )
         this._rack1y -= Game.default_steprack;
-
     }
-    if ((this._ballx > this._maxX - Game.default_rackwidth - Game.default_radiusball)) {
+    if (
+      this._ballx >
+      this._maxX - Game.default_rackwidth - Game.default_radiusball
+    ) {
       if (
-        this._bally > this._rack2y && this._bally <= this._rack2y + Game.default_racklenght
+        this._bally > this._rack2y &&
+        this._bally <= this._rack2y + Game.default_racklenght
       )
-      this._rack2y -= Game.default_steprack;
+        this._rack2y -= Game.default_steprack;
     }
-
 
     //calculate colision racket
-    if ((this._ballx <= this._minX + Game.default_rackwidth + Game.default_radiusball)) {
+    if (
+      this._ballx <=
+      this._minX + Game.default_rackwidth + Game.default_radiusball
+    ) {
       if (
-        this._bally >= this._rack1y  && this._bally <= this._rack1y + Game.default_racklenght
+        this._bally >= this._rack1y &&
+        this._bally <= this._rack1y + Game.default_racklenght
       )
         this._dx *= -1;
     }
-    if ((this._ballx >= this._maxX - Game.default_rackwidth - Game.default_radiusball)) {
+    if (
+      this._ballx >=
+      this._maxX - Game.default_rackwidth - Game.default_radiusball
+    ) {
       if (
-        this._bally >= this._rack2y && this._bally <= this._rack2y + Game.default_racklenght
+        this._bally >= this._rack2y &&
+        this._bally <= this._rack2y + Game.default_racklenght
       )
         this._dx *= -1;
     }
@@ -171,17 +190,44 @@ export class Game {
     }
 
     if (this._score1 == Game.default_victorygoal) {
-      this._io.to(this._id).emit('player1won', this.getGameInfo());
-      this._gameService.finishGame(this._id, this._score1, this._score2);
+      this._user1.leave(this._id);
+      this._user2.leave(this._id);
+      this._user1.emit('finish_game', {
+        score1: this._score1,
+        score2: this._score2,
+        status: 'win',
+      });
+      this._user2.emit('finish_game', {
+        score1: this._score1,
+        score2: this._score2,
+        status: 'lose',
+      });
+      await this._gameService.finishGame(this._id, this._score1, this._score2);
       clearInterval(this._loopid);
       return;
     }
     if (this._score2 == Game.default_victorygoal) {
-      this._io.to(this._id).emit('player2won', this.getGameInfo());
-      this._gameService.finishGame(this._id, this._score1, this._score2);
+      this._user2.leave(this._id);
+      this._user1.leave(this._id);
+      this._user2.emit('finish_game', {
+        score1: this._score1,
+        score2: this._score2,
+        status: 'win',
+      });
+      this._user1.emit('finish_game', {
+        score1: this._score1,
+        score2: this._score2,
+        status: 'lose',
+      });
+      await this._gameService.finishGame(this._id, this._score1, this._score2);
       clearInterval(this._loopid);
+      this._finishCallback.forEach((callback) => callback());
       return;
     }
     this._io.to(this._id).emit('update_game', this.getGameInfo());
+  }
+
+  onFinish(callback) {
+    this._finishCallback.push(callback);
   }
 }

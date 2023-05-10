@@ -1,9 +1,8 @@
 import { Server, Socket } from 'socket.io';
 
-export function verifyToken(token: string, client: Socket) {
+export function verifyToken(token: string) {
   try {
-    const id = this.authService.getIdFromToken(token);
-    return id;
+    return this.authService.getIdFromToken(token);
   } catch (error) {
     return null;
   }
@@ -23,16 +22,28 @@ export function wrongtoken(client: Socket) {
 }
 
 export function send_connection_server(
-  connected: Map<string, string>,
-  ingame: Map<string, string>,
+  connected: Map<string, Socket>,
+  ingame,
   server: Server,
 ) {
   const connectedlist = getKeys(connected);
-  const ingamelist = getKeys(ingame);
   const send = {
     connected: connectedlist,
-    ingame: ingamelist,
+    ingame: ingame,
   };
   console.log(send);
   server.emit('connection_server', send);
+}
+
+export function getIdFromSocket(
+  socket: Socket,
+  connected: Map<string, Socket>,
+) {
+  let id = null;
+  connected.forEach((value, key) => {
+    if (value == socket) {
+      id = key;
+    }
+  });
+  return id;
 }
