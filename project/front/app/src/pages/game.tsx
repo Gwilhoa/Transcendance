@@ -122,7 +122,3 @@ const Game = () => {
 }
 
 export default Game;
-/*<div className='sco'>
-  <div className="player1-score">{score1}</div>
-  <div className="player2-score">{score2}</div>
-</div>*/

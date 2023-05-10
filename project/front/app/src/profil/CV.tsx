@@ -55,7 +55,7 @@ export default function CV( {name, photoUrl, isFriend, isMe } : {name:string, ph
             </div>
             )
             
-            retu.push(
+        retu.push(
                 <div key={"change2FA"}>
                 <p/>
                 <input type='checkbox' name='2FA' checked={checked} onChange={clicked}  />

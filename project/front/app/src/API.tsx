@@ -31,7 +31,7 @@ export function getMessages(name:string) : Message[] {
     
     const config: AxiosRequestConfig = {
         method: 'get',
-        url: 'https://localhost:3000/channel/message',
+        url: 'http://localhost:3000/channel/message',
         params: {
           channel_id: name,
         },
@@ -70,9 +70,6 @@ export function getPositionBall() : Vector {
 
 
 export function getTwoFA() : boolean {
-
-
-
     return (true);
 }
 
