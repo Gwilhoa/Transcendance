@@ -35,6 +35,7 @@ export class Game {
   private _minY;
   private _maxY;
   private _gameService: GameService;
+  private _finishCallback: Array<() => void> = [];
 
   public constructor(
     id: string,
@@ -42,6 +43,7 @@ export class Game {
     user2: Socket,
     io: Server,
     gameService: GameService,
+    finishCallback = [],
   ) {
     this._id = id;
     this._user1 = user1;
@@ -58,8 +60,6 @@ export class Game {
     this._maxX = 0;
     this._minY = 0;
     this._maxY = 0;
-    this.start();
-    this._loopid = setInterval(this.gameLoop, Game.default_update);
     this._io = io;
     this._gameService = gameService;
   }
@@ -124,6 +124,7 @@ export class Game {
     this._bally = 0;
     this._dx = Math.cos(angle);
     this._dy = Math.sin(angle);
+    this._loopid = setInterval(this.gameLoop, Game.default_update);
   }
   public async gameLoop() {
     this._ballx += this._dx;
@@ -219,9 +220,18 @@ export class Game {
         status: 'lose',
       });
       await this._gameService.finishGame(this._id, this._score1, this._score2);
+      this._io.local.emit('finish_server', {
+        user1: this._user1.id,
+        user2: this._user2.id,
+      });
       clearInterval(this._loopid);
+      this._finishCallback.forEach((callback) => callback());
       return;
     }
     this._io.to(this._id).emit('update_game', this.getGameInfo());
+  }
+
+  onFinish(callback) {
+    this._finishCallback.push(callback);
   }
 }

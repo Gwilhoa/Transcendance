@@ -73,7 +73,7 @@ export class EventsGateway
     }
     this.logger.log(`Client disconnected: ${id}`);
     this.clients.delete(client.id);
-    if (this.ingame.has(client.id)) {
+    if (this.ingame.has(getIdFromSocket(client, this.clients))) {
       const game = await this.gameService.remakeGame(
         this.ingame.get(client.id),
       );
@@ -338,7 +338,17 @@ export class EventsGateway
         const create_gameDTO = new CreateGameDTO();
         create_gameDTO.user1_id = getIdFromSocket(player, this.clients);
         create_gameDTO.user2_id = getIdFromSocket(rival, this.clients);
+        await this.userService.changeStatus(
+          create_gameDTO.user1_id,
+          UserStatus.IN_GAME,
+        );
+        await this.userService.changeStatus(
+          create_gameDTO.user2_id,
+          UserStatus.IN_GAME,
+        );
         const create_game = await this.gameService.createGame(create_gameDTO);
+        this.ingame.set(create_gameDTO.user1_id, create_game.id);
+        this.ingame.set(create_gameDTO.user2_id, create_game.id);
         player.emit('game_found', {
           game_id: create_game.id,
           user: 1,
@@ -358,7 +368,12 @@ export class EventsGateway
           this.server,
           this.gameService,
         );
-        this.logger.log(game + ' started');
+        this.logger.log(game.getId() + ' started');
+        game.onFinish((game) => {
+          this.ingame.delete(getIdFromSocket(game.getUser1(), this.clients));
+          this.ingame.delete(getIdFromSocket(game.getUser2(), this.clients));
+        });
+        game.start();
       }
     });
   }

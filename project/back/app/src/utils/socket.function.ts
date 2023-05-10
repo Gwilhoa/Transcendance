@@ -23,14 +23,13 @@ export function wrongtoken(client: Socket) {
 
 export function send_connection_server(
   connected: Map<string, Socket>,
-  ingame: Map<string, string>,
+  ingame,
   server: Server,
 ) {
   const connectedlist = getKeys(connected);
-  const ingamelist = getKeys(ingame);
   const send = {
     connected: connectedlist,
-    ingame: ingamelist,
+    ingame: ingame,
   };
   console.log(send);
   server.emit('connection_server', send);
