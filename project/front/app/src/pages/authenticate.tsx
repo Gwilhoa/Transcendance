@@ -1,40 +1,46 @@
 import React, { useState, useEffect } from "react";
 import { useCookies, Cookies } from "react-cookie";
 import axios from "axios";
+import TwoFa from "../components/AuthenticateComponentsTwoFa"
+import NotTwoFa from "../components/AuthenticateComponentsNotTwoFa"
+import Reconnect from "../components/Reconnect"
+import { error } from "console";
+import { Link } from "react-router-dom";
 
 
 export var bigToken:string;
 
 export function TokenPage() {
-	const [accessToken, setAccessToken] = useState("");
-	const [cookies, setCookie, removeCookie] = useCookies(['jwtAuthorization']);
-	
-	const setCookieJwt = (jwtToken: string) => {
-		setCookie("jwtAuthorization", jwtToken, { maxAge: 2 * 60 * 60 });
-	};
+	const [error, setError] = useState("");
+	const [twoFa, setTwoFa] = useState(false);
+	const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get("access_token");
 
 	useEffect(() => {
-		const urlParams = new URLSearchParams(window.location.search);
-		const token = urlParams.get("access_token");
-		const url = "http://localhost:3000/auth/authenticate";
-
-		axios.get(url, {
-			headers: {
-				Authorization: `Bearer ${token}`,
-			},
+	axios.get("http://localhost:3000/auth/2fa/is2FA", {
+		headers: {
+			Authorization: `Bearer ${token}`,
+		},
+	})
+		.then((response) => {
+			setTwoFa(response.data);
+			console.log(response.data);
 		})
-			.then((response) => {
-				bigToken = response.data.access_token;
-				setAccessToken(response.data.access_token);
-				setCookieJwt(response.data.access_token);
-			})
-			.catch((error) => {
-				console.error(error);
-			});
+		.catch((error) => {
+			setError("Error " + error.response.status);
+			console.error("Error status " + error.response.status);
+		});
 	}, []);
+
 	return (
 		<div>
-			<p>{accessToken}</p>
+			{ error ? ( 
+				<Reconnect message={error} />
+			) : (
+				<>
+					{twoFa ? <TwoFa/> : <NotTwoFa/>}
+				</>
+			)}
 		</div>
 	);
 }

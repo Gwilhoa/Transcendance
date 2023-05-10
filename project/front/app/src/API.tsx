@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import axios, { AxiosResponse, AxiosRequestConfig } from 'axios';
 import { bigToken } from './pages/authenticate';
 axios.defaults.baseURL = 'http://localhost:3000/'
@@ -66,3 +67,25 @@ export function getPositionBall() : Vector {
 
     return ({x:0, y:0})
 }
+
+// export const getJwt = (url:string, token:string | null) : string => {
+// 	const [accessToken, setAccessToken] = useState("");
+// 	axios.get(url, {
+// 			headers: {
+// 				Authorization: `Bearer ${token}`,
+// 			},
+// 		})
+// 			.then((response) => {
+// 				setAccessToken(response.data.access_token);
+// 			})
+// 			.catch((error) => {
+// 				console.error(error);
+// 				setAccessToken(error);
+// 			});
+// 	return (accessToken);
+// }
+//  export function setCookieJwt(jwtToken: string) : void {
+// 	const [cookies, setCookie, removeCookie] = useCookies(['jwtAuthorization']);
+// 	setCookie("jwtAuthorization", jwtToken, { maxAge: 2 * 60 * 60 });
+// 	return ;
+// };
