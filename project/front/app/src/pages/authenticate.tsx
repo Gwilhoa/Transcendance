@@ -27,15 +27,15 @@ export function TokenPage() {
 			console.log(response.data);
 		})
 		.catch((error) => {
-			setError(error.message);
-			console.error(error);
+			setError("Error " + error.response.status);
+			console.error(error.response.status);
 		});
 	}, []);
 
 	return (
 		<div>
 			{ error ? ( 
-				<Reconnect message={error}/>
+				<Reconnect message={error} />
 			) : (
 				<>
 					{twoFa ? <TwoFa/> : <NotTwoFa/>}
