@@ -7,9 +7,6 @@ import Reconnect from "../components/Reconnect"
 import { error } from "console";
 import { Link } from "react-router-dom";
 
-
-export var bigToken:string;
-
 export function TokenPage() {
 	const [error, setError] = useState("");
 	const [twoFa, setTwoFa] = useState(false);
