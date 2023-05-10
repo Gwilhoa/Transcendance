@@ -220,10 +220,6 @@ export class Game {
         status: 'lose',
       });
       await this._gameService.finishGame(this._id, this._score1, this._score2);
-      this._io.local.emit('finish_server', {
-        user1: this._user1.id,
-        user2: this._user2.id,
-      });
       clearInterval(this._loopid);
       this._finishCallback.forEach((callback) => callback());
       return;

@@ -346,6 +346,7 @@ export class EventsGateway
           create_gameDTO.user2_id,
           UserStatus.IN_GAME,
         );
+        this.sendconnected();
         const create_game = await this.gameService.createGame(create_gameDTO);
         this.ingame.set(create_gameDTO.user1_id, create_game.id);
         this.ingame.set(create_gameDTO.user2_id, create_game.id);
@@ -368,11 +369,13 @@ export class EventsGateway
           this.server,
           this.gameService,
         );
-        this.logger.log(game.getId() + ' started');
         game.onFinish((game) => {
           this.ingame.delete(getIdFromSocket(game.getUser1(), this.clients));
           this.ingame.delete(getIdFromSocket(game.getUser2(), this.clients));
+          this.sendconnected();
+          this.logger.log(game.getId() + ' finished');
         });
+        this.logger.log(game.getId() + ' started');
         game.start();
       }
     });
