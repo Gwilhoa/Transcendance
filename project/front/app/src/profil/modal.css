@@ -56,3 +56,9 @@
         text-align: center;
         height: calc(100% - 40px);
     }
+
+
+    .button_notif {
+      background-color: rgb(102, 156, 133);
+      width: 100px;
+  }

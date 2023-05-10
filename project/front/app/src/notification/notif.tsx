@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useEffect } from "react";
 import './notific.css';
-import { ChangeChannel, JoinChat } from "../popup/chatManager";
+import { ChangeChannel} from "../popup/chatManager";
+import { Link } from "react-router-dom";
 
 interface NotificationProps {
   message: string;
@@ -14,7 +15,7 @@ export default function Notification({ message, channel }: NotificationProps) {
   useEffect(() => {
     const timer = setTimeout(() => {
       setVisible(false);
-    }, 6000);
+    }, 600000);
 
     return () => clearTimeout(timer);
     }, []);
@@ -26,13 +27,11 @@ export default function Notification({ message, channel }: NotificationProps) {
 
   if (visible) {
       return (
-          
       <div className="not">
-        <button onClick={handleClose} className="notific">
-        
+        <Link to={"/" + ChangeChannel(channel)} className="notific" onClick={handleClose}>
         {message}
-      </button>
-        </div>
+        </Link>
+      </div>
     );
     }
     else

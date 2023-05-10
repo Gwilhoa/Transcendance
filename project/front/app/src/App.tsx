@@ -9,7 +9,6 @@ import { DynamicIsInAChat, KnowMyChannel } from "./popup/chatManager";
 import TokenPage from "./pages/authenticate";
 import Template from "./template/template";
 import { ReactNode } from "react";
-import { useCookies, Cookies } from "react-cookie";
 
 export interface MyComponentProps {
 	openModal: (param: boolean) => void;
@@ -18,7 +17,7 @@ export interface MyComponentProps {
 
 const AppInsideBrowser = ({ openModal, setContent }: MyComponentProps) => {
 	return (
-			<>
+		<>
 			<Routes>
 				<Route path="/" Component={Auth}/>
 				<Route path="/auth" Component={AuthToken}/>
@@ -31,8 +30,7 @@ const AppInsideBrowser = ({ openModal, setContent }: MyComponentProps) => {
 				{DynamicIsInAChat() && 
 					<PopupChat path={KnowMyChannel()} openModal={openModal} setContent={setContent}/>
 				}
-			</>
-
+		</>
 	);
 }
 
@@ -42,7 +40,7 @@ const AppInsideBrowser = ({ openModal, setContent }: MyComponentProps) => {
 function App({ openModal, setContent }: MyComponentProps) {
 	return (
 		<BrowserRouter>
-		<AppInsideBrowser openModal={openModal} setContent={setContent} />
+			<AppInsideBrowser openModal={openModal} setContent={setContent} />
 		</BrowserRouter>
 	);
 
