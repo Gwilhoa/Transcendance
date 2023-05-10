@@ -3,7 +3,9 @@ import { useCookies, Cookies } from "react-cookie";
 import axios from "axios";
 import TwoFa from "../components/AuthenticateComponentsTwoFa"
 import NotTwoFa from "../components/AuthenticateComponentsNotTwoFa"
+import Reconnect from "../components/Reconnect"
 import { error } from "console";
+import { Link } from "react-router-dom";
 
 
 export var bigToken:string;
@@ -33,7 +35,7 @@ export function TokenPage() {
 	return (
 		<div>
 			{ error ? ( 
-				<p>{error}</p> 
+				<Reconnect message={error}/>
 			) : (
 				<>
 					{twoFa ? <TwoFa/> : <NotTwoFa/>}
