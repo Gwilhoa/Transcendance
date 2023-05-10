@@ -202,7 +202,11 @@ export class AuthController {
       (await this.userService.changeStatus(id, UserStatus.DISCONNECTED)) == null
     )
       res.status(400).send('Bad User');
-    req.logout();
-    res.redirect('/');
+    req.logout((err) => {
+      if (err) {
+        res.status(400).send(err);
+      }
+        res.redirect('/');
+      });
   }
 }
