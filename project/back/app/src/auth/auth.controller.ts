@@ -50,7 +50,6 @@ export class AuthController {
       user.email,
       false,
     );
-    console.log(code.access_token);
     res.redirect(
       'http://localhost:8080/authenticate?access_token=' + code.access_token,
     );
@@ -59,18 +58,7 @@ export class AuthController {
 
   @UseGuards(JwtIsAuthGuard)
   @Get('2fa/create')
-  async create2fa(@GetUser() token, @Res() res) {
-    const user = await this.userService.getUserById(token.sub);
-    if (user == null)
-      res.status(400).send('Bad Request : User not found or not logged in');
-    if (user.enabled2FA == true) {
-      res
-        .status(400)
-        .send(
-          'Bad Request : You already have a two factor authentication enabled',
-        );
-      return;
-    }
+  async create2fa(@GetUser() user, @Res() res) {
     const secret = await authenticator.generateSecret();
 
     const otpauthUrl = authenticator.keyuri(
@@ -79,15 +67,11 @@ export class AuthController {
       secret,
     );
 
-    if ((await this.userService.set2FASecret(secret, user.id)) == null) {
+    if ((await this.userService.set2FASecret(secret, user.sub)) == null) {
       res.status(400).send('Bad Request : Error while saving secret');
       return;
     }
     res.status(200).send(await toDataURL(otpauthUrl));
-    // return {
-    //   secret,
-    //   otpauthUrl
-    // }
   }
 
   @UseGuards(JwtIsAuthGuard)
