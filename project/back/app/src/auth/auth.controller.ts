@@ -50,6 +50,7 @@ export class AuthController {
       user.email,
       false,
     );
+    console.log(code.access_token)
     res.redirect(
       'http://localhost:8080/authenticate?access_token=' + code.access_token,
     );
@@ -157,6 +158,7 @@ export class AuthController {
       user.email,
       true,
     );
+    console.log(token);
     res.send(token);
     return;
   }
