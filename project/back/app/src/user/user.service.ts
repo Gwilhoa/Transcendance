@@ -61,8 +61,10 @@ export class UserService {
     }
     await this.test();
     const retUser = await this.authService.getUserIntra(retIntra.access_token);
-    if ((await this.userRepository.findOneBy({ id: retUser.id })) != null) {
-      return await this.userRepository.findOneBy({ id: retUser.id });
+    const verif_user = await this.userRepository.findOneBy({ id: retUser.id });
+    if (verif_user != null) {
+      verif_user.status = UserStatus.IN_CONNECTION;
+      return verif_user;
     }
     let login = retUser.login;
     let nbr = 0;
