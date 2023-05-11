@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
-import { PassportStrategy } from '@nestjs/passport';
-import { ExtractJwt, Strategy } from 'passport-jwt';
-import { UserService } from '../../user/user.service';
-import { UserStatus } from '../../utils/user.enum';
+import {Injectable} from '@nestjs/common';
+import {PassportStrategy} from '@nestjs/passport';
+import {ExtractJwt, Strategy} from 'passport-jwt';
+import {UserService} from '../../user/user.service';
+import {UserStatus} from '../../utils/user.enum';
 
 @Injectable()
 export class JwtIsAuthStrategy extends PassportStrategy(Strategy, 'jwtIsAuth') {
@@ -46,10 +46,11 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     console.log('ok user');
     if (
       user.status == UserStatus.IN_CONNECTION ||
-      user.status == UserStatus.CONNECTED
+      user.status == UserStatus.CONNECTED ||
+      user.status == UserStatus.OFFLINE
     )
       return payload;
-    console.log('erreur status');
+    console.log('erreur status: ' + user.status);
     return null;
   }
 }
