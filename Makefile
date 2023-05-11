@@ -92,6 +92,7 @@ database:
 
 back: database
 	docker-compose up -d back
+# ~~~~~~~~~~~~~~ FRONTEND ~~~~~~~~~~~~~~
 
 # ~~~~~~~~~~~~~~~~ STOP ~~~~~~~~~~~~~~~~
 
@@ -157,5 +158,5 @@ help :
 	echo "	show		same as the debug argument"
 	echo "	help		printing help message"
 
-.PHONY: all clean fclean re header show database
+.PHONY: all clean fclean re header show database front
 .SILENT:

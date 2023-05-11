@@ -141,7 +141,6 @@ export class UserService {
       return null;
     }
 
-    console.log(user.friends);
     return user.friends;
   }
 
@@ -289,7 +288,6 @@ export class UserService {
     }
     try {
       fs.writeFileSync(imagePath, buffer);
-      console.log(id + ' image updated');
       return imagePath;
     } catch (error) {
       return null;
@@ -415,10 +413,10 @@ export class UserService {
 
   async signJwtToken(
     userId: string,
-    email : string,
+    email: string,
     isauth: boolean,
   ): Promise<{ access_token: string }> {
-    let expiresTime = '5m';
+    let expiresTime = '10m';
     if (isauth == true) expiresTime = '2h';
     let check2FA: boolean;
     try {
@@ -433,7 +431,6 @@ export class UserService {
       enabled2FA: check2FA,
     };
     // const payload = { sub: parseInt(userId), isauth: isauth ,enabled2FA: 1};
-    console.log(process.env.JWT_SECRET);
 
     return {
       access_token: await this.jwt.signAsync(payload, {
