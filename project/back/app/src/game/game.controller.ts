@@ -7,20 +7,20 @@ import { GetUser } from '../auth/decorator/auth.decorator';
 @UseGuards(JwtIsAuthGuard)
 @Controller('game')
 export class GameController {
-  constructor(private readonly GameService: GameService) {}
+  constructor(private readonly gameService: GameService) {}
 
   @Get()
   getGames(@GetUser('sub') id: string) {
-    return this.GameService.getGames(id);
+    return this.gameService.getGames(id);
   }
 
   @Post()
   createGame(@Body() body: CreateGameDTO) {
-    return this.GameService.createGame(body);
+    return this.gameService.createGame(body);
   }
 
   @Get('/id/:id')
   getGameById(@Param('id') id: string) {
-    return this.GameService.getGameById(id);
+    return this.gameService.getGameById(id);
   }
 }

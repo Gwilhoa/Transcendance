@@ -1,15 +1,16 @@
-import {Injectable} from '@nestjs/common';
-import {InjectRepository} from '@nestjs/typeorm';
-import {addAdminDto} from 'src/dto/add-admin.dto';
-import {CreateChannelDto} from 'src/dto/create-channel.dto';
-import {JoinChannelDto} from 'src/dto/join-channel.dto';
-import {sendMessageDTO} from 'src/dto/sendmessage.dto';
-import {UserService} from 'src/user/user.service';
-import {Like, Repository} from 'typeorm';
-import {Channel} from './channel.entity';
-import {Message} from './message.entity';
-import {ChannelType} from 'src/utils/channel.enum';
-import {BanUserDto} from '../dto/ban-user.dto';
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { addAdminDto } from 'src/dto/add-admin.dto';
+import { CreateChannelDto } from 'src/dto/create-channel.dto';
+import { JoinChannelDto } from 'src/dto/join-channel.dto';
+import { sendMessageDTO } from 'src/dto/sendmessage.dto';
+import { UserService } from 'src/user/user.service';
+import { Like, Repository } from 'typeorm';
+import { Channel } from './channel.entity';
+import { Message } from './message.entity';
+import { ChannelType } from 'src/utils/channel.enum';
+import { BanUserDto } from '../dto/ban-user.dto';
+import * as argon2 from 'argon2';
 
 @Injectable()
 export class ChannelService {
@@ -33,6 +34,11 @@ export class ChannelService {
     if (body.type == ChannelType.PROTECTED_CHANNEL) {
       if (body.password == null)
         throw new Error('Password is required for PROTECTED_CHANNEL');
+      try {
+        chan.pwd = await argon2.hash(body.password);
+      } catch (err) {
+        throw new Error('Can not hash password');
+      }
     }
     chan = await this.channelRepository.save(chan);
     return chan;
@@ -75,6 +81,14 @@ export class ChannelService {
     if (chan.type == ChannelType.PROTECTED_CHANNEL) {
       if (body.password == null)
         throw new Error('Password is required for PROTECTED_CHANNEL');
+      let isvalid = false;
+      try {
+        isvalid = await argon2.verify(chan.pwd, body.password);
+      } catch (err) {
+        throw new Error('Can not verify password');
+      }
+      if (isvalid == false)
+        throw new Error('Password is not valid for this channel');
     }
     if (chan.bannedUsers != null && chan.bannedUsers.includes(user))
       throw new Error('User is banned');
@@ -236,6 +250,43 @@ export class ChannelService {
     if (!channel.admins.includes(target))
       throw new Error('User is not admin of this channel');
     channel.admins.filter((u) => u.id != target.id);
+    return await this.channelRepository.save(channel);
+  }
+
+  async getBanUser(channel_id, user_id) {
+    const user = await this.userService.getUserById(user_id);
+    if (user == null) throw new Error('User not found');
+    const channel = await this.channelRepository
+      .createQueryBuilder('channel')
+      .leftJoinAndSelect('channel.bannedUsers', 'bannedUsers')
+      .where('channel.id = :id', { id: channel_id })
+      .getOne();
+    if (channel == null) throw new Error('Channel not found');
+    if (!channel.users.includes(user))
+      throw new Error('User is not in this channel');
+    if (!channel.admins.includes(user))
+      throw new Error('User is not admin of this channel');
+    return channel.bannedUsers;
+  }
+
+  async deleteBanUser(body: BanUserDto, id: string) {
+    const self_user = await this.userService.getUserById(id);
+    if (self_user == null) throw new Error('User not found');
+    const target = await this.userService.getUserById(body.user_id);
+    if (target == null) throw new Error('User not found');
+    const channel = await this.channelRepository
+      .createQueryBuilder('channel')
+      .leftJoinAndSelect('channel.bannedUsers', 'bannedUsers')
+      .where('channel.id = :id', { id: body.channel_id })
+      .getOne();
+    if (channel == null) throw new Error('Channel not found');
+    if (!channel.users.includes(self_user))
+      throw new Error('User is not in this channel');
+    if (!channel.admins.includes(self_user))
+      throw new Error('User is not admin of this channel');
+    if (!channel.bannedUsers.includes(target))
+      throw new Error('User is not banned of this channel');
+    channel.bannedUsers.filter((u) => u.id != target.id);
     return await this.channelRepository.save(channel);
   }
 }

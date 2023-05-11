@@ -14,11 +14,11 @@ import { AuthService } from 'src/auth/auth.service';
 import { ChannelService } from 'src/channel/channel.service';
 import { sendMessageDTO } from 'src/dto/sendmessage.dto';
 import { sleep } from '../utils/sleep';
-import { User } from '../user/user.entity';
 import { GameService } from 'src/game/game.service';
 import { CreateGameDTO } from 'src/dto/create-game.dto';
 import { UserStatus } from 'src/utils/user.enum';
 import {
+  getIdFromSocket,
   send_connection_server,
   verifyToken,
   wrongtoken,
@@ -34,10 +34,10 @@ export class EventsGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
   @WebSocketServer() server: Server;
-  private clients: Map<string, string> = new Map<string, string>();
+  private clients: Map<string, Socket> = new Map<string, Socket>();
   private ingame: Map<string, string> = new Map<string, string>();
   private games: Map<string, Game> = new Map<string, Game>();
-  private matchmaking: Array<User> = [];
+  private matchmaking: Array<Socket> = [];
   private logger: Logger = new Logger('EventsGateway');
 
   constructor(
@@ -64,7 +64,7 @@ export class EventsGateway
   }
 
   async handleDisconnect(client: Socket) {
-    const id = this.clients.get(client.id);
+    const id = getIdFromSocket(client, this.clients);
     if ((await this.userService.changeStatus(id, UserStatus.OFFLINE)) == null) {
       this.logger.error(`Error changing status of user ${id}`);
       wrongtoken(client);
@@ -73,7 +73,7 @@ export class EventsGateway
     }
     this.logger.log(`Client disconnected: ${id}`);
     this.clients.delete(client.id);
-    if (this.ingame.has(client.id)) {
+    if (this.ingame.has(getIdFromSocket(client, this.clients))) {
       const game = await this.gameService.remakeGame(
         this.ingame.get(client.id),
       );
@@ -113,7 +113,7 @@ export class EventsGateway
     let send;
     const token = payload.token;
     const friend_id = payload.friend_id;
-    const user_id = verifyToken(token, client);
+    const user_id = verifyToken(token);
     if (user_id == null) {
       client.emit('friend_code', FriendCode.UNAUTHORIZED);
       return;
@@ -179,7 +179,7 @@ export class EventsGateway
     const channel_id = payload.channel_id;
     let message = payload.content;
     let send;
-    const user_id = verifyToken(token, client);
+    const user_id = verifyToken(token);
     const user = await this.userService.getUserById(user_id);
     const channel = await this.channelService.getChannelById(channel_id);
     if (user == null) {
@@ -229,7 +229,7 @@ export class EventsGateway
     let send;
     const token = payload.token;
     const channel_id = payload.channel_id;
-    const user_id = verifyToken(token, client);
+    const user_id = verifyToken(token);
     if (user_id == null) {
       send = {
         code: 401,
@@ -269,7 +269,7 @@ export class EventsGateway
     let send;
     const token = payload.token;
     const channel_id = payload.channel_id;
-    const user_id = verifyToken(token, client);
+    const user_id = verifyToken(token);
     if (user_id == null) {
       send = {
         code: 401,
@@ -306,17 +306,14 @@ export class EventsGateway
 
   @SubscribeMessage('join_matchmaking')
   async join_matchmaking(client: Socket, payload: any) {
-    let id;
-    let user;
     try {
-      id = await this.authService.getIdFromToken(payload.token);
-      user = await this.userService.getUserById(id);
+      await this.authService.getIdFromToken(payload.token);
     } catch (error) {
       client.emit('connection_error', 'Invalid token');
       client.disconnect();
       return;
     }
-    this.matchmaking.push(user);
+    this.matchmaking.push(client);
     const send = {
       code: 0,
     };
@@ -324,63 +321,74 @@ export class EventsGateway
   }
 
   async check_matchmaking() {
-    let matchmaking_len = this.matchmaking.length;
-    while (matchmaking_len > 1) {
-      this.matchmaking.forEach((user1) => async () => {
-        const authorized_player = this.matchmaking.filter(
-          async (user2) =>
-            user2.id !== user1.id &&
-            (await this.userService.OneOfTwoBlocked(user1.id, user2.id)),
+    this.matchmaking.forEach((player) => async () => {
+      const authorized_player = this.matchmaking.filter(
+        async (pretended_player) =>
+          player.id !== pretended_player.id &&
+          (await this.userService.OneOfTwoBlocked(
+            getIdFromSocket(player, this.clients),
+            getIdFromSocket(pretended_player, this.clients),
+          )),
+      );
+      if (authorized_player.length > 0) {
+        const rival =
+          authorized_player[
+            Math.floor(Math.random() * authorized_player.length)
+          ];
+        const create_gameDTO = new CreateGameDTO();
+        create_gameDTO.user1_id = getIdFromSocket(player, this.clients);
+        create_gameDTO.user2_id = getIdFromSocket(rival, this.clients);
+        await this.userService.changeStatus(
+          create_gameDTO.user1_id,
+          UserStatus.IN_GAME,
         );
-        const len_authorized_player = authorized_player.length;
-        if (len_authorized_player > 1) {
-          const random_player =
-            authorized_player[
-              Math.floor(Math.random() * authorized_player.length)
-            ];
-          const gameinfo = new CreateGameDTO();
-          gameinfo.user1_id = user1.id;
-          gameinfo.user2_id = random_player.id;
-
-          const create_game = await this.gameService.createGame(gameinfo);
-          this.ingame.set(user1.id, create_game.id);
-          this.ingame.set(random_player.id, create_game.id);
-          await this.userService.changeStatus(user1.id, UserStatus.IN_GAME);
-          await this.userService.changeStatus(
-            random_player.id,
-            UserStatus.IN_GAME,
-          );
-          this.clients[user1.id].join(create_game.id);
-          this.clients[random_player.id].join(create_game.id);
-          const send = {
-            game_id: create_game.id,
-          };
-          this.server.to(create_game.id).emit('create_game', send);
-          this.games.set(
-            create_game.id,
-            new Game(
-              create_game.id,
-              user1.id,
-              random_player.id,
-              this.server,
-              this.gameService,
-            ),
-          );
-        }
-      });
-      matchmaking_len = this.matchmaking.length;
-    }
+        await this.userService.changeStatus(
+          create_gameDTO.user2_id,
+          UserStatus.IN_GAME,
+        );
+        this.sendconnected();
+        const create_game = await this.gameService.createGame(create_gameDTO);
+        this.ingame.set(create_gameDTO.user1_id, create_game.id);
+        this.ingame.set(create_gameDTO.user2_id, create_game.id);
+        player.emit('game_found', {
+          game_id: create_game.id,
+          user: 1,
+          rival: rival.id,
+        });
+        rival.emit('game_found', {
+          game_id: create_game.id,
+          user: 2,
+          rival: player.id,
+        });
+        player.join(create_game.id);
+        rival.join(create_game.id);
+        const game = new Game(
+          create_game.id,
+          player,
+          rival,
+          this.server,
+          this.gameService,
+        );
+        game.onFinish((game) => {
+          this.ingame.delete(getIdFromSocket(game.getUser1(), this.clients));
+          this.ingame.delete(getIdFromSocket(game.getUser2(), this.clients));
+          this.sendconnected();
+          this.logger.log(game.getId() + ' finished');
+        });
+        this.logger.log(game.getId() + ' started');
+        game.start();
+      }
+    });
   }
 
   @SubscribeMessage('input_game')
   async input_game(client: Socket, payload: any) {
     const game_id = payload.game_id;
     const position = payload.position;
-    const user_id = verifyToken(payload.token, client);
     if (position > 100 || position < 0) {
       return;
     }
-    this.games[game_id].updateRacket(user_id, position);
+    this.games[game_id].updateRacket(client, position);
     this.server
       .to(game_id)
       .emit('update_game', this.games[game_id].getGameInfo());
