@@ -1,6 +1,6 @@
 import {Route, Routes} from "react-router-dom";
 import Auth from './pages/Auth';
-import AuthToken from './pages/AuthToken';
+// import AuthToken from './pages/AuthToken';
 import NotFound from './pages/NotFound';
 import Game from './pages/game';
 import Accueil from './pages/accueil';
@@ -20,7 +20,6 @@ const AppInsideBrowser = ({ openModal, setContent }: MyComponentProps) => {
 		<>
 			<Routes>
 				<Route path="/" Component={Auth}/>
-				<Route path="/auth" Component={AuthToken}/>
 				<Route path="*" Component={NotFound}/>
 				<Route path="/authenticate" Component={TokenPage} />
 				<Route path="/accueil/*" element={<Template openModal={openModal} setContent={setContent} child={Accueil}/>} />

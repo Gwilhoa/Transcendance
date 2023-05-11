@@ -29,6 +29,7 @@ function AuthenticateComponentsNotTwoFa() {
             .catch((error) => {
 				setError("Error " + error.response.status);
 				console.error("Error status " + error.response.status);
+				console.error(error);
             });
 	}, []);
     return (

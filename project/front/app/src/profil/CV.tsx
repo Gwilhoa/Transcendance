@@ -36,7 +36,7 @@ export default function CV( {name, photoUrl, isFriend, isMe } : {name:string, ph
     }
 
     const clicked = () => {
-		if (checked == false) {
+		if (checked === false) {
 			axios.get("http://localhost:3000/auth/2fa/create", {
 				headers: {
 					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
@@ -52,7 +52,6 @@ export default function CV( {name, photoUrl, isFriend, isMe } : {name:string, ph
 				});
 			navigate('/NotFound');
 		}
-        setChecked(!checked);
     }
 
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
