@@ -16,13 +16,6 @@ function AuthenticateComponentsTwoFa() {
         const setCookieJwt = (jwtToken: string) => {
             setCookie("jwtAuthorization", jwtToken, { maxAge: 2 * 60 * 60 });
         };
-		
-		axios.get("http://localhost:3000/auth/authenticate", {
-				headers: {
-						Authorization: `Bearer ${token}`,
-					},
-			})
-
         axios.get(url, {
             headers: {
                 Authorization: `Bearer ${token}`,

@@ -7,7 +7,6 @@ import { Navigate } from "react-router-dom";
 
 function AuthenticateComponentsNotTwoFa() {
 	const [error, setError] = useState("");
-	const [twoFa, setTwoFa] = useState(true);
 	const [cookies, setCookie, removeCookie] = useCookies(['jwtAuthorization']);
 	
 	useEffect(() => {
@@ -39,7 +38,7 @@ function AuthenticateComponentsNotTwoFa() {
 				) : (
 					<p>Waiting ...</p>
 			)}
-			<Navigate to="/accueil" />
+			{cookies.jwtAuthorization && !error ? (<Navigate to="/accueil"/>) : (<p>Waiting ...</p>)}
         </div>
     );
 }

@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes} from "react-router-dom";
+import {Route, Routes} from "react-router-dom";
 import Auth from './pages/Auth';
 import AuthToken from './pages/AuthToken';
 import NotFound from './pages/NotFound';
@@ -39,9 +39,7 @@ const AppInsideBrowser = ({ openModal, setContent }: MyComponentProps) => {
 
 function App({ openModal, setContent }: MyComponentProps) {
 	return (
-		<BrowserRouter>
 			<AppInsideBrowser openModal={openModal} setContent={setContent} />
-		</BrowserRouter>
 	);
 
 }
