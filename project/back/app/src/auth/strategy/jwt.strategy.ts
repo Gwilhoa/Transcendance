@@ -49,7 +49,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       user.status == UserStatus.CONNECTED
     )
       return payload;
-    console.log('erreur status');
+    console.log('erreur status:' + user.status);
     return null;
   }
 }
