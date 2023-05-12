@@ -5,13 +5,15 @@ import axios from "axios";
 import { error } from "console";
 import { Navigate } from "react-router-dom";
 
-function AuthenticateComponentsNotTwoFa() {
+interface props {
+    token: string | null,
+}
+
+function AuthenticateComponentsNotTwoFa({ token }: props) {
 	const [error, setError] = useState("");
 	const [cookies, setCookie, removeCookie] = useCookies(['jwtAuthorization']);
 	
 	useEffect(() => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const token = urlParams.get("access_token");
         const url = "http://localhost:3000/auth/authenticate";
 
         const setCookieJwt = (jwtToken: string) => {

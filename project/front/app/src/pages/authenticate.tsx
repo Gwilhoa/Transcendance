@@ -34,7 +34,7 @@ export function TokenPage() {
 				<Reconnect message={error} />
 			) : (
 				<>
-					{twoFa && !error ? <TwoFa/> : <NotTwoFa/>}
+					{twoFa && !error ? <TwoFa/> : <NotTwoFa token={token}/>}
 				</>
 			)}
 		</div>
