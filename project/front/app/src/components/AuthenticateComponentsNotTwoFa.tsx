@@ -5,11 +5,11 @@ import axios from "axios";
 import { error } from "console";
 import { Navigate } from "react-router-dom";
 
-interface props {
+interface tokenProps {
     token: string | null,
 }
 
-function AuthenticateComponentsNotTwoFa({ token }: props) {
+function AuthenticateComponentsNotTwoFa({ token }: tokenProps) {
 	const [error, setError] = useState("");
 	const [cookies, setCookie, removeCookie] = useCookies(['jwtAuthorization']);
 	

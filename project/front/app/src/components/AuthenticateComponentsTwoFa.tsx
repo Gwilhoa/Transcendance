@@ -3,14 +3,16 @@ import { useCookies, Cookies } from "react-cookie";
 import axios from "axios";
 import { error } from "console";
 
-function AuthenticateComponentsTwoFa() {
+interface tokenProps {
+    token: string | null,
+}
+
+function AuthenticateComponentsTwoFa({ token }: tokenProps) {
 	const [accessToken, setAccessToken] = useState("");
 	const [twoFa, setTwoFa] = useState(true);
 	const [cookies, setCookie, removeCookie] = useCookies(['jwtAuthorization']);
 	
 	useEffect(() => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const token = urlParams.get("access_token");
         const url = "http://localhost:3000/auth/authenticate";
 
         const setCookieJwt = (jwtToken: string) => {
