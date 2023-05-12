@@ -14,7 +14,7 @@ const Head = ({ openModal, setContent }: MyComponentProps) => {
   };
 
   const profilStart = () => {
-    setContent(<CV name={getName()} isFriend={false} isMe={true} photoUrl={"https://www.treehugger.com/thmb/9fuOGVoJ23ZwziKRNtAEMHw8opU=/750x0/filters:no_upscale():max_bytes(150000):strip_icc():format(webp)/piglet-grass-dandelions-01-b21d7ef8f881496f8346dbe01859537e.jpg"}/>);
+    setContent(<CV name={getName()} isFriend={false} isMe={true} photoUrl={"https://www.treehugger.com/thmb/9fuOGVoJ23ZwziKRNtAEMHw8opU=/750x0/filters:no_upscale():max_bytes(150000):strip_icc():format(webp)/piglet-grass-dandelions-01-b21d7ef8f881496f8346dbe01859537e.jpg"} closeModal={openModal}/>);
     openModal(true);
   }
 
@@ -27,7 +27,6 @@ const Head = ({ openModal, setContent }: MyComponentProps) => {
             <Link to="/accueil" className="navbar__link">
               Accueil
             </Link>
-
             <Link to={"chat"} className="navbar__link">
               Chat
             </Link>

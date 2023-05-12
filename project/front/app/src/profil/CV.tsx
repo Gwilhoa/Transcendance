@@ -4,7 +4,7 @@ import { ButtonInputToggle } from '../inputButton';
 import { getTwoFA, setTwoFA, setName } from '../API';
 
 
-export default function CV( {name, photoUrl, isFriend, isMe } : {name:string, photoUrl:string, isFriend:boolean, isMe:boolean}) {
+export default function CV( {name, photoUrl, isFriend, isMe, closeModal } : {name:string, photoUrl:string, isFriend:boolean, isMe:boolean, closeModal:(param: boolean) => void;}) {
     const retu = [];
     const [truename, setTrueName] = useState(name);
     const [image, setImage] = useState(photoUrl);
