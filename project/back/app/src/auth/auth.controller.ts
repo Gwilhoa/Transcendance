@@ -50,7 +50,6 @@ export class AuthController {
       user.email,
       false,
     );
-    console.log(code.access_token)
     res.redirect(
       'http://localhost:8080/authenticate?access_token=' + code.access_token,
     );
@@ -122,7 +121,6 @@ export class AuthController {
   @Get('authenticate') // TODO : check pourquoi ca ne marche pas une fois deux
   async authenticate2FA(@GetUser() jwtUser, @Res() res, @Body() body) {
     const id = jwtUser.sub;
-    console.log('entering function');
     let user = await this.userService.getUserById(id);
     if (user == null) {
       res.status(400).send('Bad User');

@@ -5,7 +5,16 @@ import Cookies from 'universal-cookie';
 const cookies = new Cookies();
 axios.defaults.baseURL = 'http://localhost:3000/'
 axios.defaults.headers.common = {'Authorization': `bearer ${cookies.get('jwtAuthorization')}`}
-export const socket = io("http://localhost:3000");
+export const socket = io('http://localhost:3000', {
+    transports: ['websocket']
+});
+socket.on('connect', () => {
+    socket.emit('connection', { token: cookies.get('jwtAuthorization')})
+});
+
+socket.on('connection_server', (data: any) => {
+    console.log(data);
+});
 
 export default axios;
 
@@ -85,6 +94,6 @@ export function getName() : string {
 
 export function setName(str:string) {
 
-    return (true);
+    return (false);
 }
 

@@ -65,6 +65,9 @@ export class EventsGateway
 
   async handleDisconnect(client: Socket) {
     const id = getIdFromSocket(client, this.clients);
+    if (id == null) {
+      return;
+    }
     this.logger.log(`Client disconnected: ` + id);
     if ((await this.userService.changeStatus(id, UserStatus.OFFLINE)) == null) {
       this.logger.error(`Error changing status of user ${id}`);
@@ -72,7 +75,6 @@ export class EventsGateway
       this.clients.delete(client.id);
       this.sendconnected();
     }
-    this.logger.log(`Client disconnected: ${id}`);
     this.clients.delete(client.id);
     if (this.ingame.has(getIdFromSocket(client, this.clients))) {
       const game = await this.gameService.remakeGame(
@@ -100,10 +102,22 @@ export class EventsGateway
         wrongtoken(client);
       this.clients.set(client.id, id);
       this.sendconnected();
-      const channels = await this.channelService.getAccessibleChannels(id);
+      let channels = null;
+      try {
+        channels = await this.channelService.getAccessibleChannels(id);
+      } catch (error) {
+        this.logger.error(error);
+        wrongtoken(client);
+        return;
+      }
+      if (channels == null) {
+        wrongtoken(client);
+        return;
+      }
       for (const channel of channels) {
         client.join(channel.id);
       }
+      this.logger.log(`Client connected: ${id}`);
     });
   }
 
