@@ -65,6 +65,7 @@ export class EventsGateway
 
   async handleDisconnect(client: Socket) {
     const id = getIdFromSocket(client, this.clients);
+    this.logger.log(`Client disconnected: ` + id);
     if ((await this.userService.changeStatus(id, UserStatus.OFFLINE)) == null) {
       this.logger.error(`Error changing status of user ${id}`);
       wrongtoken(client);
@@ -85,7 +86,6 @@ export class EventsGateway
 
   //on connection
   async handleConnection(client: Socket) {
-    console.log('[Socket] new client connected');
     let id;
     await client.on('connection', async (data) => {
       try {

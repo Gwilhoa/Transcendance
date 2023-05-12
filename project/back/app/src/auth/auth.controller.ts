@@ -45,8 +45,12 @@ export class AuthController {
       res.status(400).send('Bad User');
       return;
     }
-    const code = await this.userService.signJwtToken(user.id, user.email, false);
-    console.log("first jwt: " + code.access_token);
+    const code = await this.userService.signJwtToken(
+      user.id,
+      user.email,
+      false,
+    );
+    console.log(code.access_token)
     res.redirect(
       'http://localhost:8080/authenticate?access_token=' + code.access_token,
     );
@@ -56,14 +60,6 @@ export class AuthController {
   @UseGuards(JwtIsAuthGuard)
   @Get('2fa/create')
   async create2fa(@GetUser() user, @Res() res) {
-    // if (user.enabled2FA != true) {
-    //   res
-    //     .status(400)
-    //     .send(
-    //       'Bad Request : You already have a two factor authentication enabled',
-    //     );
-    //   return;
-    // }
     const secret = await authenticator.generateSecret();
 
     const otpauthUrl = authenticator.keyuri(
@@ -77,10 +73,6 @@ export class AuthController {
       return;
     }
     res.status(200).send(await toDataURL(otpauthUrl));
-    // return {
-    //   secret,
-    //   otpauthUrl
-    // }
   }
 
   @UseGuards(JwtIsAuthGuard)
@@ -116,13 +108,12 @@ export class AuthController {
     }
     await this.userService.enabled2FA(id);
     res.status(200).send(true);
-    return ;
+    return;
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('2fa/is2FA')
   async is2FA(@GetUser() user, @Res() res) {
-	  console.log(user.enabled2FA);
     res.status(200).send(user.enabled2FA);
     return;
   }
@@ -131,6 +122,7 @@ export class AuthController {
   @Get('authenticate') // TODO : check pourquoi ca ne marche pas une fois deux
   async authenticate2FA(@GetUser() jwtUser, @Res() res, @Body() body) {
     const id = jwtUser.sub;
+    console.log('entering function');
     let user = await this.userService.getUserById(id);
     if (user == null) {
       res.status(400).send('Bad User');
@@ -161,7 +153,12 @@ export class AuthController {
       res.status(400).send('unrecognized user');
       return;
     }
-    const token = await this.userService.signJwtToken(user.id, user.email, true);
+    const token = await this.userService.signJwtToken(
+      user.id,
+      user.email,
+      true,
+    );
+    console.log(token);
     res.send(token);
     return;
   }
@@ -192,7 +189,7 @@ export class AuthController {
     }
     await this.userService.disabled2FA(id);
     res.status(200).send(true);
-    return ;
+    return;
   }
 
   @UseGuards(JwtAuthGuard)
@@ -206,7 +203,7 @@ export class AuthController {
       if (err) {
         res.status(400).send(err);
       }
-        res.redirect('/');
-      });
+      res.redirect('/');
+    });
   }
 }

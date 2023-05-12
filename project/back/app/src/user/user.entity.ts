@@ -69,6 +69,6 @@ export class User {
   @OneToMany((type) => Game, (game) => game.user1 || game.user2)
   games: Game[];
 
-  @Column({ default: 0 })
+  @Column({ default: UserStatus.DISCONNECTED })
   status: UserStatus;
 }

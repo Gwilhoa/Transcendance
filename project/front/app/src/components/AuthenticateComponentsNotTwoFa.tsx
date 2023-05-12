@@ -5,14 +5,15 @@ import axios from "axios";
 import { error } from "console";
 import { Navigate } from "react-router-dom";
 
-function AuthenticateComponentsNotTwoFa() {
+interface tokenProps {
+    token: string | null,
+}
+
+function AuthenticateComponentsNotTwoFa({ token }: tokenProps) {
 	const [error, setError] = useState("");
-	const [twoFa, setTwoFa] = useState(true);
 	const [cookies, setCookie, removeCookie] = useCookies(['jwtAuthorization']);
 	
 	useEffect(() => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const token = urlParams.get("access_token");
         const url = "http://localhost:3000/auth/authenticate";
 
         const setCookieJwt = (jwtToken: string) => {
@@ -30,6 +31,7 @@ function AuthenticateComponentsNotTwoFa() {
             .catch((error) => {
 				setError("Error " + error.response.status);
 				console.error("Error status " + error.response.status);
+				console.error(error);
             });
 	}, []);
     return (
@@ -39,7 +41,7 @@ function AuthenticateComponentsNotTwoFa() {
 				) : (
 					<p>Waiting ...</p>
 			)}
-			<Navigate to="/accueil" />
+			{cookies.jwtAuthorization && !error ? (<Navigate to="/accueil"/>) : (<p>Waiting ...</p>)}
         </div>
     );
 }

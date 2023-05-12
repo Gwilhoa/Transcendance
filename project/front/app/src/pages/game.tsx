@@ -3,7 +3,8 @@ import Template from "../template/template"
 import React, { useState, useEffect, useRef } from "react";
 import { useSpring, animated } from 'react-spring';
 import { socket } from '../API';
-import { bigToken } from './authenticate';
+import Cookies from 'universal-cookie';
+const cookies = new Cookies();
 
 const Game = () => {
 
@@ -71,7 +72,7 @@ const Game = () => {
     left: "100px",
   };
 
-  socket.emit('join_matchmaking', { bigToken });
+  socket.emit('join_matchmaking', cookies.get('jwtAuthorization'));
 
   useEffect(() => {
     socket.on('update_game', (data) => {
@@ -92,7 +93,7 @@ const Game = () => {
 
   const inputGame = () => {
     const token = localStorage.getItem('token');
-    socket.emit('input_game', { game_id: gameId, position: paddle1, token: bigToken});
+    socket.emit('input_game', { game_id: gameId, position: paddle1, token: cookies.get('jwtAuthorization')});
   };
 
 

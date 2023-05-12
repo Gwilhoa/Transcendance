@@ -1,7 +1,8 @@
-import { BrowserRouter, Route, Routes} from "react-router-dom";
+import {Route, Routes} from "react-router-dom";
 import Auth from './pages/Auth';
-import AuthToken from './pages/AuthToken';
+// import AuthToken from './pages/AuthToken';
 import NotFound from './pages/NotFound';
+import CreateTwoFaPage from './pages/CreateTwoFa';
 import Game from './pages/game';
 import Accueil from './pages/accueil';
 import PopupChat from "./popup/popupChat";
@@ -20,11 +21,11 @@ const AppInsideBrowser = ({ openModal, setContent }: MyComponentProps) => {
 		<>
 			<Routes>
 				<Route path="/" Component={Auth}/>
-				<Route path="/auth" Component={AuthToken}/>
 				<Route path="*" Component={NotFound}/>
 				<Route path="/authenticate" Component={TokenPage} />
 				<Route path="/accueil/*" element={<Template openModal={openModal} setContent={setContent} child={Accueil}/>} />
 				<Route path="/game/*" element={<Template openModal={openModal} setContent={setContent} child={Game}/>} />
+				<Route path="/CreateTwoFa/*" element={<Template openModal={openModal} setContent={setContent} child={CreateTwoFaPage}/>} />
 			</Routes>
 			
 				{DynamicIsInAChat() && 
@@ -39,9 +40,7 @@ const AppInsideBrowser = ({ openModal, setContent }: MyComponentProps) => {
 
 function App({ openModal, setContent }: MyComponentProps) {
 	return (
-		<BrowserRouter>
 			<AppInsideBrowser openModal={openModal} setContent={setContent} />
-		</BrowserRouter>
 	);
 
 }

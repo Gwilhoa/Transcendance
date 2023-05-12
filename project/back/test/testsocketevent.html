@@ -9,7 +9,6 @@
 		});
 
 		socket.on('connect', () => {
-			console.log('Connected to server');
 			socket.emit('connection', { token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjkyMDAwLCJpc2F1dGgiOnRydWUsImlhdCI6MTY4MTkyMzYyMywiZXhwIjoxNjgxOTMwODIzfQ.L-Kzi-PBfmRq4I1TQNuDFiPabS8aT73yH8BjwJ69w7Q' });
 		});
 

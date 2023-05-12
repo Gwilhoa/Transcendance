@@ -9,7 +9,7 @@ function Reconnect(props:MessageProps) {
 	return (
 		<div>
 			<p>{props.message}</p>
-			<Link to="http://localhost:3000/auth/login">
+			<Link to="http://localhost:8080/">
 				<button>
 					Try to reconnect
 				</button>
