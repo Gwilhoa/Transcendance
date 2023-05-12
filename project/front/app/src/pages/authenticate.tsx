@@ -12,7 +12,6 @@ export function TokenPage() {
 	const [twoFa, setTwoFa] = useState(false);
 	const urlParams = new URLSearchParams(window.location.search);
 	const token = urlParams.get("access_token");
-	console.log(token);
 
 	axios.get("http://localhost:3000/auth/2fa/is2FA", {
 		headers: {
@@ -21,7 +20,6 @@ export function TokenPage() {
 	})
 		.then((response) => {
 			setTwoFa(response.data);
-			console.log(response.data);
 		})
 		.catch((error) => {
 			setError("Error " + error.response.status);
