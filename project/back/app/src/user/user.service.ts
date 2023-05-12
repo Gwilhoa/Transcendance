@@ -61,8 +61,9 @@ export class UserService {
     }
     await this.test();
     const retUser = await this.authService.getUserIntra(retIntra.access_token);
-    if ((await this.userRepository.findOneBy({ id: retUser.id })) != null) {
-      return await this.userRepository.findOneBy({ id: retUser.id });
+    const verif_user = await this.userRepository.findOneBy({ id: retUser.id });
+    if (verif_user != null) {
+      return await this.changeStatus(verif_user.id, UserStatus.IN_CONNECTION);
     }
     let login = retUser.login;
     let nbr = 0;
@@ -141,7 +142,6 @@ export class UserService {
       return null;
     }
 
-    console.log(user.friends);
     return user.friends;
   }
 
@@ -289,7 +289,6 @@ export class UserService {
     }
     try {
       fs.writeFileSync(imagePath, buffer);
-      console.log(id + ' image updated');
       return imagePath;
     } catch (error) {
       return null;
@@ -415,7 +414,7 @@ export class UserService {
 
   async signJwtToken(
     userId: string,
-    email : string,
+    email: string,
     isauth: boolean,
   ): Promise<{ access_token: string }> {
     let expiresTime = '5m';
@@ -433,7 +432,6 @@ export class UserService {
       enabled2FA: check2FA,
     };
     // const payload = { sub: parseInt(userId), isauth: isauth ,enabled2FA: 1};
-    console.log(process.env.JWT_SECRET);
 
     return {
       access_token: await this.jwt.signAsync(payload, {
