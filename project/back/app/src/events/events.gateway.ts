@@ -66,16 +66,16 @@ export class EventsGateway
   async handleDisconnect(client: Socket) {
     const id = getIdFromSocket(client, this.clients);
     if (id == null) {
+      client.disconnect();
       return;
     }
-    this.logger.log(`Client disconnected: ` + id);
+    this.logger.log(`Client disconnected: ${id}`);
     if ((await this.userService.changeStatus(id, UserStatus.OFFLINE)) == null) {
-      this.logger.error(`Error changing status of user ${id}`);
       wrongtoken(client);
-      this.clients.delete(client.id);
+      this.clients.delete(id);
       this.sendconnected();
     }
-    this.clients.delete(client.id);
+    this.clients.delete(id);
     if (this.ingame.has(getIdFromSocket(client, this.clients))) {
       const game = await this.gameService.remakeGame(
         this.ingame.get(client.id),
@@ -100,13 +100,12 @@ export class EventsGateway
         (await this.userService.changeStatus(id, UserStatus.CONNECTED)) == null
       )
         wrongtoken(client);
-      this.clients.set(client.id, id);
+      this.clients.set(id, client);
       this.sendconnected();
       let channels = null;
       try {
         channels = await this.channelService.getAccessibleChannels(id);
       } catch (error) {
-        this.logger.error(error);
         wrongtoken(client);
         return;
       }

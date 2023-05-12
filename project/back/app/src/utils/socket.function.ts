@@ -11,7 +11,7 @@ export function verifyToken(token: string) {
 export function getKeys(map: Map<any, any>) {
   const list = [];
   map.forEach((key, value) => {
-    list.push(key);
+    list.push(value);
   });
   return list;
 }
@@ -38,11 +38,10 @@ export function getIdFromSocket(
   socket: Socket,
   connected: Map<string, Socket>,
 ) {
-  let id = null;
   connected.forEach((value, key) => {
     if (value == socket) {
-      id = key;
+      return key;
     }
   });
-  return id;
+  return null;
 }

@@ -16,6 +16,7 @@ socket.on('connection_server', (data: any) => {
     console.log(data);
 });
 
+
 export default axios;
 
 interface Message {
