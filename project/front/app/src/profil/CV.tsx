@@ -50,7 +50,7 @@ export default function CV( {name, photoUrl, isFriend, isMe } : {name:string, ph
 					console.error("profil Error status " + error.response.status);
 					console.error(error);
 				});
-			navigate('/NotFound');
+			navigate('/CreateTwoFa');
 		}
     }
 
