@@ -6,7 +6,6 @@ import {
   HttpException,
   HttpStatus,
   Param,
-  Patch,
   Post,
   Res,
   UploadedFile,
@@ -19,7 +18,6 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtIsAuthGuard } from '../auth/guard/jwt.guard';
 import { GetUser } from '../auth/decorator/auth.decorator';
 import path, { extname } from 'path';
-import * as stream from 'stream';
 import fs from 'fs';
 
 @UseGuards(JwtIsAuthGuard)
@@ -44,11 +42,7 @@ export class UserController {
   }
 
   @Get('/id/:id')
-  async findOneById(
-    @Param('id') iduser: string,
-    @Res() response,
-    @GetUser('sub') id,
-  ) {
+  async findOneById(@Param('id') iduser: string, @Res() response) {
     const ret = await this.userService.getUserById(iduser);
     if (ret == null) {
       response.status(204).send('No Content');
@@ -207,7 +201,7 @@ export class UserController {
     @Res() response,
   ) {
     try {
-      this.userService.removeBlocked(id, blocked_id);
+      await this.userService.removeBlocked(id, blocked_id);
     } catch (e) {
       response.status(400).send('Bad Request ' + e);
       return;

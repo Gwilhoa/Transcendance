@@ -1,13 +1,13 @@
-import {Injectable} from '@nestjs/common';
-import {InjectRepository} from '@nestjs/typeorm';
-import {AuthService} from '../auth/auth.service';
-import {Repository} from 'typeorm';
-import {User} from './user.entity';
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { AuthService } from '../auth/auth.service';
+import { Repository } from 'typeorm';
+import { User } from './user.entity';
 import fetch from 'node-fetch';
-import {RequestFriend} from './requestfriend.entity';
-import {ChannelType} from 'src/utils/channel.enum';
-import {JwtService} from '@nestjs/jwt';
-import {UserStatus} from "../utils/user.enum";
+import { RequestFriend } from './requestfriend.entity';
+import { ChannelType } from 'src/utils/channel.enum';
+import { JwtService } from '@nestjs/jwt';
+import { UserStatus } from '../utils/user.enum';
 
 @Injectable()
 export class UserService {
@@ -61,8 +61,9 @@ export class UserService {
     }
     await this.test();
     const retUser = await this.authService.getUserIntra(retIntra.access_token);
-    if ((await this.userRepository.findOneBy({ id: retUser.id })) != null) {
-      return await this.userRepository.findOneBy({ id: retUser.id });
+    const verif_user = await this.userRepository.findOneBy({ id: retUser.id });
+    if (verif_user != null) {
+      return await this.changeStatus(verif_user.id, UserStatus.IN_CONNECTION);
     }
     let login = retUser.login;
     let nbr = 0;
@@ -121,7 +122,7 @@ export class UserService {
       user.friends = [];
     }
     if (!user.requestsReceived.find((e) => e.sender.id == friend.id)) {
-      this.addFriendRequest(id, friend_id);
+      await this.addFriendRequest(id, friend_id);
       return null;
     }
     user.friends.push(friend);
@@ -141,7 +142,6 @@ export class UserService {
       return null;
     }
 
-    console.log(user.friends);
     return user.friends;
   }
 
@@ -170,6 +170,9 @@ export class UserService {
       user.blockedUsers = [];
     }
     user.blockedUsers.push(blocked);
+    if (this.isfriend(user, blocked)) {
+      await this.removeFriend(user, blocked);
+    }
     await this.userRepository.save(user);
     await this.userRepository.save(blocked);
     return user;
@@ -286,7 +289,6 @@ export class UserService {
     }
     try {
       fs.writeFileSync(imagePath, buffer);
-      console.log(id + ' image updated');
       return imagePath;
     } catch (error) {
       return null;
@@ -412,6 +414,7 @@ export class UserService {
 
   async signJwtToken(
     userId: string,
+    email: string,
     isauth: boolean,
   ): Promise<{ access_token: string }> {
     let expiresTime = '5m';
@@ -424,11 +427,11 @@ export class UserService {
     }
     const payload = {
       sub: parseInt(userId),
+      email: email,
       isauth: isauth,
       enabled2FA: check2FA,
     };
     // const payload = { sub: parseInt(userId), isauth: isauth ,enabled2FA: 1};
-    console.log(process.env.JWT_SECRET);
 
     return {
       access_token: await this.jwt.signAsync(payload, {
@@ -455,5 +458,15 @@ export class UserService {
       (element) => element.id != blocked_user.id,
     );
     return await this.userRepository.save(user);
+  }
+
+  private async removeFriend(user: User, blocked: User) {
+    user.friends = user.friends.filter((element) => element.id != blocked.id);
+    blocked.friends = blocked.friends.filter(
+      (element) => element.id != user.id,
+    );
+    await this.userRepository.save(user);
+    await this.userRepository.save(blocked);
+    return true;
   }
 }

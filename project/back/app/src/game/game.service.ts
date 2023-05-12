@@ -4,6 +4,7 @@ import { Game, GameStatus } from './game.entity';
 import { Repository } from 'typeorm';
 import { UserService } from 'src/user/user.service';
 import { CreateGameDTO } from 'src/dto/create-game.dto';
+import { UserStatus } from '../utils/user.enum';
 
 @Injectable()
 export class GameService {
@@ -35,8 +36,15 @@ export class GameService {
   }
 
   async finishGame(id: string, score1: number, score2: number) {
-    const game = await this.gameRepository.findOneBy({ id: id });
+    const game = await this.gameRepository
+      .createQueryBuilder('game')
+      .leftJoinAndSelect('game.user1', 'user1')
+      .leftJoinAndSelect('game.user2', 'user2')
+      .where('game.id = :id', { id: id })
+      .getOne();
     if (game == null) throw new Error('Game not found');
+    await this.userService.changeStatus(game.user1.id, UserStatus.CONNECTED);
+    await this.userService.changeStatus(game.user2.id, UserStatus.CONNECTED);
     game.score1 = score1;
     game.score2 = score2;
     game.finished = GameStatus.FINISHED;

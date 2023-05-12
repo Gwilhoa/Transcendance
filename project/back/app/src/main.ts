@@ -3,11 +3,12 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const reflector = app.get(Reflector);
+  app.get(Reflector);
   const corsOptions = {
     origin: '*',
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const cors = require('cors');
 
   app.enableCors(corsOptions);

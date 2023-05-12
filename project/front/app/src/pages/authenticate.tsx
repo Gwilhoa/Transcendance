@@ -11,9 +11,9 @@ export function TokenPage() {
 	const [error, setError] = useState("");
 	const [twoFa, setTwoFa] = useState(false);
 	const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get("access_token");
+	const token = urlParams.get("access_token");
+	console.log(token);
 
-	useEffect(() => {
 	axios.get("http://localhost:3000/auth/2fa/is2FA", {
 		headers: {
 			Authorization: `Bearer ${token}`,
@@ -25,9 +25,8 @@ export function TokenPage() {
 		})
 		.catch((error) => {
 			setError("Error " + error.response.status);
-			console.error("Error status " + error.response.status);
+			console.error(error);
 		});
-	}, []);
 
 	return (
 		<div>
@@ -35,7 +34,7 @@ export function TokenPage() {
 				<Reconnect message={error} />
 			) : (
 				<>
-					{twoFa ? <TwoFa/> : <NotTwoFa/>}
+					{twoFa && !error ? <TwoFa token={token}/> : <NotTwoFa token={token}/>}
 				</>
 			)}
 		</div>

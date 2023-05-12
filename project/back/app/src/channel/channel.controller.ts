@@ -144,6 +144,34 @@ export class ChannelController {
     return ret;
   }
 
+  @Get('ban')
+  async getBanUser(@Body() body, @GetUser('sub') id: string) {
+    if (body.channel_id == null) {
+      response.status(400).send('channel_id is null');
+      return;
+    }
+    let ret;
+    try {
+      ret = await this.channelService.getBanUser(body.channel_id, id);
+    } catch (e) {
+      response.status(400).send(e.message);
+      return;
+    }
+    return ret;
+  }
+
+  @Delete('ban')
+  async deleteBanUser(@Body() body: BanUserDto, @GetUser('sub') id: string) {
+    let ret;
+    try {
+      ret = await this.channelService.deleteBanUser(body, id);
+    } catch (e) {
+      response.status(400).send(e.message);
+      return;
+    }
+    return ret;
+  }
+
   @Get('message')
   async getMessages(
     @Body() body: GetMessageDto,
