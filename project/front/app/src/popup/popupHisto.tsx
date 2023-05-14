@@ -77,7 +77,6 @@ const PopupHisto: React.FC<PopupProps> = ({ onClose }) => {
             <div className="scrollBlock">
                 <Add/>
             </div>
-    
         </div>
     );
   }

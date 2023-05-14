@@ -1,5 +1,4 @@
 import '../components/game.css'
-import Template from "../template/template"
 import React, { useState, useEffect, useRef } from "react";
 import { useSpring, animated } from 'react-spring';
 import { socket } from '../API';
