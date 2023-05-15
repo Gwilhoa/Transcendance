@@ -3,11 +3,11 @@ import './template.css'
 import { useState } from "react";
 import PopupHisto from "../popup/popupHisto"
 import CV from "../profil/CV";
-import { MyComponentProps } from "../App";
+import { Props } from "../App";
 import { getName } from "../API";
 import { JoinChat } from "../popup/chatManager";
 
-const Head = ({ openModal, setContent }: MyComponentProps) => {
+const Head = ({ openModal, setContent }: Props) => {
 
   const [showPopupHisto, setShowPopupHisto] = useState(false);  
   const handlePopupCloseHisto = () => {

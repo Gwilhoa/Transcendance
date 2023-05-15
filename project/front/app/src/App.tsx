@@ -9,14 +9,14 @@ import PopupChat from "./popup/popupChat";
 import { DynamicIsInAChat, KnowMyChannel } from "./popup/chatManager";
 import TokenPage from "./pages/authenticate";
 import Template from "./template/template";
-import { ReactNode, useState } from "react";
+import { ReactNode } from "react";
 
-export interface MyComponentProps {
+export interface Props {
 	openModal: (param: boolean) => void;
 	setContent: (param: ReactNode) => void;
 }
 
-const AppInsideBrowser = ({ openModal, setContent }: MyComponentProps) => {
+const AppInsideBrowser = ({ openModal, setContent }: Props) => {
 	return (
 		<>
 			<Routes>
@@ -40,7 +40,7 @@ const AppInsideBrowser = ({ openModal, setContent }: MyComponentProps) => {
 
 
 
-function App({ openModal, setContent }: MyComponentProps) {
+function App({ openModal, setContent }: Props) {
 	return (
 			<AppInsideBrowser openModal={openModal} setContent={setContent} />
 	);

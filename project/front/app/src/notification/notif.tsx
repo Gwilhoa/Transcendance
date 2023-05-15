@@ -7,15 +7,16 @@ import { Link } from "react-router-dom";
 interface NotificationProps {
   message: string;
   channel: string;
+  isInChannel: boolean;
 }
 
-export default function Notification({ message, channel }: NotificationProps) {
+export default function Notification({ message, isInChannel, channel }: NotificationProps) {
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setVisible(false);
-    }, 600000);
+    }, 6000);
 
     return () => clearTimeout(timer);
     }, []);
@@ -26,14 +27,27 @@ export default function Notification({ message, channel }: NotificationProps) {
     };
 
   if (visible) {
+    if (isInChannel) {
       return (
-      <div className="not">
-        <Link to={"/" + ChangeChannel(channel)} className="notific" onClick={handleClose}>
-        {message}
-        </Link>
-      </div>
-    );
+        <div className="not">
+          <h2>
+          <Link to={"/" + ChangeChannel(channel)} className="notific" onClick={handleClose}>
+            {message}
+          </Link>
+            </h2>
+        </div>
+      );
     }
+
+    else {
+      return (
+
+        <div className="not">
+        
+      </div>
+      )
+    }
+  }
     else
         return null;
 }

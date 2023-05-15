@@ -17,7 +17,7 @@ const Template = ({openModal, setContent}:Props) => {
         <header>
             <Head openModal={openModal} setContent={setContent}/>
         </header>
-          <Notification message={"ds"} channel={"sd"}/>
+          <Notification message={"Nouveau Message"} channel={"sd"} isInChannel={true}/>
         <main className="main-template">
           <Outlet></Outlet>
         </main>
