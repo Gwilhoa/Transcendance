@@ -7,3 +7,8 @@
 .colorTextFriend {
     color: blueviolet;
 }
+
+.accueil {
+    overflow-y: scroll;
+    width: 100%;
+}

@@ -5,6 +5,7 @@ import PopupHisto from "../popup/popupHisto"
 import CV from "../profil/CV";
 import { MyComponentProps } from "../App";
 import { getName } from "../API";
+import { JoinChat } from "../popup/chatManager";
 
 const Head = ({ openModal, setContent }: MyComponentProps) => {
 
@@ -27,7 +28,7 @@ const Head = ({ openModal, setContent }: MyComponentProps) => {
             <Link to="/accueil" className="navbar__link">
               Accueil
             </Link>
-            <Link to={"chat"} className="navbar__link">
+            <Link to={JoinChat()} className="navbar__link">
               Chat
             </Link>
             <Link to="/game" className="navbar__link">
@@ -46,5 +47,4 @@ const Head = ({ openModal, setContent }: MyComponentProps) => {
         </div>
     );
   }
-
   export default Head

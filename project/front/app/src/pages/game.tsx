@@ -7,7 +7,6 @@ const cookies = new Cookies();
 
 const Game = () => {
 
-  
   const [gameId, setGameId] = useState(0);
   const [onGame, findGame] = useState(true);
   const [score1, setScore1] = useState(0);
