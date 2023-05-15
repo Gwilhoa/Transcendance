@@ -118,7 +118,7 @@ export class AuthController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('authenticate') // TODO : check pourquoi ca ne marche pas une fois deux
+  @Get('authenticate')
   async authenticate2FA(@GetUser() jwtUser, @Res() res, @Body() body) {
     const id = jwtUser.sub;
     let user = await this.userService.getUserById(id);

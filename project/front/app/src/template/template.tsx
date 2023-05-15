@@ -8,7 +8,7 @@ interface Props {
     openModal: (param: boolean) => void;
     child: () => ReactNode;
     setContent: (param: ReactNode) => void;
-};
+}
 
 const Template = ({openModal, setContent, child}:Props) => {
 

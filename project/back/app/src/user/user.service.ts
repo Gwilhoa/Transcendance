@@ -63,8 +63,7 @@ export class UserService {
     const retUser = await this.authService.getUserIntra(retIntra.access_token);
     const verif_user = await this.userRepository.findOneBy({ id: retUser.id });
     if (verif_user != null) {
-      verif_user.status = UserStatus.IN_CONNECTION;
-      return verif_user;
+      return await this.changeStatus(verif_user.id, UserStatus.IN_CONNECTION);
     }
     let login = retUser.login;
     let nbr = 0;
@@ -418,7 +417,7 @@ export class UserService {
     email: string,
     isauth: boolean,
   ): Promise<{ access_token: string }> {
-    let expiresTime = '10m';
+    let expiresTime = '5m';
     if (isauth == true) expiresTime = '2h';
     let check2FA: boolean;
     try {

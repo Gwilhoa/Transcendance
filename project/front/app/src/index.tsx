@@ -5,6 +5,7 @@ import { createRoot } from 'react-dom/client';
 import Modal from './profil/modal';
 import { ReactNode, useState } from 'react';
 import { CookiesProvider } from 'react-cookie';
+import { BrowserRouter as Router } from 'react-router-dom'
 
 
 function MainComponent() {
@@ -13,8 +14,10 @@ function MainComponent() {
 
   return (
     <CookiesProvider>
-      <App openModal={setShow} setContent={setContent} />
-      <Modal boolModal={show} openModal={setShow} content={content}/> 
+		<Router>
+			<App openModal={setShow} setContent={setContent} />
+			<Modal boolModal={show} openModal={setShow} content={content}/> 
+		</Router>
     </CookiesProvider>
   
   );
