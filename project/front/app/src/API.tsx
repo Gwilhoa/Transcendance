@@ -35,7 +35,7 @@ interface Vector {
     y: number
 }
 
-export function sendMessage(prompt:string) {
+export function sendMessage(prompt:string, channel_id:number) {
     
 }
 

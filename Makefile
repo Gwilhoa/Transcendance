@@ -91,7 +91,7 @@ database:
 # ~~~~~~~~~~~~~~ BACKEND ~~~~~~~~~~~~~~
 
 back: database
-	docker-compose up -d back
+	docker-compose up back
 # ~~~~~~~~~~~~~~ FRONTEND ~~~~~~~~~~~~~~
 
 # ~~~~~~~~~~~~~~~~ STOP ~~~~~~~~~~~~~~~~

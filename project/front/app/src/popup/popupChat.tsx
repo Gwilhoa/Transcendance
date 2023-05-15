@@ -2,7 +2,7 @@
 import './popupChat.css'
 import { ReactNode, useState } from 'react';
 import CV from '../profil/CV';
-import { ChangeChannel, JoinChat, LeaveChat } from './chatManager';
+import { ChangeChannel, IsInAChat, JoinChat, KnowMyChannel, LeaveChat } from './chatManager';
 import { Link} from 'react-router-dom';
 import { canJoinChannel, getMessages } from '../API';
 import '../template/template.css';
@@ -54,13 +54,11 @@ const addMessages = (chan:string, setIsOpen:(param: boolean) => void, setContent
               {listMessageGet[i].contain}
             </div>
         </li>
-        )
-      }
+      )
     }
-    return <div className="messagePannel"> {messagesRet} </div>;
   }
-  
-  
+  return <div className="messagePannel"> {messagesRet} </div>;
+}
   
 const PopupChat: React.FC<{path:string, openModal:(param: boolean) => void, setContent:(param: ReactNode) => void}> = (path) => {
 
@@ -69,8 +67,10 @@ const PopupChat: React.FC<{path:string, openModal:(param: boolean) => void, setC
   const [channelList, setChannelList] = useState<ChannelItem[]>([])
   const finalPath = channelList.find((channel) => channel.name === path.path);
 
+
+  console.log(finalPath);
   const NewChan = (name:string) => {
-    if (canJoinChannel(name)) {
+      if (canJoinChannel(name)) {
       const newItem:ChannelItem  = {
         id: channelList.length + 1,
         name: name,
@@ -84,7 +84,11 @@ const PopupChat: React.FC<{path:string, openModal:(param: boolean) => void, setC
   }
 
   if (!finalPath && !NewChan(path.path)){
-    Navigate(JoinChat());
+    console.log("ENTER");
+    if (KnowMyChannel() === 'General')
+      NewChan("General");
+    else
+      return (null);
   }
 
   const handleMessageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
