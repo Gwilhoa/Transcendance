@@ -1,6 +1,6 @@
 
 import './popupChat.css'
-import { ReactNode, useState } from 'react';
+import React, { ReactNode, useState } from 'react';
 import CV from '../profil/CV';
 import { ChangeChannel, JoinChat, LeaveChat } from './chatManager';
 import { Link} from 'react-router-dom';
@@ -64,7 +64,7 @@ const addMessages = (chan:string, setIsOpen:(param: boolean) => void, setContent
   
 const PopupChat: React.FC<{path:string, openModal:(param: boolean) => void, setContent:(param: ReactNode) => void}> = (path) => {
 
-  let Navigate = useNavigate();
+  const Navigate = useNavigate();
   const [prompt, setMessage] = useState('');
   const [channelList, setChannelList] = useState<ChannelItem[]>([])
   const finalPath = channelList.find((channel) => channel.name === path.path);

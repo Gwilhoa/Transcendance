@@ -1,3 +1,4 @@
+import React from "react";
 import './popupHisto.css'
 
 
@@ -29,7 +30,7 @@ const OneScoreBlock = ({text, score1, score2 }: ShowScore) => {
 
 const Add = () => {
     const blocks = [];
-    var ListOfScore: Score[] = [
+    const ListOfScore: Score[] = [
         { ennemy: "Gchatain", scoreEnnemy: 3, scoreMe: 25 },
         { ennemy: "Dieu", scoreEnnemy: 50, scoreMe: 49 },
         { ennemy: "Xav Niel", scoreEnnemy: 0, scoreMe: 100 },
@@ -37,7 +38,7 @@ const Add = () => {
         { ennemy: "Dieu", scoreEnnemy: 50, scoreMe: 49 },
         { ennemy: "Xav Niel", scoreEnnemy: 0, scoreMe: 100 },
 
-      ];;
+      ];
     ////// REMPLIR LIST OF SCORE AVEC LES VRAIS SCORES ///////////
     
     for (let i = 0; i < ListOfScore.length; i++) {

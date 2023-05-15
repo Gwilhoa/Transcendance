@@ -36,7 +36,7 @@ interface Vector {
 }
 
 export function sendMessage(prompt:string) {
-    
+    // -
 }
 
 export function getMessages(name:string) : Message[] {

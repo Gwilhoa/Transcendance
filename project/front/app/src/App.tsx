@@ -9,7 +9,7 @@ import PopupChat from "./popup/popupChat";
 import { DynamicIsInAChat, KnowMyChannel } from "./popup/chatManager";
 import TokenPage from "./pages/authenticate";
 import Template from "./template/template";
-import { ReactNode } from "react";
+import React, { ReactNode } from "react";
 
 export interface MyComponentProps {
 	openModal: (param: boolean) => void;

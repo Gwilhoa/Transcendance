@@ -1,7 +1,6 @@
-import { ReactNode } from "react";
+import React from "react";
 
-const CreateTwoFaPage = () => {
-		 
+const CreateTwoFaPage = () => { 
         return (
             <>
                 <h1> TWOFA </h1>

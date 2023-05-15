@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import React, { ReactNode } from "react";
 import Head from "./header";
 import Foot from "./footer";
 import  '../general.css'
