@@ -17,7 +17,7 @@ function AuthenticateComponentsNotTwoFa({ token }: tokenProps) {
         const url = "http://localhost:3000/auth/authenticate";
 
         const setCookieJwt = (jwtToken: string) => {
-            setCookie("jwtAuthorization", jwtToken, { maxAge: 2 * 60 * 60 });
+            setCookie("jwtAuthorization", jwtToken, {sameSite: 'lax', maxAge: 2 * 60 * 60 });
         };
 
         axios.get(url, {
