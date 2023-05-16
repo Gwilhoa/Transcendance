@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
 import axios, { AxiosResponse, AxiosRequestConfig } from 'axios';
+import { promises } from 'dns';
 import io from "socket.io-client";
 import Cookies from 'universal-cookie';
 const cookies = new Cookies();
@@ -25,7 +25,7 @@ interface Message {
     date: string
 }
 
-interface Channel {
+export interface Channel {
     name: string,
     id: number
 }
@@ -35,7 +35,7 @@ interface Vector {
     y: number
 }
 
-export function sendMessage(prompt:string) {
+export function sendMessage(prompt:string, channel_id:number) {
     
 }
 
@@ -53,7 +53,6 @@ export function getMessages(name:string) : Message[] {
         console.log(data);
     }
 
-
     axios(config)
         .then(response => {
             parseMessage(response.data);
@@ -65,11 +64,28 @@ export function getMessages(name:string) : Message[] {
 }
 
 
-export function getChannels() : Channel[] {
-
-    return ([{name:"yo", id:1}, {name:"uluberlu", id:2}]);
+export async function getChannels() : Promise<Channel[]> {
+    createChannel("dsds")
+    try {
+        const response = await axios.get('/channel/available');
+        console.log(response.data)
+        return response.data;
+        } catch (error) {
+        console.error('Error : no channel found', error);
+        return [];
+    }
 }
 
+export async function createChannel(channelName: string): Promise<void> {
+    try {
+      const response = await axios.post('/channel/create', { channelName });
+      console.log('Canal créé avec succès');
+      // Faites quelque chose après la création du canal, par exemple, actualisez la liste des canaux disponibles
+      // ...
+    } catch (error) {
+      console.error('Erreur lors de la création du canal :', error);
+    }
+}
 
 export function canJoinChannel(Channel:string) : boolean {
     return (true);
@@ -77,7 +93,7 @@ export function canJoinChannel(Channel:string) : boolean {
 
 export function getPositionBall() : Vector {
 
-    return ({x:0, y:0})
+    return ({x:0, y:0});
 }
 
 

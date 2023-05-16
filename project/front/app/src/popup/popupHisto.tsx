@@ -37,7 +37,7 @@ const Add = () => {
         { ennemy: "Dieu", scoreEnnemy: 50, scoreMe: 49 },
         { ennemy: "Xav Niel", scoreEnnemy: 0, scoreMe: 100 },
 
-      ];;
+      ];
     ////// REMPLIR LIST OF SCORE AVEC LES VRAIS SCORES ///////////
     
     for (let i = 0; i < ListOfScore.length; i++) {
@@ -77,7 +77,6 @@ const PopupHisto: React.FC<PopupProps> = ({ onClose }) => {
             <div className="scrollBlock">
                 <Add/>
             </div>
-    
         </div>
     );
   }
