@@ -70,18 +70,22 @@ export async function getChannels() : Promise<Channel[]> {
         const response = await axios.get('/channel/available');
         console.log(response.data)
         return response.data;
-        } catch (error) {
+    } catch (error) {
         console.error('Error : no channel found', error);
         return [];
     }
 }
 
 export async function createChannel(channelName: string): Promise<void> {
+
+    const channelData = {
+        name: 'Moncanal',
+        type: 1,
+        creator_id: cookies.get('jwtAuthorization'),
+      };
     try {
-      const response = await axios.post('/channel/create', { channelName });
+      const response = await axios.post('/channel/create', channelData);
       console.log('Canal créé avec succès');
-      // Faites quelque chose après la création du canal, par exemple, actualisez la liste des canaux disponibles
-      // ...
     } catch (error) {
       console.error('Erreur lors de la création du canal :', error);
     }
