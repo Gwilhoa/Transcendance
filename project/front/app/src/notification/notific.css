@@ -1,12 +1,10 @@
 .notific 
-{ 
-    
+{
     background-color: red;
-    color: white; 
+    color: white;
     padding: 1em;
     top:0;
     left:50%;
-    
     transform: translate(-50%);
     position: absolute;
     border-bottom-left-radius: 20px;

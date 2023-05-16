@@ -27,26 +27,20 @@ export default function Notification({ message, isInChannel, channel }: Notifica
     };
 
   if (visible) {
-    if (isInChannel) {
       return (
         <div className="not">
           <h2>
+            {isInChannel} &&
           <Link to={"/" + ChangeChannel(channel)} className="notific" onClick={handleClose}>
             {message}
           </Link>
-            </h2>
+            {!isInChannel} &&
+          <Link to={"/game"} className="notific" onClick={handleClose}>
+            {message}
+          </Link>
+          </h2>
         </div>
       );
-    }
-
-    else {
-      return (
-
-        <div className="not">
-        
-      </div>
-      )
-    }
   }
     else
         return null;

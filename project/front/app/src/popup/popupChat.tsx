@@ -4,10 +4,13 @@ import { ReactNode, useState } from 'react';
 import CV from '../profil/CV';
 import { ChangeChannel, IsInAChat, JoinChat, KnowMyChannel, LeaveChat } from './chatManager';
 import { Link} from 'react-router-dom';
-import { canJoinChannel, getMessages } from '../API';
+import { Channel, canJoinChannel, getChannels, getMessages } from '../API';
 import '../template/template.css';
 import { useNavigate } from "react-router-dom";
 import { ButtonInputToggle } from '../inputButton';
+import axios from '../API';
+import { AxiosResponse } from 'axios';
+import { AxiosRequestConfig } from 'axios';
 
 type ChannelItem = {
   id: number;
@@ -16,8 +19,9 @@ type ChannelItem = {
 }
 
 
+
 const sendNewMessageToBack = (message:string) => {
-    //////J'me casse !!
+  //////J'me casse !!
 }
 
 const sendCommandToBack = (message:string) => {
@@ -27,12 +31,12 @@ const sendCommandToBack = (message:string) => {
 const addMessages = (chan:string, setIsOpen:(param: boolean) => void, setContent:(param: ReactNode) => void) => {
   const messagesRet = [];
   const listMessageGet = getMessages(chan);
-
+  
   const clickName = (i:number) => {
     setContent(<CV name={listMessageGet[i].author} isFriend={false} isMe={false} photoUrl={"https://www.treehugger.com/thmb/9fuOGVoJ23ZwziKRNtAEMHw8opU=/750x0/filters:no_upscale():max_bytes(150000):strip_icc():format(webp)/piglet-grass-dandelions-01-b21d7ef8f881496f8346dbe01859537e.jpg"} closeModal={setIsOpen}/>);
     setIsOpen(true);
   }
-
+  
   for(let i = 0; i < listMessageGet.length; i++) {
     
     if (listMessageGet[i].author === "") {
@@ -42,7 +46,7 @@ const addMessages = (chan:string, setIsOpen:(param: boolean) => void, setContent
         </li>
       )
     }
-  
+    
     else {
       messagesRet.push(
         <li key={i}>
@@ -59,18 +63,18 @@ const addMessages = (chan:string, setIsOpen:(param: boolean) => void, setContent
   }
   return <div className="messagePannel"> {messagesRet} </div>;
 }
-  
-const PopupChat: React.FC<{path:string, openModal:(param: boolean) => void, setContent:(param: ReactNode) => void}> = (path) => {
 
+const PopupChat: React.FC<{path:string, openModal:(param: boolean) => void, setContent:(param: ReactNode) => void}> = (path) => {
+  
   let Navigate = useNavigate();
   const [prompt, setMessage] = useState('');
   const [channelList, setChannelList] = useState<ChannelItem[]>([])
   const finalPath = channelList.find((channel) => channel.name === path.path);
-
-
+  
+  
   console.log(finalPath);
   const NewChan = (name:string) => {
-      if (canJoinChannel(name)) {
+    if (canJoinChannel(name)) {
       const newItem:ChannelItem  = {
         id: channelList.length + 1,
         name: name,
@@ -82,38 +86,53 @@ const PopupChat: React.FC<{path:string, openModal:(param: boolean) => void, setC
     }
     return false
   }
-
+  
   if (!finalPath && !NewChan(path.path)){
     console.log("ENTER");
     if (KnowMyChannel() === 'General')
       NewChan("General");
-    else
+      else
       return (null);
-  }
-
-  const handleMessageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setMessage(event.target.value);
-  };
-
-  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter') {
-      sendMessage();
     }
-  };
+    
+    const handleMessageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      setMessage(event.target.value);
+    };
+    
+    const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+      if (event.key === 'Enter') {
+        sendMessage();
+      }
+    };
 
-  const sendMessage = () => {
-    console.log("message", prompt);
-    if (prompt.charAt(0) === "/") {
-      sendCommandToBack(prompt);
+    const sendMessage = () => {
+      console.log("message", prompt);
+      if (prompt.charAt(0) === "/") {
+        sendCommandToBack(prompt);
+      }
+      else {
+        sendNewMessageToBack(prompt);
+      }
+      setMessage('');
     }
-    else {
-      sendNewMessageToBack(prompt);
+    
+    const updateChannelList = () => {
+      getChannels()
+      .then((channels: Channel[]) => {
+        console.log(channels)
+        // channels.map(item => ())
+        // setChannelList(channels);
+      })
+      .catch((error: any) => {
+        console.error('Erreur lors de la récupération des canaux disponibles :', error);
+      });
     }
-    setMessage('');
-  }
-  
-  return (
-    <div className="popup right">
+
+
+    setInterval(updateChannelList, 5000);
+
+    return (
+      <div className="popup right">
       <div className="popupchild">
         <header className="popup_up">
           <Link to={LeaveChat()} style={{ textDecoration: 'none' }} className="close-button" > X </Link>
