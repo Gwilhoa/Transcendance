@@ -8,13 +8,13 @@ const cookies = new Cookies();
 const CreateTwoFaPage = () => {
 		 
 	const [result, setResult] = useState<string>("");
+	const [dataImage, setDataImage] = useState<string>("");
 	const [Error, setError] = useState<string>("");
 	const handleOnChange = (res: string) => {
 		setResult(res);
 	};
 
 	useEffect(() => {
-		if (!result) {
 			axios.get("http://localhost:3000/auth/2fa/create", {
 				headers: {
 				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
@@ -22,20 +22,23 @@ const CreateTwoFaPage = () => {
 			})
 				.then((response) => {
 					console.log(response);
-					setResult(response.data);
+					setDataImage(response.data);
 				})
 				.catch((error) => {
 					setError("Error " + error.response.status);
 					console.error("profil Error status " + error.response.status);
 					console.error(error);
 				});
-		}
 	}, []);
 
 	return (
 		<>
-			<h1> TWOFA </h1>
-			<img src={result} />
+			<div className="qrCode">
+				<h1>
+					Scan the qrCode and enter your Code
+				</h1>
+				<img src={dataImage} />
+			</div>
 			<div>
 				<AuthCode 
 					allowedCharacters='numeric' 

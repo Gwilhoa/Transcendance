@@ -1,5 +1,10 @@
-.AuthCodeStyle {
-	padding: 16px;	
+.qrCode {
+	margin-bottom: 32px;
+	text-align: center;
+}
+
+.h1 {
+	text-align: center;
 }
 
 .input {
