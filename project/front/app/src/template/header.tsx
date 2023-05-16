@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import './template.css'
 import React, { useState } from "react";
-import PopupHisto from "../popup/popupHisto"
+import PopupHisto from "../popup/gameHistory/popupHisto"
 import CV from "../profil/CV";
 import { MyComponentProps } from "../App";
 import { getName } from "../API";
