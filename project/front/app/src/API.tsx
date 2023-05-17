@@ -47,6 +47,7 @@ export function getMessages(name:string) : Message[] {
         params: {
           channel_id: name,
         },
+        
       };
 
     const parseMessage = (data:AxiosResponse) => {
