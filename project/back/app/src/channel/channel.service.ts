@@ -212,7 +212,9 @@ export class ChannelService {
     if (channels == null) return null;
     channels.filter((c) => !c.users.includes(user));
     channels.filter((c) => c.type != ChannelType.PRIVATE_CHANNEL);
-    channels.filter((c) => c.bannedUsers.includes(user));
+    channels.filter(
+      (c) => c.bannedUsers != null && c.bannedUsers.includes(user),
+    );
     channels.filter((c) => c.type != ChannelType.MP_CHANNEL);
     if (channels.length == 0) return null;
     return channels;
