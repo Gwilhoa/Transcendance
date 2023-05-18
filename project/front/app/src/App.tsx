@@ -4,6 +4,7 @@ import Auth from './pages/Auth';
 import NotFound from './pages/NotFound';
 import CreateTwoFaPage from './pages/CreateTwoFa';
 import Game from './pages/game';
+import TryToReconnect from './pages/TryToReconnect';
 import Accueil from './pages/accueil';
 import PopupChat from "./popup/popupChat";
 import { DynamicIsInAChat, KnowMyChannel } from "./popup/chatManager";
@@ -23,6 +24,7 @@ const AppInsideBrowser = ({ openModal, setContent }: Props) => {
 				<Route path="/" Component={Auth}/>
 				<Route path="*" Component={NotFound}/>
 				<Route path="/authenticate" Component={TokenPage} />
+				<Route path="/Error" Component={TryToReconnect} />
 				<Route element={<Template openModal={openModal} setContent={setContent}/>}>
 					<Route path="/accueil/*" element={<Accueil></Accueil>} />
 					<Route path="/game/*" element={<Game></Game>} />

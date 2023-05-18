@@ -36,12 +36,7 @@ function AuthenticateComponentsNotTwoFa({ token }: tokenProps) {
 	}, []);
     return (
         <div>
-			{ error ? (
-				<Reconnect message={error}/>
-				) : (
-					<p>Waiting ...</p>
-			)}
-			{cookies.jwtAuthorization && !error ? (<Navigate to="/accueil"/>) : (<p>Waiting ...</p>)}
+			{cookies.jwtAuthorization ? (<Navigate to="/accueil"/>) : (<p>Waiting ...</p>)}
         </div>
     );
 }

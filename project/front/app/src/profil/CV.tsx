@@ -37,20 +37,8 @@ export default function CV( {name, photoUrl, isFriend, isMe, closeModal } : {nam
 
     const clicked = () => {
 		if (checked === false) {
-			axios.get("http://localhost:3000/auth/2fa/create", {
-				headers: {
-					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
-				},
-			})
-				.then((response) => {
-					console.log(response);
-				})
-				.catch((error) => {
-					setError("Error " + error.response.status);
-					console.error("profil Error status " + error.response.status);
-					console.error(error);
-				});
 			navigate('/CreateTwoFa');
+
 		}
     }
 
