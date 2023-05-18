@@ -1,5 +1,5 @@
 import React from "react";
-import Reconnect from "../components/Reconnect";
+import Reconnect from "../components/authenticate/Reconnect";
 import Cookies from 'universal-cookie';
 const cookies = new Cookies();
 

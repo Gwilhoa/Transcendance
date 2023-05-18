@@ -1,6 +1,6 @@
 import '../components/accueil.css'
 import { useEffect, useState } from 'react';
-import '../notification/notific.css'
+import '../components/notification/notification.css'
 
 type Friend = {
     id: number;

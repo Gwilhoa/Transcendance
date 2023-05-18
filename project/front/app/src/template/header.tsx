@@ -1,18 +1,12 @@
 import { Link } from "react-router-dom";
 import './template.css'
-import { useState } from "react";
-import PopupHisto from "../popup/popupHisto"
-import CV from "../profil/CV";
+import React from "react";
+import CV from "../components/profil/CV";
 import { Props } from "../App";
-import { getName } from "../API";
-import { IsInAChat, JoinChat, LeaveChat } from "../popup/chatManager";
+import { getName } from "../components/utils/API";
+import { IsInAChat, JoinChat, LeaveChat } from "../components/popup/chatManager";
 
 const Head = ({ openModal, setContent }: Props) => {
-
-  const [showPopupHisto, setShowPopupHisto] = useState(false);  
-  const handlePopupCloseHisto = () => {
-    setShowPopupHisto(false);
-  };
 
   const buttonChat = () => {
     if (IsInAChat())
@@ -42,10 +36,9 @@ const Head = ({ openModal, setContent }: Props) => {
             <Link to="/game" className="navbar__link">
               Jeu
             </Link>
-            <button onClick={() => setShowPopupHisto(!showPopupHisto)} className="navbar__link">
-              <h3>Historique</h3>
-            </button>
-            {showPopupHisto && <PopupHisto onClose={handlePopupCloseHisto} />}
+            <Link to="/history" className="navbar__link">
+              History
+            </Link>
             <button onClick={profilStart} className="navbar__link"> 
               <h3>
                 Profil
@@ -55,4 +48,5 @@ const Head = ({ openModal, setContent }: Props) => {
         </div>
     );
   }
+
   export default Head

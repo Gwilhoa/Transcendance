@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useCookies, Cookies } from "react-cookie";
 import axios from "axios";
-import TwoFa from "../components/AuthenticateComponentsTwoFa"
-import NotTwoFa from "../components/AuthenticateComponentsNotTwoFa"
-import Reconnect from "../components/Reconnect"
+import TwoFa from "../components/authenticate/AuthenticateComponentsTwoFa"
+import NotTwoFa from "../components/authenticate/AuthenticateComponentsNotTwoFa"
+import Reconnect from "../components/authenticate/Reconnect"
 import IfError, { setErrorCookie } from "../components/IfError"
 import { error } from "console";
 import { Link, Navigate, useNavigate } from "react-router-dom";

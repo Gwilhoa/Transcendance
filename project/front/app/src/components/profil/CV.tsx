@@ -1,8 +1,8 @@
 import './modal.css'
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ButtonInputToggle } from '../inputButton';
-import axios, { setTwoFA, setName } from '../API';
+import { ButtonInputToggle } from '../utils/inputButton';
+import axios, { setTwoFA, setName } from '../utils/API';
 import Cookies from 'universal-cookie';
 const cookies = new Cookies();
 

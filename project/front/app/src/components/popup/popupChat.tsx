@@ -1,18 +1,14 @@
 
 import './popupChat.css'
-import { ReactNode, useEffect, useState } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import CV from '../profil/CV';
 import { ChangeChannel, IsInAChat, JoinChat, KnowMyChannel, LeaveChat } from './chatManager';
 import { Link} from 'react-router-dom';
-import { Channel, Message, MessageCode, canJoinChannel, createChannel, getChannels, getMessages, socket } from '../API';
-import '../template/template.css';
+import { Channel, Message, MessageCode, canJoinChannel, createChannel, getChannels, getMessages, socket, sendNewMessageToBack, Token} from '../utils/API';
+import '../../template/template.css';
 import { useNavigate } from "react-router-dom";
-import { ButtonInputToggle } from '../inputButton';
-import { sendNewMessageToBack } from '../API';
-import axios from '../API';
-import { Token } from '../API';
-import { AxiosResponse } from 'axios';
-import { AxiosRequestConfig } from 'axios';
+import { ButtonInputToggle } from '../utils/inputButton';
+import { AxiosResponse, AxiosRequestConfig } from 'axios';
 
 type ChannelItem = {
   id: number;
@@ -68,7 +64,7 @@ const addMessages = (chan:string, setIsOpen:(param: boolean) => void, setContent
 
 const PopupChat: React.FC<{path:string, openModal:(param: boolean) => void, setContent:(param: ReactNode) => void}> = (path) => {
   
-  let Navigate = useNavigate();
+  const Navigate = useNavigate();
   const [prompt, setMessage] = useState('');
   const [channelList, setChannelList] = useState<Channel[]>([])
   const [messageList, setMessageList] = useState<Message []>([])
