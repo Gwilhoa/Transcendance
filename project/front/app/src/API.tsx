@@ -1,5 +1,6 @@
 import axios, { AxiosResponse, AxiosRequestConfig } from 'axios';
 import { promises } from 'dns';
+import { Navigate } from 'react-router-dom';
 import io from "socket.io-client";
 import Cookies from 'universal-cookie';
 const cookies = new Cookies();
@@ -16,10 +17,13 @@ socket.on('connection_server', (data: any) => {
     console.log(data);
 });
 
+export const Token = cookies.get('jwtAuthorization');
+
+
 
 export default axios;
 
-interface Message {
+export interface Message {
     contain: string,
     author: string, 
     date: string
@@ -33,6 +37,24 @@ export interface Channel {
 interface Vector {
     x: number,
     y: number
+}
+
+export enum MessageCode {
+    SUCCESS = 0,
+    CHANNEL_NOT_FOUND = 1,
+    NO_ACCESS = 2,
+    INVALID_FORMAT = 3,
+}
+  
+export enum ChannelCode {
+    CHANNEL_NOT_FOUND = 1,
+    NO_ACCESS = 2,
+}
+
+interface MMessage {
+    token: string;
+    channel_id: string;
+    content: string;
 }
 
 export function sendMessage(prompt:string, channel_id:number) {
@@ -66,7 +88,6 @@ export function getMessages(name:string) : Message[] {
 
 
 export async function getChannels() : Promise<Channel[]> {
-    createChannel("dsds")
     try {
         const response = await axios.get('/channel/available');
         console.log(response.data)
@@ -77,22 +98,53 @@ export async function getChannels() : Promise<Channel[]> {
     }
 }
 
-export async function createChannel(channelName: string): Promise<void> {
+export async function createChannel(channelName: string): Promise<boolean> {
 
     const channelData = {
-        name: 'Moncanal',
+        name: channelName,
         type: 1,
-        creator_id: cookies.get('jwtAuthorization'),
+        creator_id: cookies.get('jwtAuthorization')
       };
     try {
       const response = await axios.post('/channel/create', channelData);
       console.log('Canal créé avec succès');
+      return (true);
     } catch (error) {
-      console.error('Erreur lors de la création du canal :', error);
+        console.error('Erreur lors de la création du canal :', error);
+        return false;
     }
 }
 
+export const sendNewMessageToBack = (channelId: number, content: string) => {
+    const token = cookies.get('jwtAuthorization');
+
+    const messageData: MMessage = {
+      token, 
+      channel_id: channelId.toString(),
+      content,
+    };
+
+    socket.emit('send_message', messageData, (response: MessageCode) => {
+      if (response === MessageCode.SUCCESS) {
+        console.log('Message envoyé avec succès');
+        return ;
+      } else if (response === MessageCode.CHANNEL_NOT_FOUND) {
+        //setErrorCookie(ErrorMessage:'Le canal n\'existe pas');
+      } else if (response === MessageCode.NO_ACCESS) {
+        //setErrorCookie(ErrorMessage:'Vous n\'avez pas accès à ce canal');
+      } else if (response === MessageCode.INVALID_FORMAT) {
+        //setErrorCookie(ErrorMessage:'Format invalide du message');
+      }
+    
+      //Navigate('/Error');
+    });
+  };
+
 export function canJoinChannel(Channel:string) : boolean {
+    return (true);
+}
+
+export async function joinChannel(str:string, nb:number) : Promise<boolean> {
     return (true);
 }
 

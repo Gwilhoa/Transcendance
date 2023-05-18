@@ -29,12 +29,13 @@ const Head = ({ openModal, setContent }: Props) => {
     return (
         <div className="navbar">
           <div className="title">
-            <h3>Transcendence</h3>
+            <Link to="/accueil" className="navbar__link">
+              <h2>
+                Transcendence
+              </h2>
+            </Link>
           </div>
           <div className="navbar__links">
-            <Link to="/accueil" className="navbar__link">
-              Accueil
-            </Link>
             <Link to={buttonChat()} className="navbar__link">
               Chat
             </Link>

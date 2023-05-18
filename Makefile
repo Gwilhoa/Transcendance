@@ -103,10 +103,13 @@ stop clean:
 
 # ~~~~~~~~~~~~ CLEANNING RULES ~~~~~~~~~~~~
 
-fclean purge : clean
+remove : clean
 	printf "%-62b%b" "$(BOLD)$(RED)Removing$(END) containers"
 	@docker system prune -af >> /dev/null
 	printf "$(GREEN)[✓]$(END)\n\n"
+
+
+fclean purge : remove
 	printf "%-62b%b" "$(BOLD)$(RED)Removing$(END) volumes"
 	@docker volume prune -f >> /dev/null
 	rm -rf .temp
