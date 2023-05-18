@@ -32,7 +32,7 @@ const AppInsideBrowser = ({ openModal, setContent }: Props) => {
 					<Route path="/accueil/*" element={<Accueil></Accueil>} />
 					<Route path="/game/*" element={<Game></Game>} />
 					<Route path="/CreateTwoFa/*" element={<CreateTwoFaPage></CreateTwoFaPage>}/>
-					<Route path="/history" element={<History></History>} />
+					<Route path="/history/*" element={<History></History>} />
 				</Route>
 			</Routes>
 			
