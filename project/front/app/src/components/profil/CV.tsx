@@ -2,6 +2,7 @@ import './modal.css'
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ButtonInputToggle } from '../utils/inputButton';
+import { setErrorCookie } from "../IfError"
 import axios, { setTwoFA, setName } from '../utils/API';
 import Cookies from 'universal-cookie';
 const cookies = new Cookies();
@@ -13,7 +14,6 @@ export default function CV( {name, photoUrl, isFriend, isMe, closeModal } : {nam
     const [truename, setTrueName] = useState(name);
     const [image, setImage] = useState(photoUrl);
     const [checked, setChecked] = useState(false);
-    const [error, setError] = useState("");
 
 	useEffect(() => {
         axios.get("http://localhost:3000/auth/2fa/is2FA", {
@@ -25,7 +25,8 @@ export default function CV( {name, photoUrl, isFriend, isMe, closeModal } : {nam
 				setChecked(response.data);
             })
             .catch((error) => {
-				setError("Error " + error.response.status);
+				setErrorCookie("Error " + error.response.status);
+				navigate('/Error');
 				console.error("profil Error status " + error.response.status);
             });
 	}, []);
@@ -38,7 +39,6 @@ export default function CV( {name, photoUrl, isFriend, isMe, closeModal } : {nam
     const clicked = () => {
 		if (checked === false) {
 			navigate('/CreateTwoFa');
-
 		}
     }
 
