@@ -1,14 +1,16 @@
 
 import './popupChat.css'
-import { ReactNode, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import CV from '../profil/CV';
 import { ChangeChannel, IsInAChat, JoinChat, KnowMyChannel, LeaveChat } from './chatManager';
 import { Link} from 'react-router-dom';
-import { Channel, canJoinChannel, getChannels, getMessages } from '../API';
+import { Channel, Message, MessageCode, canJoinChannel, createChannel, getChannels, getMessages, socket } from '../API';
 import '../template/template.css';
 import { useNavigate } from "react-router-dom";
 import { ButtonInputToggle } from '../inputButton';
+import { sendNewMessageToBack } from '../API';
 import axios from '../API';
+import { Token } from '../API';
 import { AxiosResponse } from 'axios';
 import { AxiosRequestConfig } from 'axios';
 
@@ -20,9 +22,9 @@ type ChannelItem = {
 
 
 
-const sendNewMessageToBack = (message:string) => {
+//const sendNewMessageToBack = (message:string) => {
   //////J'me casse !!
-}
+//}
 
 const sendCommandToBack = (message:string) => {
   //////Chao !!
@@ -68,31 +70,35 @@ const PopupChat: React.FC<{path:string, openModal:(param: boolean) => void, setC
   
   let Navigate = useNavigate();
   const [prompt, setMessage] = useState('');
-  const [channelList, setChannelList] = useState<ChannelItem[]>([])
+  const [channelList, setChannelList] = useState<Channel[]>([])
+  const [messageList, setMessageList] = useState<Message []>([])
+  const [currentChanel, setCurrentChanel] = useState<number>(0);
   const finalPath = channelList.find((channel) => channel.name === path.path);
   
   
   console.log(finalPath);
-  const NewChan = (name:string) => {
+  async function NewChan(name:string) {
     if (canJoinChannel(name)) {
       const newItem:ChannelItem  = {
         id: channelList.length + 1,
         name: name,
         URL: ChangeChannel(name)
       };
-      setChannelList([...channelList, newItem]); 
-      Navigate(ChangeChannel(name));
-      return true
+      if (await createChannel(name)) {
+        setChannelList([...channelList, newItem]); 
+        Navigate(ChangeChannel(name));
+        return true
+      }
     }
     return false
   }
   
   if (!finalPath && !NewChan(path.path)){
     console.log("ENTER");
-    if (KnowMyChannel() === 'General')
-      NewChan("General");
+      if (KnowMyChannel() === 'General')
+        NewChan("General");
       else
-      return (null);
+        return (null);
     }
     
     const handleMessageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -111,25 +117,41 @@ const PopupChat: React.FC<{path:string, openModal:(param: boolean) => void, setC
         sendCommandToBack(prompt);
       }
       else {
-        sendNewMessageToBack(prompt);
+        sendNewMessageToBack(currentChanel, prompt);
       }
       setMessage('');
     }
+
+    // useEffect(() => {
+    //   // Écoute des événements de messages reçus
+    //   socket.on('message_received', (message: string) => {
+    //     //setMessageList((prevMessages) => [...prevMessages, message]);
+    //   });
+  
+    //   // Écoute des événements de canaux mis à jour
+
+    //   // Nettoyage lors du démontage du composant
+    //   return () => {
+    //     socket.off('message_received');
+    //     socket.off('channels_updated');
+    //   };
+    // }, []);
+
+
+    
     
     const updateChannelList = () => {
       getChannels()
       .then((channels: Channel[]) => {
         console.log(channels)
-        // channels.map(item => ())
-        // setChannelList(channels);
+        setChannelList(channels);
       })
       .catch((error: any) => {
         console.error('Erreur lors de la récupération des canaux disponibles :', error);
       });
     }
 
-
-    setInterval(updateChannelList, 5000);
+    updateChannelList();
 
     return (
       <div className="popup right">
@@ -144,12 +166,12 @@ const PopupChat: React.FC<{path:string, openModal:(param: boolean) => void, setC
           <div className='popup_list_of_chanel'>
             {channelList.map(item => (
               <li className="chanel" key={item.id}>
-                <Link to={item.URL}>
+                <Link to={ChangeChannel(item.name)}>
                   {item.name}
                 </Link>
               </li> 
             ))}
-
+            
             <ButtonInputToggle
             onInputSubmit={NewChan}
             textInButton='+'

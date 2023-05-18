@@ -47,6 +47,7 @@ export class ChannelController {
     @GetUser('sub') id: string,
     @Res() response,
   ) {
+    body.creator_id = id;
     let ret;
     try {
       ret = await this.channelService.createChannel(body);
@@ -202,14 +203,12 @@ export class ChannelController {
     try {
       ret = await this.channelService.sendMessage(body, id);
     } catch (e) {
-      resp.status(400).send(e.message);
-      return;
+      return resp.status(400).send(e.message);
     }
     if (ret == null) {
-      resp.status(204).send('No content');
-      return;
+      return resp.status(204).send('No content');
     }
-    resp.status(200).send(ret);
+    return resp.status(200).send(ret);
   }
 
   @Post('/mp/create')
@@ -234,6 +233,15 @@ export class ChannelController {
     if (channels == null) {
       resp.status(204).send('No content');
     }
+  }
+
+  @Get('/id/:id')
+  async getChannelById(@Param('id') id: string, @Res() resp) {
+    const channel = await this.channelService.getChannelById(id);
+    if (channel == null) {
+      return resp.status(204).send('No content');
+    }
+    return resp.status(200).send(channel);
   }
 
   @Get('/available')
