@@ -1,18 +1,11 @@
 import { Link } from "react-router-dom";
 import './template.css'
-import React, { useState } from "react";
-import PopupHisto from "../popup/gameHistory/popupHisto"
+import React from "react";
 import CV from "../profil/CV";
 import { MyComponentProps } from "../App";
 import { getName } from "../API";
 
 const Head = ({ openModal, setContent }: MyComponentProps) => {
-
-  const [showPopupHisto, setShowPopupHisto] = useState(false);  
-  const handlePopupCloseHisto = () => {
-    setShowPopupHisto(false);
-  };
-
   const profilStart = () => {
     setContent(<CV name={getName()} isFriend={false} isMe={true} photoUrl={"https://www.treehugger.com/thmb/9fuOGVoJ23ZwziKRNtAEMHw8opU=/750x0/filters:no_upscale():max_bytes(150000):strip_icc():format(webp)/piglet-grass-dandelions-01-b21d7ef8f881496f8346dbe01859537e.jpg"}/>);
     openModal(true);
@@ -34,10 +27,9 @@ const Head = ({ openModal, setContent }: MyComponentProps) => {
             <Link to="/game" className="navbar__link">
               Jeu
             </Link>
-            <button onClick={() => setShowPopupHisto(true)} className="navbar__link">
-              <h3>Historique</h3>
-            </button>
-            {showPopupHisto && <PopupHisto onClose={handlePopupCloseHisto} />}
+            <Link to="/history" className="navbar__link">
+              History
+            </Link>
             <button onClick={profilStart} className="navbar__link"> 
               <h3>
                 Profil

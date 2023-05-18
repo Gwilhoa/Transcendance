@@ -1,10 +1,5 @@
 import React from "react";
-import './popupHisto.css'
-
-
-type PopupProps = {
-    onClose: () => void;
-};
+import './css/history.css'
 
 interface Score {
     ennemy: string;
@@ -66,11 +61,10 @@ const Add = () => {
         return <div className="score-board">{blocks}</div>;
 }
 
-const PopupHisto: React.FC<PopupProps> = ({ onClose }) => {
+const History = () => {
     return (
-        <div className="popup left">
-             <header className="popup_up">
-                <button className="close-button" onClick={onClose}> X </button>
+        <div className="page-history">
+             <header className="history-title">
                 <div className="texte">
                     {"Historique"}
                 </div>
@@ -83,4 +77,4 @@ const PopupHisto: React.FC<PopupProps> = ({ onClose }) => {
     );
   }
 
-  export default PopupHisto
+  export default History;
