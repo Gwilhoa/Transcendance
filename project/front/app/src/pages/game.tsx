@@ -1,5 +1,4 @@
 import './css/game.css'
-import Template from "../template/template"
 import React, { useState, useEffect, useRef } from "react";
 import { useSpring, animated } from 'react-spring';
 import { socket } from '../components/utils/API';
@@ -8,31 +7,27 @@ const cookies = new Cookies();
 
 const Game = () => {
 
+  const [gameId, setGameId] = useState(0);
+  const [onGame, findGame] = useState(true);
+  const [score1, setScore1] = useState(0);
+  const [score2, setScore2] = useState(0);
+  
+  const [ball, setBall] = useState({ x: 50, y: 50});
+  const [paddle1, setPaddle1] = useState({ y: 42.5 });
+  const [paddle2, setPaddle2] = useState({ y: 42.5 });
+  
+  const [windowSize, setWindowSize] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight
+  });
+  
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const spinnerAnimation = useSpring({
     from: { transform: 'rotate(0deg)' },
     to: { transform: 'rotate(360deg)' },
     loop: true,
     config: { duration: 4000 },
   });
-  
-  const [gameId, setGameId] = useState(null);
-  const [onGame, findGame] = useState(true);
-  
-  const [score1, setScore1] = useState(0);
-  const [score2, setScore2] = useState(0);
-  
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const Height = document.documentElement.clientHeight * 0.8;
-  const Width = document.documentElement.clientWidth - 802;
-  const [ball, setBall] = useState({ x: 50, y: 50});
-  const [paddle1, setPaddle1] = useState({ y: 42.5 });
-  const [paddle2, setPaddle2] = useState({ y: 42.5 });
-
-  const [windowSize, setWindowSize] = useState({
-    width: window.innerWidth,
-    height: window.innerHeight
-  });
-
   useEffect(() => {
     function handleResize() {
       setWindowSize({
@@ -43,10 +38,12 @@ const Game = () => {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-
-
-
-
+  
+  
+  const Height = document.documentElement.clientHeight * 0.8;
+  const Width = document.documentElement.clientWidth - 802;
+  
+  
   
 
   const handleKeyDown = (event: KeyboardEvent) => {

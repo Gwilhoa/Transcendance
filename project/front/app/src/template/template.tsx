@@ -1,24 +1,25 @@
 import React, { ReactNode } from "react";
 import Head from "./header";
 import Foot from "./footer";
-import Notification from "../components/notification/notif";
+import  '../App.css'
+import Notification from "../components/notification/notification";
+import { Outlet } from "react-router-dom";
 
 interface Props {
     openModal: (param: boolean) => void;
-    child: () => ReactNode;
     setContent: (param: ReactNode) => void;
 }
 
-const Template = ({openModal, setContent, child}:Props) => {
+const Template = ({openModal, setContent}:Props) => {
 
     return (
       <div className="page">
         <header>
             <Head openModal={openModal} setContent={setContent}/>
         </header>
-          <Notification message={"ds"} channel={"sd"}/>
+        <Notification message={"Nouveau Message"} channel={"sd"} isInChannel={false}/>
         <main className="main-template">
-          {child()}
+          <Outlet></Outlet>
         </main>
 
         <footer>

@@ -72,7 +72,6 @@ const History = () => {
             <div className="scrollBlock">
                 <Add/>
             </div>
-    
         </div>
     );
   }

@@ -12,27 +12,29 @@ import TokenPage from "./pages/authenticate";
 import Template from "./template/template";
 import React, { ReactNode } from "react";
 
-export interface MyComponentProps {
+export interface Props {
 	openModal: (param: boolean) => void;
 	setContent: (param: ReactNode) => void;
 }
 
-const AppInsideBrowser = ({ openModal, setContent }: MyComponentProps) => {
+const AppInsideBrowser = ({ openModal, setContent }: Props) => {
 	return (
 		<>
 			<Routes>
 				<Route path="/" Component={Auth}/>
 				<Route path="*" Component={NotFound}/>
 				<Route path="/authenticate" Component={TokenPage} />
-				<Route path="/accueil/*" element={<Template openModal={openModal} setContent={setContent} child={Accueil}/>} />
-				<Route path="/game/*" element={<Template openModal={openModal} setContent={setContent} child={Game}/>} />
-				<Route path="/CreateTwoFa/*" element={<Template openModal={openModal} setContent={setContent} child={CreateTwoFaPage}/>} />
-				<Route path="/history" element={<Template openModal={openModal} setContent={setContent} child={History}/>} />
+				<Route element={<Template openModal={openModal} setContent={setContent}/>}>
+					<Route path="/accueil/*" element={<Accueil></Accueil>} />
+					<Route path="/game/*" element={<Game></Game>} />
+					<Route path="/CreateTwoFa/*" element={<CreateTwoFaPage></CreateTwoFaPage>}/>
+					<Route path="/history" element={<History></History>} />
+				</Route>
 			</Routes>
 			
-				{DynamicIsInAChat() && 
-					<PopupChat path={KnowMyChannel()} openModal={openModal} setContent={setContent}/>
-				}
+			{DynamicIsInAChat() && 
+				<PopupChat path={KnowMyChannel()} openModal={openModal} setContent={setContent}/>
+			}
 		</>
 	);
 }
@@ -40,7 +42,7 @@ const AppInsideBrowser = ({ openModal, setContent }: MyComponentProps) => {
 
 
 
-function App({ openModal, setContent }: MyComponentProps) {
+function App({ openModal, setContent }: Props) {
 	return (
 			<AppInsideBrowser openModal={openModal} setContent={setContent} />
 	);
