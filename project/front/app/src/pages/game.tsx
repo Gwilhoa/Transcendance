@@ -1,7 +1,7 @@
-import '../components/game.css'
+import './css/game.css'
 import React, { useState, useEffect, useRef } from "react";
 import { useSpring, animated } from 'react-spring';
-import { socket } from '../API';
+import { socket } from '../components/utils/API';
 import Cookies from 'universal-cookie';
 const cookies = new Cookies();
 

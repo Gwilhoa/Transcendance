@@ -1,8 +1,8 @@
 import './modal.css'
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ButtonInputToggle } from '../inputButton';
-import axios, { setTwoFA, setName } from '../API';
+import { ButtonInputToggle } from '../utils/inputButton';
+import axios, { setTwoFA, setName } from '../utils/API';
 import Cookies from 'universal-cookie';
 const cookies = new Cookies();
 
@@ -37,20 +37,8 @@ export default function CV( {name, photoUrl, isFriend, isMe, closeModal } : {nam
 
     const clicked = () => {
 		if (checked === false) {
-			axios.get("http://localhost:3000/auth/2fa/create", {
-				headers: {
-					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
-				},
-			})
-				.then((response) => {
-					console.log(response);
-				})
-				.catch((error) => {
-					setError("Error " + error.response.status);
-					console.error("profil Error status " + error.response.status);
-					console.error(error);
-				});
 			navigate('/CreateTwoFa');
+
 		}
     }
 

@@ -1,8 +1,8 @@
-import { ReactNode } from "react";
+import React, { ReactNode } from "react";
 import Head from "./header";
 import Foot from "./footer";
-import  '../general.css'
-import Notification from "../notification/notif";
+import  '../App.css'
+import Notification from "../components/notification/notification";
 import { Outlet } from "react-router-dom";
 
 interface Props {

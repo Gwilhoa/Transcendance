@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useCookies, Cookies } from "react-cookie";
-import Reconnect from "../components/Reconnect";
+import Reconnect from "./Reconnect";
 import axios from "axios";
 import { error } from "console";
 import { Navigate } from "react-router-dom";
@@ -36,12 +36,7 @@ function AuthenticateComponentsNotTwoFa({ token }: tokenProps) {
 	}, []);
     return (
         <div>
-			{ error ? (
-				<Reconnect message={error}/>
-				) : (
-					<p>Waiting ...</p>
-			)}
-			{cookies.jwtAuthorization && !error ? (<Navigate to="/accueil"/>) : (<p>Waiting ...</p>)}
+			{cookies.jwtAuthorization ? (<Navigate to="/accueil"/>) : (<p>Waiting ...</p>)}
         </div>
     );
 }

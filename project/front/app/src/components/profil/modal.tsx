@@ -1,11 +1,11 @@
-import { ReactNode } from "react";
+import React, { ReactNode } from "react";
 import './modal.css'
 
 interface Props {
     openModal: (param: boolean) => void;
     boolModal: boolean;
     content: ReactNode;
-};
+}
 
 export default function Modal( {openModal, boolModal, content}:Props) {
 

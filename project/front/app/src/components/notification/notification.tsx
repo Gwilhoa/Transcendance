@@ -1,6 +1,6 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useEffect } from "react";
-import './notific.css';
+import './notification.css';
 import { ChangeChannel} from "../popup/chatManager";
 import { Link } from "react-router-dom";
 
