@@ -4,10 +4,10 @@ import React, { ReactNode, useState } from 'react';
 import CV from '../profil/CV';
 import { ChangeChannel, JoinChat, LeaveChat } from './chatManager';
 import { Link} from 'react-router-dom';
-import { canJoinChannel, getMessages } from '../API';
-import '../template/template.css';
+import { canJoinChannel, getMessages } from '../utils/API';
+import '../../template/template.css';
 import { useNavigate } from "react-router-dom";
-import { ButtonInputToggle } from '../inputButton';
+import { ButtonInputToggle } from '../utils/inputButton';
 
 type ChannelItem = {
   id: number;

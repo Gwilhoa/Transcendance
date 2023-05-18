@@ -2,7 +2,7 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { createRoot } from 'react-dom/client';
-import Modal from './profil/modal';
+import Modal from './components/profil/modal';
 import React, { ReactNode, useState } from 'react';
 import { CookiesProvider } from 'react-cookie';
 import { BrowserRouter as Router } from 'react-router-dom'

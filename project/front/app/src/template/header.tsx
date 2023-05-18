@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
 import './template.css'
 import React from "react";
-import CV from "../profil/CV";
+import CV from "../components/profil/CV";
 import { MyComponentProps } from "../App";
-import { getName } from "../API";
+import { getName } from "../components/utils/API";
 
 const Head = ({ openModal, setContent }: MyComponentProps) => {
   const profilStart = () => {

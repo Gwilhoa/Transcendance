@@ -1,8 +1,7 @@
 import React, { ReactNode } from "react";
 import Head from "./header";
 import Foot from "./footer";
-import  '../general.css'
-import Notification from "../notification/notif";
+import Notification from "../components/notification/notif";
 
 interface Props {
     openModal: (param: boolean) => void;
