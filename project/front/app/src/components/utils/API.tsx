@@ -57,9 +57,9 @@ interface MMessage {
     content: string;
 }
 
-export function sendMessage(prompt:string, channel_id:number) {
-    
-}
+// export function sendMessage(prompt:string, channel_id:number) {
+//     
+// }
 
 export function getMessages(name:string) : Message[] {
     

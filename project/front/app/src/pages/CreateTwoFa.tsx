@@ -6,7 +6,6 @@ import Cookies from 'universal-cookie';
 const cookies = new Cookies();
 
 const CreateTwoFaPage = () => {
-		 
 	const [result, setResult] = useState<string>("");
 	const [dataImage, setDataImage] = useState<string>("");
 	const [Error, setError] = useState<string>("");
