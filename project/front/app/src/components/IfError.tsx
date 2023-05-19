@@ -4,7 +4,6 @@ import { Cookies } from "react-cookie";
 const cookies = new Cookies();
 
 export function setErrorCookie(ErrorMessage:string) {
-	
 	cookies.set('Error', ErrorMessage);	
 }
 

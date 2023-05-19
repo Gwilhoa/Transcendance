@@ -10,6 +10,7 @@ import History from './pages/history';
 import PopupChat from "./components/popup/popupChat";
 import { DynamicIsInAChat, KnowMyChannel } from "./components/popup/chatManager";
 import TokenPage from "./pages/authenticate";
+import NotTwoFa from "./components/authenticate/AuthenticateComponentsNotTwoFa"
 import Template from "./template/template";
 import React, { ReactNode } from "react";
 
@@ -25,12 +26,13 @@ const AppInsideBrowser = ({ openModal, setContent }: Props) => {
 				<Route path="/" Component={Auth}/>
 				<Route path="*" Component={NotFound}/>
 				<Route path="/authenticate" Component={TokenPage} />
+				<Route path="/authenticate/NotTwoFa" Component={NotTwoFa} />
 				<Route path="/Error" Component={TryToReconnect} />
 				<Route element={<Template openModal={openModal} setContent={setContent}/>}>
 					<Route path="/accueil/*" element={<Accueil></Accueil>} />
 					<Route path="/game/*" element={<Game></Game>} />
 					<Route path="/CreateTwoFa/*" element={<CreateTwoFaPage></CreateTwoFaPage>}/>
-					<Route path="/history" element={<History></History>} />
+					<Route path="/history/*" element={<History></History>} />
 				</Route>
 			</Routes>
 			
