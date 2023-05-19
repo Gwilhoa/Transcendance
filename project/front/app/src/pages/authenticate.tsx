@@ -18,7 +18,7 @@ export function TokenPage() {
 	useEffect(() => {
 		axios.get("http://localhost:3000/auth/2fa/is2FA", {
 			headers: {
-				Authorization: `Bearer `,
+				Authorization: `Bearer ${token}`,
 			},
 		})
 			.then((response) => {
@@ -27,7 +27,6 @@ export function TokenPage() {
 			.catch((error) => {
 				setError("Error " + error.response.status);
 				setErrorCookie("Error TEST");
-				navigate("/Error");
 
 				console.error(error);
 			});

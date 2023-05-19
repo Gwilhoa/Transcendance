@@ -73,6 +73,28 @@ const PopupChat: React.FC<{path:string, openModal:(param: boolean) => void, setC
   
   
   console.log(finalPath);
+  const updateChannelList = () => {
+    getChannels()
+    .then((channels: Channel[]) => {
+      console.log(channels)
+      setChannelList(channels);
+    })
+    .catch((error: any) => {
+      console.error('Erreur lors de la récupération des canaux disponibles :', error);
+    });
+  }
+  updateChannelList();
+  useEffect(() => {
+
+    socket.on('message_received', (message: string) => {
+      //setMessageList((prevMessages) => [...prevMessages, message]);
+    });
+  
+    return () => {
+      socket.off('message_received');
+      socket.off('channels_updated');
+    };
+  }, []);
   async function NewChan(name:string) {
     if (canJoinChannel(name)) {
       const newItem:ChannelItem  = {
@@ -118,36 +140,11 @@ const PopupChat: React.FC<{path:string, openModal:(param: boolean) => void, setC
       setMessage('');
     }
 
-    // useEffect(() => {
-    //   // Écoute des événements de messages reçus
-    //   socket.on('message_received', (message: string) => {
-    //     //setMessageList((prevMessages) => [...prevMessages, message]);
-    //   });
-  
-    //   // Écoute des événements de canaux mis à jour
 
-    //   // Nettoyage lors du démontage du composant
-    //   return () => {
-    //     socket.off('message_received');
-    //     socket.off('channels_updated');
-    //   };
-    // }, []);
 
 
     
-    
-    const updateChannelList = () => {
-      getChannels()
-      .then((channels: Channel[]) => {
-        console.log(channels)
-        setChannelList(channels);
-      })
-      .catch((error: any) => {
-        console.error('Erreur lors de la récupération des canaux disponibles :', error);
-      });
-    }
 
-    updateChannelList();
 
     return (
       <div className="popup right">
