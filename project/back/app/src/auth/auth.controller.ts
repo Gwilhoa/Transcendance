@@ -59,7 +59,7 @@ export class AuthController {
 
   @UseGuards(JwtIsAuthGuard)
   @Get('2fa/create')
-  async create2fa(@GetUser('id') id, @Res() res) {
+  async create2fa(@GetUser('sub') id, @Res() res) {
     let user = await this.userService.getUserById(id);
     if (user == null) {
       res.status(400).send('Bad User');
@@ -122,7 +122,7 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Get('2fa/is2FA')
-  async is2FA(@GetUser('id') id, @Res() res) {
+  async is2FA(@GetUser('sub') id, @Res() res) {
     let user = await this.userService.getUserById(id);
     if (user == null) {
       res.status(400).send('Bad User');

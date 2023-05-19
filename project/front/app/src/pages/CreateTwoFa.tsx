@@ -63,8 +63,7 @@ const CreateTwoFaPage = () => {
 			})
 				.then((response) => {
 					console.log(response);
-					cookies.remove('jwtAuthorization');
-					navigate('/');
+					navigate('/accueil');
 				})
 				.catch((error) => {
 					if (error.response.status === 401) {
@@ -117,7 +116,6 @@ const CreateTwoFaPage = () => {
 					ref={AuthInputRef}
 				/>
 				{ Error == true ? (<ErrorInput />) : (<></>)}
-				<p>After that you need to reconnect</p>
 			</div>
 		</>
 
