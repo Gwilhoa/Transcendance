@@ -119,7 +119,7 @@ export class AuthController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('authenticate')
+  @Post('authenticate')
   async authenticate2FA(@GetUser() jwtUser, @Res() res, @Body() body) {
     const id = jwtUser.sub;
     let user = await this.userService.getUserById(id);
