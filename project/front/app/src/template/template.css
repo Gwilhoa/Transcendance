@@ -36,7 +36,7 @@
     height: calc(100vh - (var(--footer-size) + var(--header-size)));
     top:var(--header-size);
     position: absolute; 
-    width: calc(100% - 401px);
+    /* width: calc(100% - 401px); */
     display: flex;
     flex-direction: column;
     justify-content: center;
