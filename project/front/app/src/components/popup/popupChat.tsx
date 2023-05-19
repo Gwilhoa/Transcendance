@@ -67,14 +67,38 @@ const PopupChat: React.FC<{path:string, openModal:(param: boolean) => void, setC
   const Navigate = useNavigate();
   const [prompt, setMessage] = useState('');
   const [channelList, setChannelList] = useState<Channel[]>([])
+  const finalPath = channelList.find((channel) => channel.name === path.path);
   const [messageList, setMessageList] = useState<Message []>([])
   const [currentChanel, setCurrentChanel] = useState<number>(0);
-  const finalPath = channelList.find((channel) => channel.name === path.path);
   
   
-  console.log(finalPath);
+  console.log("final path : " + finalPath);
+  const updateChannelList = () => {
+    getChannels()
+    .then((channels: Channel[]) => {
+      console.log(channels)
+      setChannelList(channels);
+    })
+    .catch((error: any) => {
+      console.error('Erreur lors de la récupération des canaux disponibles :', error);
+    });
+  }
+  updateChannelList();
+  useEffect(() => {
+
+    socket.on('message_received', (message: string) => {
+      //setMessageList((prevMessages) => [...prevMessages, message]);
+    });
+  
+    return () => {
+      socket.off('message_received');
+      socket.off('channels_updated');
+    };
+  }, []);
   async function NewChan(name:string) {
-    if (canJoinChannel(name)) {
+      if (name === 'General')
+        return;
+      if (canJoinChannel(name)) {
       const newItem:ChannelItem  = {
         id: channelList.length + 1,
         name: name,
@@ -117,37 +141,6 @@ const PopupChat: React.FC<{path:string, openModal:(param: boolean) => void, setC
       }
       setMessage('');
     }
-
-    // useEffect(() => {
-    //   // Écoute des événements de messages reçus
-    //   socket.on('message_received', (message: string) => {
-    //     //setMessageList((prevMessages) => [...prevMessages, message]);
-    //   });
-  
-    //   // Écoute des événements de canaux mis à jour
-
-    //   // Nettoyage lors du démontage du composant
-    //   return () => {
-    //     socket.off('message_received');
-    //     socket.off('channels_updated');
-    //   };
-    // }, []);
-
-
-    
-    
-    const updateChannelList = () => {
-      getChannels()
-      .then((channels: Channel[]) => {
-        console.log(channels)
-        setChannelList(channels);
-      })
-      .catch((error: any) => {
-        console.error('Erreur lors de la récupération des canaux disponibles :', error);
-      });
-    }
-
-    updateChannelList();
 
     return (
       <div className="popup right">
