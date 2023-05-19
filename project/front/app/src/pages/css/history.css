@@ -1,8 +1,11 @@
 .page-history {
+  /* 
   position: fixed;
+  */
+  width: 100%;
   top: var(--header-size);
   bottom: var(--footer-size);
-  width: 100%;
+  background-color: aquamarine;
   height: calc(100vh - (var(--header-size) + var(--footer-size)));
 }
 
@@ -15,17 +18,34 @@
 } 
   
 .score-block {
-  background-color: rgb(255, 30, 30);
+  /* background-color: rgb(255, 30, 30);
   color: white;
   padding: 10px;
-  /* height: 4rem; */
+  height: 4rem; */
+  background-color: rgb(255, 30, 30);
+  width: 30%;
+  height: 30%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px;
+  overflow: hidden;
+  position: relative;
+  padding: 10px;
+  height: 4rem;
 }
 
 .score-board {
-  margin: 0 auto;
+  /* margin: 0 auto;
   display: grid;
   gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); */
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 60%;
+  margin: 0 auto;
+  margin-bottom: 50px;
 }
 
 .score-text {
@@ -42,4 +62,11 @@
 .scrollBlock {
   overflow: auto;
   max-height: 94%;
+}
+
+@media only screen and (max-width: 900px) {
+  .media {
+    width: 70%;
+    height: 70%;
+  }
 }
