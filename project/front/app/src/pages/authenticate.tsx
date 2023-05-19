@@ -22,7 +22,6 @@ export function TokenPage() {
 					navigate("/authenticate/NotTwoFa");
 				else
 					navigate('/authenticate/TwoFa');
-
 			})
 			.catch((error) => {
 				setErrorCookie("Error " + error.response.status);
@@ -32,8 +31,6 @@ export function TokenPage() {
 
 	return (
 		<>
-
-			
 		</>
 	);
 }

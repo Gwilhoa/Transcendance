@@ -1,6 +1,7 @@
 import '../components/accueil.css'
 import React, { useEffect, useState } from 'react';
 import '../components/notification/notification.css'
+import ErrorToken from '../components/IfError';
 
 type Friend = {
     id: number;
@@ -28,6 +29,7 @@ const Accueil = () => {
 
         return (
             <div className='accueil'>
+				<ErrorToken />
                 {friendList.map(item => (
                 <li className="formFriend" key={item.id}>
                     <img className='circle-image' src={item.photo} alt="selected" />

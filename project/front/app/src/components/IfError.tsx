@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Cookies } from "react-cookie";
 const cookies = new Cookies();
@@ -7,15 +7,17 @@ export function setErrorCookie(ErrorMessage:string) {
 	cookies.set('Error', ErrorMessage);	
 }
 
-function IfError() {
+function ErrorToken() {
 	const navigate = useNavigate();
 
-	if (cookies.get('Error'))
+	if (cookies.get('jwtAuthorization') == null) {
+		setErrorCookie('you\'r connexion time out');
 		navigate('/Error');
+	}
 	return (
 		<>
 		</>
 	);
 }
 
-export default IfError;
+export default ErrorToken;
