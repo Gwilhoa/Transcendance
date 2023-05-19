@@ -67,12 +67,12 @@ const PopupChat: React.FC<{path:string, openModal:(param: boolean) => void, setC
   const Navigate = useNavigate();
   const [prompt, setMessage] = useState('');
   const [channelList, setChannelList] = useState<Channel[]>([])
+  const finalPath = channelList.find((channel) => channel.name === path.path);
   const [messageList, setMessageList] = useState<Message []>([])
   const [currentChanel, setCurrentChanel] = useState<number>(0);
-  const finalPath = channelList.find((channel) => channel.name === path.path);
   
   
-  console.log(finalPath);
+  console.log("final path : " + finalPath);
   const updateChannelList = () => {
     getChannels()
     .then((channels: Channel[]) => {
@@ -96,7 +96,9 @@ const PopupChat: React.FC<{path:string, openModal:(param: boolean) => void, setC
     };
   }, []);
   async function NewChan(name:string) {
-    if (canJoinChannel(name)) {
+      if (name === 'General')
+        return;
+      if (canJoinChannel(name)) {
       const newItem:ChannelItem  = {
         id: channelList.length + 1,
         name: name,
@@ -139,12 +141,6 @@ const PopupChat: React.FC<{path:string, openModal:(param: boolean) => void, setC
       }
       setMessage('');
     }
-
-
-
-
-    
-
 
     return (
       <div className="popup right">
