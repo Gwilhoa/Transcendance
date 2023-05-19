@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Post,
   Query,
   Req,
   Res,
@@ -75,7 +76,7 @@ export class AuthController {
   }
 
   @UseGuards(JwtIsAuthGuard)
-  @Get('2fa/enable')
+  @Post('2fa/enable')
   async turnOn2FA(@GetUser('sub') id, @Res() res, @Body() body) {
     const user = await this.userService.getUserById(id);
     if (user == null) {
