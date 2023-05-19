@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import AuthCode from 'react-auth-code-input';
 import "../style/CreateTwoFa.css";
 import Cookies from 'universal-cookie';
+import ErrorToken from '../components/IfError';
 const cookies = new Cookies();
 
 const CreateTwoFaPage = () => {
@@ -32,6 +33,7 @@ const CreateTwoFaPage = () => {
 
 	return (
 		<>
+			<ErrorToken />
 			<div className="qrCode">
 				<h1>
 					Scan the qrCode and enter your Code

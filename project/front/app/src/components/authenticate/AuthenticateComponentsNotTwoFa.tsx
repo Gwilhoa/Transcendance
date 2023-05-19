@@ -3,6 +3,7 @@ import Cookies from "universal-cookie";
 const cookies = new Cookies();
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { setErrorCookie } from "../IfError";
 
 function AuthenticateComponentsNotTwoFa() {
 	const navigate = useNavigate();
@@ -25,8 +26,10 @@ function AuthenticateComponentsNotTwoFa() {
 				navigate('/accueil');
             })
             .catch((error) => {
-				console.error("Error status " + error.response.status);
+				cookies.remove('tenMinToken');
+				setErrorCookie("Error " + error.response.status);
 				console.error(error);
+				navigate('/Error');
             });
 	}, []);
     return (
