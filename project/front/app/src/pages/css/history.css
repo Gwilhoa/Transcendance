@@ -1,0 +1,45 @@
+.page-history {
+  position: fixed;
+  top: var(--header-size);
+  bottom: var(--footer-size);
+  width: 100%;
+  height: calc(100vh - (var(--header-size) + var(--footer-size)));
+}
+
+.history-title {
+  border-bottom: 3px solid var(--colorside);
+  /* margin: 3rem, 0; */
+
+  width: 100%;
+  display: flex;
+} 
+  
+.score-block {
+  background-color: rgb(255, 30, 30);
+  color: white;
+  padding: 10px;
+  /* height: 4rem; */
+}
+
+.score-board {
+  margin: 0 auto;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.score-text {
+  font-size: 1rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.score {
+  font-size: 1rem;
+  margin-top: 1px;
+}
+
+.scrollBlock {
+  overflow: auto;
+  max-height: 94%;
+}

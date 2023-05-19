@@ -1,14 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
-	
-interface MessageProps {
-  message: string;
-}
+import Cookies from 'universal-cookie';
+const cookies = new Cookies();
 
-function Reconnect(props:MessageProps) {
+function Reconnect() {
 	return (
 		<div>
-			<p>{props.message}</p>
+			<p>{cookies.get('Error')}</p>
 			<Link to="http://localhost:8080/">
 				<button>
 					Try to reconnect

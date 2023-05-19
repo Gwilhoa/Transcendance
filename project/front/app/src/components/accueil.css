@@ -1,0 +1,17 @@
+.formFriend {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    width: calc(100% - 40px);
+    border: 3px solid green;
+    flex-direction: row-reverse;
+}
+
+.colorTextFriend {
+    color: blueviolet;
+}
+
+.accueil {
+    overflow-y: scroll;
+    width: 100%;
+}

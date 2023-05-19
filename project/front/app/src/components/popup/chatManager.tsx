@@ -34,7 +34,7 @@ export function LeaveChat() {
 export function JoinChat() {
     const location = window.location;
     if (!IsInAChat()) {
-        var str = location.pathname.split('/')[1];
+        let str = location.pathname.split('/')[1];
         str += "/chat";
         //const history = useNavigate();
         //history('/chat/');
@@ -58,7 +58,7 @@ export function KnowMyChannel():string {
 export function ChangeChannel(str:string) {
     
         const location = window.location;
-        var next = location.pathname.split('/')[1];
+        let next = location.pathname.split('/')[1];
         next += "/chat/";
         next += str;
         return next

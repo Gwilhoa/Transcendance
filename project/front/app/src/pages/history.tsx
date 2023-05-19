@@ -1,9 +1,6 @@
-import './popupHisto.css'
-
-
-type PopupProps = {
-    onClose: () => void;
-};
+import React from "react";
+import ErrorToken from "../components/IfError";
+import './css/history.css'
 
 interface Score {
     ennemy: string;
@@ -29,7 +26,7 @@ const OneScoreBlock = ({text, score1, score2 }: ShowScore) => {
 
 const Add = () => {
     const blocks = [];
-    var ListOfScore: Score[] = [
+    const ListOfScore: Score[] = [
         { ennemy: "Gchatain", scoreEnnemy: 3, scoreMe: 25 },
         { ennemy: "Dieu", scoreEnnemy: 50, scoreMe: 49 },
         { ennemy: "Xav Niel", scoreEnnemy: 0, scoreMe: 100 },
@@ -37,7 +34,7 @@ const Add = () => {
         { ennemy: "Dieu", scoreEnnemy: 50, scoreMe: 49 },
         { ennemy: "Xav Niel", scoreEnnemy: 0, scoreMe: 100 },
 
-      ];;
+      ];
     ////// REMPLIR LIST OF SCORE AVEC LES VRAIS SCORES ///////////
     
     for (let i = 0; i < ListOfScore.length; i++) {
@@ -65,11 +62,11 @@ const Add = () => {
         return <div className="score-board">{blocks}</div>;
 }
 
-const PopupHisto: React.FC<PopupProps> = ({ onClose }) => {
+const History = () => {
     return (
-        <div className="popup left">
-             <header className="popup_up">
-                <button className="close-button" onClick={onClose}> X </button>
+        <div className="page-history">
+			<ErrorToken />
+             <header className="history-title">
                 <div className="texte">
                     {"Historique"}
                 </div>
@@ -77,9 +74,8 @@ const PopupHisto: React.FC<PopupProps> = ({ onClose }) => {
             <div className="scrollBlock">
                 <Add/>
             </div>
-    
         </div>
     );
   }
 
-  export default PopupHisto
+  export default History;
