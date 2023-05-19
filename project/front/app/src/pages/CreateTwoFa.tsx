@@ -10,8 +10,32 @@ const CreateTwoFaPage = () => {
 	const [result, setResult] = useState<string>("");
 	const [dataImage, setDataImage] = useState<string>("");
 	const [Error, setError] = useState<string>("");
+
 	const handleOnChange = (res: string) => {
 		setResult(res);
+		if (res.length === 6) {
+			console.log("result of input create 2fa " + res);
+			axios.post("http://localhost:3000/auth/2fa/enable", {
+				headers: {
+					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+				},
+			},
+			{
+				data: {
+					code: res
+				},
+			})
+				.then((response) => {
+					console.log(response);
+					// setDataImage(response.data);
+				})
+				.catch((error) => {
+					setError("Error " + error.response.status);
+					console.error("profil Error status " + error.response.status);
+					console.error(error);
+				});
+
+		}
 	};
 
 	useEffect(() => {
