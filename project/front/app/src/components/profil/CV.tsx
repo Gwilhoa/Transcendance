@@ -15,21 +15,23 @@ export default function CV( {name, photoUrl, isFriend, isMe, closeModal } : {nam
     const [image, setImage] = useState(photoUrl);
     const [checked, setChecked] = useState(false);
 
-	useEffect(() => {
-        axios.get("http://localhost:3000/auth/2fa/is2FA", {
-            headers: {
-                Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
-            },
-        })
-            .then((response) => {
-				setChecked(response.data);
-            })
-            .catch((error) => {
+		axios.get("http://localhost:3000/auth/2fa/is2FA", {
+			headers: {
+				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+			},
+		})
+			.then((response) => {
+				if (response.data == false)
+					setChecked(false);
+				else
+					setChecked(true);
+				console.log(response.data);
+			})
+			.catch((error) => {
 				setErrorCookie("Error " + error.response.status);
+				console.error(error);
 				navigate('/Error');
-				console.error("profil Error status " + error.response.status);
-            });
-	}, []);
+			});
 
     const changeName = (str:string) => {
         if (setName(str))
