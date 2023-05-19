@@ -14,14 +14,13 @@ const Template = ({openModal, setContent}:Props) => {
 
     return (
       <div className="page">
-        <header>
-            <Head openModal={openModal} setContent={setContent}/>
-        </header>
         <Notification message={"Nouveau Message"} channel={"sd"} isInChannel={false}/>
         <main className="main-template">
           <Outlet></Outlet>
         </main>
-
+        <header>
+            <Head openModal={openModal} setContent={setContent}/>
+        </header>
         <footer>
             <Foot/>
         </footer>
