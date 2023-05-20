@@ -31,7 +31,7 @@ export interface Message {
 
 export interface Channel {
     name: string,
-    id: number
+    id: string
 }
 
 interface Vector {
@@ -61,8 +61,31 @@ interface MMessage {
 //     
 // }
 
-export function getMessages(name:string) : Message[] {
+
+export const getMessage = async (channel_id: string) => {
+    const user_id = cookies.get('jwtAuthorization');
+    // Émettre un événement au serveur pour demander les messages
+    socket.emit('getMessages', { channel_id, user_id }, (messages: any[]) => {
+      console.log('Messages récupérés :', messages);
+      // Faites quelque chose avec les messages récupérés, par exemple, les mettre à jour dans le state du composant
+    });
+  };
+
+
+export async function getMessages(channel_id:string) : Promise<Message[]> {
     
+    try {
+        const response = await axios.get('/channel/available');
+        console.log(response.data)
+        return response.data;
+    } catch (error) {
+        console.error('Error : no channel found', error);
+        return [];
+    }
+
+
+
+
     const config: AxiosRequestConfig = {
         method: 'get',
         url: 'http://localhost:3000/channel/message',
@@ -115,7 +138,7 @@ export async function createChannel(channelName: string): Promise<boolean> {
     }
 }
 
-export const sendNewMessageToBack = (channelId: number, content: string) => {
+export const sendNewMessageToBack = (channelId: string, content: string) => {
     const token = cookies.get('jwtAuthorization');
 
     const messageData: MMessage = {
