@@ -15,7 +15,7 @@ function AuthenticateComponentsNotTwoFa() {
 			cookies.set('jwtAuthorization', jwtToken, {sameSite: 'lax', maxAge: 2 * 60 * 60 });
         };
 
-        axios.get(url, {
+        axios.post(url, {code: ""},{
             headers: {
                 Authorization: `Bearer ${cookies.get('tenMinToken')}`,
             },
