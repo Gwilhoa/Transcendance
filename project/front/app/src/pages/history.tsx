@@ -1,4 +1,5 @@
 import React from "react";
+import ErrorToken from "../components/IfError";
 import './css/history.css'
 
 interface Score {
@@ -64,6 +65,7 @@ const Add = () => {
 const History = () => {
     return (
         <div className="page-history">
+			<ErrorToken />
              <header className="history-title">
                 <div className="texte">
                     {"Historique"}

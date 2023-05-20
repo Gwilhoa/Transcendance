@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Post,
   Query,
   Req,
   Res,
@@ -58,7 +59,16 @@ export class AuthController {
 
   @UseGuards(JwtIsAuthGuard)
   @Get('2fa/create')
-  async create2fa(@GetUser() user, @Res() res) {
+  async create2fa(@GetUser('sub') id, @Res() res) {
+    let user = await this.userService.getUserById(id);
+    if (user == null) {
+      res.status(400).send('Bad User');
+      return;
+    }
+    if (user.enabled2FA == true) {
+      res.status(400).send('Bad Request : 2 factor authentication already set');
+      return;
+    }
     const secret = await authenticator.generateSecret();
 
     const otpauthUrl = authenticator.keyuri(
@@ -67,7 +77,7 @@ export class AuthController {
       secret,
     );
 
-    if ((await this.userService.set2FASecret(secret, user.sub)) == null) {
+    if ((await this.userService.set2FASecret(secret, user.id)) == null) {
       res.status(400).send('Bad Request : Error while saving secret');
       return;
     }
@@ -75,7 +85,7 @@ export class AuthController {
   }
 
   @UseGuards(JwtIsAuthGuard)
-  @Get('2fa/enable')
+  @Post('2fa/enable')
   async turnOn2FA(@GetUser('sub') id, @Res() res, @Body() body) {
     const user = await this.userService.getUserById(id);
     if (user == null) {
@@ -112,13 +122,18 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Get('2fa/is2FA')
-  async is2FA(@GetUser() user, @Res() res) {
+  async is2FA(@GetUser('sub') id, @Res() res) {
+    let user = await this.userService.getUserById(id);
+    if (user == null) {
+      res.status(400).send('Bad User');
+      return;
+    }
     res.status(200).send(user.enabled2FA);
     return;
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('authenticate')
+  @Post('authenticate')
   async authenticate2FA(@GetUser() jwtUser, @Res() res, @Body() body) {
     const id = jwtUser.sub;
     let user = await this.userService.getUserById(id);
