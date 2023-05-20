@@ -1,72 +1,82 @@
 .page-history {
-  /* 
-  position: fixed;
-  */
   width: 100%;
   top: var(--header-size);
   bottom: var(--footer-size);
-  /* background-color: aquamarine; */
   height: calc(100vh - (var(--header-size) + var(--footer-size)));
 }
 
 .history-title {
-  border-bottom: 3px solid var(--colorside);
-  /* margin: 3rem, 0; */
-
-  width: 100%;
-  display: flex;
+  color:rgb(209, 209, 209);
+  border-bottom: 3px solid rgb(209, 209, 209);
+  font-size: 2.5rem;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  margin-left: 2rem;
+  margin-right: 2rem;
+  font-weight: bold;
 } 
   
 .score-block {
-  /* background-color: rgb(255, 30, 30);
-  color: white;
-  padding: 10px;
-  height: 4rem; */
-  background-color: rgb(255, 30, 30);
-  width: 30%;
-  height: 30%;
+  border-radius: 15px;
+  background-color: rgb(48, 62, 121);
+  width: 15rem;
+  color:rgb(209, 209, 209);
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 10px;
+  margin-right: 20px;
   overflow: hidden;
   position: relative;
   padding: 10px;
-  height: 4rem;
+  height: 6.5rem;
+  display: block;
 }
 
 .score-board {
-  /* margin: 0 auto;
-  display: grid;
-  gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); */
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
-  width: 60%;
-  margin: 0 auto;
-  margin-bottom: 50px;
+  margin: 2rem;
 }
 
-.score-text {
-  font-size: 1rem;
+.status {
+  
+  font-size: 1.5rem;
   font-weight: bold;
-  margin-bottom: 1rem;
+  margin: 0;
+}
+
+.image {
+  width: 2rem;
+  height: 2rem;
+  margin: 0 0.5rem 0 0.5rem;
+  border-radius: 50%;
 }
 
 .score {
-  font-size: 1rem;
-  margin-top: 1px;
+  display: flex;
+  justify-content: center;
+  text-align: center;
 }
+
+.player {
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+
+p {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-top: 0.5rem;
+}
+
+.player > p{
+  margin: 0;
+}
+
 
 .scrollBlock {
   overflow: auto;
   max-height: 94%;
 }
 
-@media only screen and (max-width: 900px) {
-  .media {
-    width: 70%;
-    height: 70%;
-  }
-}
