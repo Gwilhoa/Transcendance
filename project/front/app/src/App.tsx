@@ -5,7 +5,7 @@ import NotFound from './pages/NotFound';
 import CreateTwoFaPage from './pages/CreateTwoFa';
 import Game from './pages/game';
 import TryToReconnect from './pages/TryToReconnect';
-import Accueil from './pages/accueil';
+import Home from './pages/home';
 import History from './pages/history';
 import PopupChat from "./components/popup/popupChat";
 import { DynamicIsInAChat, KnowMyChannel } from "./components/popup/chatManager";
@@ -31,7 +31,7 @@ const AppInsideBrowser = ({ openModal, setContent }: Props) => {
 				<Route path="/authenticate/TwoFa" Component={TwoFa} />
 				<Route path="/Error" Component={TryToReconnect} />
 				<Route element={<Template openModal={openModal} setContent={setContent}/>}>
-					<Route path="/accueil/*" element={<Accueil></Accueil>} />
+					<Route path="/home/*" element={<Home></Home>} />
 					<Route path="/game/*" element={<Game></Game>} />
 					<Route path="/CreateTwoFa/*" element={<CreateTwoFaPage></CreateTwoFaPage>}/>
 					<Route path="/history/*" element={<History></History>} />
