@@ -25,7 +25,7 @@ const IsTwoFA = () => {
 		})
 			.then((response) => {
 				if (response.data == true)
-					navigate("/accueil");
+					navigate("/home");
 			})
 			.catch((error) => {
 				setErrorCookie("Error " + error.response.status);
@@ -63,7 +63,7 @@ const CreateTwoFaPage = () => {
 			})
 				.then((response) => {
 					console.log(response);
-					navigate('/accueil');
+					navigate('/home');
 				})
 				.catch((error) => {
 					if (error.response.status === 401) {

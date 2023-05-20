@@ -10,22 +10,35 @@ interface Score {
  
 
 interface ShowScore {
-    text: string;
+    status: string;
     score1: string;
     score2: string;
 }
 
-const OneScoreBlock = ({text, score1, score2 }: ShowScore) => {
+const OneScoreBlock = ({status, score1, score2 }: ShowScore) => {
     return (
       <div className="score-block">
-        <div className="score-text">{text}</div>
-        <div className="score">{score1 + " - " + score2}</div>
+        <h3 className="status">{status}</h3>
+            <div className="score">
+            <div className="player">
+                {/* <a href="" className="image"><img className="image" src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/42_Logo.svg/1200px-42_Logo.svg.png"></img></a> */}
+                <img className="image" src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/42_Logo.svg/1200px-42_Logo.svg.png"></img>
+                <p>{score1}</p> {/* todo: add link to profil */}
+            </div>
+            <p>against</p>
+            <div className="player">
+                {/* <a href="" className="image"><img className="image" src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/42_Logo.svg/1200px-42_Logo.svg.png"></img></a> */}
+                <img className="image" src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/42_Logo.svg/1200px-42_Logo.svg.png"></img>
+                <p>{score2}</p> {/* todo: add link to profil */}
+            </div>
+        </div>
       </div>
     );
 };
 
 const Add = () => {
     const blocks = [];
+    // todo: change enemy here no more use 
     const ListOfScore: Score[] = [
         { ennemy: "Gchatain", scoreEnnemy: 3, scoreMe: 25 },
         { ennemy: "Dieu", scoreEnnemy: 50, scoreMe: 49 },
@@ -41,7 +54,7 @@ const Add = () => {
         if (ListOfScore[i].scoreMe > ListOfScore[i].scoreEnnemy) {
             blocks.push (
                 <OneScoreBlock
-                text={"Victoire contre " + ListOfScore[i].ennemy}
+                status={"Victory:"}
                 score1={String(ListOfScore[i].scoreMe)}
                 score2={String(ListOfScore[i].scoreEnnemy)}
                 key={i}
@@ -51,7 +64,7 @@ const Add = () => {
         else { 
             blocks.push (
                 <OneScoreBlock
-                text={"Tu es faible face à " + ListOfScore[i].ennemy}
+                status={"Defeat:"}
                 score1={String(ListOfScore[i].scoreMe)}
                 score2={String(ListOfScore[i].scoreEnnemy)}
                 key={i}
@@ -67,7 +80,7 @@ const History = () => {
         <div className="page-history">
 			<ErrorToken />
              <header className="history-title">
-                <div className="texte">
+                <div>
                     {"Historique"}
                 </div>
             </header>
