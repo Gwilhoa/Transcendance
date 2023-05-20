@@ -51,7 +51,7 @@ export function KnowMyChannel():string {
         const lastSegment = segments[3];
         return lastSegment;
     }
-    return 'General'
+    return 'SoloChannel'
 }
 
 
