@@ -1,26 +1,26 @@
 
 import './popupChat.css'
 import React, { ReactNode, useEffect, useState } from 'react';
-import { ChangeChannel, KnowMyChannel, LeaveChat } from './chatManager';
+import { ChangeChannel, LeaveChat } from './chatManager';
 import { Link} from 'react-router-dom';
-import { Channel, Message, MessageCode, canJoinChannel, createChannel, getChannels, getMessages, socket, sendNewMessageToBack, Token, getMessage} from '../utils/API';
+import { Channel, Message, canJoinChannel, createChannel, getChannels, socket, sendNewMessageToBack, getMessages} from '../utils/API';
 import '../../template/template.css';
 import { useNavigate } from "react-router-dom";
 import { ButtonInputToggle } from '../utils/inputButton';
 import { parthMessages } from './parthMessage';
-import { debug } from 'console';
 
 type ChannelItem = {
-  id: number;
+  id: string;
   URL:string
   name:string
 }
 
+
 //const sendNewMessageToBack = (message:string) => {
   //////J'me casse !!
-//}
-
-const sendCommandToBack = (message:string) => {
+  //}
+  
+  const sendCommandToBack = (message:string) => {
   //////Chao !!
 }
 
@@ -29,48 +29,56 @@ const PopupChat: React.FC<{path:string, openModal:(param: boolean) => void, setC
   const Navigate = useNavigate();
   const [prompt, setMessage] = useState('');
   const [channelList, setChannelList] = useState<Channel[]>([])
+  const [messageList, setMessageList] = useState<Message []>([])
+  const [currentChanel, setCurrentChanel] = useState<string>("");
   
   let finalPath:Channel|undefined;
-  if (Array.isArray(channelList)) {
-    finalPath = channelList.find((channel) => channel.name === param.path);
-    if (finalPath)
-      setTitle(finalPath.name);
-  }
-  const [messageList, setMessageList] = useState<Message []>([])
-  const [dontHaveChannel, setDontHaveChannel] = useState(false);
-  const [currentChanel, setCurrentChanel] = useState<number>(0);
-  
-  
-  console.log("final path : " + finalPath);
-  
-  const updateChannelList = () => {
+  const nupdateChannelList = () => {
     getChannels()
     .then((channels: Channel[]) => {
-      console.log(channels)
+      console.log(channels);
       setChannelList(channels);
+      const foundChannel = channels.find((channel) => channel.name === param.path);
+      if (!foundChannel) {
+        setCurrentChanel("");
+        setTitle('SoloChannel');
+      } else if (foundChannel) {
+        console.log("channel is " + foundChannel.name)
+        setCurrentChanel(foundChannel.id);
+        setTitle(foundChannel.name);
+        //getMessages(foundChannel.id);
+      }
     })
     .catch((error: any) => {
       console.error('Erreur lors de la récupération des canaux disponibles :', error);
     });
+  };
+
+  if (Array.isArray(channelList)) {
+    finalPath = channelList.find((channel) => channel.name === param.path);
   }
-
-  updateChannelList();
-
+  
+  
+  console.log("final path : " + finalPath);
+  
   useEffect(() => {
     socket.on('message', (message: string) => {
       setMessageList([ {contain:message, date:"ee", author:'ejd'}]);
     });
-  
     return () => {
       socket.off('message_received');
       socket.off('channels_updated');
     };
-  }, []);
+  });
+
+  useEffect(() => {
+    nupdateChannelList()
+  }, [param.path])
 
   async function NewChan(name:string) {
     if (name && canJoinChannel(name)) {
         const newItem:ChannelItem  = {
-        id: channelList.length + 1,
+        id: "",
         name: name,
           URL: ChangeChannel(name)
         };
@@ -84,10 +92,27 @@ const PopupChat: React.FC<{path:string, openModal:(param: boolean) => void, setC
     return false
   }
   
-  if (!finalPath && param.path != "/" && param.path != "SoloChannel" && param.path != "" && !NewChan(param.path)){
-      setDontHaveChannel(true);
-      setTitle('SoloChannel');
-      console.log(title);
+
+  const nChangeChannel = (name:string, id:string) => {
+    //setTitle(name);
+    return ChangeChannel(name);
+
+  }
+
+  const parthChannel = () => {
+    if (Array.isArray(channelList)) {
+      return (
+
+      channelList.map(item => (
+        <li className="chanel" key={item.id}>
+        <Link to={nChangeChannel(item.name, item.id)}>
+        {item.name}
+        </Link>
+      </li>
+          )
+        )
+      )
+    }
   }
     
   const handleMessageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -102,6 +127,14 @@ const PopupChat: React.FC<{path:string, openModal:(param: boolean) => void, setC
 
   const sendMessage = () => {
     console.log("message", prompt);
+    if (currentChanel === "") {
+      const newMessage:Message = {
+        contain: prompt,
+        date :"00",
+        author:""
+      }
+      setMessageList([...messageList, newMessage]);
+    }
     if (prompt.charAt(0) === "/") {
       sendCommandToBack(prompt);
     }
@@ -110,9 +143,6 @@ const PopupChat: React.FC<{path:string, openModal:(param: boolean) => void, setC
     }
     setMessage('');
   }
-    //if (!dontHaveChannel)
-    //  getMessage(currentChanel.toString());
-
     return (
       <div className="popup right">
       <div className="popupchild">
@@ -124,13 +154,9 @@ const PopupChat: React.FC<{path:string, openModal:(param: boolean) => void, setC
         </header>
         <div className="popup_corps">
           <div className='popup_list_of_chanel'>
-            {channelList.map(item => (
-              <li className="chanel" key={item.id}>
-                <Link to={ChangeChannel(item.name)}>
-                  {item.name}
-                </Link>
-              </li> 
-            ))}
+            {
+              parthChannel()
+            }
             
             <ButtonInputToggle
             onInputSubmit={NewChan}

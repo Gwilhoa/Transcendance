@@ -31,7 +31,7 @@ export interface Message {
 
 export interface Channel {
     name: string,
-    id: number
+    id: string
 }
 
 interface Vector {
@@ -138,7 +138,7 @@ export async function createChannel(channelName: string): Promise<boolean> {
     }
 }
 
-export const sendNewMessageToBack = (channelId: number, content: string) => {
+export const sendNewMessageToBack = (channelId: string, content: string) => {
     const token = cookies.get('jwtAuthorization');
 
     const messageData: MMessage = {
