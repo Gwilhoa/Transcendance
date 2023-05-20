@@ -1,4 +1,4 @@
-import '../components/accueil.css'
+import './css/accueil.css'
 import React, { useEffect, useState } from 'react';
 import '../components/notification/notification.css'
 import ErrorToken from '../components/IfError';
