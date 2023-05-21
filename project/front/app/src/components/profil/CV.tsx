@@ -2,6 +2,7 @@ import './modal.css'
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ButtonInputToggle } from '../utils/inputButton';
+import LogoutButton from './logout';
 import { setErrorCookie } from "../IfError"
 import axios, { setTwoFA, setName } from '../utils/API';
 import Cookies from 'universal-cookie';
@@ -15,6 +16,7 @@ export default function CV( {name, photoUrl, isFriend, isMe, closeModal } : {nam
     const [image, setImage] = useState(photoUrl);
     const [checked, setChecked] = useState(false);
 
+	useEffect(() => {
 		axios.get("http://localhost:3000/auth/2fa/is2FA", {
 			headers: {
 				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
@@ -32,6 +34,7 @@ export default function CV( {name, photoUrl, isFriend, isMe, closeModal } : {nam
 				console.error(error);
 				navigate('/Error');
 			});
+	}, []);
 
     const changeName = (str:string) => {
         if (setName(str))
@@ -41,6 +44,23 @@ export default function CV( {name, photoUrl, isFriend, isMe, closeModal } : {nam
     const clicked = () => {
 		if (checked === false) {
 			navigate('/CreateTwoFa');
+			closeModal(false);
+		}
+		else {
+			axios.get("http://localhost:3000/auth/2fa/disable", {
+				headers: {
+					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+				},
+			})
+				.then((response) => {
+					console.log(response);
+				})
+				.catch((error) => {
+					setErrorCookie("Error " + error.response.status);
+					console.error(error);
+					navigate('/Error');
+				});
+			setChecked(false);
 		}
     }
 
@@ -86,7 +106,12 @@ export default function CV( {name, photoUrl, isFriend, isMe, closeModal } : {nam
                 <label htmlFor="scales">2FA</label>
                 </div>
             )
-        }
+		retu.push(
+			<div key={"logout"}>
+				<LogoutButton closeModal={closeModal} />
+			</div>	
+		)
+	}
 
 
         //retu.push(
@@ -95,18 +120,28 @@ export default function CV( {name, photoUrl, isFriend, isMe, closeModal } : {nam
 
     if (!isFriend && !isMe) {
         retu.push(
-            <button key={"buttonFriend"}>
-                Ajouter en ami
-            </button>
-        )
+			<>
+				<button key={"buttonFriend"}>
+					Add friend
+				</button>
+				<button key={"buttonInvite"}>
+					Challenge
+				</button>
+			</>
+		)
     }
 
     if (isFriend && !isMe) {
         retu.push(
-            <button key={"buttonInvite"}>
-                Inviter à une partie
-            </button>
-        )
+			<>
+				<button key={"buttonFriend"}>
+					Unfriend
+				</button>
+				<button key={"buttonInvite"}>
+					Challenge
+				</button>
+			</>
+		)
     }
 
     return (
