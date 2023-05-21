@@ -1,15 +1,15 @@
 .navbar {
-    position:fixed;
-    width: 100%;
-    height: var(--header-size);
-    top:0px;
-    background-color: #333;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 20px;
-  }
-  
+  position:fixed;
+  width: 100%;
+  height: var(--header-size);
+  top:0px;
+  background-color: #333;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+}
+
   .title h3 {
     color: #fff;
   }
@@ -22,7 +22,7 @@
     cursor: pointer;
     margin-right: 40px;
   }
-
+  
   .footer {
     position: fixed;
     width: 100%;
@@ -33,16 +33,21 @@
   }
   
   .main-template {
+    position: absolute; 
+    /* top: var(--header-size); */
     height: calc(100vh - (var(--footer-size) + var(--header-size)));
     top:var(--header-size);
-    position: absolute; 
-    width: calc(100% - 401px);
+    width: 100%;
+    /* 
     display: flex;
+    width: calc(100% - 401px);
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    */
   }
   
   .page {
     overflow: hidden;
   }
+  

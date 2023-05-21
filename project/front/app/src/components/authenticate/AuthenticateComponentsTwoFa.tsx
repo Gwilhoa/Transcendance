@@ -36,7 +36,7 @@ function AuthenticateComponentsTwoFa() {
 					console.log(response);
 					setCookieJwt(response.data.access_token);
 					cookies.remove('tenMinToken');
-					navigate('/Accueil');
+					navigate('/Home');
 				})
 				.catch((error) => {
 					if (error.response.status === 401) {

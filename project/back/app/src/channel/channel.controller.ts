@@ -38,7 +38,7 @@ export class ChannelController {
       response.status(400).send(e.message);
       return;
     }
-    response.status(200).send(ret);
+    return response.status(200).send(ret);
   }
 
   @Post('create')
@@ -72,7 +72,7 @@ export class ChannelController {
       response.status(400).send(e.message);
       return;
     }
-    response.status(201).send(ret);
+    return response.status(201).send(ret);
   }
 
   @Post('leave')
@@ -88,7 +88,7 @@ export class ChannelController {
       response.status(400).send(e.message);
       return;
     }
-    response.status(200).send(ret);
+    return response.status(200).send(ret);
   }
 
   @Post('admin')
@@ -190,7 +190,7 @@ export class ChannelController {
       resp.status(204).send('No content');
       return;
     }
-    resp.status(200).send(ret);
+    return resp.status(200).send(ret);
   }
 
   @Post('message')
@@ -224,15 +224,16 @@ export class ChannelController {
       resp.status(400).send(e.message);
       return;
     }
-    resp.status(200).send(ret);
+    return resp.status(200).send(ret);
   }
 
   @Get('/name/:name')
   async getChannelsByName(@Param('name') name: string, @Res() resp) {
     const channels = await this.channelService.getChannelsByName(name);
     if (channels == null) {
-      resp.status(204).send('No content');
+      return resp.status(204).send('No content');
     }
+    return resp.status(200).send(channels);
   }
 
   @Get('/id/:id')
@@ -248,8 +249,8 @@ export class ChannelController {
   async getAvailableChannels(@GetUser('sub') id: string, @Res() resp) {
     const channels = await this.channelService.getAvailableChannels(id);
     if (channels == null) {
-      resp.status(204).send('No content');
+      return resp.status(204).send('No content');
     }
-    resp.status(200).send(channels);
+    return resp.status(200).send(channels);
   }
 }

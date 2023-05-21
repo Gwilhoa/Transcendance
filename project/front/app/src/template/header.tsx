@@ -23,7 +23,7 @@ const Head = ({ openModal, setContent }: Props) => {
     return (
         <div className="navbar">
           <div className="title">
-            <Link to="/accueil" className="navbar__link">
+            <Link to="/home" className="navbar__link">
               <h2>
                 Transcendence
               </h2>

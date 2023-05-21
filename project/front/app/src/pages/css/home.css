@@ -1,0 +1,34 @@
+.user{
+    background-color: rgb(31, 42, 83);
+    border-radius: 30px;
+    height: 4rem;
+    display: flex;
+    align-items: center;
+    margin: 1rem 1rem 0 1rem;
+}
+
+.image--home {
+    border-radius: 50%;
+    margin-left: 1rem;
+    width: 2.5rem;
+}
+
+.user > p{
+    margin-left: 1rem;
+    margin-right: 1rem;
+    font-size: 1.5rem;
+    color: rgb(209, 209, 209);
+}
+
+
+/* .home {
+    overflow-y: scroll;
+    width: 100%;
+}
+
+.scrollBlock {
+    overflow: auto;
+    max-height: 94%;
+  }
+   */
+  

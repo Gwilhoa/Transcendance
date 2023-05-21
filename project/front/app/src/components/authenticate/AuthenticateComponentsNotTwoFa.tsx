@@ -23,7 +23,7 @@ function AuthenticateComponentsNotTwoFa() {
             .then((response) => {
                 setCookieJwt(response.data.access_token);
 				cookies.remove('tenMinToken');
-				navigate('/accueil');
+				navigate('/home');
             })
             .catch((error) => {
 				cookies.remove('tenMinToken');
