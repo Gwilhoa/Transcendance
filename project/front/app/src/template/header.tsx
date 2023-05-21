@@ -10,38 +10,38 @@ import Cookies from 'universal-cookie';
 const cookies = new Cookies();
 
 const Head = ({ openModal, setContent }: Props) => {
-	const [name, setName] = useState<number>(0);
+	const [name, setName] = useState<string>("");
 	const [image, setImage] = useState<string>("");
 	const navigate = useNavigate();
 
 	useEffect(() => {
-		axios.get("http://localhost:3000/user", {
+		axios.get("http://localhost:3000/user/id", {
 			headers: {
 				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
 			},
 		})
 			.then((response) => {
 				console.log(response);
-				setName(response.data.id);
+				setName(response.data.username);
 			})
 			.catch((error) => {
 				setErrorCookie("Error " + error.response.status);
 				console.error(error);
 				navigate('/Error');
 			});
-		axios.get("http://localhost:3000/user/image", {
-			headers: {
-				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
-			},
-		})
-			.then((response) => {
-				console.log(response);
-			})
-			.catch((error) => {
-				setErrorCookie("Error " + error.response.status);
-				console.error(error);
-				navigate('/Error');
-			});
+		// axios.get("http://localhost:3000/user/image", {
+		// 	headers: {
+		// 		Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+		// 	},
+		// })
+		// 	.then((response) => {
+		// 		console.log(response);
+		// 	})
+		// 	.catch((error) => {
+		// 		setErrorCookie("Error " + error.response.status);
+		// 		console.error(error);
+		// 		navigate('/Error');
+		// 	});
 	}, []);
 
   const buttonChat = () => {
@@ -53,7 +53,7 @@ const Head = ({ openModal, setContent }: Props) => {
 
   const profilStart = () => {
     setContent(
-		<CV name={getName()} 
+		<CV name={name} 
 		isFriend={false} 
 		isMe={true} 
 		photoUrl={"https://www.treehugger.com/thmb/9fuOGVoJ23ZwziKRNtAEMHw8opU=/750x0/filters:no_upscale():max_bytes(150000):strip_icc():format(webp)/piglet-grass-dandelions-01-b21d7ef8f881496f8346dbe01859537e.jpg"} 
