@@ -17,8 +17,9 @@ import { UserService } from './user.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtIsAuthGuard } from '../auth/guard/jwt.guard';
 import { GetUser } from '../auth/decorator/auth.decorator';
-import path, { extname } from 'path';
-import fs from 'fs';
+import * as path from 'path';
+import * as fs from 'fs';
+import { extname } from 'path';
 
 @UseGuards(JwtIsAuthGuard)
 @Controller('user')
@@ -58,7 +59,7 @@ export class UserController {
     try {
       imagePath = await this.userService.getImageById(id);
     } catch (e) {
-      response.status(404).send('Not Found');
+      response.status(404).send(e.message);
       return;
     }
     const stream = fs.createReadStream(imagePath);
