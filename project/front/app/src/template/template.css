@@ -37,7 +37,7 @@
     /* top: var(--header-size); */
     height: calc(100vh - (var(--footer-size) + var(--header-size)));
     top:var(--header-size);
-    width: 100%;
+    width: var(--main-width);
     /* 
     display: flex;
     width: calc(100% - 401px);

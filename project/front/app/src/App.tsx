@@ -7,12 +7,12 @@ import Game from './pages/game';
 import TryToReconnect from './pages/TryToReconnect';
 import Home from './pages/home';
 import History from './pages/history';
+import Template from "./template/template";
 import PopupChat from "./components/popup/popupChat";
 import { DynamicIsInAChat, KnowMyChannel } from "./components/popup/chatManager";
 import TokenPage from "./pages/authenticate";
 import NotTwoFa from "./components/authenticate/AuthenticateComponentsNotTwoFa"
 import TwoFa from "./components/authenticate/AuthenticateComponentsTwoFa"
-import Template from "./template/template";
 import React, { ReactNode } from "react";
 
 export interface Props {
