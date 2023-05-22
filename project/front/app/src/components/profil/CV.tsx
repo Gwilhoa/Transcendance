@@ -15,6 +15,7 @@ export default function CV( {name, photoUrl, isFriend, isMe, closeModal } : {nam
     const [truename, setTrueName] = useState(name);
     const [image, setImage] = useState<string>(photoUrl);
     const [checked, setChecked] = useState(false);
+	const [errorName, setErrorName] = useState<boolean>(false);
 
 	useEffect(() => {
 		axios.get("http://localhost:3000/auth/2fa/is2FA", {
@@ -45,10 +46,12 @@ export default function CV( {name, photoUrl, isFriend, isMe, closeModal } : {nam
 				.then((response) => {
 					console.log(response);
 					console.log("this is name");
+					setErrorName(false);
 					setTrueName(str);
 				})
 				.catch((error) => {
 					console.error(error);
+					setErrorName(true);
 				});
     }
 
@@ -80,7 +83,20 @@ export default function CV( {name, photoUrl, isFriend, isMe, closeModal } : {nam
         if (file) {
             const reader = new FileReader();
             reader.onload = () => {
-                setImage(reader.result as string);
+				const img = reader.result as string;
+				console.log(img);
+				axios.post("http://localhost:3000/user/image", 
+				{ image: img }, 
+				{ headers: {
+					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`, 
+				},})
+				.then((response) => {
+					console.log(response);
+					setImage(reader.result as string);
+				})
+				.catch((error) => {
+					console.error(error);
+				});
             };
             reader.readAsDataURL(file);
         }
@@ -99,14 +115,16 @@ export default function CV( {name, photoUrl, isFriend, isMe, closeModal } : {nam
         )
         
         retu.push(
-            <div key={"changeName"}>
-            <p/>
-            <ButtonInputToggle
-            onInputSubmit={changeName}
-            textInButton='Change name'
-            placeHolder='New name'
-            classInput='button_notif'
-            classButton='button_notif'/>
+            <div key={"changeName"} className="ChangeNameDiv">
+				<p/>
+					<ButtonInputToggle
+					onInputSubmit={changeName}
+					textInButton='Change name'
+					placeHolder='New name'
+					classInput='button_notif'
+					classButton='button_notif'
+					/>
+				{errorName ? <p className="errorName">Already Exist</p> : <></>}
             </div>
             )
             
