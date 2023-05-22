@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Cookies } from "react-cookie";
 import axios from "axios";
-const cookies = new Cookies();
+import { cookies } from "../App";
 
 export function setErrorCookie(ErrorMessage:string) {
 	cookies.set('Error', ErrorMessage);	
