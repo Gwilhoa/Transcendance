@@ -224,12 +224,16 @@ export class UserController {
     @Body('name') name: string,
     @Res() response,
   ) {
-    const ret = await this.userService.setName(id, name);
-    if (ret == null) {
-      response.status(204).send('No Content');
-      return;
-    }
-    response.status(200).send(ret);
+	  const ret = await this.userService.setName(id, name);
+	  try {
+		if (ret == null) {
+		  response.status(204).send('No Content');
+		  return;
+		}
+	} catch (e) {
+		response.status(400).send('Already Used');
+	}
+	response.status(200).send(ret);
   }
 
   @Get('isfriend')

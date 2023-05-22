@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { ButtonInputToggle } from '../utils/inputButton';
 import LogoutButton from './logout';
 import { setErrorCookie } from "../IfError"
-import axios, { setName } from '../utils/API';
+import axios from '../utils/API';
 import Cookies from 'universal-cookie';
 const cookies = new Cookies();
 
@@ -36,9 +36,20 @@ export default function CV( {name, photoUrl, isFriend, isMe, closeModal } : {nam
 			});
 	}, [navigate]);
 
-    const changeName = (str:string) => {
-        if (setName(str))
-            setTrueName(str);
+	const changeName = (str: string) => {
+			axios.post("http://localhost:3000/user/name", 
+				{ name: str }, 
+				{ headers: {
+					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`, 
+				},})
+				.then((response) => {
+					console.log(response);
+					console.log("this is name");
+					setTrueName(str);
+				})
+				.catch((error) => {
+					console.error(error);
+				});
     }
 
     const clicked = () => {
