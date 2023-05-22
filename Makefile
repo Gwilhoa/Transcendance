@@ -91,6 +91,8 @@ database:
 # ~~~~~~~~~~~~~~ BACKEND ~~~~~~~~~~~~~~
 
 back: database
+	docker-compose -f docker-compose.yml build back
+	docker-compose -f docker-compose.yml create back
 	docker-compose up back
 # ~~~~~~~~~~~~~~ FRONTEND ~~~~~~~~~~~~~~
 

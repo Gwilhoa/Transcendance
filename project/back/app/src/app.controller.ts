@@ -1,7 +1,6 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, Res, UseGuards } from '@nestjs/common';
 import { AppService } from './app.service';
-import {Res, Req} from '@nestjs/common';
-import { JwtIsAuthGuard } from './guard/jwt.guard';
+import { JwtIsAuthGuard } from './auth/guard/jwt.guard';
 
 @Controller()
 export class AppController {
@@ -12,7 +11,6 @@ export class AppController {
     return this.appService.getHello();
   }
 
-  @UseGuards(JwtIsAuthGuard)
   @Get('addbot')
   async addbot(@Res() res)
   {
