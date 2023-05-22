@@ -32,8 +32,7 @@ const PopupChat: React.FC<{path:string, openModal:(param: boolean) => void, setC
   const [messageList, setMessageList] = useState<Message []>([])
   const [currentChanel, setCurrentChanel] = useState<string>("");
   
-  let finalPath:Channel|undefined;
-  const nupdateChannelList = () => {
+  const updateChannelList = () => {
     getChannels()
     .then((channels: Channel[]) => {
       console.log(channels);
@@ -46,20 +45,12 @@ const PopupChat: React.FC<{path:string, openModal:(param: boolean) => void, setC
         console.log("channel is " + foundChannel.name)
         setCurrentChanel(foundChannel.id);
         setTitle(foundChannel.name);
-        //getMessages(foundChannel.id);
       }
     })
     .catch((error: any) => {
       console.error('Erreur lors de la récupération des canaux disponibles :', error);
     });
   };
-
-  if (Array.isArray(channelList)) {
-    finalPath = channelList.find((channel) => channel.name === param.path);
-  }
-  
-  
-  console.log("final path : " + finalPath);
   
   useEffect(() => {
     socket.on('message', (message: string) => {
@@ -72,7 +63,7 @@ const PopupChat: React.FC<{path:string, openModal:(param: boolean) => void, setC
   });
 
   useEffect(() => {
-    nupdateChannelList()
+    updateChannelList()
   }, [param.path])
 
   async function NewChan(name:string) {
@@ -134,16 +125,22 @@ const PopupChat: React.FC<{path:string, openModal:(param: boolean) => void, setC
         author:""
       }
       setMessageList([...messageList, newMessage]);
+      setMessage('');
+      return ;
     }
     if (prompt.charAt(0) === "/") {
       sendCommandToBack(prompt);
+      console.log("zz")
     }
     else {
+      //console.log("zz")
+      //socket.emit("message", prompt)
       sendNewMessageToBack(currentChanel, prompt);
     }
     setMessage('');
   }
-    return (
+
+  return (
       <div className="popup right">
       <div className="popupchild">
         <header className="popup_up">

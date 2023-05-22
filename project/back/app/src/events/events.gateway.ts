@@ -203,18 +203,17 @@ export class EventsGateway
       send = {
         code: messageCode.UNEXISTING_CHANNEL,
       };
-    } else if (!(await this.channelService.isInChannel(user, channel))) {
+    } else if (!(await this.channelService.isInChannel(user.id, channel.id))) {
       send = {
         code: messageCode.UNACCESSIBLE_CHANNEL,
       };
     } else {
       message = new sendMessageDTO();
       message.content = payload.content;
-      message.user = user_id;
-      message.channel = channel_id;
+      message.channel = payload.channel_id;
       let msg;
       try {
-        msg = await this.channelService.sendMessage(message, user_id);
+        msg = await this.channelService.sendMessage(message, user.id);
       } catch (error) {
         send = {
           code: messageCode.INVALID_FORMAT,
@@ -259,7 +258,7 @@ export class EventsGateway
       send = {
         code: 1,
       };
-    } else if (!(await this.channelService.isInChannel(user, channel))) {
+    } else if (!(await this.channelService.isInChannel(user.id, channel.id))) {
       send = {
         code: 2,
       };
@@ -299,7 +298,7 @@ export class EventsGateway
       send = {
         code: 1,
       };
-    } else if (!(await this.channelService.isInChannel(user, channel))) {
+    } else if (!(await this.channelService.isInChannel(user.id, channel.id))) {
       send = {
         code: 2,
       };

@@ -63,8 +63,12 @@ export class ChannelService {
     return await this.channelRepository.findOneBy({ id: id });
   }
 
-  public async isInChannel(user_id, channel_id) {
-    const chan = await this.channelRepository.findOneBy({ id: channel_id });
+  public async isInChannel(user_id: string, channel_id: string) {
+    const chan = await this.channelRepository
+      .createQueryBuilder('channel')
+      .leftJoinAndSelect('channel.users', 'users')
+      .where('channel.id = :id', { id: channel_id })
+      .getOne();
     if (chan == null) return false;
     const user = await this.userService.getUserById(user_id);
     if (user == null) return false;
