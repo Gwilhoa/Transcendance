@@ -59,7 +59,6 @@ export class UserService {
     if (retIntra == null) {
       return null;
     }
-    await this.test();
     const retUser = await this.authService.getUserIntra(retIntra.access_token);
     const verif_user = await this.userRepository.findOneBy({ id: retUser.id });
     if (verif_user != null) {
@@ -145,17 +144,17 @@ export class UserService {
     return user.friends;
   }
 
-  public async test() {
-    if ((await this.userRepository.findOneBy({ id: '1' })) != null) {
-      return null;
-    }
-    const user = new User();
-    user.id = '1';
-    user.username = 'test';
-    user.email = 'test@student.42lyon.fr';
-    await this.userRepository.save(user);
-    return user;
-  }
+  // public async test() {
+  //   if ((await this.userRepository.findOneBy({ id: '1' })) != null) {
+  //     return null;
+  //   }
+  //   const user = new User();
+  //   user.id = '1';
+  //   user.username = 'test';
+  //   user.email = 'test@student.42lyon.fr';
+  //   await this.userRepository.save(user);
+  //   return user;
+  // }
 
   public async addBlocked(id: string, blocked_id: string) {
     const user = await this.userRepository.findOneBy({ id: id });
