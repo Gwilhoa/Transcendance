@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Cookies from "universal-cookie";
 const cookies = new Cookies();
 import axios from "axios";
-import { error } from "console";
 import { useNavigate } from "react-router-dom";
 import AuthCode, { AuthCodeRef } from "react-auth-code-input";
 import { setErrorCookie } from "../IfError";
@@ -10,10 +9,30 @@ import { ErrorInput } from "../../pages/CreateTwoFa";
 import "../../style/CreateTwoFa.css";
 
 function AuthenticateComponentsTwoFa() {
-	const [result, setResult] = useState<string>("");
+	const [, setResult] = useState<string>("");
 	const [Error, setError] = useState<boolean>(false);
 	const navigate = useNavigate();
 	const AuthInputRef = useRef<AuthCodeRef>(null);
+
+	useEffect(() => {
+		if (cookies.get('jwtAuthorization') != null) {
+			axios.get("http://localhost:3000/auth/2fa/is2FA", {
+				headers: {
+					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+				},
+			})
+				.then(() => {
+					cookies.remove('Error');
+					navigate('/home');
+				})
+				.catch((error) => {
+					cookies.remove('tenMinToken');
+					setErrorCookie("Error " + error.response.status);
+					console.error(error);
+					navigate('/Error');
+				});
+		}
+	}, [navigate]);
 
 	const setCookieJwt = (jwtToken: string) => {
 		cookies.set('jwtAuthorization', jwtToken, {sameSite: 'lax', maxAge: 2 * 60 * 60 });
@@ -54,7 +73,6 @@ function AuthenticateComponentsTwoFa() {
 			setError(false);
 		}
 	};
-
 
 
     return (

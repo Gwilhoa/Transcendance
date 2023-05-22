@@ -3,7 +3,7 @@ import './template.css'
 import React, { useEffect, useState } from "react";
 import CV from "../components/profil/CV";
 import { Props } from "../App";
-import axios, { getName } from "../components/utils/API";
+import axios from "../components/utils/API";
 import { IsInAChat, JoinChat, LeaveChat } from "../components/popup/chatManager";
 import { setErrorCookie } from "../components/IfError";
 import Cookies from 'universal-cookie';
@@ -44,7 +44,7 @@ const Head = ({ openModal, setContent }: Props) => {
 				console.error(error);
 				navigate('/Error');
 			});
-	}, []);
+	}, [navigate]);
 
   const buttonChat = () => {
     if (IsInAChat())

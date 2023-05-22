@@ -23,7 +23,7 @@ function Auth() {
 					console.error(error.status)
 				});
 		}
-	}, []);
+	}, [navigate]);
 
   return (
 	<div className="Auth">

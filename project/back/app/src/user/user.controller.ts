@@ -69,7 +69,7 @@ export class UserController {
       const base64Image = image.toString('base64');
       const dataUri = `data:image/${fileExt};base64,${base64Image}`;
       response.setHeader('Content-Type', `image/${fileExt}`);
-      response.status(400).send(dataUri);
+      response.status(200).send(dataUri);
     } catch (error) {
       response.status(500).send('Internal Server Error');
     }
@@ -91,7 +91,7 @@ export class UserController {
       const base64Image = image.toString('base64');
       const dataUri = `data:image/${fileExt};base64,${base64Image}`;
       response.setHeader('Content-Type', `image/${fileExt}`);
-      response.status(400).send(dataUri);
+      response.status(200).send(dataUri);
     } catch (error) {
       response.status(500).send('Internal Server Error');
     }

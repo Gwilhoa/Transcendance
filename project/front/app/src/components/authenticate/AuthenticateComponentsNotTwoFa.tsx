@@ -53,7 +53,8 @@ function AuthenticateComponentsNotTwoFa() {
 					navigate('/Error');
 				});
 			}
-	}, []);
+	}, [navigate, error]);
+
     return (
         <div>
 			<p>Waiting ...</p>

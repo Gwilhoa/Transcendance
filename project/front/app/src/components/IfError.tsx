@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Cookies } from "react-cookie";
 import axios from "axios";
@@ -27,7 +27,7 @@ function ErrorToken() {
 				console.error(error);
 				navigate('/Error');
 			});
-	}, []);
+	}, [navigate]);
 
 	return (
 		<>

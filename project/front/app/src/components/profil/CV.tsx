@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { ButtonInputToggle } from '../utils/inputButton';
 import LogoutButton from './logout';
 import { setErrorCookie } from "../IfError"
-import axios, { setTwoFA, setName } from '../utils/API';
+import axios, { setName } from '../utils/API';
 import Cookies from 'universal-cookie';
 const cookies = new Cookies();
 
@@ -13,7 +13,7 @@ export default function CV( {name, photoUrl, isFriend, isMe, closeModal } : {nam
     const retu = [];
 	const navigate = useNavigate();
     const [truename, setTrueName] = useState(name);
-    const [image, setImage] = useState<string | ArrayBuffer>(photoUrl);
+    const [image, setImage] = useState<string>(photoUrl);
     const [checked, setChecked] = useState(false);
 
 	useEffect(() => {
@@ -34,23 +34,7 @@ export default function CV( {name, photoUrl, isFriend, isMe, closeModal } : {nam
 				console.error(error);
 				navigate('/Error');
 			});
-		axios.get("http://localhost:3000/user/image", {
-			headers: {
-				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
-			},
-		})
-			.then((response) => {
-				const blob = new Blob([response.data]);
-				const tempUrl = URL.createObjectURL(blob);
-				setImage(tempUrl);
-			})
-			.catch((error) => {
-				setErrorCookie("Error " + error.response.status);
-				console.error(error);
-				navigate('/Error');
-			});
-		console.log(image);
-	}, []);
+	}, [navigate]);
 
     const changeName = (str:string) => {
         if (setName(str))
@@ -93,7 +77,7 @@ export default function CV( {name, photoUrl, isFriend, isMe, closeModal } : {nam
 
     retu.push(
         <div key={"image"}>
-            <img className='circle-image' src={`data:image/jpeg;base64,${image}`} alt="selected" />
+            <img className='circle-image' src={image} alt="selected" />
             <br/> <br/>
         </div>
     )
@@ -128,11 +112,6 @@ export default function CV( {name, photoUrl, isFriend, isMe, closeModal } : {nam
 			</div>	
 		)
 	}
-
-
-        //retu.push(
-          //  <div></div>
-        //)
 
     if (!isFriend && !isMe) {
         retu.push(
