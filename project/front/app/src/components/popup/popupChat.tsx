@@ -15,7 +15,6 @@ type ChannelItem = {
   name:string
 }
 
-
 //const sendNewMessageToBack = (message:string) => {
   //////J'me casse !!
   //}
@@ -37,14 +36,18 @@ const PopupChat: React.FC<{path:string, openModal:(param: boolean) => void, setC
     .then((channels: Channel[]) => {
       console.log(channels);
       setChannelList(channels);
-      const foundChannel = channels.find((channel) => channel.name === param.path);
-      if (!foundChannel) {
-        setCurrentChanel("");
-        setTitle('SoloChannel');
-      } else if (foundChannel) {
-        console.log("channel is " + foundChannel.name)
-        setCurrentChanel(foundChannel.id);
-        setTitle(foundChannel.name);
+      if (Array.isArray(channels)) {
+        const foundChannel = channels.find((channel) => channel.name === param.path);
+        if (!foundChannel) {
+          setCurrentChanel("");
+          setMessageList([]);
+          setTitle('SoloChannel');
+        } else if (foundChannel) {
+          console.log("channel is " + foundChannel.name)
+          setMessageList([]);
+          setCurrentChanel(foundChannel.id);
+          setTitle(foundChannel.name);
+        }
       }
     })
     .catch((error: any) => {
@@ -54,6 +57,7 @@ const PopupChat: React.FC<{path:string, openModal:(param: boolean) => void, setC
   
   useEffect(() => {
     socket.on('message', (message: string) => {
+      console.log("Guilhem me ment");
       setMessageList([ {contain:message, date:"ee", author:'ejd'}]);
     });
     return () => {

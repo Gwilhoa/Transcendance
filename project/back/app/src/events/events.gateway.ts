@@ -231,7 +231,8 @@ export class EventsGateway
         channel: msg.channel,
         date: msg.date,
       };
-      this.server.to(channel_id).emit('message', sendmsg);
+      //TODO: unique
+      this.server.emit('message', sendmsg);
     }
     client.emit('message_code', send);
   }
