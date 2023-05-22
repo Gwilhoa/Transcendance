@@ -272,13 +272,17 @@ export class UserService {
   }
 
   public async setAvatar(id, buffer, extname) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const fs = require('fs');
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const path = require('path');
     const lastimage = await this.getPathImage(id);
     if (lastimage != null) {
-      fs.unlink(lastimage);
+      fs.unlink(lastimage, (error) => {
+        if (error) {
+          console.error('Error deleting last image:', error);
+        } else {
+          console.log('Last image deleted successfully');
+        }
+      });
     }
     const imagePath = path.join(
       __dirname,
@@ -289,7 +293,7 @@ export class UserService {
       `${id}${extname}`,
     );
     try {
-      await fs.access(path.dirname(imagePath));
+      await fs.promises.access(path.dirname(imagePath));
     } catch (error) {
       fs.mkdirSync(path.dirname(imagePath), { recursive: true });
     }

@@ -78,31 +78,31 @@ export default function CV( {name, photoUrl, isFriend, isMe, closeModal } : {nam
 		}
     }
 
-    const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files && event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = () => {
-				const img = reader.result as string;
-				console.log(img);
-				axios.post("http://localhost:3000/user/image", 
-				{ image: img }, 
-				{ headers: {
-					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`, 
-				},})
-				.then((response) => {
-					console.log(response);
-					setImage(reader.result as string);
+	const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		const file = event.target.files && event.target.files[0];
+		if (file) {
+			const formData = new FormData();
+			formData.append('image', file);
+
+			axios({
+				method: 'post',
+				url: 'http://localhost:3000/user/image',
+				headers: {
+					'Authorization': `Bearer ${cookies.get('jwtAuthorization')}`,
+					'Content-Type': 'multipart/form-data',
+				},
+				data: formData,
+			})
+				.then(response => {
+					console.log(response.data);
 				})
-				.catch((error) => {
+				.catch(error => {
 					console.error(error);
 				});
-            };
-            reader.readAsDataURL(file);
-        }
-    };
+		}
+	};
 
-    retu.push(
+	retu.push(
         <div key={"image"}>
             <img className='circle-image' src={image} alt="selected" />
             <br/> <br/>
