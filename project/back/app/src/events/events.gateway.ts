@@ -126,7 +126,7 @@ export class EventsGateway
     let send;
     const token = payload.token;
     const friend_id = payload.friend_id;
-    const user_id = verifyToken(token);
+    const user_id = verifyToken(token, this.authService);
     if (user_id == null) {
       client.emit('friend_code', FriendCode.UNAUTHORIZED);
       return;
@@ -192,7 +192,7 @@ export class EventsGateway
     const channel_id = payload.channel_id;
     let message = payload.content;
     let send;
-    const user_id = verifyToken(token);
+    const user_id = verifyToken(token, this.authService);
     const user = await this.userService.getUserById(user_id);
     const channel = await this.channelService.getChannelById(channel_id);
     if (user == null) {
@@ -210,7 +210,7 @@ export class EventsGateway
     } else {
       message = new sendMessageDTO();
       message.content = payload.content;
-      message.channel = payload.channel_id;
+      message.channel_id = payload.channel_id;
       let msg;
       try {
         msg = await this.channelService.sendMessage(message, user.id);
@@ -231,6 +231,7 @@ export class EventsGateway
         channel: msg.channel,
         date: msg.date,
       };
+      this.logger.debug('new message sent : ' + sendmsg.content);
       //TODO: unique
       this.server.emit('message', sendmsg);
     }
@@ -242,7 +243,7 @@ export class EventsGateway
     let send;
     const token = payload.token;
     const channel_id = payload.channel_id;
-    const user_id = verifyToken(token);
+    const user_id = verifyToken(token, this.authService);
     if (user_id == null) {
       send = {
         code: 401,
@@ -282,7 +283,7 @@ export class EventsGateway
     let send;
     const token = payload.token;
     const channel_id = payload.channel_id;
-    const user_id = verifyToken(token);
+    const user_id = verifyToken(token, this.authService);
     if (user_id == null) {
       send = {
         code: 401,

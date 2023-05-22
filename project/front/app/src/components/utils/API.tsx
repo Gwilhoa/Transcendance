@@ -18,6 +18,10 @@ socket.on('connection_server', (data: any) => {
     console.log(data);
 });
 
+socket.on('message_code', (data: any) => {
+    console.log(data.code);
+})
+
 export const Token = cookies.get('jwtAuthorization');
 
 

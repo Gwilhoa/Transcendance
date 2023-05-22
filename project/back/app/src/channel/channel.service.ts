@@ -69,9 +69,14 @@ export class ChannelService {
       .leftJoinAndSelect('channel.users', 'users')
       .where('channel.id = :id', { id: channel_id })
       .getOne();
+    console.log(chan.users);
     if (chan == null) return false;
     const user = await this.userService.getUserById(user_id);
     if (user == null) return false;
+    let chanuser;
+    for (chanuser of chan.users) {
+      if (user.id == chanuser.id) return true;
+    }
     return chan.users.includes(user);
   }
 
@@ -173,6 +178,7 @@ export class ChannelService {
   }
 
   public async sendMessage(body: sendMessageDTO, user_id) {
+    console.log(body);
     if (body.content.length > 4242 || body.content.length <= 0)
       throw new Error('Message too long (max 4242) or empty');
     const message = new Message();
