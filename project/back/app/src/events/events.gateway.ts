@@ -126,7 +126,7 @@ export class EventsGateway
     let send;
     const token = payload.token;
     const friend_id = payload.friend_id;
-    const user_id = verifyToken(token);
+    const user_id = verifyToken(token, this.authService);
     if (user_id == null) {
       client.emit('friend_code', FriendCode.UNAUTHORIZED);
       return;
@@ -192,7 +192,7 @@ export class EventsGateway
     const channel_id = payload.channel_id;
     let message = payload.content;
     let send;
-    const user_id = verifyToken(token);
+    const user_id = verifyToken(token, this.authService);
     const user = await this.userService.getUserById(user_id);
     const channel = await this.channelService.getChannelById(channel_id);
     if (user == null) {
@@ -203,18 +203,17 @@ export class EventsGateway
       send = {
         code: messageCode.UNEXISTING_CHANNEL,
       };
-    } else if (!(await this.channelService.isInChannel(user, channel))) {
+    } else if (!(await this.channelService.isInChannel(user.id, channel.id))) {
       send = {
         code: messageCode.UNACCESSIBLE_CHANNEL,
       };
     } else {
       message = new sendMessageDTO();
       message.content = payload.content;
-      message.user = user_id;
-      message.channel = channel_id;
+      message.channel_id = payload.channel_id;
       let msg;
       try {
-        msg = await this.channelService.sendMessage(message, user_id);
+        msg = await this.channelService.sendMessage(message, user.id);
       } catch (error) {
         send = {
           code: messageCode.INVALID_FORMAT,
@@ -232,7 +231,9 @@ export class EventsGateway
         channel: msg.channel,
         date: msg.date,
       };
-      this.server.to(channel_id).emit('message', sendmsg);
+      this.logger.debug('new message sent : ' + sendmsg.content);
+      //TODO: unique
+      this.server.emit('message', sendmsg);
     }
     client.emit('message_code', send);
   }
@@ -242,7 +243,7 @@ export class EventsGateway
     let send;
     const token = payload.token;
     const channel_id = payload.channel_id;
-    const user_id = verifyToken(token);
+    const user_id = verifyToken(token, this.authService);
     if (user_id == null) {
       send = {
         code: 401,
@@ -259,7 +260,7 @@ export class EventsGateway
       send = {
         code: 1,
       };
-    } else if (!(await this.channelService.isInChannel(user, channel))) {
+    } else if (!(await this.channelService.isInChannel(user.id, channel.id))) {
       send = {
         code: 2,
       };
@@ -282,7 +283,7 @@ export class EventsGateway
     let send;
     const token = payload.token;
     const channel_id = payload.channel_id;
-    const user_id = verifyToken(token);
+    const user_id = verifyToken(token, this.authService);
     if (user_id == null) {
       send = {
         code: 401,
@@ -299,7 +300,7 @@ export class EventsGateway
       send = {
         code: 1,
       };
-    } else if (!(await this.channelService.isInChannel(user, channel))) {
+    } else if (!(await this.channelService.isInChannel(user.id, channel.id))) {
       send = {
         code: 2,
       };

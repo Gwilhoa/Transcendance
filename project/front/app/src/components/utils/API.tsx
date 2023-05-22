@@ -1,8 +1,9 @@
 import axios, { AxiosResponse, AxiosRequestConfig } from 'axios';
 import { promises } from 'dns';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import io from "socket.io-client";
 import Cookies from 'universal-cookie';
+import { setErrorCookie } from '../IfError';
 const cookies = new Cookies();
 axios.defaults.baseURL = 'http://localhost:3000/'
 axios.defaults.headers.common = {'Authorization': `bearer ${cookies.get('jwtAuthorization')}`}
@@ -16,6 +17,10 @@ socket.on('connect', () => {
 socket.on('connection_server', (data: any) => {
     console.log(data);
 });
+
+socket.on('message_code', (data: any) => {
+    console.log(data.code);
+})
 
 export const Token = cookies.get('jwtAuthorization');
 
@@ -143,7 +148,7 @@ export const sendNewMessageToBack = (channelId: string, content: string) => {
 
     const messageData: MMessage = {
       token, 
-      channel_id: channelId.toString(),
+      channel_id: channelId,
       content,
     };
 
@@ -152,14 +157,14 @@ export const sendNewMessageToBack = (channelId: string, content: string) => {
         console.log('Message envoyé avec succès');
         return ;
       } else if (response === MessageCode.CHANNEL_NOT_FOUND) {
-        //setErrorCookie(ErrorMessage:'Le canal n\'existe pas');
+        setErrorCookie('Le canal n\'existe pas');
       } else if (response === MessageCode.NO_ACCESS) {
-        //setErrorCookie(ErrorMessage:'Vous n\'avez pas accès à ce canal');
+        setErrorCookie('Vous n\'avez pas accès à ce canal');
       } else if (response === MessageCode.INVALID_FORMAT) {
-        //setErrorCookie(ErrorMessage:'Format invalide du message');
+        setErrorCookie('Format invalide du message');
       }
-    
-      //Navigate('/Error');
+      const Navigate = useNavigate();
+      Navigate('/Error');
     });
   };
 
