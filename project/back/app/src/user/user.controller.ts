@@ -17,14 +17,15 @@ import { UserService } from './user.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtIsAuthGuard } from '../auth/guard/jwt.guard';
 import { GetUser } from '../auth/decorator/auth.decorator';
-import path, { extname } from 'path';
-import fs from 'fs';
+import * as path from 'path';
+import * as fs from 'fs';
+import { extname } from 'path';
+import { promisify } from 'util';
 
 @UseGuards(JwtIsAuthGuard)
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
-
   @Get()
   async getUsers(): Promise<User[]> {
     return this.userService.getUsers();
@@ -58,16 +59,20 @@ export class UserController {
     try {
       imagePath = await this.userService.getImageById(id);
     } catch (e) {
-      response.status(404).send('Not Found');
-      return;
+      return response.status(404).send(e.message);
     }
-    const stream = fs.createReadStream(imagePath);
-    const fileExt = path.extname(imagePath).substr(1);
-    response.setHeader('Content-Type', 'image/' + fileExt);
-    stream.on('error', (error) => {
-      response.status(400).send('Bad Request');
-    });
-    stream.pipe(response);
+
+    try {
+      const asyncReadFile = promisify(fs.readFile);
+      const image = await asyncReadFile(imagePath);
+      const fileExt = path.extname(imagePath).substr(1);
+      const base64Image = image.toString('base64');
+      const dataUri = `data:image/${fileExt};base64,${base64Image}`;
+      response.setHeader('Content-Type', `image/${fileExt}`);
+      response.status(200).send(dataUri);
+    } catch (error) {
+      response.status(500).send('Internal Server Error');
+    }
   }
 
   @Get('/image/:id')
@@ -76,16 +81,20 @@ export class UserController {
     try {
       imagePath = await this.userService.getImageById(id);
     } catch (e) {
-      response.status(404).send('Not Found');
-      return;
+      return response.status(404).send(e.message);
     }
-    const stream = fs.createReadStream(imagePath);
-    const fileExt = path.extname(imagePath).substr(1);
-    response.setHeader('Content-Type', 'image/' + fileExt);
-    stream.on('error', (error) => {
-      response.status(400).send('Bad Request');
-    });
-    stream.pipe(response);
+
+    try {
+      const asyncReadFile = promisify(fs.readFile);
+      const image = await asyncReadFile(imagePath);
+      const fileExt = path.extname(imagePath).substr(1);
+      const base64Image = image.toString('base64');
+      const dataUri = `data:image/${fileExt};base64,${base64Image}`;
+      response.setHeader('Content-Type', `image/${fileExt}`);
+      response.status(200).send(dataUri);
+    } catch (error) {
+      response.status(500).send('Internal Server Error');
+    }
   }
 
   @Post('/image')
