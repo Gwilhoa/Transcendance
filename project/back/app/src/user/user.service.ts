@@ -260,13 +260,12 @@ export class UserService {
     if (user == null) {
       return null;
     }
-	const users = await this.userRepository.find();
-	let userIndex;
-	for (userIndex in users)
-		{
-			if (userIndex.name == name)
-				throw new Error('already use');
-		}
+    const users = await this.userRepository.find();
+    users.forEach((user) => {
+      if (user.username == name) {
+        throw new Error('Username already taken');
+      }
+    });
     user.username = name;
     await this.userRepository.save(user);
     return user;
