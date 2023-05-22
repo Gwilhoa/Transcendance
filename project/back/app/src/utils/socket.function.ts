@@ -1,5 +1,5 @@
 import { Server, Socket } from 'socket.io';
-import {AuthService} from "../auth/auth.service";
+import { AuthService } from '../auth/auth.service';
 
 export function verifyToken(token: string, authService: AuthService) {
   try {

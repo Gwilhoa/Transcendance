@@ -228,6 +228,7 @@ export class EventsGateway
         id: msg.id,
         content: msg.content,
         user: msg.user.id,
+        username: msg.user.username,
         channel: msg.channel,
         date: msg.date,
       };
@@ -406,5 +407,9 @@ export class EventsGateway
     this.server
       .to(game_id)
       .emit('update_game', this.games[game_id].getGameInfo());
+  }
+
+  async sendchangename(id: string, name: string) {
+    this.server.emit('change_name', { id: id, name: name });
   }
 }
