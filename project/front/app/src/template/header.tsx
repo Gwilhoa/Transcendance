@@ -29,19 +29,21 @@ const Head = ({ openModal, setContent }: Props) => {
 				console.error(error);
 				navigate('/Error');
 			});
-		// axios.get("http://localhost:3000/user/image", {
-		// 	headers: {
-		// 		Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
-		// 	},
-		// })
-		// 	.then((response) => {
-		// 		console.log(response);
-		// 	})
-		// 	.catch((error) => {
-		// 		setErrorCookie("Error " + error.response.status);
-		// 		console.error(error);
-		// 		navigate('/Error');
-		// 	});
+		axios.get("http://localhost:3000/user/image", {
+			headers: {
+				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+			},
+		})
+			.then((response) => {
+				const data = response.data;
+				console.log(response);
+				setImage(data);
+			})
+			.catch((error) => {
+				setErrorCookie("Error " + error.response.status);
+				console.error(error);
+				navigate('/Error');
+			});
 	}, []);
 
   const buttonChat = () => {
@@ -56,7 +58,7 @@ const Head = ({ openModal, setContent }: Props) => {
 		<CV name={name} 
 		isFriend={false} 
 		isMe={true} 
-		photoUrl={"https://www.treehugger.com/thmb/9fuOGVoJ23ZwziKRNtAEMHw8opU=/750x0/filters:no_upscale():max_bytes(150000):strip_icc():format(webp)/piglet-grass-dandelions-01-b21d7ef8f881496f8346dbe01859537e.jpg"} 
+		photoUrl={image} 
 		closeModal={openModal}
 		/>);
     openModal(true);

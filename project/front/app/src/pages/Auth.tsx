@@ -9,15 +9,20 @@ function Auth() {
 
 	cookies.remove('Error');  
 	useEffect(() => {
-		axios.get("http://localhost:3000/auth/2fa/is2FA", {
-			headers: {
-				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
-			},
-		})
-			.then(() => {
-				navigate('/home');
-			});
 
+		if (cookies.get('jwtAuthorization') != null) {
+			axios.get("http://localhost:3000/auth/2fa/is2FA", {
+				headers: {
+					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+				},
+			})
+				.then(() => {
+					navigate('/home');
+				})
+				.catch((error) => {
+					console.error(error.status)
+				});
+		}
 	}, []);
 
   return (

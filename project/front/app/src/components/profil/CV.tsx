@@ -13,7 +13,7 @@ export default function CV( {name, photoUrl, isFriend, isMe, closeModal } : {nam
     const retu = [];
 	const navigate = useNavigate();
     const [truename, setTrueName] = useState(name);
-    const [image, setImage] = useState(photoUrl);
+    const [image, setImage] = useState<string | ArrayBuffer>(photoUrl);
     const [checked, setChecked] = useState(false);
 
 	useEffect(() => {
@@ -34,6 +34,22 @@ export default function CV( {name, photoUrl, isFriend, isMe, closeModal } : {nam
 				console.error(error);
 				navigate('/Error');
 			});
+		axios.get("http://localhost:3000/user/image", {
+			headers: {
+				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+			},
+		})
+			.then((response) => {
+				const blob = new Blob([response.data]);
+				const tempUrl = URL.createObjectURL(blob);
+				setImage(tempUrl);
+			})
+			.catch((error) => {
+				setErrorCookie("Error " + error.response.status);
+				console.error(error);
+				navigate('/Error');
+			});
+		console.log(image);
 	}, []);
 
     const changeName = (str:string) => {
@@ -77,7 +93,7 @@ export default function CV( {name, photoUrl, isFriend, isMe, closeModal } : {nam
 
     retu.push(
         <div key={"image"}>
-            <img className='circle-image' src={image} alt="selected" />
+            <img className='circle-image' src={`data:image/jpeg;base64,${image}`} alt="selected" />
             <br/> <br/>
         </div>
     )

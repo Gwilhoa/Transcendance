@@ -16,16 +16,24 @@ function AuthenticateComponentsNotTwoFa() {
 				cookies.set('jwtAuthorization', jwtToken, {sameSite: 'lax', maxAge: 2 * 60 * 60 });
 			};
 
-		axios.get("http://localhost:3000/auth/2fa/is2FA", {
-			headers: {
-				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
-			},
-		})
-			.then(() => {
-				setError(true);
-				cookies.remove('Error');
-				navigate('/home');
-			});
+		if (cookies.get('jwtAuthorization') != null) {
+			axios.get("http://localhost:3000/auth/2fa/is2FA", {
+				headers: {
+					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+				},
+			})
+				.then(() => {
+					setError(true);
+					cookies.remove('Error');
+					navigate('/home');
+				})
+				.catch((error) => {
+					cookies.remove('tenMinToken');
+					setErrorCookie("Error " + error.response.status);
+					console.error(error);
+					navigate('/Error');
+				});
+		}
 			
 			if (error === false) {
 			axios.post(url, {code: ""},{
