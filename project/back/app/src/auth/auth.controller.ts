@@ -46,6 +46,7 @@ export class AuthController {
       res.status(400).send('Bad User');
       return;
     }
+    console.log('id : ' + user.id);
     const code = await this.userService.signJwtToken(
       user.id,
       user.email,

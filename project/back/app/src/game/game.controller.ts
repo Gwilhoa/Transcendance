@@ -18,17 +18,18 @@ export class GameController {
   constructor(private readonly gameService: GameService) {}
 
   @Get()
-  getGames(@GetUser('sub') id: string, @Res() response) {
-    return response.status(200).send(this.gameService.getGames(id));
+  async getGames(@GetUser('sub') id: string, @Res() response) {
+    console.log(await this.gameService.getGames(id));
+    return response.status(200).send(await this.gameService.getGames(id));
   }
 
   @Post()
-  createGame(@Body() body: CreateGameDTO, @Res() response) {
-    return response.status(200).send(this.gameService.createGame(body));
+  async createGame(@Body() body: CreateGameDTO, @Res() response) {
+    return response.status(200).send(await this.gameService.createGame(body));
   }
 
   @Get('/id/:id')
-  getGameById(@Param('id') id: string, @Res() response) {
-    return response.status(200).send(this.gameService.getGameById(id));
+  async getGameById(@Param('id') id: string, @Res() response) {
+    return response.status(200).send(await this.gameService.getGameById(id));
   }
 }
