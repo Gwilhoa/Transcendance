@@ -58,7 +58,7 @@ const PopupChat: React.FC<{path:string, openModal:(param: boolean) => void, setC
   useEffect(() => {
     socket.on('message', (message: string) => {
       console.log("Guilhem me ment");
-      setMessageList([ {contain:message, date:"ee", author:'ejd'}]);
+      setMessageList([...messageList, {contain:message, date:"ee", author:'ejd'}]);
     });
     return () => {
       socket.off('message_received');
