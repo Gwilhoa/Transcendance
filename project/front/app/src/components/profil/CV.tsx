@@ -19,8 +19,39 @@ export default function CV( { id, closeModal } : { id:string, closeModal:(param:
     const [checked, setChecked] = useState(false);
 	const [errorName, setErrorName] = useState<boolean>(false);
 
+
+	const refresh = (id:string) => {
+		axios.get("http://localhost:3000/user/image/" + id, {
+			headers: {
+				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+			},
+		})
+			.then((response) => {
+				const data = response.data;
+				setImage(data);
+			})
+			.catch((error) => {
+				setErrorCookie("Error " + error.response.status);
+				console.error(error);
+				navigate('/Error');
+			});
+
+		axios.get("http://localhost:3000/user/id/" + id, {
+			headers: {
+				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+			},
+		})
+			.then((response) => {
+				setName(response.data.username);
+			})
+			.catch((error) => {
+				setErrorCookie("Error " + error.response.status);
+				console.error(error);
+				navigate('/Error');
+			});
+	};
+
 	useEffect(() => {
-		console.log("c'est l'id " + id);
 		axios.get("http://localhost:3000/user/id", {
 			headers: {
 				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
@@ -39,38 +70,8 @@ export default function CV( { id, closeModal } : { id:string, closeModal:(param:
 				navigate('/Error');
 			});
 
-		axios.get("http://localhost:3000/user/image/" + id, {
-			headers: {
-				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
-			},
-		})
-			.then((response) => {
-				const data = response.data;
-				console.log(response);
-				console.log("bijour je get image");
-				setImage(data);
-			})
-			.catch((error) => {
-				setErrorCookie("Error " + error.response.status);
-				console.error(error);
-				navigate('/Error');
-			});
-
-		axios.get("http://localhost:3000/user/id/" + id, {
-			headers: {
-				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
-			},
-		})
-			.then((response) => {
-				console.log(response);
-				setName(response.data.username);
-			})
-			.catch((error) => {
-				setErrorCookie("Error " + error.response.status);
-				console.error(error);
-				navigate('/Error');
-			});
-
+		refresh(id);
+		
 		axios.get("http://localhost:3000/auth/2fa/is2FA", {
 			headers: {
 				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
@@ -96,11 +97,9 @@ export default function CV( { id, closeModal } : { id:string, closeModal:(param:
 				{ headers: {
 					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`, 
 				},})
-				.then((response) => {
-					console.log(response);
-					console.log("this is name");
+				.then(() => {
 					setErrorName(false);
-					setName(str);
+					refresh(id)
 				})
 				.catch((error) => {
 					console.error(error);
@@ -148,6 +147,7 @@ export default function CV( { id, closeModal } : { id:string, closeModal:(param:
 			})
 				.then(response => {
 					console.log(response.data);
+					refresh(id);
 				})
 				.catch(error => {
 					console.error(error);
