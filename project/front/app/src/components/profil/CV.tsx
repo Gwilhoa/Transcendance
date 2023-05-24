@@ -57,10 +57,8 @@ export default function CV( { id, closeModal } : { id:string, closeModal:(param:
 			},
 		})
 			.then((response) => {
-				console.log(response);
 				if (id === response.data.id) {
 					setIsMe(true);
-					console.log("this is me");
 				}
 			})
 			.catch((error) => {
@@ -81,7 +79,6 @@ export default function CV( { id, closeModal } : { id:string, closeModal:(param:
 					setChecked(false);
 				else
 					setChecked(true);
-				console.log(response.data);
 			})
 			.catch((error) => {
 				setErrorCookie("Error " + error.response.status);
@@ -117,9 +114,6 @@ export default function CV( { id, closeModal } : { id:string, closeModal:(param:
 					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
 				},
 			})
-				.then((response) => {
-					console.log(response);
-				})
 				.catch((error) => {
 					setErrorCookie("Error " + error.response.status);
 					console.error(error);

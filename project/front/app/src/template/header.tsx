@@ -20,7 +20,6 @@ const Head = ({ openModal, setContent }: Props) => {
 			},
 		})
 			.then((response) => {
-				console.log(response);
 				setId(response.data.id);
 			})
 			.catch((error) => {
