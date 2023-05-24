@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { ButtonInputToggle } from '../utils/inputButton';
 import LogoutButton from './logout';
 import { setErrorCookie } from "../IfError"
-import axios, { setName } from '../utils/API';
+import axios from '../utils/API';
 import Cookies from 'universal-cookie';
 const cookies = new Cookies();
 
@@ -15,6 +15,7 @@ export default function CV( {name, photoUrl, isFriend, isMe, closeModal } : {nam
     const [truename, setTrueName] = useState(name);
     const [image, setImage] = useState<string>(photoUrl);
     const [checked, setChecked] = useState(false);
+	const [errorName, setErrorName] = useState<boolean>(false);
 
 	useEffect(() => {
 		axios.get("http://localhost:3000/auth/2fa/is2FA", {
@@ -36,9 +37,22 @@ export default function CV( {name, photoUrl, isFriend, isMe, closeModal } : {nam
 			});
 	}, [navigate]);
 
-    const changeName = (str:string) => {
-        if (setName(str))
-            setTrueName(str);
+	const changeName = (str: string) => {
+			axios.post("http://localhost:3000/user/name", 
+				{ name: str }, 
+				{ headers: {
+					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`, 
+				},})
+				.then((response) => {
+					console.log(response);
+					console.log("this is name");
+					setErrorName(false);
+					setTrueName(str);
+				})
+				.catch((error) => {
+					console.error(error);
+					setErrorName(true);
+				});
     }
 
     const clicked = () => {
@@ -64,18 +78,31 @@ export default function CV( {name, photoUrl, isFriend, isMe, closeModal } : {nam
 		}
     }
 
-    const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files && event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = () => {
-                setImage(reader.result as string);
-            };
-            reader.readAsDataURL(file);
-        }
-    };
+	const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		const file = event.target.files && event.target.files[0];
+		if (file) {
+			const formData = new FormData();
+			formData.append('image', file);
 
-    retu.push(
+			axios({
+				method: 'post',
+				url: 'http://localhost:3000/user/image',
+				headers: {
+					'Authorization': `Bearer ${cookies.get('jwtAuthorization')}`,
+					'Content-Type': 'multipart/form-data',
+				},
+				data: formData,
+			})
+				.then(response => {
+					console.log(response.data);
+				})
+				.catch(error => {
+					console.error(error);
+				});
+		}
+	};
+
+	retu.push(
         <div key={"image"}>
             <img className='circle-image' src={image} alt="selected" />
             <br/> <br/>
@@ -88,14 +115,16 @@ export default function CV( {name, photoUrl, isFriend, isMe, closeModal } : {nam
         )
         
         retu.push(
-            <div key={"changeName"}>
-            <p/>
-            <ButtonInputToggle
-            onInputSubmit={changeName}
-            textInButton='Change name'
-            placeHolder='New name'
-            classInput='button_notif'
-            classButton='button_notif'/>
+            <div key={"changeName"} className="ChangeNameDiv">
+				<p/>
+					<ButtonInputToggle
+					onInputSubmit={changeName}
+					textInButton='Change name'
+					placeHolder='New name'
+					classInput='button_notif'
+					classButton='button_notif'
+					/>
+				{errorName ? <p className="errorName">Already Exist</p> : <></>}
             </div>
             )
             

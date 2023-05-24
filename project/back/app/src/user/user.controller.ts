@@ -131,18 +131,25 @@ export class UserController {
     @Res() response,
     @UploadedFile() file,
   ) {
+    if (!file) {
+      throw new HttpException('No file uploaded', HttpStatus.BAD_REQUEST);
+    }
+
     const ret = await this.userService.setAvatar(
       id,
       file.buffer,
       extname(file.originalname),
     );
-    if (ret == null) {
-      response.send('Error while uploading image').status(400);
-      return;
-    }
-    response.status(200).send(ret);
-  }
 
+    if (!ret) {
+      throw new HttpException(
+        'Error while uploading image',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+
+    return response.status(HttpStatus.OK).send(ret);
+  }
   @Post('/friend')
   async addFriend(
     @GetUser('sub') id: string,
@@ -230,12 +237,16 @@ export class UserController {
     @Body('name') name: string,
     @Res() response,
   ) {
-    const ret = await this.userService.setName(id, name);
-    if (ret == null) {
-      response.status(204).send('No Content');
-      return;
+    let ret;
+    try {
+      ret = await this.userService.setName(id, name);
+    } catch (e) {
+      return response.status(400).send('Bad Request ' + e);
     }
-    response.status(200).send(ret);
+    if (ret == null) {
+      return response.status(204).send('No Content');
+    }
+    return response.status(200).send(ret);
   }
 
   @Get('isfriend')
