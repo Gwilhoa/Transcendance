@@ -5,6 +5,7 @@ import { cookies } from "../App";
 
 export function setErrorCookie(ErrorMessage:string) {
 	cookies.set('Error', ErrorMessage);	
+	localStorage.removeItem('id');
 }
 
 function ErrorToken() {

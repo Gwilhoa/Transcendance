@@ -1,6 +1,5 @@
 import React from "react";
 import './css/history.css'
-// import Cookies from 'universal-cookie';
 import ErrorToken, { setErrorCookie } from '../components/IfError';
 import axios from '../components/utils/API'
 import { useNavigate } from 'react-router-dom';
@@ -96,6 +95,7 @@ const Add = () => {
 }
 
 const History = () => {
+	const id = localStorage.getItem('id');
     return (
         <div className="page-history">
 			<ErrorToken />

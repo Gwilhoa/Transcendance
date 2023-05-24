@@ -10,24 +10,30 @@ import Cookies from 'universal-cookie';
 const cookies = new Cookies();
 
 const Head = ({ openModal, setContent }: Props) => {
-	const [id, setId] = useState<string>("");
+	const [id, setId] = useState<string | null>(null);
 	const navigate = useNavigate();
 
 	useEffect(() => {
-		axios.get("http://localhost:3000/user/id", {
-			headers: {
-				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
-			},
-		})
-			.then((response) => {
-				setId(response.data.id);
+		if (localStorage.getItem('id') === null) {
+			axios.get("http://localhost:3000/user/id", {
+				headers: {
+					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+				},
 			})
-			.catch((error) => {
-				setErrorCookie("Error " + error.response.status);
-				console.error(error);
-				navigate('/Error');
-			});
-			}, [navigate]);
+				.then((response) => {
+					setId(response.data.id);
+					localStorage.setItem('id', response.data.id);
+				})
+				.catch((error) => {
+					setErrorCookie("Error " + error.response.status);
+					console.error(error);
+					navigate('/Error');
+				});
+		}
+		else {
+			setId(localStorage.getItem('id'));	
+		}
+	}, [navigate]);
 
   const buttonChat = () => {
     if (IsInAChat())
@@ -60,7 +66,7 @@ const Head = ({ openModal, setContent }: Props) => {
             <Link to="/game" className="navbar__link">
               Jeu
             </Link>
-            <Link to="/history" className="navbar__link">
+            <Link to='/history' className="navbar__link">
               History
             </Link>
             <button onClick={profilStart} className="navbar__link"> 

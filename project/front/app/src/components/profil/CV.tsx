@@ -9,7 +9,7 @@ import Cookies from 'universal-cookie';
 const cookies = new Cookies();
 
 
-export default function CV( { id, closeModal } : { id:string, closeModal:(param: boolean) => void; }) {
+export default function CV( { id, closeModal } : { id: string | null, closeModal:(param: boolean) => void; }) {
     const retu = [];
 	const navigate = useNavigate();
 	const [isMe, setIsMe] =  useState<boolean>(false);
@@ -19,7 +19,7 @@ export default function CV( { id, closeModal } : { id:string, closeModal:(param:
     const [checked, setChecked] = useState(false);
 	const [errorName, setErrorName] = useState<boolean>(false);
 
-	const refresh = useCallback((id:string) => {
+	const refresh = useCallback(( id: string | null ) => {
 		axios.get("http://localhost:3000/user/image/" + id, {
 			headers: {
 				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
