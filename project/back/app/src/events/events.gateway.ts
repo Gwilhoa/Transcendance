@@ -54,7 +54,6 @@ export class EventsGateway
     };
     check().then(() => this.logger.log('check matchmaking started'));
   }
-
   sendconnected() {
     send_connection_server(this.clients, this.ingame, this.server);
   }
@@ -113,6 +112,7 @@ export class EventsGateway
         wrongtoken(client);
         return;
       }
+      this.logger.debug(channels);
       for (const channel of channels) {
         client.join(channel.id);
       }
@@ -232,9 +232,8 @@ export class EventsGateway
         channel: msg.channel,
         date: msg.date,
       };
-      this.logger.debug('new message sent : ' + sendmsg.content);
-      //TODO: unique
-      this.server.emit('message', sendmsg);
+      this.server.to(channel.id).emit('message', sendmsg);
+      //this.server.emit('message', sendmsg);
     }
     client.emit('message_code', send);
   }

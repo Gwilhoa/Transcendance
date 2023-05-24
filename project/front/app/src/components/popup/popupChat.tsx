@@ -35,12 +35,15 @@ const PopupChat: React.FC<{path:string, openModal:(param: boolean) => void, setC
     const name = await getName();
     socket.on('message', (message: any) => {
         console.log("message received : " + message);
-          console.log("nom " +  name);
+          console.log(name);
         if (message.username === name) {
-          setMessageList([...messageList, {contain:message.content, date:message.date, author:""}]);
+          messageList.push({contain:message.content, date:message.date, author:""})
+          setMessageList([...messageList]);
         }
-        else
-          setMessageList([...messageList, {contain:message.content, date:message.date, author:message.username}]);
+        else {
+          messageList.push({contain: message.content, date: message.date, author: message.username})
+          setMessageList([...messageList]);
+        }
     });
   }
   
