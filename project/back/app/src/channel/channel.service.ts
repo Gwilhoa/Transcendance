@@ -69,7 +69,6 @@ export class ChannelService {
       .leftJoinAndSelect('channel.users', 'users')
       .where('channel.id = :id', { id: channel_id })
       .getOne();
-    console.log(chan.users);
     if (chan == null) return false;
     const user = await this.userService.getUserById(user_id);
     if (user == null) return false;
@@ -178,7 +177,6 @@ export class ChannelService {
   }
 
   public async sendMessage(body: sendMessageDTO, user_id) {
-    console.log(body);
     if (body.content.length > 4242 || body.content.length <= 0)
       throw new Error('Message too long (max 4242) or empty');
     const message = new Message();
@@ -212,7 +210,13 @@ export class ChannelService {
     const user = await this.userService.getUserById(user_id);
     if (user == null) throw new Error('User not found');
     const channels = await this.channelRepository.find();
-    return channels.filter((c) => c.users.includes(user));
+    console.log(channels);
+    let channel;
+    for (channel of channels) {
+      if (!channel.users.includes(user))
+        channels.filter((c) => c.id != channel.id);
+    }
+    return channels;
   }
 
   async getAvailableChannels(id: string) {

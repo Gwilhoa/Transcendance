@@ -21,6 +21,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { extname } from 'path';
 import { promisify } from 'util';
+import fetch from 'node-fetch';
 
 @UseGuards(JwtIsAuthGuard)
 @Controller('user')
@@ -59,9 +60,14 @@ export class UserController {
     try {
       imagePath = await this.userService.getImageById(id);
     } catch (e) {
-      return response.status(404).send(e.message);
+      const request = await fetch(
+        'https://cdn.bitume2000.fr/achievement/0.png',
+      );
+      const buffer = await request.buffer();
+      fs.mkdirSync(__dirname + '/../../../images', { recursive: true });
+      await this.userService.setAvatar(id, buffer, '.png');
+      imagePath = await this.userService.getImageById(id);
     }
-
     try {
       const asyncReadFile = promisify(fs.readFile);
       const image = await asyncReadFile(imagePath);
