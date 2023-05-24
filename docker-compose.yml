@@ -19,6 +19,16 @@ services:
     ports:
       - "5432:5432"
 
+
+  adminer:
+    container_name: adminer
+    image: adminer
+    restart: unless-stopped
+    ports:
+      - "3215:8080"
+    networks:
+      - transnet
+
   back:
     init: true
     ports:
