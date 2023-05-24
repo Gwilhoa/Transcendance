@@ -59,7 +59,6 @@ export class UserService {
     if (retIntra == null) {
       return null;
     }
-    await this.test();
     const retUser = await this.authService.getUserIntra(retIntra.access_token);
     const verif_user = await this.userRepository.findOneBy({ id: retUser.id });
     if (verif_user != null) {
@@ -145,17 +144,17 @@ export class UserService {
     return user.friends;
   }
 
-  public async test() {
-    if ((await this.userRepository.findOneBy({ id: '1' })) != null) {
-      return null;
-    }
-    const user = new User();
-    user.id = '1';
-    user.username = 'test';
-    user.email = 'test@student.42lyon.fr';
-    await this.userRepository.save(user);
-    return user;
-  }
+  // public async test() {
+  //   if ((await this.userRepository.findOneBy({ id: '1' })) != null) {
+  //     return null;
+  //   }
+  //   const user = new User();
+  //   user.id = '1';
+  //   user.username = 'test';
+  //   user.email = 'test@student.42lyon.fr';
+  //   await this.userRepository.save(user);
+  //   return user;
+  // }
 
   public async addBlocked(id: string, blocked_id: string) {
     const user = await this.userRepository.findOneBy({ id: id });
@@ -260,19 +259,29 @@ export class UserService {
     if (user == null) {
       return null;
     }
+    const users = await this.userRepository.find();
+    users.forEach((user) => {
+      if (user.username == name) {
+        throw new Error('Username already taken');
+      }
+    });
     user.username = name;
     await this.userRepository.save(user);
     return user;
   }
 
   public async setAvatar(id, buffer, extname) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const fs = require('fs');
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const path = require('path');
     const lastimage = await this.getPathImage(id);
     if (lastimage != null) {
-      fs.unlink(lastimage);
+      fs.unlink(lastimage, (error) => {
+        if (error) {
+          console.error('Error deleting last image:', error);
+        } else {
+          console.log('Last image deleted successfully');
+        }
+      });
     }
     const imagePath = path.join(
       __dirname,
@@ -283,7 +292,7 @@ export class UserService {
       `${id}${extname}`,
     );
     try {
-      await fs.access(path.dirname(imagePath));
+      await fs.promises.access(path.dirname(imagePath));
     } catch (error) {
       fs.mkdirSync(path.dirname(imagePath), { recursive: true });
     }

@@ -91,6 +91,8 @@ database:
 # ~~~~~~~~~~~~~~ BACKEND ~~~~~~~~~~~~~~
 
 back: database
+	docker-compose -f docker-compose.yml build back
+	docker-compose -f docker-compose.yml create back
 	docker-compose up back
 # ~~~~~~~~~~~~~~ FRONTEND ~~~~~~~~~~~~~~
 
@@ -99,6 +101,11 @@ back: database
 stop clean:
 	printf "%-62b%b" "$(BOLD)$(PURPLE)Stoping$(END) containers"
 	docker-compose -f docker-compose.yml stop
+	printf "$(GREEN)[✓]$(END)\n\n"
+
+down :
+	printf "%-62b%b" "$(BOLD)$(PURPLE)Destroy$(END) containers"
+	docker-compose -f docker-compose.yml down
 	printf "$(GREEN)[✓]$(END)\n\n"
 
 # ~~~~~~~~~~~~ CLEANNING RULES ~~~~~~~~~~~~

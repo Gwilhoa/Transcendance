@@ -4,19 +4,74 @@ import { useNavigate } from 'react-router-dom';
 import { ButtonInputToggle } from '../utils/inputButton';
 import LogoutButton from './logout';
 import { setErrorCookie } from "../IfError"
-import axios, { setName } from '../utils/API';
+import axios from '../utils/API';
 import Cookies from 'universal-cookie';
 const cookies = new Cookies();
 
 
-export default function CV( {name, photoUrl, isFriend, isMe, closeModal } : {name:string, photoUrl:string, isFriend:boolean, isMe:boolean, closeModal:(param: boolean) => void;}) {
+export default function CV( { id, closeModal } : { id:string, closeModal:(param: boolean) => void; }) {
     const retu = [];
 	const navigate = useNavigate();
-    const [truename, setTrueName] = useState(name);
-    const [image, setImage] = useState<string>(photoUrl);
+	const [isMe, setIsMe] =  useState<boolean>(false);
+	const [isFriend, setIsFriend] =  useState<boolean>(false);
+    const [name, setName] = useState<string>("");
+    const [image, setImage] = useState<string>("");
     const [checked, setChecked] = useState(false);
+	const [errorName, setErrorName] = useState<boolean>(false);
+
+
+	const refresh = (id:string) => {
+		axios.get("http://localhost:3000/user/image/" + id, {
+			headers: {
+				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+			},
+		})
+			.then((response) => {
+				const data = response.data;
+				setImage(data);
+			})
+			.catch((error) => {
+				setErrorCookie("Error " + error.response.status);
+				console.error(error);
+				navigate('/Error');
+			});
+
+		axios.get("http://localhost:3000/user/id/" + id, {
+			headers: {
+				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+			},
+		})
+			.then((response) => {
+				setName(response.data.username);
+			})
+			.catch((error) => {
+				setErrorCookie("Error " + error.response.status);
+				console.error(error);
+				navigate('/Error');
+			});
+	};
 
 	useEffect(() => {
+		axios.get("http://localhost:3000/user/id", {
+			headers: {
+				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+			},
+		})
+			.then((response) => {
+				console.log(response);
+				if (id === response.data.id) {
+					setIsMe(true);
+					console.log("this is me");
+				}
+			})
+			.catch((error) => {
+				setErrorCookie("Error " + error.response.status);
+				console.error(error);
+				navigate('/Error');
+			});
+
+		refresh(id);
+		
 		axios.get("http://localhost:3000/auth/2fa/is2FA", {
 			headers: {
 				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
@@ -34,11 +89,22 @@ export default function CV( {name, photoUrl, isFriend, isMe, closeModal } : {nam
 				console.error(error);
 				navigate('/Error');
 			});
-	}, [navigate]);
+	}, [navigate, id]);
 
-    const changeName = (str:string) => {
-        if (setName(str))
-            setTrueName(str);
+	const changeName = (str: string) => {
+			axios.post("http://localhost:3000/user/name", 
+				{ name: str }, 
+				{ headers: {
+					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`, 
+				},})
+				.then(() => {
+					setErrorName(false);
+					refresh(id)
+				})
+				.catch((error) => {
+					console.error(error);
+					setErrorName(true);
+				});
     }
 
     const clicked = () => {
@@ -64,18 +130,32 @@ export default function CV( {name, photoUrl, isFriend, isMe, closeModal } : {nam
 		}
     }
 
-    const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files && event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = () => {
-                setImage(reader.result as string);
-            };
-            reader.readAsDataURL(file);
-        }
-    };
+	const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		const file = event.target.files && event.target.files[0];
+		if (file) {
+			const formData = new FormData();
+			formData.append('image', file);
 
-    retu.push(
+			axios({
+				method: 'post',
+				url: 'http://localhost:3000/user/image',
+				headers: {
+					'Authorization': `Bearer ${cookies.get('jwtAuthorization')}`,
+					'Content-Type': 'multipart/form-data',
+				},
+				data: formData,
+			})
+				.then(response => {
+					console.log(response.data);
+					refresh(id);
+				})
+				.catch(error => {
+					console.error(error);
+				});
+		}
+	};
+
+	retu.push(
         <div key={"image"}>
             <img className='circle-image' src={image} alt="selected" />
             <br/> <br/>
@@ -88,14 +168,16 @@ export default function CV( {name, photoUrl, isFriend, isMe, closeModal } : {nam
         )
         
         retu.push(
-            <div key={"changeName"}>
-            <p/>
-            <ButtonInputToggle
-            onInputSubmit={changeName}
-            textInButton='Change name'
-            placeHolder='New name'
-            classInput='button_notif'
-            classButton='button_notif'/>
+            <div key={"changeName"} className="ChangeNameDiv">
+				<p/>
+					<ButtonInputToggle
+					onInputSubmit={changeName}
+					textInButton='Change name'
+					placeHolder='New name'
+					classInput='button_notif'
+					classButton='button_notif'
+					/>
+				{errorName ? <p className="errorName">Already Exist</p> : <></>}
             </div>
             )
             
@@ -142,7 +224,7 @@ export default function CV( {name, photoUrl, isFriend, isMe, closeModal } : {nam
     return (
         <div className="modalCorps">
             <h2>
-                {truename}
+                {name}
             </h2>
             <div>
                 {retu}

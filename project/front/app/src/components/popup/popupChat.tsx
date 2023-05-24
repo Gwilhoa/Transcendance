@@ -3,7 +3,7 @@ import './popupChat.css'
 import React, { ReactNode, useEffect, useState } from 'react';
 import { ChangeChannel, LeaveChat } from './chatManager';
 import { Link} from 'react-router-dom';
-import { Channel, Message, canJoinChannel, createChannel, getChannels, socket, sendNewMessageToBack, getMessages} from '../utils/API';
+import { Channel, Message, canJoinChannel, createChannel, getChannels, socket, sendNewMessageToBack, getMessages, getName} from '../utils/API';
 import '../../template/template.css';
 import { useNavigate } from "react-router-dom";
 import { ButtonInputToggle } from '../utils/inputButton';
@@ -30,6 +30,22 @@ const PopupChat: React.FC<{path:string, openModal:(param: boolean) => void, setC
   const [channelList, setChannelList] = useState<Channel[]>([])
   const [messageList, setMessageList] = useState<Message []>([])
   const [currentChanel, setCurrentChanel] = useState<string>("");
+
+  async function parthMessage(){
+    const name = await getName();
+    socket.on('message', (message: any) => {
+        console.log("message received : " + message);
+          console.log(name);
+        if (message.username === name) {
+          messageList.push({contain:message.content, date:message.date, author:""})
+          setMessageList([...messageList]);
+        }
+        else {
+          messageList.push({contain: message.content, date: message.date, author: message.username})
+          setMessageList([...messageList]);
+        }
+    });
+  }
   
   const updateChannelList = () => {
     getChannels()
@@ -56,15 +72,15 @@ const PopupChat: React.FC<{path:string, openModal:(param: boolean) => void, setC
   };
   
   useEffect(() => {
-    socket.on('message', (message: string) => {
-      console.log("Guilhem me ment");
-      setMessageList([ {contain:message, date:"ee", author:'ejd'}]);
-    });
+    parthMessage()
     return () => {
       socket.off('message_received');
       socket.off('channels_updated');
     };
-  });
+  }, []);
+
+  
+
 
   useEffect(() => {
     updateChannelList()
@@ -122,6 +138,10 @@ const PopupChat: React.FC<{path:string, openModal:(param: boolean) => void, setC
 
   const sendMessage = () => {
     console.log("message", prompt);
+    if (prompt.length === 0) {
+      return
+    }
+
     if (currentChanel === "") {
       const newMessage:Message = {
         contain: prompt,

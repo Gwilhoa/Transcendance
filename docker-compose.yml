@@ -19,6 +19,15 @@ services:
     ports:
       - "5432:5432"
 
+  adminer:
+    container_name: adminer
+    image: adminer
+    restart: unless-stopped
+    ports:
+      - "3215:8080"
+    networks:
+      - transnet
+
   back:
     init: true
     ports:
@@ -55,6 +64,37 @@ services:
       - transnet
     ports:
       - "8080:8080"
+
+  # phpmyadmin: # TODO: remove phpmyadmin
+  #   depends_on:
+  #     - db
+  #   image: phpmyadmin/phpmyadmin
+  #   container_name:
+  #     phpmyadmin
+  #   networks:
+  #     - transnet
+  #   environment:
+  #     PMA_HOST: db
+  #     PMA_USER: transcendence
+  #     PMA_PASSWORD: 8m*rRX3ubgX4di0PSQA46k2Zf2JlUx
+  #     PMA_PORT: 33065432
+  #     PMA_ARBITRARY: 1
+  #   restart: always
+  #   ports:
+  #     - 8081:80
+
+  # pgadmin:
+  # # TODO: remove pgadmin
+  #   container_name: pgadmin4_container
+  #   image: dpage/pgadmin4
+  #   restart: always
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: admin@admin.com
+  #     PGADMIN_DEFAULT_PASSWORD: root
+  #   ports:
+  #     - "5050:81"
+  #   networks:
+  #     - transnet
 
 # volumes:
 #   temp:

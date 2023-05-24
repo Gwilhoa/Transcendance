@@ -1,6 +1,10 @@
 import React from "react";
-import ErrorToken from "../components/IfError";
 import './css/history.css'
+// import Cookies from 'universal-cookie';
+import ErrorToken, { setErrorCookie } from '../components/IfError';
+import axios from '../components/utils/API'
+import { useNavigate } from 'react-router-dom';
+import {cookies} from '../App'
 
 interface Score {
     ennemy: string;
@@ -38,7 +42,23 @@ const OneScoreBlock = ({status, score1, score2 }: ShowScore) => {
 
 const Add = () => {
     const blocks = [];
-    // todo: change enemy here no more use 
+    // todo: change enemy here no more use
+
+    const navigate = useNavigate();
+    axios.get("http://localhost:3000/game",{
+        headers: {
+            Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+        },
+    })
+    .then((response) => {
+        console.log(response);
+    })
+    .catch((error) => {
+        console.error(error);
+        setErrorCookie(error.response.status);
+		navigate('/Error');
+    })
+    
     const ListOfScore: Score[] = [
         { ennemy: "Gchatain", scoreEnnemy: 3, scoreMe: 25 },
         { ennemy: "Dieu", scoreEnnemy: 50, scoreMe: 49 },
