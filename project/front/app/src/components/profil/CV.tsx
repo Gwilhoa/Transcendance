@@ -1,5 +1,5 @@
 import './modal.css'
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ButtonInputToggle } from '../utils/inputButton';
 import LogoutButton from './logout';
@@ -19,8 +19,7 @@ export default function CV( { id, closeModal } : { id:string, closeModal:(param:
     const [checked, setChecked] = useState(false);
 	const [errorName, setErrorName] = useState<boolean>(false);
 
-
-	const refresh = (id:string) => {
+	const refresh = useCallback((id:string) => {
 		axios.get("http://localhost:3000/user/image/" + id, {
 			headers: {
 				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
@@ -49,7 +48,7 @@ export default function CV( { id, closeModal } : { id:string, closeModal:(param:
 				console.error(error);
 				navigate('/Error');
 			});
-	};
+	}, [navigate]);
 
 	useEffect(() => {
 		axios.get("http://localhost:3000/user/id", {
@@ -89,7 +88,7 @@ export default function CV( { id, closeModal } : { id:string, closeModal:(param:
 				console.error(error);
 				navigate('/Error');
 			});
-	}, [navigate, id]);
+	}, [navigate, id, refresh]);
 
 	const changeName = (str: string) => {
 			axios.post("http://localhost:3000/user/name", 
@@ -197,27 +196,27 @@ export default function CV( { id, closeModal } : { id:string, closeModal:(param:
 
     if (!isFriend && !isMe) {
         retu.push(
-			<>
-				<button key={"buttonFriend"}>
+			<div key="notFriend">
+				<button>
 					Add friend
 				</button>
-				<button key={"buttonInvite"}>
+				<button>
 					Challenge
 				</button>
-			</>
+			</div>
 		)
     }
 
     if (isFriend && !isMe) {
         retu.push(
-			<>
-				<button key={"buttonFriend"}>
+			<div key="Friend">
+				<button>
 					Unfriend
 				</button>
-				<button key={"buttonInvite"}>
+				<button>
 					Challenge
 				</button>
-			</>
+			</div>
 		)
     }
 
