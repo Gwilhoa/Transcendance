@@ -5,7 +5,7 @@ import CV from "../components/profil/CV";
 import { Props } from "../App";
 import axios from "../components/utils/API";
 import { IsInAChat, JoinChat, LeaveChat } from "../components/popup/chatManager";
-import { setErrorCookie } from "../components/IfError";
+import { setErrorLocalStorage } from "../components/IfError";
 import Cookies from 'universal-cookie';
 const cookies = new Cookies();
 
@@ -25,7 +25,7 @@ const Head = ({ openModal, setContent }: Props) => {
 					localStorage.setItem('id', response.data.id);
 				})
 				.catch((error) => {
-					setErrorCookie("Error " + error.response.status);
+					setErrorLocalStorage("Error " + error.response.status);
 					console.error(error);
 					navigate('/Error');
 				});

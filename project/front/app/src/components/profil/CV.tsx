@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ButtonInputToggle } from '../utils/inputButton';
 import LogoutButton from './logout';
-import { setErrorCookie } from "../IfError"
+import { setErrorLocalStorage } from "../IfError"
 import axios from '../utils/API';
 import Cookies from 'universal-cookie';
 const cookies = new Cookies();
@@ -30,7 +30,7 @@ export default function CV( { id, closeModal } : { id: string | null, closeModal
 				setImage(data);
 			})
 			.catch((error) => {
-				setErrorCookie("Error " + error.response.status);
+				setErrorLocalStorage("Error " + error.response.status);
 				console.error(error);
 				navigate('/Error');
 			});
@@ -44,29 +44,16 @@ export default function CV( { id, closeModal } : { id: string | null, closeModal
 				setName(response.data.username);
 			})
 			.catch((error) => {
-				setErrorCookie("Error " + error.response.status);
+				setErrorLocalStorage("Error " + error.response.status);
 				console.error(error);
 				navigate('/Error');
 			});
 	}, [navigate]);
 
 	useEffect(() => {
-		axios.get("http://localhost:3000/user/id", {
-			headers: {
-				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
-			},
-		})
-			.then((response) => {
-				if (id === response.data.id) {
-					setIsMe(true);
-				}
-			})
-			.catch((error) => {
-				setErrorCookie("Error " + error.response.status);
-				console.error(error);
-				navigate('/Error');
-			});
-
+		if (id === localStorage.getItem('id')) {
+			setIsMe(true);
+		}
 		refresh(id);
 		
 		axios.get("http://localhost:3000/auth/2fa/is2FA", {
@@ -81,7 +68,7 @@ export default function CV( { id, closeModal } : { id: string | null, closeModal
 					setChecked(true);
 			})
 			.catch((error) => {
-				setErrorCookie("Error " + error.response.status);
+				setErrorLocalStorage("Error " + error.response.status);
 				console.error(error);
 				navigate('/Error');
 			});
@@ -115,7 +102,7 @@ export default function CV( { id, closeModal } : { id: string | null, closeModal
 				},
 			})
 				.catch((error) => {
-					setErrorCookie("Error " + error.response.status);
+					setErrorLocalStorage("Error " + error.response.status);
 					console.error(error);
 					navigate('/Error');
 				});
@@ -138,12 +125,13 @@ export default function CV( { id, closeModal } : { id: string | null, closeModal
 				},
 				data: formData,
 			})
-				.then(response => {
-					console.log(response.data);
+				.then(() => {
 					refresh(id);
 				})
-				.catch(error => {
+				.catch((error) => {
+					setErrorLocalStorage("Error " + error.response.status);
 					console.error(error);
+					navigate('/Error');
 				});
 		}
 	};

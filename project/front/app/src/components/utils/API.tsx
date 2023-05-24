@@ -3,7 +3,7 @@ import { promises } from 'dns';
 import { Navigate, useNavigate } from 'react-router-dom';
 import io from "socket.io-client";
 import Cookies from 'universal-cookie';
-import { setErrorCookie } from '../IfError';
+import { setErrorLocalStorage } from '../IfError';
 const cookies = new Cookies();
 axios.defaults.baseURL = 'http://localhost:3000/'
 axios.defaults.headers.common = {'Authorization': `bearer ${cookies.get('jwtAuthorization')}`}
@@ -169,11 +169,11 @@ export const sendNewMessageToBack = (channelId: string, content: string) => {
         console.log('Message envoyé avec succès');
         return ;
       } else if (response === MessageCode.CHANNEL_NOT_FOUND) {
-        setErrorCookie('Le canal n\'existe pas');
+        setErrorLocalStorage('Le canal n\'existe pas');
       } else if (response === MessageCode.NO_ACCESS) {
-        setErrorCookie('Vous n\'avez pas accès à ce canal');
+        setErrorLocalStorage('Vous n\'avez pas accès à ce canal');
       } else if (response === MessageCode.INVALID_FORMAT) {
-        setErrorCookie('Format invalide du message');
+        setErrorLocalStorage('Format invalide du message');
       }
       const Navigate = useNavigate();
       Navigate('/Error');

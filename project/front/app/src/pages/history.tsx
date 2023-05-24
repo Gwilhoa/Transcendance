@@ -1,6 +1,6 @@
 import React from "react";
 import './css/history.css'
-import ErrorToken, { setErrorCookie } from '../components/IfError';
+import ErrorToken, { setErrorLocalStorage } from '../components/IfError';
 import axios from '../components/utils/API'
 import { useNavigate } from 'react-router-dom';
 import {cookies} from '../App'
@@ -54,7 +54,7 @@ const Add = () => {
     })
     .catch((error) => {
         console.error(error);
-        setErrorCookie(error.response.status);
+        setErrorLocalStorage(error.response.status);
 		navigate('/Error');
     })
     
