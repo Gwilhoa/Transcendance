@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useEffect, useState }from "react";
 import './css/history.css'
 // import Cookies from 'universal-cookie';
 import ErrorToken, { setErrorCookie } from '../components/IfError';
 import axios from '../components/utils/API'
+import { AxiosResponse } from 'axios';
 import { useNavigate } from 'react-router-dom';
-import {cookies} from '../App'
+import { cookies } from '../App'
 
 interface Score {
     ennemy: string;
@@ -42,22 +43,26 @@ const OneScoreBlock = ({status, score1, score2 }: ShowScore) => {
 
 const Add = () => {
     const blocks = [];
+    const [response, setResponse] = useState<AxiosResponse | null>(null);
     // todo: change enemy here no more use
 
     const navigate = useNavigate();
-    axios.get("http://localhost:3000/game",{
-        headers: {
-            Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
-        },
-    })
-    .then((response) => {
-        console.log(response);
-    })
-    .catch((error) => {
-        console.error(error);
-        setErrorCookie(error.response.status);
-		navigate('/Error');
-    })
+    useEffect(() =>{
+        axios.get("http://localhost:3000/game",{
+            headers: {
+                Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+            },
+        })
+        .then((res) => {
+            console.log(res);
+            setResponse(res.data);
+        })
+        .catch((error) => {
+            console.error(error);
+            setErrorCookie(error.response.status);
+            navigate('/Error');
+        })
+    }, [navigate]);
     
     const ListOfScore: Score[] = [
         { ennemy: "Gchatain", scoreEnnemy: 3, scoreMe: 25 },
@@ -68,6 +73,13 @@ const Add = () => {
         { ennemy: "Xav Niel", scoreEnnemy: 0, scoreMe: 100 },
 
       ];
+    if (response == null)
+      return <></>;
+    let game: any;
+    // for (game of response)
+    // {
+    //     console.log('game id: ' + game.id);
+    // }
     ////// REMPLIR LIST OF SCORE AVEC LES VRAIS SCORES ///////////
     
     for (let i = 0; i < ListOfScore.length; i++) {
