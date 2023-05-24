@@ -14,9 +14,22 @@ export class GameService {
   ) {}
 
   async getGames(id) {
-    return await this.gameRepository.find({
-      where: [{ user1: id }, { user2: id }],
-    });
+    let tabgame = [];
+    const games1 = await this.gameRepository
+      .createQueryBuilder('game')
+      .leftJoinAndSelect('game.user1', 'user1')
+      .leftJoinAndSelect('game.user2', 'user2')
+      .where('user1.id = :id', { id: id })
+      .getMany();
+
+    const games2 = await this.gameRepository
+      .createQueryBuilder('game')
+      .leftJoinAndSelect('game.user1', 'user1')
+      .leftJoinAndSelect('game.user2', 'user2')
+      .where('user2.id = :id', { id: id })
+      .getMany();
+    tabgame = [...games1, ...games2];
+    return tabgame;
   }
 
   async createGame(body: CreateGameDTO) {

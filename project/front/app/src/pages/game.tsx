@@ -42,9 +42,6 @@ const Game = () => {
   
   const Height = document.documentElement.clientHeight * 0.8;
   const Width = document.documentElement.clientWidth - 802;
-  
-  
-  
 
   const handleKeyDown = (event: KeyboardEvent) => {
     switch (event.code) {
