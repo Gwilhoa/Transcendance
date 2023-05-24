@@ -115,6 +115,18 @@ export async function getMessages(channel_id:string) : Promise<Message[]> {
 }
 
 
+export async function getName() : Promise<string> {
+  try {
+      const response = await axios.get('/user/id');
+      console.log(response.data)
+      return response.data;
+  } catch (error) {
+      console.error('Error : no channel found', error);
+      return "";
+  }
+}
+
+
 export async function getChannels() : Promise<Channel[]> {
     try {
         const response = await axios.get('/channel/available');
@@ -190,9 +202,6 @@ export function setTwoFA(isFa:boolean) {
     console.log(isFa);
 }
 
-export function getName() : string {
-    return ("Pigi16")
-}
 
 export function setName(str:string) {
 
