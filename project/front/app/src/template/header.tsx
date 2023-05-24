@@ -10,8 +10,7 @@ import Cookies from 'universal-cookie';
 const cookies = new Cookies();
 
 const Head = ({ openModal, setContent }: Props) => {
-	const [name, setName] = useState<string>("");
-	const [image, setImage] = useState<string>("");
+	const [id, setId] = useState<string>("");
 	const navigate = useNavigate();
 
 	useEffect(() => {
@@ -22,29 +21,14 @@ const Head = ({ openModal, setContent }: Props) => {
 		})
 			.then((response) => {
 				console.log(response);
-				setName(response.data.username);
+				setId(response.data.id);
 			})
 			.catch((error) => {
 				setErrorCookie("Error " + error.response.status);
 				console.error(error);
 				navigate('/Error');
 			});
-		axios.get("http://localhost:3000/user/image", {
-			headers: {
-				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
-			},
-		})
-			.then((response) => {
-				const data = response.data;
-				console.log(response);
-				setImage(data);
-			})
-			.catch((error) => {
-				setErrorCookie("Error " + error.response.status);
-				console.error(error);
-				navigate('/Error');
-			});
-	}, [navigate]);
+			}, [navigate]);
 
   const buttonChat = () => {
     if (IsInAChat())
@@ -55,10 +39,7 @@ const Head = ({ openModal, setContent }: Props) => {
 
   const profilStart = () => {
     setContent(
-		<CV name={name} 
-		isFriend={false} 
-		isMe={true} 
-		photoUrl={image} 
+		<CV id={id}
 		closeModal={openModal}
 		/>);
     openModal(true);
