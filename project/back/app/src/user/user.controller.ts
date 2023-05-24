@@ -82,12 +82,18 @@ export class UserController {
   }
 
   @Get('/image/:id')
-  async getImageById(@Param() id: string, @Res() response) {
+  async getImageById(@Param('id') id: string, @Res() response) {
     let imagePath;
     try {
       imagePath = await this.userService.getImageById(id);
     } catch (e) {
-      return response.status(404).send(e.message);
+      const request = await fetch(
+        'https://cdn.bitume2000.fr/achievement/0.png',
+      );
+      const buffer = await request.buffer();
+      fs.mkdirSync(__dirname + '/../../../images', { recursive: true });
+      await this.userService.setAvatar(id, buffer, '.png');
+      imagePath = await this.userService.getImageById(id);
     }
 
     try {
