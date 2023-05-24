@@ -6,6 +6,7 @@ import axios from '../components/utils/API'
 import { AxiosResponse } from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { cookies } from '../App'
+import { off } from "process";
 
 interface Score {
     ennemy: string;
@@ -75,11 +76,12 @@ const Add = () => {
       ];
     if (response == null)
       return <></>;
+    let games : JSON = response;
     let game: any;
-    // for (game of response)
-    // {
-    //     console.log('game id: ' + game.id);
-    // }
+    for (game of games)
+    {
+        console.log('game id: ' + game.id);
+    }
     ////// REMPLIR LIST OF SCORE AVEC LES VRAIS SCORES ///////////
     
     for (let i = 0; i < ListOfScore.length; i++) {
