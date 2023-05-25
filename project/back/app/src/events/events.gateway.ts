@@ -83,7 +83,7 @@ export class EventsGateway
       this.ingame.delete(game.user2.id);
     }
     if (this.matchmaking.includes(client)) {
-        this.matchmaking.splice(this.matchmaking.indexOf(client), 1);
+      this.matchmaking.splice(this.matchmaking.indexOf(client), 1);
     }
     this.sendconnected();
   }

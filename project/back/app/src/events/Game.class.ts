@@ -190,6 +190,7 @@ export class Game {
     }
 
     if (this._score1 == Game.default_victorygoal) {
+      return;
       this._user1.leave(this._id);
       this._user2.leave(this._id);
       this._user1.emit('finish_game', {
@@ -207,6 +208,7 @@ export class Game {
       return;
     }
     if (this._score2 == Game.default_victorygoal) {
+      return;
       this._user2.leave(this._id);
       this._user1.leave(this._id);
       this._user2.emit('finish_game', {
