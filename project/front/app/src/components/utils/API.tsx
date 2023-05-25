@@ -22,6 +22,11 @@ socket.on('message_code', (data: any) => {
     console.log(data.code);
 })
 
+socket.on('updateprofil', (data: any) => {
+    console.log('test');
+    console.log(data);
+})
+
 export const Token = cookies.get('jwtAuthorization');
 
 

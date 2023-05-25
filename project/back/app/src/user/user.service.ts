@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AuthService } from '../auth/auth.service';
 import { Repository } from 'typeorm';
@@ -8,9 +8,16 @@ import { RequestFriend } from './requestfriend.entity';
 import { ChannelType } from 'src/utils/channel.enum';
 import { JwtService } from '@nestjs/jwt';
 import { UserStatus } from '../utils/user.enum';
-
+import { WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { Server } from 'socket.io';
+@WebSocketGateway({
+  cors: {
+    origin: '*',
+  },
+})
 @Injectable()
 export class UserService {
+  @WebSocketServer() server: Server;
   constructor(
     private jwt: JwtService,
     @InjectRepository(User) private userRepository: Repository<User>,
@@ -267,6 +274,11 @@ export class UserService {
     });
     user.username = name;
     await this.userRepository.save(user);
+    const send = {
+      id: user.id,
+      type: 'name',
+    };
+    this.server.emit('updateprofil', send);
     return user;
   }
 
@@ -298,6 +310,11 @@ export class UserService {
     }
     try {
       fs.writeFileSync(imagePath, buffer);
+      const send = {
+        id: id,
+        type: 'name',
+      };
+      this.server.emit('updateprofil', send);
       return imagePath;
     } catch (error) {
       return null;
