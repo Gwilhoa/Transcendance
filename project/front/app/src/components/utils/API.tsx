@@ -118,7 +118,7 @@ export async function getMessages(channel_id:string) : Promise<Message[]> {
 export async function getName() : Promise<string> {
   try {
       const response = await axios.get('/user/id');
-      console.log(response.data)
+      console.log(response.data);
       return response.data.username;
   } catch (error) {
       console.error('Error : no channel found', error);
