@@ -116,7 +116,7 @@ export class Game {
       bally: this._bally,
     };
   }
-  public start() {
+  public async start() {
     const angle = Math.random() * 360;
     this._rack1y = Game.default_positionR;
     this._rack2y = Game.default_positionR;

@@ -40,10 +40,11 @@ export function getIdFromSocket(
   socket: Socket,
   connected: Map<string, Socket>,
 ) {
+  let ret = null;
   connected.forEach((value, key) => {
-    if (value == socket) {
-      return key;
+    if (value.id == socket.id) {
+      ret = key;
     }
   });
-  return null;
+  return ret;
 }

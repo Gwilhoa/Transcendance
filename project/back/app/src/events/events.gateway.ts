@@ -82,6 +82,9 @@ export class EventsGateway
       this.ingame.delete(game.user1.id);
       this.ingame.delete(game.user2.id);
     }
+    if (this.matchmaking.includes(client)) {
+        this.matchmaking.splice(this.matchmaking.indexOf(client), 1);
+    }
     this.sendconnected();
   }
 
@@ -328,7 +331,7 @@ export class EventsGateway
       client.disconnect();
       return;
     }
-    this.logger.debug('new in matchmaking ' + id)
+    this.logger.debug('new in matchmaking ' + id);
     this.matchmaking.push(client);
     const send = {
       code: 0,
@@ -337,20 +340,37 @@ export class EventsGateway
   }
 
   async check_matchmaking() {
-    this.matchmaking.forEach((player) => async () => {
-      const authorized_player = this.matchmaking.filter(
-        async (pretended_player) =>
-          player.id !== pretended_player.id &&
-          (await this.userService.OneOfTwoBlocked(
-            getIdFromSocket(player, this.clients),
-            getIdFromSocket(pretended_player, this.clients),
-          )),
-      );
+    this.logger.debug('checking matchmaking');
+    let i = 0;
+    while (i < this.matchmaking.length) {
+      this.logger.debug(this.matchmaking[i].id);
+      const player = this.matchmaking[i];
+      const authorized_player = [];
+      let j = 0;
+      while (j < this.matchmaking.length) {
+        const pretended_player = this.matchmaking[j];
+        const player_id = getIdFromSocket(player, this.clients);
+        const pretended_player_id = getIdFromSocket(
+          pretended_player,
+          this.clients,
+        );
+        if (
+          pretended_player_id != player_id &&
+          !(await this.userService.OneOfTwoBlocked(
+            pretended_player_id,
+            player_id,
+          ))
+        ) {
+          authorized_player.push(pretended_player);
+        }
+        j++;
+      }
       if (authorized_player.length > 0) {
         const rival =
           authorized_player[
             Math.floor(Math.random() * authorized_player.length)
           ];
+        this.logger.debug('found rival ' + rival.id);
         const create_gameDTO = new CreateGameDTO();
         create_gameDTO.user1_id = getIdFromSocket(player, this.clients);
         create_gameDTO.user2_id = getIdFromSocket(rival, this.clients);
@@ -392,9 +412,18 @@ export class EventsGateway
           this.logger.log(game.getId() + ' finished');
         });
         this.logger.log(game.getId() + ' started');
+        const tempmatchmaking = [];
+        for (const player of this.matchmaking) {
+          if (player != rival && player != rival) {
+            tempmatchmaking.push(player);
+          }
+        }
+        this.matchmaking = tempmatchmaking;
+        this.server.to(game.getId()).emit('game_start', game.getId());
         game.start();
       }
-    });
+      i++;
+    }
   }
 
   @SubscribeMessage('input_game')
