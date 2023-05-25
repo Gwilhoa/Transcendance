@@ -1,7 +1,6 @@
 import React, { useEffect, useState }from "react";
 import './css/history.css'
-// import Cookies from 'universal-cookie';
-import ErrorToken, { setErrorCookie } from '../components/IfError';
+import ErrorToken, { setErrorLocalStorage } from '../components/IfError';
 import axios from '../components/utils/API'
 import { AxiosResponse } from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -42,6 +41,16 @@ const OneScoreBlock = ({status, score1, score2 }: ShowScore) => {
     );
 };
 
+function getUserIndex(game : any)
+{
+    const id = localStorage.getItem('id');
+    if (game.user1.id == id)
+        return 1;
+    return 2;
+}
+
+
+
 const Add = () => {
     const blocks = [];
     const [response, setResponse] = useState<any>(null);
@@ -60,7 +69,7 @@ const Add = () => {
         })
         .catch((error) => {
             console.error(error);
-            setErrorCookie(error.response.status);
+            setErrorLocalStorage(error.response.status);
             navigate('/Error');
         })
     }, [navigate]);
@@ -76,11 +85,12 @@ const Add = () => {
       ];
     if (response == null)
       return <></>;
+    console.log('-------------------------');
     for (const game of response)
     {
         console.log('game :')
         console.log(game)
-        console.log('game id: ' + game.id);
+        console.log('user id: ' + getUserIndex(game));
     }
     ////// REMPLIR LIST OF SCORE AVEC LES VRAIS SCORES ///////////
     

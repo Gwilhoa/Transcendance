@@ -10,6 +10,7 @@ function LogoutButton( { closeModal } : {closeModal:(param: boolean) => void;}) 
 			navigate('/');
 			closeModal(false);
 			cookies.remove('jwtAuthorization');
+			localStorage.removeItem('id');
 		};
 
 	return (

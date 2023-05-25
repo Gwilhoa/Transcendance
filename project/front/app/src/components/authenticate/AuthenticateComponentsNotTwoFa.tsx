@@ -3,7 +3,7 @@ import Cookies from "universal-cookie";
 const cookies = new Cookies();
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { setErrorCookie } from "../IfError";
+import { setErrorLocalStorage } from "../IfError";
 
 function AuthenticateComponentsNotTwoFa() {
 	const navigate = useNavigate();
@@ -29,7 +29,7 @@ function AuthenticateComponentsNotTwoFa() {
 				})
 				.catch((error) => {
 					cookies.remove('tenMinToken');
-					setErrorCookie("Error " + error.response.status);
+					setErrorLocalStorage("Error " + error.response.status);
 					console.error(error);
 					navigate('/Error');
 				});
@@ -48,7 +48,7 @@ function AuthenticateComponentsNotTwoFa() {
 				})
 				.catch((error) => {
 					cookies.remove('tenMinToken');
-					setErrorCookie("Error " + error.response.status);
+					setErrorLocalStorage("Error " + error.response.status);
 					console.error(error);
 					navigate('/Error');
 				});
