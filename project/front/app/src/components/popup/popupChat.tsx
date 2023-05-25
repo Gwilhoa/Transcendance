@@ -32,35 +32,19 @@ const PopupChat: React.FC<{path:string, openModal:(param: boolean) => void, setC
   const [currentChanel, setCurrentChanel] = useState<string>("");
 
   async function parthMessage(){
-    const name = await getName();
-    socket.on('message', (message: any) => {
-<<<<<<< HEAD
-        console.log("message received : ");
-        console.log(message);
-          console.log("nom " +  name);
-        if (message.username === name) {
-          messageList.push({contain:message.content, date:message.date, author:""})
-          
-          console.log(messageList);
-        }
-        else
-          messageList.push({contain:message.content, date:message.date, author:""})
-
-        setMessageList([...messageList]);
-=======
-        console.log("message received : " + message);
-          console.log(name);
-        if (message.username === name) {
-          messageList.push({contain:message.content, date:message.date, author:""})
-          setMessageList([...messageList]);
-        }
-        else {
-          messageList.push({contain: message.content, date: message.date, author: message.username})
-          setMessageList([...messageList]);
-        }
->>>>>>> origin/main
-    });
-  }
+  const name = await getName();
+  socket.on('message', (message: any) => {
+    console.log("message received : " + message);
+    console.log(name);
+    if (message.username === name) {
+      messageList.push({contain:message.content, date:message.date, author:""})
+    }
+    else {
+      messageList.push({contain: message.content, date: message.date, author: message.username})
+    }
+    setMessageList([...messageList]);
+  });
+}
   
   const updateChannelList = () => {
     getChannels()

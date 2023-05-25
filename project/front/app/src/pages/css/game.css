@@ -38,7 +38,19 @@
   right: 1%;
 }
 
+.score {
+  color: rgb(115, 121, 69);
+  font-size: calc(5vw + 5vh);
+  position: absolute;
+  text-align: center;
+}
 
+.parentscore {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
 .ball {
   position: absolute;

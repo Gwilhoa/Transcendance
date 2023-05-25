@@ -8,7 +8,7 @@ const cookies = new Cookies();
 const Game = () => {
 
   const [gameId, setGameId] = useState(0);
-  const [onGame, findGame] = useState(true);
+  const [onGame, findGame] = useState(false);
   const [score1, setScore1] = useState(0);
   const [score2, setScore2] = useState(0);
   
@@ -66,7 +66,15 @@ const Game = () => {
     left: "100px",
   };
 
+  socket.on('matchmaking_code', (data) => {
+    console.log(data);
+  }
+
   socket.emit('join_matchmaking', cookies.get('jwtAuthorization'));
+  socket.on('matchmaking_code', () => {
+    console.log("dhdh")
+    findGame(true);
+  });
 
   useEffect(() => {
     socket.on('update_game', (data) => {
@@ -95,7 +103,7 @@ const Game = () => {
     <>
       {!onGame && 
         <>
-          <h2> Searching players... </h2>
+          <h2 style={{color: 'white'}}> Searching players... </h2>
           <p></p>
           <animated.img src={"https://pic.onlinewebfonts.com/svg/img_155544.png"} className={"gameimg"} style={spinnerAnimation}></animated.img>
         </>
@@ -107,6 +115,19 @@ const Game = () => {
           ref={canvasRef}
           className="game-canvas"
           > </canvas>
+        
+
+          <div className="parentscore">
+            <div className="score">
+              <h1>
+
+              {score1 + " | " + score2} 
+              </h1>
+            </div>
+          </div>
+
+
+  
           <div className="paddle1" style={{ top: paddle1.y + '%' }} />
           <div className="paddle2" style={{ top: paddle2.y + '%'}} />
           <div className="ball" style={{ top: ball.x + '%', left: ball.y + '%' }} />

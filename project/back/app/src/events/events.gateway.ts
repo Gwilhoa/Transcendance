@@ -320,13 +320,15 @@ export class EventsGateway
 
   @SubscribeMessage('join_matchmaking')
   async join_matchmaking(client: Socket, payload: any) {
+    let id;
     try {
-      await this.authService.getIdFromToken(payload.token);
+      id = await this.authService.getIdFromToken(payload.token);
     } catch (error) {
       client.emit('connection_error', 'Invalid token');
       client.disconnect();
       return;
     }
+    this.logger.debug('new in matchmaking ' + id)
     this.matchmaking.push(client);
     const send = {
       code: 0,
