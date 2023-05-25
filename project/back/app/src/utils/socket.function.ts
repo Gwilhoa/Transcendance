@@ -1,9 +1,11 @@
 import { Server, Socket } from 'socket.io';
+import { AuthService } from '../auth/auth.service';
 
-export function verifyToken(token: string) {
+export function verifyToken(token: string, authService: AuthService) {
   try {
-    return this.authService.getIdFromToken(token);
+    return authService.getIdFromToken(token);
   } catch (error) {
+    console.error(error);
     return null;
   }
 }

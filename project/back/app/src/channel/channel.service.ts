@@ -63,11 +63,19 @@ export class ChannelService {
     return await this.channelRepository.findOneBy({ id: id });
   }
 
-  public async isInChannel(user_id, channel_id) {
-    const chan = await this.channelRepository.findOneBy({ id: channel_id });
+  public async isInChannel(user_id: string, channel_id: string) {
+    const chan = await this.channelRepository
+      .createQueryBuilder('channel')
+      .leftJoinAndSelect('channel.users', 'users')
+      .where('channel.id = :id', { id: channel_id })
+      .getOne();
     if (chan == null) return false;
     const user = await this.userService.getUserById(user_id);
     if (user == null) return false;
+    let chanuser;
+    for (chanuser of chan.users) {
+      if (user.id == chanuser.id) return true;
+    }
     return chan.users.includes(user);
   }
 
@@ -202,7 +210,13 @@ export class ChannelService {
     const user = await this.userService.getUserById(user_id);
     if (user == null) throw new Error('User not found');
     const channels = await this.channelRepository.find();
-    return channels.filter((c) => c.users.includes(user));
+    console.log(channels);
+    let channel;
+    for (channel of channels) {
+      if (!channel.users.includes(user))
+        channels.filter((c) => c.id != channel.id);
+    }
+    return channels;
   }
 
   async getAvailableChannels(id: string) {

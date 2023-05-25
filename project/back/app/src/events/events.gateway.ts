@@ -54,7 +54,6 @@ export class EventsGateway
     };
     check().then(() => this.logger.log('check matchmaking started'));
   }
-
   sendconnected() {
     send_connection_server(this.clients, this.ingame, this.server);
   }
@@ -113,6 +112,7 @@ export class EventsGateway
         wrongtoken(client);
         return;
       }
+      this.logger.debug(channels);
       for (const channel of channels) {
         client.join(channel.id);
       }
@@ -126,7 +126,7 @@ export class EventsGateway
     let send;
     const token = payload.token;
     const friend_id = payload.friend_id;
-    const user_id = verifyToken(token);
+    const user_id = verifyToken(token, this.authService);
     if (user_id == null) {
       client.emit('friend_code', FriendCode.UNAUTHORIZED);
       return;
@@ -192,7 +192,7 @@ export class EventsGateway
     const channel_id = payload.channel_id;
     let message = payload.content;
     let send;
-    const user_id = verifyToken(token);
+    const user_id = verifyToken(token, this.authService);
     const user = await this.userService.getUserById(user_id);
     const channel = await this.channelService.getChannelById(channel_id);
     if (user == null) {
@@ -203,18 +203,17 @@ export class EventsGateway
       send = {
         code: messageCode.UNEXISTING_CHANNEL,
       };
-    } else if (!(await this.channelService.isInChannel(user, channel))) {
+    } else if (!(await this.channelService.isInChannel(user.id, channel.id))) {
       send = {
         code: messageCode.UNACCESSIBLE_CHANNEL,
       };
     } else {
       message = new sendMessageDTO();
       message.content = payload.content;
-      message.user = user_id;
-      message.channel = channel_id;
+      message.channel_id = payload.channel_id;
       let msg;
       try {
-        msg = await this.channelService.sendMessage(message, user_id);
+        msg = await this.channelService.sendMessage(message, user.id);
       } catch (error) {
         send = {
           code: messageCode.INVALID_FORMAT,
@@ -229,10 +228,12 @@ export class EventsGateway
         id: msg.id,
         content: msg.content,
         user: msg.user.id,
+        username: msg.user.username,
         channel: msg.channel,
         date: msg.date,
       };
-      this.server.to(channel_id).emit('message', sendmsg);
+      this.server.to(channel.id).emit('message', sendmsg);
+      //this.server.emit('message', sendmsg);
     }
     client.emit('message_code', send);
   }
@@ -242,7 +243,7 @@ export class EventsGateway
     let send;
     const token = payload.token;
     const channel_id = payload.channel_id;
-    const user_id = verifyToken(token);
+    const user_id = verifyToken(token, this.authService);
     if (user_id == null) {
       send = {
         code: 401,
@@ -259,7 +260,7 @@ export class EventsGateway
       send = {
         code: 1,
       };
-    } else if (!(await this.channelService.isInChannel(user, channel))) {
+    } else if (!(await this.channelService.isInChannel(user.id, channel.id))) {
       send = {
         code: 2,
       };
@@ -282,7 +283,7 @@ export class EventsGateway
     let send;
     const token = payload.token;
     const channel_id = payload.channel_id;
-    const user_id = verifyToken(token);
+    const user_id = verifyToken(token, this.authService);
     if (user_id == null) {
       send = {
         code: 401,
@@ -299,7 +300,7 @@ export class EventsGateway
       send = {
         code: 1,
       };
-    } else if (!(await this.channelService.isInChannel(user, channel))) {
+    } else if (!(await this.channelService.isInChannel(user.id, channel.id))) {
       send = {
         code: 2,
       };
@@ -405,5 +406,9 @@ export class EventsGateway
     this.server
       .to(game_id)
       .emit('update_game', this.games[game_id].getGameInfo());
+  }
+
+  async sendchangename(id: string, name: string) {
+    this.server.emit('change_name', { id: id, name: name });
   }
 }

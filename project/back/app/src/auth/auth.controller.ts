@@ -38,13 +38,12 @@ export class AuthController {
   @Get('callback')
   async getLogin(@Query() id, @Res() res) {
     if (id.code == null) {
-      res.status(400).send('Bad Request');
+      return res.redirect('http://localhost:8080/error');
     }
 
     const user = await this.userService.createUsers(id.code);
     if (user == null) {
-      res.status(400).send('Bad User');
-      return;
+      return res.status(400).send('Bad User');
     }
     console.log('id : ' + user.id);
     const code = await this.userService.signJwtToken(
@@ -61,14 +60,14 @@ export class AuthController {
   @UseGuards(JwtIsAuthGuard)
   @Get('2fa/create')
   async create2fa(@GetUser('sub') id, @Res() res) {
-    let user = await this.userService.getUserById(id);
+    const user = await this.userService.getUserById(id);
     if (user == null) {
-      res.status(400).send('Bad User');
-      return;
+      return res.status(400).send('Bad User');
     }
     if (user.enabled2FA == true) {
-      res.status(400).send('Bad Request : 2 factor authentication already set');
-      return;
+      return res
+        .status(400)
+        .send('Bad Request : 2 factor authentication already set');
     }
     const secret = await authenticator.generateSecret();
 
@@ -79,10 +78,9 @@ export class AuthController {
     );
 
     if ((await this.userService.set2FASecret(secret, user.id)) == null) {
-      res.status(400).send('Bad Request : Error while saving secret');
-      return;
+      return res.status(400).send('Bad Request : Error while saving secret');
     }
-    res.status(200).send(await toDataURL(otpauthUrl));
+    return res.status(200).send(await toDataURL(otpauthUrl));
   }
 
   @UseGuards(JwtIsAuthGuard)
@@ -94,43 +92,37 @@ export class AuthController {
       return;
     }
     if (user.secret2FA == null) {
-      res
+      return res
         .status(400)
         .send(
           'Bad Request : You need to create a two factor authentication secret first',
         );
-      return;
     }
     const code2FA = body.code;
     if (code2FA == null) {
-      res.status(400).send('Bad Request : You need to provide a code');
-      return;
+      return res.status(400).send('Bad Request : You need to provide a code');
     }
     const isValid: boolean = await this.authService.verify2FA(
       user.secret2FA,
       code2FA,
     );
     if (!isValid) {
-      res
+      return res
         .status(400)
         .send('Bad Request : Wrong two factor authentication code');
-      return;
     }
     await this.userService.enabled2FA(id);
-    res.status(200).send(true);
-    return;
+    return res.status(200).send(true);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('2fa/is2FA')
   async is2FA(@GetUser('sub') id, @Res() res) {
-    let user = await this.userService.getUserById(id);
+    const user = await this.userService.getUserById(id);
     if (user == null) {
-      res.status(400).send('Bad User');
-      return;
+      return res.status(400).send('Bad User');
     }
-    res.status(200).send(user.enabled2FA);
-    return;
+    return res.status(200).send(user.enabled2FA);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -139,8 +131,7 @@ export class AuthController {
     const id = jwtUser.sub;
     let user = await this.userService.getUserById(id);
     if (user == null) {
-      res.status(400).send('Bad User');
-      return;
+      return res.status(400).send('Bad User');
     }
     if (user.enabled2FA == true) {
       const code2FA = body.code;

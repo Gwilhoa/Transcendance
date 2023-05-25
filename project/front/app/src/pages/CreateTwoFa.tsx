@@ -32,7 +32,7 @@ const IsTwoFA = () => {
 				console.error(error);
 				navigate('/Error');
 			});
-	}, []);
+	}, [navigate]);
 
 	return (
 		<>
@@ -42,7 +42,7 @@ const IsTwoFA = () => {
 
 
 const CreateTwoFaPage = () => {
-	const [result, setResult] = useState<string>("");
+	const [, setResult] = useState<string>("");
 	const [dataImage, setDataImage] = useState<string>("");
 	const [Error, setError] = useState<boolean>(false);
 	const navigate = useNavigate();
@@ -96,7 +96,7 @@ const CreateTwoFaPage = () => {
 					setErrorCookie("Error " + error.response.status);
 					navigate('/Error');
 				});
-	}, []);
+	}, [navigate]);
 
 	return (
 		<>

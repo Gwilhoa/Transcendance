@@ -1,6 +1,5 @@
-import {Route, Routes, useNavigate} from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import Auth from './pages/Auth';
-// import AuthToken from './pages/AuthToken';
 import NotFound from './pages/NotFound';
 import CreateTwoFaPage from './pages/CreateTwoFa';
 import Game from './pages/game';

@@ -1,12 +1,34 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import './template.css'
-import React from "react";
+import React, { useEffect, useState } from "react";
 import CV from "../components/profil/CV";
 import { Props } from "../App";
-import { getName } from "../components/utils/API";
+import axios from "../components/utils/API";
 import { IsInAChat, JoinChat, LeaveChat } from "../components/popup/chatManager";
+import { setErrorCookie } from "../components/IfError";
+import Cookies from 'universal-cookie';
+const cookies = new Cookies();
 
 const Head = ({ openModal, setContent }: Props) => {
+	const [id, setId] = useState<string>("");
+	const navigate = useNavigate();
+
+	useEffect(() => {
+		axios.get("http://localhost:3000/user/id", {
+			headers: {
+				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+			},
+		})
+			.then((response) => {
+				console.log(response);
+				setId(response.data.id);
+			})
+			.catch((error) => {
+				setErrorCookie("Error " + error.response.status);
+				console.error(error);
+				navigate('/Error');
+			});
+			}, [navigate]);
 
   const buttonChat = () => {
     if (IsInAChat())
@@ -16,7 +38,10 @@ const Head = ({ openModal, setContent }: Props) => {
   }
 
   const profilStart = () => {
-    setContent(<CV name={getName()} isFriend={false} isMe={true} photoUrl={"https://www.treehugger.com/thmb/9fuOGVoJ23ZwziKRNtAEMHw8opU=/750x0/filters:no_upscale():max_bytes(150000):strip_icc():format(webp)/piglet-grass-dandelions-01-b21d7ef8f881496f8346dbe01859537e.jpg"} closeModal={openModal}/>);
+    setContent(
+		<CV id={id}
+		closeModal={openModal}
+		/>);
     openModal(true);
   }
 

@@ -103,6 +103,11 @@ stop clean:
 	docker-compose -f docker-compose.yml stop
 	printf "$(GREEN)[✓]$(END)\n\n"
 
+down :
+	printf "%-62b%b" "$(BOLD)$(PURPLE)Destroy$(END) containers"
+	docker-compose -f docker-compose.yml down
+	printf "$(GREEN)[✓]$(END)\n\n"
+
 # ~~~~~~~~~~~~ CLEANNING RULES ~~~~~~~~~~~~
 
 remove : clean

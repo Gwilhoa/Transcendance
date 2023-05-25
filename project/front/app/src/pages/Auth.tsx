@@ -1,15 +1,30 @@
-import React from 'react';
-import { Link } from "react-router-dom";
+import axios from 'axios';
+import React, { useEffect } from 'react';
+import { Link, useNavigate } from "react-router-dom";
 import Cookies from 'universal-cookie';
 const cookies = new Cookies();
 
 function Auth() {
-  //state
+	const navigate = useNavigate();
 
-  //comportement
-  cookies.remove('Error');  
+	cookies.remove('Error');  
+	useEffect(() => {
 
-  //render	
+		if (cookies.get('jwtAuthorization') != null) {
+			axios.get("http://localhost:3000/auth/2fa/is2FA", {
+				headers: {
+					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+				},
+			})
+				.then(() => {
+					navigate('/home');
+				})
+				.catch((error) => {
+					console.error(error.status)
+				});
+		}
+	}, [navigate]);
+
   return (
 	<div className="Auth">
 		<div className="Auth-title">
