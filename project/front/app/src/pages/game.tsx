@@ -65,12 +65,13 @@ const Game = () => {
     top: "50px",
     left: "100px",
   };
-
+  
   socket.on('matchmaking_code', (data) => {
+    console.log('yo');
     console.log(data);
-  }
-
-  socket.emit('join_matchmaking', cookies.get('jwtAuthorization'));
+  });
+  
+  socket.emit('join_matchmaking', {token : cookies.get('jwtAuthorization')});
   socket.on('matchmaking_code', () => {
     console.log("dhdh")
     findGame(true);
