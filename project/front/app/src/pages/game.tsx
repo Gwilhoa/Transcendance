@@ -73,9 +73,13 @@ const Game = () => {
   
   socket.emit('join_matchmaking', {token : cookies.get('jwtAuthorization')});
   socket.on('matchmaking_code', () => {
-    console.log("dhdh")
-    findGame(true);
+    console.log("enter matchmaking")
   });
+
+  socket.on('create_game', (any) => {
+    console.log("WESH")
+    console.log(any);
+  })
 
   useEffect(() => {
     socket.on('update_game', (data) => {
