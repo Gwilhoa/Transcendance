@@ -44,7 +44,7 @@ const OneScoreBlock = ({status, score1, score2 }: ShowScore) => {
 
 const Add = () => {
     const blocks = [];
-    const [response, setResponse] = useState<AxiosResponse | null>(null);
+    const [response, setResponse] = useState<any>(null);
     // todo: change enemy here no more use
 
     const navigate = useNavigate();
@@ -76,10 +76,10 @@ const Add = () => {
       ];
     if (response == null)
       return <></>;
-    let games : JSON = response;
-    let game: any;
-    for (game of games)
+    for (const game of response)
     {
+        console.log('game :')
+        console.log(game)
         console.log('game id: ' + game.id);
     }
     ////// REMPLIR LIST OF SCORE AVEC LES VRAIS SCORES ///////////
