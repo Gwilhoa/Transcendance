@@ -380,7 +380,7 @@ export class UserService {
       .leftJoinAndSelect('user.blockedUsers', 'blockedUsers')
       .where('user.id = :id', { id: user_id })
       .getOne();
-    if (user == null && myuser == null) {
+    if (user == null || myuser == null) {
       return false;
     }
     myuser.blockedUsers.forEach((element) => {

@@ -5,8 +5,7 @@ export function verifyToken(token: string, authService: AuthService) {
   try {
     return authService.getIdFromToken(token);
   } catch (error) {
-    console.error(error);
-    return null;
+    throw Error('Invalid token');
   }
 }
 
@@ -20,7 +19,6 @@ export function getKeys(map: Map<any, any>) {
 
 export function wrongtoken(client: Socket) {
   client.emit('connection_error', 'Invalid token');
-  client.disconnect();
 }
 
 export function send_connection_server(
