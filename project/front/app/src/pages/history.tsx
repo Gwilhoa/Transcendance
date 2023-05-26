@@ -68,11 +68,12 @@ const Add = () => {
     }, [navigate]);
     console.log("toto");
     
-    if (response == null)
+    if (response == null || response.length == 0)
     {
-        console.log("toto");
-        return (<p className="no-game-played">{"You don't apost have played a game yet!"}</p>);
+        // console.log("toto");
+        return (<p className="no-game-played">{"You don't have played a game yet!"}</p>);
     }
+    console.log(response)
     let i = 0;
     for (const game of response)
     {
@@ -107,6 +108,7 @@ const Add = () => {
 }
 
 const History = () => {
+    console.log('aaa');
     return (
         <div className="page-history">
 			<ErrorToken />
