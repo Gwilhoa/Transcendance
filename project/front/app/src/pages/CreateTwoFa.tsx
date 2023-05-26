@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useRef, useState } from 'react';
 import AuthCode, { AuthCodeRef } from 'react-auth-code-input';
-import "../style/CreateTwoFa.css";
+import "./css/CreateTwoFa.css";
 import Cookies from 'universal-cookie';
 import ErrorToken, { setErrorLocalStorage } from '../components/IfError';
 import { useNavigate } from 'react-router-dom';
@@ -10,7 +10,7 @@ const cookies = new Cookies();
 export const ErrorInput = () => {
 		
 	return (
-	<p>Bad input try again</p>
+	<p className='Error-msg'>*Bad input try again</p>
 	);
 }
 
@@ -102,13 +102,11 @@ const CreateTwoFaPage = () => {
 		<>
 			<ErrorToken />
 			<IsTwoFA />
-			<div className="qrCode">
-				<h1>
+				<h1 className='create-2FA-title'>
 					Scan the qrCode and enter your Code
 				</h1>
-				<img src={dataImage} />
-			</div>
-			<div>
+				<img src={dataImage} className="qrCode"/>
+			<div className='input-2fa'>
 				<AuthCode 
 					allowedCharacters='numeric' 
 					onChange={handleOnChange} 

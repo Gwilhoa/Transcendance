@@ -27,7 +27,7 @@
   position: absolute;
   width: 1%;
   height: 15%;
-  background-color: white;
+  background-color: var(--light-color);
 }
 
 .paddle1 {

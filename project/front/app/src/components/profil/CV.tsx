@@ -161,7 +161,7 @@ export default function CV( { id, closeModal } : { id: string | null, closeModal
 					classInput='button_notif'
 					classButton='button_notif'
 					/>
-				{errorName ? <p className="errorName">*Name already Exist</p> : <></>}
+				{errorName ? <p className="Error-msg">*Name already Exist</p> : <></>}
             </div>
             )
             
@@ -173,9 +173,9 @@ export default function CV( { id, closeModal } : { id: string | null, closeModal
 					<span></span>
 					<p>2FA</p>
 				</label> */}
-				<label htmlFor="scales"></label>
-				<input type='checkbox' name='2FA' checked={checked} onChange={clicked} />
-					{/* <p>2FA</p> */}
+				<label htmlFor="toggleSwitch"></label>
+				<input type='checkbox' name='2FA' checked={checked} onChange={clicked} id="toggleSwitch"/>
+					<p>2FA</p>
 				</div>
             )
 		retu.push(

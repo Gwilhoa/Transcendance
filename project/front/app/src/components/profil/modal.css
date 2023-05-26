@@ -5,9 +5,9 @@
   top: 50%;
   transform: translate(-50%, -50%) ;
   width: 500px;
-  height: 500px;
+  height: 650px;
   overflow: auto;
-  background-color: white;
+  background-color: var(--light-color);
   border-radius: 20px;
 }
 
@@ -42,7 +42,7 @@
   position: absolute;
   right: 25px;
   background-color: rgb(189, 39, 39);
-  color: white;
+  color: var(--light-color);
   border: none;
   padding: 0.25rem 0.5rem 0.25rem 0.5rem;
   border-radius: 50%;
@@ -62,7 +62,7 @@
   background-color: rgb(57, 49, 114);
   border: 0.2rem solid rgb(57, 49, 114);
   border-radius: 1rem;
-  background-color: white;
+  background-color: var(--light-color);
   color: black;
   font-size: 1rem;
   width: 8rem;
@@ -90,32 +90,135 @@
   justify-self: center;
 }
 
-.change2FA{
-  margin: 1rem;
+/* .change2FA {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 25px;
 }
 
-.change2FA > input{
-  /* position: absolute;
-	top: 0;
-	bottom: 0;
-	left: 0;
-	right: 0; */
-	background: #99b4df;
-	border-radius: 20px;
+.change2FA input[type='checkbox'] {
+  opacity: 0;
+  width: 0;
+  height: 0;
 }
 
-.change2FA > input:checked{
-background: #3ea80c;
+.change2FA label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50px;
+  height: 25px;
+  background-color: #ccc;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
+
+.change2FA label:after {
+  content: '';
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  width: 23px;
+  height: 23px;
+  background-color: white;
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+}
+
+.change2FA input[type='checkbox']:checked + label {
+  background-color: #2196F3;
+}
+
+.change2FA input[type='checkbox']:checked + label:after {
+  transform: translateX(25px);
+}
+
+.change2FA label:active:after {
+  width: 30px;
+} */
+
+
+
+
+
+
+
+
+
+
+
+
+
+.change2FA {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 25px;
+}
+
+/* .change2FA input[type="checkbox"] {
+  opacity: 0;
+  width: 0;
+  height: 0;
+} */
+
+.change2FA label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50px;
+  height: 25px;
+  background-color: #ccc;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.change2FA label:after {
+  content: "";
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  width: 23px;
+  height: 23px;
+  background-color: var(--light-color);
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+}
+
+.change2FA input:checked + label {
+  background-color: #2196f3;
+}
+
+/* .change2FA input[type="checkbox"]:checked + label:after {
+  transform: translateX(25px);
+}
+
+.change2FA label:hover {
+  background-color: #ddd;
+}
+*/
+
+
+
+
+
+
+
+
+
+
+
+.Error-msg {
+  font-size: 0.75rem;
+}
+
 
 /* .change2FA > label{
   margin-left: 0.5rem;;
 } */
-
-.errorName {
-  color: red;
-  font-size: 0.75rem;
-}
 
 .logout > button{
   border: 0;
@@ -124,6 +227,6 @@ background: #3ea80c;
   padding: 1rem;
   background-color: rgb(57, 49, 114);
   
-  color : white;
+  color : var(--light-color);
 
 }
