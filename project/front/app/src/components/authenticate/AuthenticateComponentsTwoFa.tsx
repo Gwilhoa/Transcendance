@@ -4,7 +4,7 @@ const cookies = new Cookies();
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import AuthCode, { AuthCodeRef } from "react-auth-code-input";
-import { setErrorCookie } from "../IfError";
+import { setErrorLocalStorage } from "../IfError";
 import { ErrorInput } from "../../pages/CreateTwoFa";
 import "../../style/CreateTwoFa.css";
 
@@ -27,7 +27,7 @@ function AuthenticateComponentsTwoFa() {
 				})
 				.catch((error) => {
 					cookies.remove('tenMinToken');
-					setErrorCookie("Error " + error.response.status);
+					setErrorLocalStorage("Error " + error.response.status);
 					console.error(error);
 					navigate('/Error');
 				});
@@ -59,7 +59,7 @@ function AuthenticateComponentsTwoFa() {
 				})
 				.catch((error) => {
 					if (error.response.status === 401) {
-						setErrorCookie("unauthorized");
+						setErrorLocalStorage("unauthorized");
 						navigate('/Error');
 					}
 					else {

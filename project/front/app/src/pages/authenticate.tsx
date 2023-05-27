@@ -2,7 +2,7 @@ import React from "react";
 import Cookies from "universal-cookie";
 const cookies = new Cookies();
 import axios from "axios";
-import { setErrorCookie } from "../components/IfError"
+import { setErrorLocalStorage } from "../components/IfError"
 import { useNavigate } from "react-router-dom";
 
 export function TokenPage() {
@@ -24,7 +24,7 @@ export function TokenPage() {
 					navigate('/authenticate/TwoFa');
 			})
 			.catch((error) => {
-				setErrorCookie("Error " + error.response.status);
+				setErrorLocalStorage("Error " + error.response.status);
 				console.error(error);
 				navigate('/Error');
 			});
