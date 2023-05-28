@@ -149,7 +149,6 @@ export class Game {
     this._ballx += this._dx;
     this._bally += this._dy;
 
-    //check if ball will be in racket // TODO: check si ca marche
     if (
       this._ballx <
       this._minX + Game.default_rackwidth + Game.default_radiusball
@@ -208,8 +207,12 @@ export class Game {
         return;
       }
     }
+
     if (this._bally < this._minY || this._bally > this._maxY) {
       this._dy *= -1;
+    }
+    if (this._ballx < this._minX || this._ballx > this._maxX) {
+      this._dx *= -1;
     }
 
     if (this._score1 == Game.default_victorygoal) {
@@ -228,6 +231,7 @@ export class Game {
       });
       await this._gameService.finishGame(this._id, this._score1, this._score2);
       clearInterval(this._loopid);
+      this.executeFinishCallbacks();
       return;
     }
     if (this._score2 == Game.default_victorygoal) {
@@ -246,12 +250,16 @@ export class Game {
       });
       await this._gameService.finishGame(this._id, this._score1, this._score2);
       clearInterval(this._loopid);
-      this._finishCallback.forEach((callback) => callback());
+      this.executeFinishCallbacks();
       return;
     }
     this._io.to(this._id).emit('update_game', this.getGameInfo());
   };
 
+  private executeFinishCallbacks() {
+    console.log('Callbacks:', this._finishCallback);
+    this._finishCallback.forEach((callback) => callback());
+  }
   onFinish(callback) {
     this._finishCallback.push(callback);
   }

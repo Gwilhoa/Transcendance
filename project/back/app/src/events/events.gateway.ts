@@ -18,7 +18,8 @@ import { GameService } from 'src/game/game.service';
 import { CreateGameDTO } from 'src/dto/create-game.dto';
 import { UserStatus } from 'src/utils/user.enum';
 import {
-  getIdFromSocket, getKeys,
+  getIdFromSocket,
+  getKeys,
   send_connection_server,
   verifyToken,
   wrongtoken,
@@ -457,7 +458,9 @@ export class EventsGateway
           this.server,
           this.gameService,
         );
-        game.onFinish((game) => {
+        game.onFinish((finishedGame) => {
+          this.logger.debug(game);
+          // Utilisez la variable "finishedGame" pour effectuer des opérations sur la game terminée
           this.ingame.delete(getIdFromSocket(game.getUser1(), this.clients));
           this.ingame.delete(getIdFromSocket(game.getUser2(), this.clients));
           this.sendconnected();
