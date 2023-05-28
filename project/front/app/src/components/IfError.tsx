@@ -3,8 +3,9 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { cookies } from "../App";
 
-export function setErrorCookie(ErrorMessage:string) {
-	cookies.set('Error', ErrorMessage);	
+export function setErrorLocalStorage(ErrorMessage:string) {
+	localStorage.setItem('Error', ErrorMessage);
+	localStorage.removeItem('id');
 }
 
 function ErrorToken() {
@@ -12,7 +13,7 @@ function ErrorToken() {
 
 	useEffect(() => { 
 	if (cookies.get('jwtAuthorization') == null) {
-		setErrorCookie('you\'r connexion time out');
+		setErrorLocalStorage('you\'r connexion time out');
 		navigate('/Error');
 	}
 
@@ -22,7 +23,7 @@ function ErrorToken() {
 			},
 		})
 			.catch((error) => {
-				setErrorCookie("Error " + error.response.status);
+				setErrorLocalStorage("Error " + error.response.status);
 				console.error(error);
 				navigate('/Error');
 			});
