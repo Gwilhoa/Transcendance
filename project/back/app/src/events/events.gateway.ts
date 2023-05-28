@@ -75,10 +75,14 @@ export class EventsGateway
       this.sendconnected();
     }
     this.clients.delete(id);
-    if (this.ingame.has(getIdFromSocket(client, this.clients))) {
+    if (getKeys(this.ingame).includes(id)) {
       const game = await this.gameService.remakeGame(
         this.ingame.get(client.id),
       );
+      if (game == null) {
+        this.logger.error('game not found');
+        return;
+      }
       this.ingame.delete(game.user1.id);
       this.ingame.delete(game.user2.id);
     }

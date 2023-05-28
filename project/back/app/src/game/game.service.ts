@@ -65,7 +65,12 @@ export class GameService {
   }
 
   async remakeGame(id: string) {
-    const game = await this.gameRepository.findOneBy({ id: id });
+    const game = await this.gameRepository
+      .createQueryBuilder('game')
+      .leftJoinAndSelect('game.user1', 'user1')
+      .leftJoinAndSelect('game.user2', 'user2')
+      .where('game.id = :id', { id: id })
+        .getOne();
     if (game == null) throw new Error('Game not found');
     game.finished = GameStatus.REMAKE;
     return await this.gameRepository.save(game);

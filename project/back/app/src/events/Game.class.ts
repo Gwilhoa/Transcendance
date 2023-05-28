@@ -16,7 +16,7 @@ export class Game {
   static default_sizeMaxX = 100;
   static default_sizeMinY = 0;
   static default_sizeMaxY = 100;
-  static default_victorygoal: 3;
+  static default_victorygoal = 3;
 
   private _io: Server;
   private _loopid: NodeJS.Timeout;
@@ -213,6 +213,7 @@ export class Game {
     }
 
     if (this._score1 == Game.default_victorygoal) {
+      console.log('game finish ' + this._id);
       this._user1.leave(this._id);
       this._user2.leave(this._id);
       this._user1.emit('finish_game', {
@@ -230,6 +231,7 @@ export class Game {
       return;
     }
     if (this._score2 == Game.default_victorygoal) {
+      console.log('game finish ' + this._id);
       this._user2.leave(this._id);
       this._user1.leave(this._id);
       this._user2.emit('finish_game', {
