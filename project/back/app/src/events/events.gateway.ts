@@ -18,7 +18,7 @@ import { GameService } from 'src/game/game.service';
 import { CreateGameDTO } from 'src/dto/create-game.dto';
 import { UserStatus } from 'src/utils/user.enum';
 import {
-  getIdFromSocket,
+  getIdFromSocket, getKeys,
   send_connection_server,
   verifyToken,
   wrongtoken,
@@ -82,6 +82,9 @@ export class EventsGateway
       this.ingame.delete(game.user1.id);
       this.ingame.delete(game.user2.id);
     }
+    if (this.matchmaking.includes(client)) {
+      this.matchmaking.splice(this.matchmaking.indexOf(client), 1);
+    }
     this.sendconnected();
   }
 
@@ -97,8 +100,10 @@ export class EventsGateway
       }
       if (
         (await this.userService.changeStatus(id, UserStatus.CONNECTED)) == null
-      )
+      ) {
         wrongtoken(client);
+        return;
+      }
       this.clients.set(id, client);
       this.sendconnected();
       let channels = null;
@@ -126,7 +131,13 @@ export class EventsGateway
     let send;
     const token = payload.token;
     const friend_id = payload.friend_id;
-    const user_id = verifyToken(token, this.authService);
+    let user_id = null;
+    try {
+      user_id = verifyToken(token, this.authService);
+    } catch (error) {
+      wrongtoken(client);
+      return;
+    }
     if (user_id == null) {
       client.emit('friend_code', FriendCode.UNAUTHORIZED);
       return;
@@ -192,7 +203,13 @@ export class EventsGateway
     const channel_id = payload.channel_id;
     let message = payload.content;
     let send;
-    const user_id = verifyToken(token, this.authService);
+    const user_id = getIdFromSocket(client, this.clients);
+    try {
+      verifyToken(token, this.authService);
+    } catch (error) {
+      wrongtoken(client);
+      return;
+    }
     const user = await this.userService.getUserById(user_id);
     const channel = await this.channelService.getChannelById(channel_id);
     if (user == null) {
@@ -283,7 +300,13 @@ export class EventsGateway
     let send;
     const token = payload.token;
     const channel_id = payload.channel_id;
-    const user_id = verifyToken(token, this.authService);
+    const user_id = getIdFromSocket(client, this.clients);
+    try {
+      verifyToken(token, this.authService);
+    } catch (error) {
+      wrongtoken(client);
+      return;
+    }
     if (user_id == null) {
       send = {
         code: 401,
@@ -320,13 +343,43 @@ export class EventsGateway
 
   @SubscribeMessage('join_matchmaking')
   async join_matchmaking(client: Socket, payload: any) {
-    try {
-      await this.authService.getIdFromToken(payload.token);
-    } catch (error) {
-      client.emit('connection_error', 'Invalid token');
-      client.disconnect();
+    if (payload.token == null) {
+      wrongtoken(client);
       return;
     }
+    try {
+      verifyToken(payload.token, this.authService);
+    } catch (error) {
+      wrongtoken(client);
+      return;
+    }
+    const id = await this.authService.getIdFromToken(payload.token);
+    if (id == null) {
+      wrongtoken(client);
+      return;
+    }
+    if (getKeys(this.ingame).includes(id)) {
+      const send = {
+        code: 1,
+        message: 'You are already in a game',
+      };
+      client.emit('matchmaking_code', send);
+      return;
+    }
+    let i = 0;
+    while (i < this.matchmaking.length) {
+      const player = this.matchmaking[i];
+      if (player.id == client.id) {
+        const send = {
+          code: 1,
+          message: 'You are already in matchmaking',
+        };
+        client.emit('matchmaking_code', send);
+        return;
+      }
+      i++;
+    }
+    this.logger.debug('new in matchmaking ' + id);
     this.matchmaking.push(client);
     const send = {
       code: 0,
@@ -335,20 +388,37 @@ export class EventsGateway
   }
 
   async check_matchmaking() {
-    this.matchmaking.forEach((player) => async () => {
-      const authorized_player = this.matchmaking.filter(
-        async (pretended_player) =>
-          player.id !== pretended_player.id &&
-          (await this.userService.OneOfTwoBlocked(
-            getIdFromSocket(player, this.clients),
-            getIdFromSocket(pretended_player, this.clients),
-          )),
-      );
+    this.logger.debug('checking matchmaking');
+    let i = 0;
+    while (i < this.matchmaking.length) {
+      this.logger.debug(this.matchmaking[i].id);
+      const player = this.matchmaking[i];
+      const authorized_player = [];
+      let j = 0;
+      while (j < this.matchmaking.length) {
+        const pretended_player = this.matchmaking[j];
+        const player_id = getIdFromSocket(player, this.clients);
+        const pretended_player_id = getIdFromSocket(
+          pretended_player,
+          this.clients,
+        );
+        if (
+          pretended_player_id != player_id &&
+          !(await this.userService.OneOfTwoBlocked(
+            pretended_player_id,
+            player_id,
+          ))
+        ) {
+          authorized_player.push(pretended_player);
+        }
+        j++;
+      }
       if (authorized_player.length > 0) {
         const rival =
           authorized_player[
             Math.floor(Math.random() * authorized_player.length)
           ];
+        this.logger.debug('found rival ' + rival.id);
         const create_gameDTO = new CreateGameDTO();
         create_gameDTO.user1_id = getIdFromSocket(player, this.clients);
         create_gameDTO.user2_id = getIdFromSocket(rival, this.clients);
@@ -389,20 +459,26 @@ export class EventsGateway
           this.sendconnected();
           this.logger.log(game.getId() + ' finished');
         });
-        this.logger.log(game.getId() + ' started');
+        const tempmatchmaking = [];
+        for (const t of this.matchmaking) {
+          if (t.id != rival.id && player.id != t.id) {
+            tempmatchmaking.push(player);
+          }
+        }
+        this.matchmaking = tempmatchmaking;
+        this.server.to(game.getId()).emit('game_start', game.getId());
+        this.logger.log('game ' + game.getId() + ' started');
         game.start();
       }
-    });
+      i++;
+    }
   }
 
   @SubscribeMessage('input_game')
   async input_game(client: Socket, payload: any) {
     const game_id = payload.game_id;
-    const position = payload.position;
-    if (position > 100 || position < 0) {
-      return;
-    }
-    this.games[game_id].updateRacket(client, position);
+    const type = payload.type;
+    this.games[game_id].updateRacket(client, type);
     this.server
       .to(game_id)
       .emit('update_game', this.games[game_id].getGameInfo());

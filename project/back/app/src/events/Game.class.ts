@@ -1,5 +1,6 @@
 import { Server, Socket } from 'socket.io';
 import { GameService } from 'src/game/game.service';
+import { sleep } from '../utils/sleep';
 
 export class Game {
   static default_positionR = 50;
@@ -56,12 +57,13 @@ export class Game {
     this._bally = Game.default_positionBy;
     this._dx = 0;
     this._dy = 0;
-    this._minX = 0;
-    this._maxX = 0;
-    this._minY = 0;
-    this._maxY = 0;
+    this._minX = Game.default_sizeMinX;
+    this._maxX = Game.default_sizeMaxX;
+    this._minY = Game.default_sizeMinY;
+    this._maxY = Game.default_sizeMaxY;
     this._io = io;
     this._gameService = gameService;
+    console.log('game created' + this._id);
   }
 
   public getId() {
@@ -101,8 +103,23 @@ export class Game {
   }
 
   public updateRacket(player: Socket, y: number) {
-    if (player.id == this._user1.id) this._rack1y = y;
-    else if (player.id == this._user2.id) this._rack2y = y;
+    if (player.id == this._user1.id) {
+      if (y == 1) {
+        if (this._rack1y >= this._maxY - Game.default_racklenght) return;
+        this._rack1y += 1;
+      } else if (y == 0) {
+        if (this._rack1y <= this._minY + Game.default_racklenght) return;
+        this._rack1y -= 1;
+      }
+    } else if (player.id == this._user2.id) {
+      if (y == 1) {
+        if (this._rack2y >= this._maxY - Game.default_racklenght) return;
+        this._rack2y += 1;
+      } else if (y == 0) {
+        if (this._rack2y <= this._minY + Game.default_racklenght) return;
+        this._rack2y -= 1;
+      }
+    }
   }
 
   public getGameInfo() {
@@ -116,17 +133,19 @@ export class Game {
       bally: this._bally,
     };
   }
-  public start() {
+  public async start() {
+    console.log('game launch ' + this._id);
+    await sleep(3000);
     const angle = Math.random() * 360;
     this._rack1y = Game.default_positionR;
     this._rack2y = Game.default_positionR;
-    this._ballx = 0;
-    this._bally = 0;
+    this._ballx = 50;
+    this._bally = 50;
     this._dx = Math.cos(angle);
     this._dy = Math.sin(angle);
     this._loopid = setInterval(this.gameLoop, Game.default_update);
   }
-  public async gameLoop() {
+  public gameLoop = async () => {
     this._ballx += this._dx;
     this._bally += this._dy;
 
@@ -175,14 +194,18 @@ export class Game {
     }
 
     //calculate colision wall
-    if (this._ballx < this._minX || this._ballx > this._maxX) {
-      if (this._ballx < this._minX) {
+    if (this._bally < this._minY || this._bally > this._maxY) {
+      if (this._bally < this._minY) {
         this._score1++;
+        clearInterval(this._loopid);
         this.start();
+        return;
       }
-      if (this._ballx > this._maxX) {
+      if (this._bally > this._maxY) {
+        clearInterval(this._loopid);
         this._score2++;
         this.start();
+        return;
       }
     }
     if (this._bally < this._minY || this._bally > this._maxY) {
@@ -225,7 +248,7 @@ export class Game {
       return;
     }
     this._io.to(this._id).emit('update_game', this.getGameInfo());
-  }
+  };
 
   onFinish(callback) {
     this._finishCallback.push(callback);
