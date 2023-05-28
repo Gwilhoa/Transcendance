@@ -1,6 +1,6 @@
 import { Server, Socket } from 'socket.io';
 import { GameService } from 'src/game/game.service';
-import {sleep} from "../utils/sleep";
+import { sleep } from '../utils/sleep';
 
 export class Game {
   static default_positionR = 50;
@@ -103,8 +103,23 @@ export class Game {
   }
 
   public updateRacket(player: Socket, y: number) {
-    if (player.id == this._user1.id) this._rack1y = y;
-    else if (player.id == this._user2.id) this._rack2y = y;
+    if (player.id == this._user1.id) {
+      if (y == 1) {
+        if (this._rack1y >= this._maxY - Game.default_racklenght) return;
+        this._rack1y += 1;
+      } else if (y == 0) {
+        if (this._rack1y <= this._minY + Game.default_racklenght) return;
+        this._rack1y -= 1;
+      }
+    } else if (player.id == this._user2.id) {
+      if (y == 1) {
+        if (this._rack2y >= this._maxY - Game.default_racklenght) return;
+        this._rack2y += 1;
+      } else if (y == 0) {
+        if (this._rack2y <= this._minY + Game.default_racklenght) return;
+        this._rack2y -= 1;
+      }
+    }
   }
 
   public getGameInfo() {

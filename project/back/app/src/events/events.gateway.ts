@@ -18,7 +18,7 @@ import { GameService } from 'src/game/game.service';
 import { CreateGameDTO } from 'src/dto/create-game.dto';
 import { UserStatus } from 'src/utils/user.enum';
 import {
-  getIdFromSocket,
+  getIdFromSocket, getKeys,
   send_connection_server,
   verifyToken,
   wrongtoken,
@@ -354,7 +354,11 @@ export class EventsGateway
       return;
     }
     const id = await this.authService.getIdFromToken(payload.token);
-    if (this.ingame[id] != null) {
+    if (id == null) {
+      wrongtoken(client);
+      return;
+    }
+    if (getKeys(this.ingame).includes(id)) {
       const send = {
         code: 1,
         message: 'You are already in a game',
@@ -473,11 +477,8 @@ export class EventsGateway
   @SubscribeMessage('input_game')
   async input_game(client: Socket, payload: any) {
     const game_id = payload.game_id;
-    const position = payload.position;
-    if (position > 100 || position < 0) {
-      return;
-    }
-    this.games[game_id].updateRacket(client, position);
+    const type = payload.type;
+    this.games[game_id].updateRacket(client, type);
     this.server
       .to(game_id)
       .emit('update_game', this.games[game_id].getGameInfo());
