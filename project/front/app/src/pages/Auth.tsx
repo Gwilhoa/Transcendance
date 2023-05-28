@@ -7,7 +7,8 @@ const cookies = new Cookies();
 function Auth() {
 	const navigate = useNavigate();
 
-	cookies.remove('Error');  
+	localStorage.removeItem('Error');
+	localStorage.removeItem('id');
 	useEffect(() => {
 
 		if (cookies.get('jwtAuthorization') != null) {

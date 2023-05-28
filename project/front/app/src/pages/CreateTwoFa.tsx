@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import AuthCode, { AuthCodeRef } from 'react-auth-code-input';
 import "../style/CreateTwoFa.css";
 import Cookies from 'universal-cookie';
-import ErrorToken, { setErrorCookie } from '../components/IfError';
+import ErrorToken, { setErrorLocalStorage } from '../components/IfError';
 import { useNavigate } from 'react-router-dom';
 const cookies = new Cookies();
 
@@ -28,7 +28,7 @@ const IsTwoFA = () => {
 					navigate("/home");
 			})
 			.catch((error) => {
-				setErrorCookie("Error " + error.response.status);
+				setErrorLocalStorage("Error " + error.response.status);
 				console.error(error);
 				navigate('/Error');
 			});
@@ -67,7 +67,7 @@ const CreateTwoFaPage = () => {
 				})
 				.catch((error) => {
 					if (error.response.status === 401) {
-						setErrorCookie("unauthorized");
+						setErrorLocalStorage("unauthorized");
 						navigate('/Error');
 					}
 					else {
@@ -93,7 +93,7 @@ const CreateTwoFaPage = () => {
 					setDataImage(response.data);
 				})
 				.catch((error) => {
-					setErrorCookie("Error " + error.response.status);
+					setErrorLocalStorage("Error " + error.response.status);
 					navigate('/Error');
 				});
 	}, [navigate]);

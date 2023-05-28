@@ -1,15 +1,15 @@
 import './modal.css'
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ButtonInputToggle } from '../utils/inputButton';
 import LogoutButton from './logout';
-import { setErrorCookie } from "../IfError"
+import { setErrorLocalStorage } from "../IfError"
 import axios from '../utils/API';
 import Cookies from 'universal-cookie';
 const cookies = new Cookies();
 
 
-export default function CV( { id, closeModal } : { id:string, closeModal:(param: boolean) => void; }) {
+export default function CV( { id, closeModal } : { id: string | null, closeModal:(param: boolean) => void; }) {
     const retu = [];
 	const navigate = useNavigate();
 	const [isMe, setIsMe] =  useState<boolean>(false);
@@ -19,8 +19,7 @@ export default function CV( { id, closeModal } : { id:string, closeModal:(param:
     const [checked, setChecked] = useState(false);
 	const [errorName, setErrorName] = useState<boolean>(false);
 
-
-	const refresh = (id:string) => {
+	const refresh = useCallback(( id: string | null ) => {
 		axios.get("http://localhost:3000/user/image/" + id, {
 			headers: {
 				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
@@ -31,7 +30,7 @@ export default function CV( { id, closeModal } : { id:string, closeModal:(param:
 				setImage(data);
 			})
 			.catch((error) => {
-				setErrorCookie("Error " + error.response.status);
+				setErrorLocalStorage("Error " + error.response.status);
 				console.error(error);
 				navigate('/Error');
 			});
@@ -45,31 +44,16 @@ export default function CV( { id, closeModal } : { id:string, closeModal:(param:
 				setName(response.data.username);
 			})
 			.catch((error) => {
-				setErrorCookie("Error " + error.response.status);
+				setErrorLocalStorage("Error " + error.response.status);
 				console.error(error);
 				navigate('/Error');
 			});
-	};
+	}, [navigate]);
 
 	useEffect(() => {
-		axios.get("http://localhost:3000/user/id", {
-			headers: {
-				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
-			},
-		})
-			.then((response) => {
-				console.log(response);
-				if (id === response.data.id) {
-					setIsMe(true);
-					console.log("this is me");
-				}
-			})
-			.catch((error) => {
-				setErrorCookie("Error " + error.response.status);
-				console.error(error);
-				navigate('/Error');
-			});
-
+		if (id === localStorage.getItem('id')) {
+			setIsMe(true);
+		}
 		refresh(id);
 		
 		axios.get("http://localhost:3000/auth/2fa/is2FA", {
@@ -82,14 +66,13 @@ export default function CV( { id, closeModal } : { id:string, closeModal:(param:
 					setChecked(false);
 				else
 					setChecked(true);
-				console.log(response.data);
 			})
 			.catch((error) => {
-				setErrorCookie("Error " + error.response.status);
+				setErrorLocalStorage("Error " + error.response.status);
 				console.error(error);
 				navigate('/Error');
 			});
-	}, [navigate, id]);
+	}, [navigate, id, refresh]);
 
 	const changeName = (str: string) => {
 			axios.post("http://localhost:3000/user/name", 
@@ -118,11 +101,8 @@ export default function CV( { id, closeModal } : { id:string, closeModal:(param:
 					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
 				},
 			})
-				.then((response) => {
-					console.log(response);
-				})
 				.catch((error) => {
-					setErrorCookie("Error " + error.response.status);
+					setErrorLocalStorage("Error " + error.response.status);
 					console.error(error);
 					navigate('/Error');
 				});
@@ -145,12 +125,13 @@ export default function CV( { id, closeModal } : { id:string, closeModal:(param:
 				},
 				data: formData,
 			})
-				.then(response => {
-					console.log(response.data);
+				.then(() => {
 					refresh(id);
 				})
-				.catch(error => {
+				.catch((error) => {
+					setErrorLocalStorage("Error " + error.response.status);
 					console.error(error);
+					navigate('/Error');
 				});
 		}
 	};
@@ -197,27 +178,27 @@ export default function CV( { id, closeModal } : { id:string, closeModal:(param:
 
     if (!isFriend && !isMe) {
         retu.push(
-			<>
-				<button key={"buttonFriend"}>
+			<div key="notFriend">
+				<button>
 					Add friend
 				</button>
-				<button key={"buttonInvite"}>
+				<button>
 					Challenge
 				</button>
-			</>
+			</div>
 		)
     }
 
     if (isFriend && !isMe) {
         retu.push(
-			<>
-				<button key={"buttonFriend"}>
+			<div key="Friend">
+				<button>
 					Unfriend
 				</button>
-				<button key={"buttonInvite"}>
+				<button>
 					Challenge
 				</button>
-			</>
+			</div>
 		)
     }
 
