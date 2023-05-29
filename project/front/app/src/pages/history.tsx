@@ -1,24 +1,20 @@
-import React from "react";
+import React, { useEffect, useState }from "react";
 import './css/history.css'
 import ErrorToken, { setErrorLocalStorage } from '../components/IfError';
 import axios from '../components/utils/API'
 import { useNavigate } from 'react-router-dom';
-import {cookies} from '../App'
+import { cookies } from '../App'
 
-interface Score {
-    ennemy: string;
-    scoreEnnemy: number;
-    scoreMe: number;
-}
- 
 
 interface ShowScore {
     status: string;
-    score1: string;
-    score2: string;
+    myScore: string;
+    opponentScore: string;
 }
 
-const OneScoreBlock = ({status, score1, score2 }: ShowScore) => {
+const vistoryScore = 3;
+
+const OneScoreBlock = ({status, myScore, opponentScore }: ShowScore) => {
     return (
       <div className="score-block">
         <h3 className="status">{status}</h3>
@@ -26,76 +22,93 @@ const OneScoreBlock = ({status, score1, score2 }: ShowScore) => {
             <div className="player">
                 {/* <a href="" className="image"><img className="image" src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/42_Logo.svg/1200px-42_Logo.svg.png"></img></a> */}
                 <img className="image" src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/42_Logo.svg/1200px-42_Logo.svg.png"></img>
-                <p>{score1}</p> {/* todo: add link to profil */}
+                <p>{myScore}</p> {/* todo: add link to profil */}
             </div>
             <p>against</p>
             <div className="player">
                 {/* <a href="" className="image"><img className="image" src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/42_Logo.svg/1200px-42_Logo.svg.png"></img></a> */}
                 <img className="image" src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/42_Logo.svg/1200px-42_Logo.svg.png"></img>
-                <p>{score2}</p> {/* todo: add link to profil */}
+                <p>{opponentScore}</p> {/* todo: add link to profil */}
             </div>
         </div>
       </div>
     );
 };
 
+function getUserIndex(game : any)
+{
+    const id = localStorage.getItem('id');
+    if (game.user1.id == id)
+        return 1;
+    return 2;
+}
+
+
+
 const Add = () => {
     const blocks = [];
-    // todo: change enemy here no more use
+    const [response, setResponse] = useState<any>(null);
 
     const navigate = useNavigate();
-    axios.get("http://localhost:3000/game",{
-        headers: {
-            Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
-        },
-    })
-    .then((response) => {
-        console.log(response);
-    })
-    .catch((error) => {
-        console.error(error);
-        setErrorLocalStorage(error.response.status);
-		navigate('/Error');
-    })
+    useEffect(() =>{
+        axios.get("http://localhost:3000/game",{
+            headers: {
+                Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+            },
+        })
+        .then((res) => {
+            console.log(res);
+            setResponse(res.data);
+        })
+        .catch((error) => {
+            console.error(error);
+            setErrorLocalStorage(error.response.status);
+            navigate('/Error');
+        })
+    }, [navigate]);
+    console.log("toto");
     
-    const ListOfScore: Score[] = [
-        { ennemy: "Gchatain", scoreEnnemy: 3, scoreMe: 25 },
-        { ennemy: "Dieu", scoreEnnemy: 50, scoreMe: 49 },
-        { ennemy: "Xav Niel", scoreEnnemy: 0, scoreMe: 100 },
-        { ennemy: "Gchatain", scoreEnnemy: 3, scoreMe: 25 },
-        { ennemy: "Dieu", scoreEnnemy: 50, scoreMe: 49 },
-        { ennemy: "Xav Niel", scoreEnnemy: 0, scoreMe: 100 },
-
-      ];
-    ////// REMPLIR LIST OF SCORE AVEC LES VRAIS SCORES ///////////
-    
-    for (let i = 0; i < ListOfScore.length; i++) {
-        if (ListOfScore[i].scoreMe > ListOfScore[i].scoreEnnemy) {
-            blocks.push (
-                <OneScoreBlock
-                status={"Victory:"}
-                score1={String(ListOfScore[i].scoreMe)}
-                score2={String(ListOfScore[i].scoreEnnemy)}
-                key={i}
-                />
-            )
+    if (response == null || response.length == 0)
+    {
+        // console.log("toto");
+        return (<p className="no-game-played">{"You don't have played a game yet!"}</p>);
+    }
+    console.log(response)
+    let i = 0;
+    for (const game of response)
+    {
+        let status : string;
+        if( game.score1 == vistoryScore && getUserIndex(game) == 1)
+            status = 'Victory';
+        else
+            status = 'Defeat';
+        let myScore : string;
+        let opponentScore : string;
+        if (getUserIndex(game) == 1)
+        {
+            myScore = game.score1;
+            opponentScore = game.score2;
         }
-        else { 
-            blocks.push (
-                <OneScoreBlock
-                status={"Defeat:"}
-                score1={String(ListOfScore[i].scoreMe)}
-                score2={String(ListOfScore[i].scoreEnnemy)}
-                key={i}
-                />
-            )
-            }
+        else
+        {
+            myScore = game.score2;
+            opponentScore = game.score1;
         }
-        return <div className="score-board">{blocks}</div>;
+        blocks.push (
+            <OneScoreBlock
+            status={status + ':'}
+            myScore={myScore}
+            opponentScore={opponentScore}
+            key={i}
+            />
+        )
+        i++;
+    }
+    return <div className="score-board">{blocks}</div>;
 }
 
 const History = () => {
-	const id = localStorage.getItem('id');
+    console.log('aaa');
     return (
         <div className="page-history">
 			<ErrorToken />
@@ -105,7 +118,7 @@ const History = () => {
                 </div>
             </header>
             <div className="scrollBlock">
-                <Add/>
+                <Add />
             </div>
         </div>
     );

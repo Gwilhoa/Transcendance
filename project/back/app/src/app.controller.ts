@@ -15,6 +15,7 @@ export class AppController {
   async addbot(@Res() res)
   {
     this.appService.addbot();
+    return res.status(400).send('ok');
   }
 
   @Get('addfriend/:id')
