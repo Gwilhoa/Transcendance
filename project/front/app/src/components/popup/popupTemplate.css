@@ -6,7 +6,7 @@
     position: absolute;
     right: 7px;
     background-color: rgb(189, 39, 39);
-    color: white;
+    color: var(--light-color);
     border: none;
     padding: 6px;
     border-radius: 20px;

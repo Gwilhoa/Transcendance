@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import AuthCode, { AuthCodeRef } from "react-auth-code-input";
 import { setErrorLocalStorage } from "../IfError";
 import { ErrorInput } from "../../pages/CreateTwoFa";
-import "../../style/CreateTwoFa.css";
+import "../../pages/css/CreateTwoFa.css";
 
 function AuthenticateComponentsTwoFa() {
 	const [, setResult] = useState<string>("");
