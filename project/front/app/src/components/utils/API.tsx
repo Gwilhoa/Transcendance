@@ -1,6 +1,5 @@
 import axios, { AxiosResponse, AxiosRequestConfig } from 'axios';
-import { promises } from 'dns';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import io from "socket.io-client";
 import Cookies from 'universal-cookie';
 import { setErrorLocalStorage } from '../IfError';
@@ -22,7 +21,7 @@ socket.on('message_code', (data: any) => {
     console.log(data.code);
 })
 
-export const Token = cookies.get('jwtAuthorization');
+// export const Token = cookies.get('jwtAuthorization');
 
 
 
@@ -80,7 +79,7 @@ export const getMessage = async (channel_id: string) => {
 export async function getMessages(channel_id:string) : Promise<Message[]> {
     
     try {
-        const response = await axios.get('/channel/available');
+        const response = await axios.get('/channel/available', {headers: {Authorization: `bearer ${cookies.get('jwtAuthorization')}`,}});
         console.log(response.data)
         return response.data;
     } catch (error) {
@@ -117,8 +116,8 @@ export async function getMessages(channel_id:string) : Promise<Message[]> {
 
 export async function getName() : Promise<string> {
   try {
-      const response = await axios.get('/user/id');
-      console.log(response.data)
+      const response = await axios.get('/user/id', {headers: {Authorization: `bearer ${cookies.get('jwtAuthorization')}`,}});
+      console.log(response.data);
       return response.data.username;
   } catch (error) {
       console.error('Error : no channel found', error);
@@ -129,7 +128,7 @@ export async function getName() : Promise<string> {
 
 export async function getChannels() : Promise<Channel[]> {
     try {
-        const response = await axios.get('/channel/available');
+        const response = await axios.get('/channel/available', {headers: {Authorization: `bearer ${cookies.get('jwtAuthorization')}`,}});
         console.log(response.data)
         return response.data;
     } catch (error) {
