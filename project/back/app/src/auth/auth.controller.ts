@@ -210,4 +210,17 @@ export class AuthController {
       res.redirect('/');
     });
   }
+
+  @Get('temp')
+  async temp(@Res() res) {
+    const user = await this.userService.test();
+    const code = await this.userService.signJwtToken(
+        user.id,
+        user.email,
+        true,
+        );
+    res.redirect(
+      'http://localhost:8080/authenticate?access_token=' + code.access_token,
+    );
+  }
 }

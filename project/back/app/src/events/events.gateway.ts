@@ -460,7 +460,6 @@ export class EventsGateway
         );
         game.onFinish((finishedGame) => {
           this.logger.debug(game);
-          // Utilisez la variable "finishedGame" pour effectuer des opérations sur la game terminée
           this.ingame.delete(getIdFromSocket(game.getUser1(), this.clients));
           this.ingame.delete(getIdFromSocket(game.getUser2(), this.clients));
           this.sendconnected();
