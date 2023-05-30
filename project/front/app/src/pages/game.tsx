@@ -27,13 +27,13 @@ const Game = () => {
     switch (event.code) {
       case "KeyW":
         //setPaddle1((paddle) => ({ y: (paddle.y - 1) < 0 ? 0: paddle.y - 1}));
-        socket.emit("input_game", {gameId: gameId, type: 1})
+        socket.emit("input_game", {game_id: gameId, type: 1})
         break;
       case "KeyS":
         //setPaddle1((paddle) => ({ y: (paddle.y + 1) > 85 ? 85: paddle.y + 1}));
         //socket.emit()
         console.log("UP !!")
-        socket.emit("input_game", {gameId: gameId, type: 0})
+        socket.emit("input_game", {game_id: gameId, type: 0})
         break;
     }
   };
