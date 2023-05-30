@@ -4,6 +4,7 @@ import { useSpring, animated } from 'react-spring';
 import { socket } from '../components/utils/API';
 import Cookies from 'universal-cookie';
 import { useNavigate } from 'react-router-dom';
+import { cp } from 'fs';
 const cookies = new Cookies();
 
 const Game = () => {
@@ -11,7 +12,6 @@ const Game = () => {
   const Height = document.documentElement.clientHeight * 0.8;
   const Width = document.documentElement.clientWidth - 802;
   
-  const [gameId, setGameId] = useState(0);
   const [onGame, findGame] = useState(false);
   const [score1, setScore1] = useState(0);
   const [playerId, setPlayerId] = useState(0);
@@ -23,18 +23,21 @@ const Game = () => {
   const navigate = useNavigate();
   
   
+  let gameId = 0;
   const handleKeyDown = (event: KeyboardEvent) => {
     console.log(gameId);
     switch (event.code) {
       case "KeyW":
         //setPaddle1((paddle) => ({ y: (paddle.y - 1) < 0 ? 0: paddle.y - 1}));
         socket.emit("input_game", {game_id: gameId, type: 1})
+        console.log(gameId);
         break;
       case "KeyS":
         //setPaddle1((paddle) => ({ y: (paddle.y + 1) > 85 ? 85: paddle.y + 1}));
         //socket.emit()
         console.log("UP !!")
         socket.emit("input_game", {game_id: gameId, type: 0})
+        console.log(gameId);
         break;
     }
   };
@@ -77,7 +80,9 @@ const Game = () => {
         socket.on('game_start', (code:any) => {
           console.log(code);
           console.log("join game")
-          setGameId(code)
+          gameId = (code)
+          console.log("code")
+          console.log(gameId);
           socket.emit('input_game', { game_id: gameId, position: paddle1, token: cookies.get('jwtAuthorization')});
         });
       }
