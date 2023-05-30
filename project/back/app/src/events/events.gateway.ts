@@ -6,25 +6,18 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { Game } from './Game.class';
-import { Logger } from '@nestjs/common';
-import { Server, Socket } from 'socket.io';
-import { UserService } from 'src/user/user.service';
-import { AuthService } from 'src/auth/auth.service';
-import { ChannelService } from 'src/channel/channel.service';
-import { sendMessageDTO } from 'src/dto/sendmessage.dto';
-import { sleep } from '../utils/sleep';
-import { GameService } from 'src/game/game.service';
-import { CreateGameDTO } from 'src/dto/create-game.dto';
-import { UserStatus } from 'src/utils/user.enum';
-import {
-  getIdFromSocket,
-  getKeys,
-  send_connection_server,
-  verifyToken,
-  wrongtoken,
-} from 'src/utils/socket.function';
-import { FriendCode, messageCode } from 'src/utils/requestcode.enum';
+import {Game} from './Game.class';
+import {Logger} from '@nestjs/common';
+import {Server, Socket} from 'socket.io';
+import {UserService} from 'src/user/user.service';
+import {AuthService} from 'src/auth/auth.service';
+import {ChannelService} from 'src/channel/channel.service';
+import {sendMessageDTO} from 'src/dto/sendmessage.dto';
+import {GameService} from 'src/game/game.service';
+import {CreateGameDTO} from 'src/dto/create-game.dto';
+import {UserStatus} from 'src/utils/user.enum';
+import {getIdFromSocket, getKeys, send_connection_server, verifyToken, wrongtoken,} from 'src/utils/socket.function';
+import {FriendCode, messageCode} from 'src/utils/requestcode.enum';
 
 @WebSocketGateway({
   cors: {
@@ -344,14 +337,13 @@ export class EventsGateway
       wrongtoken(client);
       return;
     }
-    try {
-      verifyToken(payload.token, this.authService);
-    } catch (error) {
+    const id = await this.authService.getIdFromToken(payload.token);
+    if (id == null) {
       wrongtoken(client);
       return;
     }
-    const id = await this.authService.getIdFromToken(payload.token);
-    if (id == null) {
+    const user = await this.userService.getUserById(id);
+    if (user == null || user.status != UserStatus.CONNECTED) {
       wrongtoken(client);
       return;
     }
@@ -417,6 +409,28 @@ export class EventsGateway
             Math.floor(Math.random() * authorized_player.length)
           ];
         this.logger.debug('found rival ' + rival.id);
+        if (this.server.sockets.sockets.get(player.id) == null) {
+          const tempmatchmaking = [];
+          for (const p of this.matchmaking) {
+            if (p.id != player.id) {
+              tempmatchmaking.push(p);
+            }
+          }
+          this.matchmaking = tempmatchmaking;
+          this.check_matchmaking();
+          return;
+        }
+        if (this.server.sockets.sockets.get(rival.id) == null) {
+          const tempmatchmaking = [];
+          for (const p of this.matchmaking) {
+            if (p.id != rival.id) {
+              tempmatchmaking.push(p);
+            }
+          }
+          this.matchmaking = tempmatchmaking;
+          this.check_matchmaking();
+          return;
+        }
         const create_gameDTO = new CreateGameDTO();
         create_gameDTO.user1_id = getIdFromSocket(player, this.clients);
         create_gameDTO.user2_id = getIdFromSocket(rival, this.clients);
