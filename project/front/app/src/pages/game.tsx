@@ -24,6 +24,7 @@ const Game = () => {
   
   
   const handleKeyDown = (event: KeyboardEvent) => {
+    console.log(gameId);
     switch (event.code) {
       case "KeyW":
         //setPaddle1((paddle) => ({ y: (paddle.y - 1) < 0 ? 0: paddle.y - 1}));
