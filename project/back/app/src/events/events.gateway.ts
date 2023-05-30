@@ -46,15 +46,7 @@ export class EventsGateway
     private authService: AuthService,
     private channelService: ChannelService,
     private gameService: GameService,
-  ) {
-    const check = async () => {
-      while (true) {
-        await this.check_matchmaking();
-        await sleep(10000);
-      }
-    };
-    check().then(() => this.logger.log('check matchmaking started'));
-  }
+  ) {}
   sendconnected() {
     send_connection_server(this.clients, this.ingame, this.server);
   }
@@ -390,6 +382,7 @@ export class EventsGateway
       code: 0,
     };
     client.emit('matchmaking_code', send);
+    this.check_matchmaking();
   }
 
   async check_matchmaking() {
@@ -458,6 +451,7 @@ export class EventsGateway
           this.server,
           this.gameService,
         );
+        this.games[game.getId()] = game;
         game.onFinish((finishedGame) => {
           this.logger.debug(game);
           this.ingame.delete(getIdFromSocket(game.getUser1(), this.clients));
@@ -484,7 +478,9 @@ export class EventsGateway
   async input_game(client: Socket, payload: any) {
     const game_id = payload.game_id;
     const type = payload.type;
+    this.logger.debug('game id = ' + game_id + ' ' + type);
     this.games[game_id].updateRacket(client, type);
+    this.logger.debug(this.games[game_id].getGameInfo());
     this.server
       .to(game_id)
       .emit('update_game', this.games[game_id].getGameInfo());
@@ -492,5 +488,25 @@ export class EventsGateway
 
   async sendchangename(id: string, name: string) {
     this.server.emit('change_name', { id: id, name: name });
+  }
+
+  @SubscribeMessage('leave_matchmaking')
+  async leave_matchmaking(client: Socket, payload: any) {
+    const id = getIdFromSocket(client, this.clients);
+    const tempmatchmaking = [];
+    let send = {
+      code: 1,
+    };
+    for (const t of this.matchmaking) {
+      if (t.id != id) {
+        tempmatchmaking.push(t);
+        send = {
+          code: 0,
+        };
+      }
+    }
+    this.matchmaking = tempmatchmaking;
+    this.logger.debug('leaving matchmaking ' + id);
+    client.emit('matchmaking_code', send);
   }
 }
