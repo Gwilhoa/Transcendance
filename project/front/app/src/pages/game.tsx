@@ -27,11 +27,13 @@ const Game = () => {
     switch (event.code) {
       case "KeyW":
         //setPaddle1((paddle) => ({ y: (paddle.y - 1) < 0 ? 0: paddle.y - 1}));
-        //socket.emit()
+        socket.emit("input_game", {gameId: gameId, type: 1})
         break;
       case "KeyS":
         //setPaddle1((paddle) => ({ y: (paddle.y + 1) > 85 ? 85: paddle.y + 1}));
         //socket.emit()
+        console.log("UP !!")
+        socket.emit("input_game", {gameId: gameId, type: 0})
         break;
     }
   };
@@ -98,7 +100,8 @@ const Game = () => {
       setScore1(data.score1);
       setScore2(data.score2);
       setBall({x: data.ballx, y: data.bally});
-      //setPaddle2(y: data.)
+      setPaddle2(data.rack2y);
+      setPaddle1(data.rack1y);
       if (!onGame) {
         findGame(true);
       }
