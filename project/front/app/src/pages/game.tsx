@@ -92,7 +92,7 @@ const Game = () => {
   socket.on('create_game', (any) => {
     console.log("WESH")
     console.log(any);
-    setGameId(any)
+    //setGameId(any)
   })
 
   useEffect(() => {
