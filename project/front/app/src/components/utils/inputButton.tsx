@@ -33,6 +33,7 @@ export function ButtonInputToggle({ onInputSubmit, textInButton, placeHolder, cl
         value={inputValue}
         onChange={handleInputChange}
         placeholder={placeHolder}
+        autoFocus
         >
 
         </input>

@@ -1,7 +1,7 @@
 .notific 
 {
     background-color: red;
-    color: white;
+    color: var(--light-color);
     padding: 1em;
     top:0;
     left:50%;

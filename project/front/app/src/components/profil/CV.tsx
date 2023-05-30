@@ -145,12 +145,15 @@ export default function CV( { id, closeModal } : { id: string | null, closeModal
     
     if (isMe) {
         retu.push(
-            <input type="file" onChange={handleImageChange} key={"changeImage"}/>
+			<div className="browse-file">
+				<input type="file" onChange={handleImageChange} key={"changeImage"} id="files"/>
+				<label htmlFor="files">Change image</label>
+			</div>
+
         )
         
         retu.push(
             <div key={"changeName"} className="ChangeNameDiv">
-				<p/>
 					<ButtonInputToggle
 					onInputSubmit={changeName}
 					textInButton='Change name'
@@ -158,19 +161,25 @@ export default function CV( { id, closeModal } : { id: string | null, closeModal
 					classInput='button_notif'
 					classButton='button_notif'
 					/>
-				{errorName ? <p className="errorName">Already Exist</p> : <></>}
+				{errorName ? <p className="Error-msg">*Name already Exist</p> : <></>}
             </div>
             )
             
         retu.push(
-                <div key={"change2FA"}>
-                <p/>
-                <input type='checkbox' name='2FA' checked={checked} onChange={clicked}  />
-                <label htmlFor="scales">2FA</label>
-                </div>
+                <div key={"change2FA"} className="change2FA">
+                {/* <input type='checkbox' name='2FA' checked={checked} onChange={clicked}  /> */}
+                {/* <label htmlFor="scales">
+					<input type='checkbox' name='2FA' checked={checked} onChange={clicked} />
+					<span></span>
+					<p>2FA</p>
+				</label> */}
+				<label htmlFor="toggleSwitch"></label>
+				<input type='checkbox' name='2FA' checked={checked} onChange={clicked} id="toggleSwitch"/>
+					<p>2FA</p>
+				</div>
             )
 		retu.push(
-			<div key={"logout"}>
+			<div key={"logout"} className="logout">
 				<LogoutButton closeModal={closeModal} />
 			</div>	
 		)
