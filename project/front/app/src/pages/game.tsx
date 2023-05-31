@@ -12,7 +12,7 @@ const Game = () => {
   const Height = document.documentElement.clientHeight * 0.8;
   const Width = document.documentElement.clientWidth - 802;
   
-  const [onGame, findGame] = useState(false);
+  const [onGame, findGame] = useState(0);
   const [score1, setScore1] = useState(0);
   const [playerId, setPlayerId] = useState(0);
   const [score2, setScore2] = useState(0);
@@ -20,6 +20,7 @@ const Game = () => {
   const [ball, setBall] = useState({ x: 50, y: 50});
   const [paddle1, setPaddle1] = useState(42.5 );
   const [paddle2, setPaddle2] = useState(42.5 );
+  const [finalScore, setFinalScore] = useState("");
   const navigate = useNavigate();
   
   
@@ -29,15 +30,13 @@ const Game = () => {
     switch (event.code) {
       case "KeyW":
         //setPaddle1((paddle) => ({ y: (paddle.y - 1) < 0 ? 0: paddle.y - 1}));
-        socket.emit("input_game", {game_id: gameId, type: 1})
-        setPaddle1(paddle1 + 1);
+        socket.emit("input_game", {game_id: gameId, type: 0})
         console.log(gameId);
         break;
-      case "KeyS":
-        //setPaddle1((paddle) => ({ y: (paddle.y + 1) > 85 ? 85: paddle.y + 1}));
-        //socket.emit()
-        console.log("UP !!")
-        socket.emit("input_game", {game_id: gameId, type: 0})
+        case "KeyS":
+          //setPaddle1((paddle) => ({ y: (paddle.y + 1) > 85 ? 85: paddle.y + 1}));
+          //socket.emit()
+        socket.emit("input_game", {game_id: gameId, type: 1})
         console.log(gameId);
         break;
     }
@@ -95,6 +94,10 @@ const Game = () => {
     
   }, []);
   
+  socket.on('finish_game', (any) => {
+    setFinalScore(any.status);
+    findGame(2);
+  });
 
   socket.on('create_game', (any) => {
     console.log("WESH")
@@ -104,20 +107,23 @@ const Game = () => {
   
 
   useEffect(() => {
-    socket.on('update_game', (data) => {
-      setScore1(data.score1);
-      setScore2(data.score2);
-      setBall({x: data.ballx, y: data.bally});
-      setPaddle2(data.rack2y)
-      setPaddle1(data.rack1y);
-      console.log(paddle2);
-      console.log(paddle1);
-      if (!onGame) {
-        findGame(true);
-      }
-      
-    });
 
+
+    
+
+      socket.on('update_game', (data) => {
+        setScore1(data.score1);
+        setScore2(data.score2);
+        setBall({x: data.ballx, y: data.bally});
+        setPaddle2(data.rack2y)
+        setPaddle1(data.rack1y);
+        console.log(paddle2);
+        console.log(paddle1);
+        if (!onGame) {
+          findGame(1);
+        }
+      });
+      
     console.log("ENTER");
     return () => {
       socket.off('update_game');
@@ -134,7 +140,7 @@ const Game = () => {
 
   return (
     <>
-      {!onGame && 
+      {onGame == 0 && 
         <>
           <h2 style={{color: 'white'}}> Searching players... </h2>
           <p></p>
@@ -142,7 +148,7 @@ const Game = () => {
         </>
       }
 
-      {onGame && 
+      {onGame == 1 && 
         <>
           <canvas
           ref={canvasRef}
@@ -158,12 +164,24 @@ const Game = () => {
               </h1>
             </div>
           </div>
-
-
-  
           <div className="paddle1" style={{ top: paddle1 + '%' }} />
           <div className="paddle2" style={{ top: paddle2 + '%'}} />
           <div className="ball" style={{ top: ball.x + '%', left: ball.y + '%' }} />
+        </>
+      }
+
+      {
+        onGame == 2 &&
+        <>
+        <h1>
+          
+          {"you " + finalScore}
+
+          <button>
+            {"Back to the Home !!"}
+          </button>
+        </h1>
+
         </>
       }
     </>
