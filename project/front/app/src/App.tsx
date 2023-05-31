@@ -6,6 +6,7 @@ import Game from './pages/game';
 import TryToReconnect from './pages/TryToReconnect';
 import Home from './pages/home';
 import History from './pages/history';
+import Chat from './pages/chat';
 import Template from "./template/template";
 import PopupChat from "./components/popup/popupChat";
 import { DynamicIsInAChat, KnowMyChannel } from "./components/popup/chatManager";
