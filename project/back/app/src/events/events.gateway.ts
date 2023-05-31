@@ -6,18 +6,24 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import {Game} from './Game.class';
-import {Logger} from '@nestjs/common';
-import {Server, Socket} from 'socket.io';
-import {UserService} from 'src/user/user.service';
-import {AuthService} from 'src/auth/auth.service';
-import {ChannelService} from 'src/channel/channel.service';
-import {sendMessageDTO} from 'src/dto/sendmessage.dto';
-import {GameService} from 'src/game/game.service';
-import {CreateGameDTO} from 'src/dto/create-game.dto';
-import {UserStatus} from 'src/utils/user.enum';
-import {getIdFromSocket, getKeys, send_connection_server, verifyToken, wrongtoken,} from 'src/utils/socket.function';
-import {FriendCode, messageCode} from 'src/utils/requestcode.enum';
+import { Game } from './Game.class';
+import { Logger } from '@nestjs/common';
+import { Server, Socket } from 'socket.io';
+import { UserService } from 'src/user/user.service';
+import { AuthService } from 'src/auth/auth.service';
+import { ChannelService } from 'src/channel/channel.service';
+import { sendMessageDTO } from 'src/dto/sendmessage.dto';
+import { GameService } from 'src/game/game.service';
+import { CreateGameDTO } from 'src/dto/create-game.dto';
+import { UserStatus } from 'src/utils/user.enum';
+import {
+  getIdFromSocket,
+  getKeys,
+  send_connection_server,
+  verifyToken,
+  wrongtoken,
+} from 'src/utils/socket.function';
+import { FriendCode, messageCode } from 'src/utils/requestcode.enum';
 
 @WebSocketGateway({
   cors: {
@@ -62,15 +68,14 @@ export class EventsGateway
     }
     this.clients.delete(id);
     if (getKeys(this.ingame).includes(id)) {
-      const game = await this.gameService.remakeGame(
-        this.ingame.get(client.id),
-      );
+      const game = await this.gameService.remakeGame(this.ingame.get(id));
       if (game == null) {
         this.logger.error('game not found');
         return;
       }
-      this.ingame.delete(game.user1.id);
-      this.ingame.delete(game.user2.id);
+      this.ingame.delete(id);
+      this.games[game.id].remake();
+      this.games.delete(game.id);
     }
     if (this.matchmaking.includes(client)) {
       this.matchmaking.splice(this.matchmaking.indexOf(client), 1);
@@ -494,7 +499,6 @@ export class EventsGateway
     const type = payload.type;
     this.logger.debug('game id = ' + game_id + ' ' + type);
     this.games[game_id].updateRacket(client, type);
-    this.logger.debug(this.games[game_id].getGameInfo());
     this.server
       .to(game_id)
       .emit('update_game', this.games[game_id].getGameInfo());

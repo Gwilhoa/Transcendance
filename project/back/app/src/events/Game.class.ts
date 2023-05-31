@@ -3,11 +3,11 @@ import { GameService } from 'src/game/game.service';
 import { sleep } from '../utils/sleep';
 
 export class Game {
-  static default_positionR = 50;
+  static default_positionR = 42.5;
   static default_positionBx = 50;
   static default_positionBy = 50;
   static default_update = 60;
-  static default_racklenght = 10;
+  static default_racklenght = 15;
   static default_rackwidth = 2;
   static default_steprack = 1;
   static default_radiusball = 1;
@@ -106,18 +106,18 @@ export class Game {
     if (player.id == this._user1.id) {
       if (y == 1) {
         if (this._rack1y >= this._maxY - Game.default_racklenght) return;
-        this._rack1y += 1;
+        this._rack1y += 2;
       } else if (y == 0) {
-        if (this._rack1y <= this._minY + Game.default_racklenght) return;
-        this._rack1y -= 1;
+        if (this._rack1y <= 0) return;
+        this._rack1y -= 2;
       }
     } else if (player.id == this._user2.id) {
       if (y == 1) {
         if (this._rack2y >= this._maxY - Game.default_racklenght) return;
-        this._rack2y += 1;
+        this._rack2y += 2;
       } else if (y == 0) {
-        if (this._rack2y <= this._minY + Game.default_racklenght) return;
-        this._rack2y -= 1;
+        if (this._rack2y <= 0) return;
+        this._rack2y -= 2;
       }
     }
   }
@@ -170,39 +170,40 @@ export class Game {
         this._rack2y -= Game.default_steprack;
     }
 
-    //calculate colision racket
+    //calcul colision rack
     if (
-      this._ballx <=
-      this._minX + Game.default_rackwidth + Game.default_radiusball
+      this._ballx <= this._minX + 1 &&
+      this._bally > this._rack1y &&
+      this._bally <= this._rack1y + Game.default_racklenght
     ) {
-      if (
-        this._bally >= this._rack1y &&
-        this._bally <= this._rack1y + Game.default_racklenght
-      )
-        this._dx *= -1;
+      this._dx *= -1;
     }
+
     if (
-      this._ballx >=
-      this._maxX - Game.default_rackwidth - Game.default_radiusball
+      this._ballx >= this._maxX - 1 &&
+      this._bally > this._rack2y &&
+      this._bally <= this._rack2y + Game.default_racklenght
     ) {
-      if (
-        this._bally >= this._rack2y &&
-        this._bally <= this._rack2y + Game.default_racklenght
-      )
-        this._dx *= -1;
+      this._dx *= -1; // Inversion de la direction horizontale de la balle
     }
 
     //calculate colision wall
     if (this._bally < this._minY || this._bally > this._maxY) {
       if (this._bally < this._minY) {
+        this._ballx = Game.default_positionBx;
+        this._bally = Game.default_positionBy;
         this._score1++;
+        this._io.to(this._id).emit('update_game', this.getGameInfo());
         clearInterval(this._loopid);
         this.start();
         return;
       }
       if (this._bally > this._maxY) {
-        clearInterval(this._loopid);
+        this._ballx = Game.default_positionBx;
+        this._bally = Game.default_positionBy;
         this._score2++;
+        this._io.to(this._id).emit('update_game', this.getGameInfo());
+        clearInterval(this._loopid);
         this.start();
         return;
       }
@@ -262,5 +263,18 @@ export class Game {
   }
   onFinish(callback) {
     this._finishCallback.push(callback);
+  }
+
+  public remake() {
+    console.log('game finish ' + this._id);
+    this._io.to(this._id).emit('finish_game', {
+      score1: 0,
+      score2: 0,
+      status: 'remake',
+    });
+    this._user2.leave(this._id);
+    this._user1.leave(this._id);
+    clearInterval(this._loopid);
+    this.executeFinishCallbacks();
   }
 }
