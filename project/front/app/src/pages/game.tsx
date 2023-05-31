@@ -114,7 +114,7 @@ const Game = () => {
       socket.on('update_game', (data) => {
         setScore1(data.score1);
         setScore2(data.score2);
-        setBall({x: data.ballx, y: data.bally});
+        setBall({x: (data.ballx - 0.5), y: (data.bally - 0.5)});
         setPaddle2(data.rack2y)
         setPaddle1(data.rack1y);
         console.log(paddle2);

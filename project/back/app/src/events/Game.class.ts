@@ -150,42 +150,29 @@ export class Game {
     this._bally += this._dy;
 
     if (
-      this._ballx <
-      this._minX + Game.default_rackwidth + Game.default_radiusball
-    ) {
+      this._bally <=
+      this._minY + Game.default_rackwidth + Game.default_radiusball
+      ) {
+      console.log("ENTER")
       if (
-        this._bally > this._rack1y &&
-        this._bally <= this._rack1y + Game.default_racklenght
+        this._ballx >= this._rack1y &&
+        this._ballx <= this._rack1y + Game.default_racklenght
       )
-        this._rack1y -= Game.default_steprack;
-    }
+      this._dy *= -1;
+      }
     if (
-      this._ballx >
-      this._maxX - Game.default_rackwidth - Game.default_radiusball
+      this._bally >=
+      (this._maxY - Game.default_rackwidth - Game.default_radiusball)
     ) {
+      console.log("ENTER")
       if (
-        this._bally > this._rack2y &&
-        this._bally <= this._rack2y + Game.default_racklenght
+        this._ballx >= this._rack2y &&
+        this._ballx <= (this._rack2y + Game.default_racklenght)
       )
-        this._rack2y -= Game.default_steprack;
+        this._dy *= -1;
     }
 
     //calcul colision rack
-    if (
-      this._ballx <= this._minX + 1 &&
-      this._bally > this._rack1y &&
-      this._bally <= this._rack1y + Game.default_racklenght
-    ) {
-      this._dx *= -1;
-    }
-
-    if (
-      this._ballx >= this._maxX - 1 &&
-      this._bally > this._rack2y &&
-      this._bally <= this._rack2y + Game.default_racklenght
-    ) {
-      this._dx *= -1; // Inversion de la direction horizontale de la balle
-    }
 
     //calculate colision wall
     if (this._bally < this._minY || this._bally > this._maxY) {
@@ -193,6 +180,25 @@ export class Game {
         this._ballx = Game.default_positionBx;
         this._bally = Game.default_positionBy;
         this._score1++;
+        if (this._score1 == Game.default_victorygoal) {
+          console.log('game finish ' + this._id);
+          this._user1.leave(this._id);
+          this._user2.leave(this._id);
+          this._user1.emit('finish_game', {
+            score1: this._score1,
+            score2: this._score2,
+            status: 'win',
+          });
+          this._user2.emit('finish_game', {
+            score1: this._score1,
+            score2: this._score2,
+            status: 'lose',
+          });
+          await this._gameService.finishGame(this._id, this._score1, this._score2);
+          clearInterval(this._loopid);
+          this.executeFinishCallbacks();
+          return;
+        }
         this._io.to(this._id).emit('update_game', this.getGameInfo());
         clearInterval(this._loopid);
         this.start();
@@ -202,6 +208,25 @@ export class Game {
         this._ballx = Game.default_positionBx;
         this._bally = Game.default_positionBy;
         this._score2++;
+        if (this._score2 == Game.default_victorygoal) {
+          console.log('game finish ' + this._id);
+          this._user2.leave(this._id);
+          this._user1.leave(this._id);
+          this._user2.emit('finish_game', {
+            score1: this._score1,
+            score2: this._score2,
+            status: 'win',
+          });
+          this._user1.emit('finish_game', {
+            score1: this._score1,
+            score2: this._score2,
+            status: 'lose',
+          });
+          await this._gameService.finishGame(this._id, this._score1, this._score2);
+          clearInterval(this._loopid);
+          this.executeFinishCallbacks();
+          return;
+        }
         this._io.to(this._id).emit('update_game', this.getGameInfo());
         clearInterval(this._loopid);
         this.start();
@@ -214,45 +239,6 @@ export class Game {
     }
     if (this._ballx < this._minX || this._ballx > this._maxX) {
       this._dx *= -1;
-    }
-
-    if (this._score1 == Game.default_victorygoal) {
-      console.log('game finish ' + this._id);
-      this._user1.leave(this._id);
-      this._user2.leave(this._id);
-      this._user1.emit('finish_game', {
-        score1: this._score1,
-        score2: this._score2,
-        status: 'win',
-      });
-      this._user2.emit('finish_game', {
-        score1: this._score1,
-        score2: this._score2,
-        status: 'lose',
-      });
-      await this._gameService.finishGame(this._id, this._score1, this._score2);
-      clearInterval(this._loopid);
-      this.executeFinishCallbacks();
-      return;
-    }
-    if (this._score2 == Game.default_victorygoal) {
-      console.log('game finish ' + this._id);
-      this._user2.leave(this._id);
-      this._user1.leave(this._id);
-      this._user2.emit('finish_game', {
-        score1: this._score1,
-        score2: this._score2,
-        status: 'win',
-      });
-      this._user1.emit('finish_game', {
-        score1: this._score1,
-        score2: this._score2,
-        status: 'lose',
-      });
-      await this._gameService.finishGame(this._id, this._score1, this._score2);
-      clearInterval(this._loopid);
-      this.executeFinishCallbacks();
-      return;
     }
     this._io.to(this._id).emit('update_game', this.getGameInfo());
   };
