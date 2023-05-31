@@ -1,12 +1,13 @@
 import { Server, Socket } from 'socket.io';
 import { GameService } from 'src/game/game.service';
+import { sleep } from '../utils/sleep';
 
 export class Game {
-  static default_positionR = 50;
+  static default_positionR = 42.5;
   static default_positionBx = 50;
   static default_positionBy = 50;
   static default_update = 60;
-  static default_racklenght = 10;
+  static default_racklenght = 15;
   static default_rackwidth = 2;
   static default_steprack = 1;
   static default_radiusball = 1;
@@ -15,7 +16,7 @@ export class Game {
   static default_sizeMaxX = 100;
   static default_sizeMinY = 0;
   static default_sizeMaxY = 100;
-  static default_victorygoal: 3;
+  static default_victorygoal = 3;
 
   private _io: Server;
   private _loopid: NodeJS.Timeout;
@@ -56,12 +57,13 @@ export class Game {
     this._bally = Game.default_positionBy;
     this._dx = 0;
     this._dy = 0;
-    this._minX = 0;
-    this._maxX = 0;
-    this._minY = 0;
-    this._maxY = 0;
+    this._minX = Game.default_sizeMinX;
+    this._maxX = Game.default_sizeMaxX;
+    this._minY = Game.default_sizeMinY;
+    this._maxY = Game.default_sizeMaxY;
     this._io = io;
     this._gameService = gameService;
+    console.log('game created' + this._id);
   }
 
   public getId() {
@@ -101,8 +103,23 @@ export class Game {
   }
 
   public updateRacket(player: Socket, y: number) {
-    if (player.id == this._user1.id) this._rack1y = y;
-    else if (player.id == this._user2.id) this._rack2y = y;
+    if (player.id == this._user1.id) {
+      if (y == 1) {
+        if (this._rack1y >= this._maxY - Game.default_racklenght) return;
+        this._rack1y += 2;
+      } else if (y == 0) {
+        if (this._rack1y <= 0) return;
+        this._rack1y -= 2;
+      }
+    } else if (player.id == this._user2.id) {
+      if (y == 1) {
+        if (this._rack2y >= this._maxY - Game.default_racklenght) return;
+        this._rack2y += 2;
+      } else if (y == 0) {
+        if (this._rack2y <= 0) return;
+        this._rack2y -= 2;
+      }
+    }
   }
 
   public getGameInfo() {
@@ -116,118 +133,134 @@ export class Game {
       bally: this._bally,
     };
   }
-  public start() {
+  public async start() {
+    console.log('game launch ' + this._id);
+    await sleep(3000);
     const angle = Math.random() * 360;
     this._rack1y = Game.default_positionR;
     this._rack2y = Game.default_positionR;
-    this._ballx = 0;
-    this._bally = 0;
+    this._ballx = 50;
+    this._bally = 50;
     this._dx = Math.cos(angle);
     this._dy = Math.sin(angle);
     this._loopid = setInterval(this.gameLoop, Game.default_update);
   }
-  public async gameLoop() {
+  public gameLoop = async () => {
     this._ballx += this._dx;
     this._bally += this._dy;
 
-    //check if ball will be in racket // TODO: check si ca marche
     if (
-      this._ballx <
-      this._minX + Game.default_rackwidth + Game.default_radiusball
-    ) {
+      this._bally <=
+      this._minY + Game.default_rackwidth + Game.default_radiusball
+      ) {
+      console.log("ENTER")
       if (
-        this._bally > this._rack1y &&
-        this._bally <= this._rack1y + Game.default_racklenght
+        this._ballx >= this._rack1y &&
+        this._ballx <= this._rack1y + Game.default_racklenght
       )
-        this._rack1y -= Game.default_steprack;
-    }
+      this._dy *= -1;
+      }
     if (
-      this._ballx >
-      this._maxX - Game.default_rackwidth - Game.default_radiusball
+      this._bally >=
+      (this._maxY - Game.default_rackwidth - Game.default_radiusball)
     ) {
+      console.log("ENTER")
       if (
-        this._bally > this._rack2y &&
-        this._bally <= this._rack2y + Game.default_racklenght
+        this._ballx >= this._rack2y &&
+        this._ballx <= (this._rack2y + Game.default_racklenght)
       )
-        this._rack2y -= Game.default_steprack;
+        this._dy *= -1;
     }
 
-    //calculate colision racket
-    if (
-      this._ballx <=
-      this._minX + Game.default_rackwidth + Game.default_radiusball
-    ) {
-      if (
-        this._bally >= this._rack1y &&
-        this._bally <= this._rack1y + Game.default_racklenght
-      )
-        this._dx *= -1;
-    }
-    if (
-      this._ballx >=
-      this._maxX - Game.default_rackwidth - Game.default_radiusball
-    ) {
-      if (
-        this._bally >= this._rack2y &&
-        this._bally <= this._rack2y + Game.default_racklenght
-      )
-        this._dx *= -1;
-    }
+    //calcul colision rack
 
     //calculate colision wall
-    if (this._ballx < this._minX || this._ballx > this._maxX) {
-      if (this._ballx < this._minX) {
+    if (this._bally < this._minY || this._bally > this._maxY) {
+      if (this._bally < this._minY) {
+        this._ballx = Game.default_positionBx;
+        this._bally = Game.default_positionBy;
         this._score1++;
+        if (this._score1 == Game.default_victorygoal) {
+          console.log('game finish ' + this._id);
+          this._user1.leave(this._id);
+          this._user2.leave(this._id);
+          this._user1.emit('finish_game', {
+            score1: this._score1,
+            score2: this._score2,
+            status: 'win',
+          });
+          this._user2.emit('finish_game', {
+            score1: this._score1,
+            score2: this._score2,
+            status: 'lose',
+          });
+          await this._gameService.finishGame(this._id, this._score1, this._score2);
+          clearInterval(this._loopid);
+          this.executeFinishCallbacks();
+          return;
+        }
+        this._io.to(this._id).emit('update_game', this.getGameInfo());
+        clearInterval(this._loopid);
         this.start();
+        return;
       }
-      if (this._ballx > this._maxX) {
+      if (this._bally > this._maxY) {
+        this._ballx = Game.default_positionBx;
+        this._bally = Game.default_positionBy;
         this._score2++;
+        if (this._score2 == Game.default_victorygoal) {
+          console.log('game finish ' + this._id);
+          this._user2.leave(this._id);
+          this._user1.leave(this._id);
+          this._user2.emit('finish_game', {
+            score1: this._score1,
+            score2: this._score2,
+            status: 'win',
+          });
+          this._user1.emit('finish_game', {
+            score1: this._score1,
+            score2: this._score2,
+            status: 'lose',
+          });
+          await this._gameService.finishGame(this._id, this._score1, this._score2);
+          clearInterval(this._loopid);
+          this.executeFinishCallbacks();
+          return;
+        }
+        this._io.to(this._id).emit('update_game', this.getGameInfo());
+        clearInterval(this._loopid);
         this.start();
+        return;
       }
     }
+
     if (this._bally < this._minY || this._bally > this._maxY) {
       this._dy *= -1;
     }
-
-    if (this._score1 == Game.default_victorygoal) {
-      this._user1.leave(this._id);
-      this._user2.leave(this._id);
-      this._user1.emit('finish_game', {
-        score1: this._score1,
-        score2: this._score2,
-        status: 'win',
-      });
-      this._user2.emit('finish_game', {
-        score1: this._score1,
-        score2: this._score2,
-        status: 'lose',
-      });
-      await this._gameService.finishGame(this._id, this._score1, this._score2);
-      clearInterval(this._loopid);
-      return;
-    }
-    if (this._score2 == Game.default_victorygoal) {
-      this._user2.leave(this._id);
-      this._user1.leave(this._id);
-      this._user2.emit('finish_game', {
-        score1: this._score1,
-        score2: this._score2,
-        status: 'win',
-      });
-      this._user1.emit('finish_game', {
-        score1: this._score1,
-        score2: this._score2,
-        status: 'lose',
-      });
-      await this._gameService.finishGame(this._id, this._score1, this._score2);
-      clearInterval(this._loopid);
-      this._finishCallback.forEach((callback) => callback());
-      return;
+    if (this._ballx < this._minX || this._ballx > this._maxX) {
+      this._dx *= -1;
     }
     this._io.to(this._id).emit('update_game', this.getGameInfo());
-  }
+  };
 
+  private executeFinishCallbacks() {
+    console.log('Callbacks:', this._finishCallback);
+    this._finishCallback.forEach((callback) => callback());
+  }
   onFinish(callback) {
     this._finishCallback.push(callback);
+  }
+
+  public remake() {
+    console.log('game finish ' + this._id);
+    this._io.to(this._id).emit('finish_game', {
+      score1: 0,
+      score2: 0,
+      status: 'remake',
+    });
+    this._user2.leave(this._id);
+    this._user1.leave(this._id);
+    clearInterval(this._loopid);
+    this.executeFinishCallbacks();
   }
 }
