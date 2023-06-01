@@ -25,7 +25,7 @@ export default axios;
 
 export interface Message {
     contain: string,
-    author: string, 
+    author: string,
     date: string
 }
 
@@ -45,7 +45,7 @@ export enum MessageCode {
     NO_ACCESS = 2,
     INVALID_FORMAT = 3,
 }
-  
+
 export enum ChannelCode {
     CHANNEL_NOT_FOUND = 1,
     NO_ACCESS = 2,
@@ -58,7 +58,7 @@ interface MMessage {
 }
 
 // export function sendMessage(prompt:string, channel_id:number) {
-//     
+//
 // }
 
 
@@ -66,14 +66,14 @@ export const getMessage = async (channel_id: string) => {
     const user_id = cookies.get('jwtAuthorization');
     // Émettre un événement au serveur pour demander les messages
     socket.emit('getMessages', { channel_id, user_id }, (messages: any[]) => {
-      console.log('Messages récupérés :', messages);
-      // Faites quelque chose avec les messages récupérés, par exemple, les mettre à jour dans le state du composant
+        console.log('Messages récupérés :', messages);
+        // Faites quelque chose avec les messages récupérés, par exemple, les mettre à jour dans le state du composant
     });
-  };
+};
 
 
 export async function getMessages(channel_id:string) : Promise<Message[]> {
-    
+
     try {
         const response = await axios.get('/channel/available', {headers: {Authorization: `bearer ${cookies.get('jwtAuthorization')}`,}});
         console.log(response.data)
@@ -90,10 +90,10 @@ export async function getMessages(channel_id:string) : Promise<Message[]> {
         method: 'get',
         url: 'http://localhost:3000/channel/message',
         params: {
-          channel_id: name,
+            channel_id: name,
         },
-        
-      };
+
+    };
 
     const parseMessage = (data:AxiosResponse) => {
         console.log(data);
@@ -102,23 +102,23 @@ export async function getMessages(channel_id:string) : Promise<Message[]> {
     axios(config)
         .then(response => {
             parseMessage(response.data);
-          })
-    .catch(error => 
-      console.error(error)
-      );
+        })
+        .catch(error =>
+            console.error(error)
+        );
     return ([{contain:cookies.get('jwtAuthorization'), author:"dfdf", date:"jfd"}]);
 }
 
 
 export async function getName() : Promise<string> {
-  try {
-      const response = await axios.get('/user/id', {headers: {Authorization: `bearer ${cookies.get('jwtAuthorization')}`,}});
-      console.log(response.data);
-      return response.data.username;
-  } catch (error) {
-      console.error('Error : no channel found', error);
-      return "";
-  }
+    try {
+        const response = await axios.get('/user/id', {headers: {Authorization: `bearer ${cookies.get('jwtAuthorization')}`,}});
+        console.log(response.data);
+        return response.data.username;
+    } catch (error) {
+        console.error('Error : no channel found', error);
+        return "";
+    }
 }
 
 
@@ -154,26 +154,26 @@ export const sendNewMessageToBack = (channelId: string, content: string) => {
     const token = cookies.get('jwtAuthorization');
 
     const messageData: MMessage = {
-      token, 
-      channel_id: channelId,
-      content,
+        token,
+        channel_id: channelId,
+        content,
     };
 
     socket.emit('send_message', messageData, (response: MessageCode) => {
-      if (response === MessageCode.SUCCESS) {
-        console.log('Message envoyé avec succès');
-        return ;
-      } else if (response === MessageCode.CHANNEL_NOT_FOUND) {
-        setErrorLocalStorage('Le canal n\'existe pas');
-      } else if (response === MessageCode.NO_ACCESS) {
-        setErrorLocalStorage('Vous n\'avez pas accès à ce canal');
-      } else if (response === MessageCode.INVALID_FORMAT) {
-        setErrorLocalStorage('Format invalide du message');
-      }
-      const Navigate = useNavigate();
-      Navigate('/Error');
+        if (response === MessageCode.SUCCESS) {
+            console.log('Message envoyé avec succès');
+            return ;
+        } else if (response === MessageCode.CHANNEL_NOT_FOUND) {
+            setErrorLocalStorage('Le canal n\'existe pas');
+        } else if (response === MessageCode.NO_ACCESS) {
+            setErrorLocalStorage('Vous n\'avez pas accès à ce canal');
+        } else if (response === MessageCode.INVALID_FORMAT) {
+            setErrorLocalStorage('Format invalide du message');
+        }
+        const Navigate = useNavigate();
+        Navigate('/Error');
     });
-  };
+};
 
 export function canJoinChannel(Channel:string) : boolean {
     return (true);
@@ -202,4 +202,3 @@ export function setName(str:string) {
 
     return (false);
 }
-
