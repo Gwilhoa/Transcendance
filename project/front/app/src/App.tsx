@@ -6,24 +6,19 @@ import Game from './pages/game';
 import TryToReconnect from './pages/TryToReconnect';
 import Home from './pages/home';
 import History from './pages/history';
-import Chat from './pages/chat';
 import Template from "./template/template";
 import PopupChat from "./components/popup/popupChat";
 import { DynamicIsInAChat, KnowMyChannel } from "./components/popup/chatManager";
 import TokenPage from "./pages/authenticate";
 import NotTwoFa from "./components/authenticate/AuthenticateComponentsNotTwoFa"
 import TwoFa from "./components/authenticate/AuthenticateComponentsTwoFa"
-import React, { ReactNode } from "react";
+import React from "react";
 import Cookies from 'universal-cookie';
 
 export const cookies = new Cookies();
 
-export interface Props {
-	openModal: (param: boolean) => void;
-	setContent: (param: ReactNode) => void;
-}
 
-const AppInsideBrowser = ({ openModal, setContent }: Props) => {
+const AppInsideBrowser = () => {
 	return (
 		<>
 			<Routes>
@@ -33,7 +28,7 @@ const AppInsideBrowser = ({ openModal, setContent }: Props) => {
 				<Route path="/authenticate/NotTwoFa" Component={NotTwoFa} />
 				<Route path="/authenticate/TwoFa" Component={TwoFa} />
 				<Route path="/Error" Component={TryToReconnect} />
-				<Route element={<Template openModal={openModal} setContent={setContent}/>}>
+				<Route element={<Template/>}>
 					<Route path="/home/*" element={<Home></Home>} />
 					<Route path="/game/*" element={<Game></Game>} />
 					<Route path="/CreateTwoFa/*" element={<CreateTwoFaPage></CreateTwoFaPage>}/>
@@ -42,7 +37,7 @@ const AppInsideBrowser = ({ openModal, setContent }: Props) => {
 			</Routes>
 			
 			{DynamicIsInAChat() && 
-				<PopupChat path={KnowMyChannel()} openModal={openModal} setContent={setContent}/>
+				<PopupChat path={KnowMyChannel()}/>
 			}
 		</>
 	);
@@ -51,9 +46,9 @@ const AppInsideBrowser = ({ openModal, setContent }: Props) => {
 
 
 
-function App({ openModal, setContent }: Props) {
+function App() {
 	return (
-			<AppInsideBrowser openModal={openModal} setContent={setContent} />
+			<AppInsideBrowser/>
 	);
 
 }
