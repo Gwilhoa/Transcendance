@@ -46,6 +46,7 @@ services:
       APP_SECRET: ${APP_SECRET}
       APP_REDIRECT_URI: ${APP_REDIRECT_URI}
       JWT_SECRET : ${JWT_SECRET}
+      IP : ${IP}
     build:
       context: ./project/back
     networks:
@@ -53,6 +54,8 @@ services:
     restart: unless-stopped
 
   front:
+    environment:
+      IP : ${IP}
     init: true
     container_name:
       front
