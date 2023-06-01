@@ -1,17 +1,18 @@
 import { Link, useNavigate } from "react-router-dom";
 import './template.css'
 import React, { useEffect, useState } from "react";
-import CV from "../components/profil/CV";
-import { Props } from "../App";
 import axios from "../components/utils/API";
 import { IsInAChat, JoinChat, LeaveChat } from "../components/popup/chatManager";
 import { setErrorLocalStorage } from "../components/IfError";
 import Cookies from 'universal-cookie';
+import { useDispatch } from "react-redux";
+import { openModal } from "../redux/modal/modalSlice";
 const cookies = new Cookies();
 
-const Head = ({ openModal, setContent }: Props) => {
+const Head = () => {
 	const [id, setId] = useState<string | null>(null);
 	const navigate = useNavigate();
+
 
 	useEffect(() => {
 		if (localStorage.getItem('id') === null) {
@@ -42,13 +43,11 @@ const Head = ({ openModal, setContent }: Props) => {
       return JoinChat();
   }
 
-  const profilStart = () => {
-    setContent(
-		<CV id={id}
-		closeModal={openModal}
-		/>);
-    openModal(true);
-  }
+	const dispatch = useDispatch();
+
+	const handleOpenModal = (id: string | null) => {
+		dispatch(openModal(id));
+	};
 
     return (
         <div className="navbar">
@@ -69,7 +68,7 @@ const Head = ({ openModal, setContent }: Props) => {
             <Link to='/history' className="navbar__link">
               History
             </Link>
-            <button onClick={profilStart} className="navbar__link"> 
+            <button onClick={() => handleOpenModal(id)} className="navbar__link"> 
               <h3>
                 Profil
               </h3>

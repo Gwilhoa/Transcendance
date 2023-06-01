@@ -21,10 +21,6 @@ socket.on('message_code', (data: any) => {
     console.log(data.code);
 })
 
-// export const Token = cookies.get('jwtAuthorization');
-
-
-
 export default axios;
 
 export interface Message {
@@ -142,12 +138,12 @@ export async function createChannel(channelName: string): Promise<boolean> {
     const channelData = {
         name: channelName,
         type: 1,
-        creator_id: cookies.get('jwtAuthorization')
-    };
+        creator_id: localStorage.getItem('id'), 
+      };
     try {
-        const response = await axios.post('/channel/create', channelData);
-        console.log('Canal créé avec succès');
-        return (true);
+      const response = await axios.post('/channel/create', {name: channelData.name, creator_id: channelData.creator_id, type: channelData.type}, {headers: {Authorization: `bearer ${cookies.get('jwtAuthorization')}`,}});
+      console.log('Canal créé avec succès');
+      return (true);
     } catch (error) {
         console.error('Erreur lors de la création du canal :', error);
         return false;
