@@ -6,10 +6,9 @@ import LogoutButton from './logout';
 import { setErrorLocalStorage } from "../IfError"
 import axios from '../utils/API';
 import Cookies from 'universal-cookie';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { closeModal } from '../../redux/modal/modalSlice';
-import { useDispatch } from "react-redux";
 const cookies = new Cookies();
 
 
