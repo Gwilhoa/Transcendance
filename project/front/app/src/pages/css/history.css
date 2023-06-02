@@ -51,9 +51,10 @@
   height: 2rem;
   margin: 0 0.5rem 0 0.5rem;
   border-radius: 50%;
+  cursor: pointer;
 }
 
-.score {
+.history-score {
   display: flex;
   justify-content: center;
   text-align: center;

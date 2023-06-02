@@ -17,7 +17,7 @@ function ErrorToken() {
 		navigate('/Error');
 	}
 
-		axios.get("http://localhost:3000/auth/2fa/is2FA", {
+		axios.get(process.env.REACT_APP_IP + ":3000/auth/2fa/is2FA", {
 			headers: {
 				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
 			},

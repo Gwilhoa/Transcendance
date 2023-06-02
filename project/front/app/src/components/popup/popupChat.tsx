@@ -23,7 +23,7 @@ type ChannelItem = {
   //////Chao !!
 }
 
-const PopupChat: React.FC<{path:string, openModal:(param: boolean) => void, setContent:(param: ReactNode) => void}> = (param) => {
+const PopupChat: React.FC<{path:string}> = (param) => {
   const [title, setTitle] = useState(param.path);
   const Navigate = useNavigate();
   const [prompt, setMessage] = useState('');
@@ -186,7 +186,7 @@ const PopupChat: React.FC<{path:string, openModal:(param: boolean) => void, setC
             classButton='button_channel'/>
           </div>
           <div className="messages">
-            {parthMessages(messageList, param.path, param.openModal, param.setContent)}
+            {parthMessages(messageList, param.path)}
             <div className="popup_input" >
                 <input 
                   type="input" 

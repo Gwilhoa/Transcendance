@@ -4,9 +4,9 @@ import io from "socket.io-client";
 import Cookies from 'universal-cookie';
 import { setErrorLocalStorage } from '../IfError';
 const cookies = new Cookies();
-axios.defaults.baseURL = 'http://localhost:3000/'
+axios.defaults.baseURL = process.env.REACT_APP_IP + ":3000/";
 axios.defaults.headers.common = {'Authorization': `bearer ${cookies.get('jwtAuthorization')}`}
-export const socket = io('http://localhost:3000', {
+export const socket = io(process.env.REACT_APP_IP + ":3000", {
     transports: ['websocket']
 });
 socket.on('connect', () => {
@@ -20,10 +20,6 @@ socket.on('connection_server', (data: any) => {
 socket.on('message_code', (data: any) => {
     console.log(data.code);
 })
-
-// export const Token = cookies.get('jwtAuthorization');
-
-
 
 export default axios;
 
@@ -92,7 +88,7 @@ export async function getMessages(channel_id:string) : Promise<Message[]> {
 
     const config: AxiosRequestConfig = {
         method: 'get',
-        url: 'http://localhost:3000/channel/message',
+        url: process.env.REACT_APP_IP + ':3000/channel/message',
         params: {
             channel_id: name,
         },
@@ -142,12 +138,12 @@ export async function createChannel(channelName: string): Promise<boolean> {
     const channelData = {
         name: channelName,
         type: 1,
-        creator_id: cookies.get('jwtAuthorization')
-    };
+        creator_id: localStorage.getItem('id'), 
+      };
     try {
-        const response = await axios.post('/channel/create', channelData);
-        console.log('Canal créé avec succès');
-        return (true);
+      const response = await axios.post('/channel/create', {name: channelData.name, creator_id: channelData.creator_id, type: channelData.type}, {headers: {Authorization: `bearer ${cookies.get('jwtAuthorization')}`,}});
+      console.log('Canal créé avec succès');
+      return (true);
     } catch (error) {
         console.error('Erreur lors de la création du canal :', error);
         return false;

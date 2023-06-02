@@ -3,23 +3,23 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { createRoot } from 'react-dom/client';
 import Modal from './components/profil/modal';
-import React, { ReactNode, useState } from 'react';
+import React from 'react';
 import { CookiesProvider } from 'react-cookie';
 import { BrowserRouter as Router } from 'react-router-dom'
-
+import { Provider } from 'react-redux'; // Importez le composant Provider de react-redux
+import store from './redux/store'; // Importez le store Redux
 
 function MainComponent() {
-  const [show, setShow] = useState(false);
-  const [content, setContent] = useState<ReactNode>();
 
   return (
-    <CookiesProvider>
-		<Router>
-			<App openModal={setShow} setContent={setContent} />
-			<Modal boolModal={show} openModal={setShow} content={content}/> 
-		</Router>
-    </CookiesProvider>
-  
+	<Provider store={store}>
+		<CookiesProvider>
+			<Router>
+				<App/>
+				<Modal/> 
+			</Router>
+		</CookiesProvider>
+	</Provider> 
   );
 }
 

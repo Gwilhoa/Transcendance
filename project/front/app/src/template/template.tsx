@@ -1,16 +1,11 @@
-import React, { ReactNode } from "react";
+import React from "react";
 import Head from "./header";
 import Foot from "./footer";
 import  '../App.css'
 import Notification from "../components/notification/notification";
 import { Outlet } from "react-router-dom";
 
-interface Props {
-    openModal: (param: boolean) => void;
-    setContent: (param: ReactNode) => void;
-}
-
-const Template = ({openModal, setContent}:Props) => {
+const Template = () => {
 
     return (
       <div className="page">
@@ -19,7 +14,7 @@ const Template = ({openModal, setContent}:Props) => {
           <Outlet></Outlet>
         </main>
         <header>
-            <Head openModal={openModal} setContent={setContent}/>
+            <Head/>
         </header>
         <footer>
             <Foot/>

@@ -1,14 +1,17 @@
 import React from "react";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import Cookies from "universal-cookie";
+import { closeModal } from "../../redux/modal/modalSlice";
 const cookies = new Cookies();
 
-function LogoutButton( { closeModal } : {closeModal:(param: boolean) => void;}) {
+function LogoutButton() {
 	const navigate = useNavigate();
+	const dispatch = useDispatch();
 
 	const handleOnClick = () => {
 			navigate('/');
-			closeModal(false);
+			dispatch(closeModal());
 			cookies.remove('jwtAuthorization');
 			localStorage.removeItem('id');
 		};

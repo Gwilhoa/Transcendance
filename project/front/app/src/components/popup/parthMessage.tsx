@@ -1,16 +1,23 @@
 import { Message } from "../utils/API";
 import CV from "../profil/CV";
 import React, { ReactNode } from "react";
+import { useDispatch } from "react-redux";
+import { openModal } from "../../redux/modal/modalSlice";
 
 
-export function parthMessages (listMessageGet:Message[], chan:string, setIsOpen:(param: boolean) => void, setContent:(param: ReactNode) => void) {
+export function parthMessages ( listMessageGet:Message[], chan:string ) {
     const messagesRet = [];
     
-    const clickName = (i:number) => {
-      setContent(<CV id={i.toString()} closeModal={setIsOpen}/>);
-      setIsOpen(true);
-    }
-    
+    // const clickName = (i:number) => {
+    //   setContent(<CV id={i.toString()} closeModal={setIsOpen}/>);
+    //   setIsOpen(true);
+    // }
+
+
+	const clickName = (id: number) => {
+		console.log(id);
+	};
+
     for(let i = 0; i < listMessageGet.length; i++) {
       
       if (listMessageGet[i].author === "") {

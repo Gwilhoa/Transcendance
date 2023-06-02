@@ -18,7 +18,7 @@ const IsTwoFA = () => {
 	const navigate = useNavigate();
 
 	useEffect(() => { 
-		axios.get("http://localhost:3000/auth/2fa/is2FA", {
+		axios.get(process.env.REACT_APP_IP + ":3000/auth/2fa/is2FA", {
 			headers: {
 				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
 			},
@@ -52,7 +52,7 @@ const CreateTwoFaPage = () => {
 		setResult(res);
 		if (res.length === 6) {
 			console.log("result of input create 2fa " + res);
-			axios.post("http://localhost:3000/auth/2fa/enable", 
+			axios.post(process.env.REACT_APP_IP + ":3000/auth/2fa/enable",
 			{
 				code: res
 			},
@@ -83,7 +83,7 @@ const CreateTwoFaPage = () => {
 	};
 
 	useEffect(() => {
-			axios.get("http://localhost:3000/auth/2fa/create", {
+			axios.get(process.env.REACT_APP_IP + ":3000/auth/2fa/create", {
 				headers: {
 				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
 				},
