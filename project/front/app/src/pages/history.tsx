@@ -23,7 +23,7 @@ const OneScoreBlock = ({status, myScore, opponentScore, opponentId }: ShowScore)
     const id = localStorage.getItem('id');
 
 	useEffect(() =>{
-		axios.get("http://localhost:3000/user/image/" + id, {
+		axios.get(process.env.REACT_APP_IP + ":3000/user/image/" + id, {
 			headers: {
 				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
 			},
@@ -37,7 +37,7 @@ const OneScoreBlock = ({status, myScore, opponentScore, opponentId }: ShowScore)
 				console.error(error);
 				navigate('/Error');
 			});
-        axios.get("http://localhost:3000/user/image/" + opponentId, {
+        axios.get(process.env.REACT_APP_IP + ":3000/user/image/" + opponentId, {
             headers: {
                 Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
             },
@@ -91,7 +91,7 @@ const Add = () => {
 
     const navigate = useNavigate();
     useEffect(() =>{
-        axios.get("http://localhost:3000/game",{
+        axios.get(process.env.REACT_APP_IP + ":3000/game",{
             headers: {
                 Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
             },
