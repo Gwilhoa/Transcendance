@@ -14,7 +14,6 @@ const Game = () => {
   
   const [onGame, findGame] = useState(0);
   const [score1, setScore1] = useState(0);
-  const [playerId, setPlayerId] = useState(0);
   const [score2, setScore2] = useState(0);
   
   const [ball, setBall] = useState({ x: 50, y: 50});
@@ -172,19 +171,20 @@ const Game = () => {
 
       {
         onGame == 2 &&
-        <>
-        <h1>
-          
-          {"you " + finalScore}
+    
+        
+   <div className="defeat-screen">
+      <h1 className="defeat-screen__title">{"you " + finalScore}</h1>
+      <div className="defeat-screen__buttons">
+        <button className="defeat-screen__button">Replay</button>
+        <button className="defeat-screen__button">Home</button>
+      </div>
+    </div>
 
-          <button>
-            {"Back to the Home !!"}
-          </button>
-        </h1>
 
-        </>
-      }
+    }
     </>
+
   );
 }
 
