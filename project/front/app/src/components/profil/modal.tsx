@@ -1,24 +1,28 @@
-import React, { ReactNode } from "react";
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { closeModal } from '../../redux/modal/modalSlice';
+import { RootState } from "../../redux/store";
+import CV from "./CV";
 import './modal.css'
 
-interface Props {
-    openModal: (param: boolean) => void;
-    boolModal: boolean;
-    content: ReactNode;
-}
+export default function Modal() {
+	const dispatch = useDispatch();
+	const isOpen = useSelector((state: RootState) => state.modal.isOpen);
 
-export default function Modal( {openModal, boolModal, content}:Props) {
+	const handleCloseModal = () => {
+		dispatch(closeModal());
+	};
 
     return (
             <>
-             {boolModal && 
+             {isOpen && 
             <div className="overlay">
             <div className="modal">
                 <div className="header-modal">
                     Profil
-                    <button className="close-button-modal" onClick={() => openModal(false)}> X </button>
+                    <button className="close-button-modal" onClick={() => handleCloseModal()}> X </button>
                 </div>
-                {content}
+                <CV/>
             </div>
         </div>}
             </>

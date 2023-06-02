@@ -6,10 +6,13 @@ import LogoutButton from './logout';
 import { setErrorLocalStorage } from "../IfError"
 import axios from '../utils/API';
 import Cookies from 'universal-cookie';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState } from '../../redux/store';
+import { closeModal } from '../../redux/modal/modalSlice';
 const cookies = new Cookies();
 
 
-export default function CV( { id, closeModal } : { id: string | null, closeModal:(param: boolean) => void; }) {
+export default function CV() {
     const retu = [];
 	const navigate = useNavigate();
 	const [isMe, setIsMe] =  useState<boolean>(false);
@@ -18,6 +21,8 @@ export default function CV( { id, closeModal } : { id: string | null, closeModal
     const [image, setImage] = useState<string>("");
     const [checked, setChecked] = useState(false);
 	const [errorName, setErrorName] = useState<boolean>(false);
+	const id = useSelector((state: RootState) => state.modal.id);
+	const dispatch = useDispatch();
 
 	const refresh = useCallback(( id: string | null ) => {
 		axios.get("http://localhost:3000/user/image/" + id, {
@@ -93,7 +98,7 @@ export default function CV( { id, closeModal } : { id: string | null, closeModal
     const clicked = () => {
 		if (checked === false) {
 			navigate('/CreateTwoFa');
-			closeModal(false);
+			dispatch(closeModal());
 		}
 		else {
 			axios.get("http://localhost:3000/auth/2fa/disable", {
@@ -145,8 +150,8 @@ export default function CV( { id, closeModal } : { id: string | null, closeModal
     
     if (isMe) {
         retu.push(
-			<div className="browse-file">
-				<input type="file" onChange={handleImageChange} key={"changeImage"} id="files"/>
+			<div className="browse-file" key={"changeImage"}>
+				<input type="file" onChange={handleImageChange} id="files"/>
 				<label htmlFor="files">Change image</label>
 			</div>
 
@@ -180,7 +185,7 @@ export default function CV( { id, closeModal } : { id: string | null, closeModal
             )
 		retu.push(
 			<div key={"logout"} className="logout">
-				<LogoutButton closeModal={closeModal} />
+				<LogoutButton/>
 			</div>	
 		)
 	}
