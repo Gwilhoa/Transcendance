@@ -4,6 +4,8 @@ import ErrorToken, { setErrorLocalStorage } from '../components/IfError';
 import axios from '../components/utils/API'
 import { useNavigate } from 'react-router-dom';
 import { cookies } from '../App'
+import { useDispatch } from "react-redux";
+import { openModal } from "../redux/modal/modalSlice";
 
 
 interface ShowScore {
@@ -11,17 +13,19 @@ interface ShowScore {
     myScore: string;
     opponentScore: string;
     opponentId : string;
+    myUsername: string;
+    opponentUsername: string;
 }
 
 const vistoryScore = 3;
 
-const OneScoreBlock = ({status, myScore, opponentScore, opponentId }: ShowScore) => {
+const OneScoreBlock = ({status, myScore, opponentScore, opponentId, myUsername, opponentUsername }: ShowScore) => {
     const navigate = useNavigate();
     const [image, setImage] = useState<string>("");
     const [user1Image, setUser1Image] = useState<string>("");
     const [user2Image, setUser2Image] = useState<string>("");
     const id = localStorage.getItem('id');
-
+    const dispatch = useDispatch();
 	useEffect(() =>{
 		axios.get("http://localhost:3000/user/image/" + id, {
 			headers: {
@@ -56,19 +60,15 @@ const OneScoreBlock = ({status, myScore, opponentScore, opponentId }: ShowScore)
     return (
       <div className="score-block">
         <h3 className="status">{status}</h3>
-            <div className="score">
+            <div className="history-score">
             <div className="player">
-                {/* <a href="" className="image"><img className="image" src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/42_Logo.svg/1200px-42_Logo.svg.png"></img></a> */}
-                {/* <a href={profilStart}> */}
-                    <img className="image" src={user1Image}></img>
-                    {/* </a> */}
-                <p>{myScore}</p> {/* todo: add link to profil */}
+                <img className="image" src={user1Image} onClick={() => dispatch(openModal(id))} title={myUsername}></img>
+                <p>{myScore}</p>
             </div>
             <p>against</p>
             <div className="player">
-                {/* <a href="" className="image"><img className="image" src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/42_Logo.svg/1200px-42_Logo.svg.png"></img></a> */}
-                <img className="image" src={user2Image}></img>
-                <p>{opponentScore}</p> {/* todo: add link to profil */}
+                <img className="image" src={user2Image} onClick={() => dispatch(openModal(opponentId))} title={opponentUsername}></img>
+                <p>{opponentScore}</p> 
             </div>
         </div>
       </div>
@@ -125,17 +125,23 @@ const Add = () => {
         let myScore : string;
         let opponentScore : string;
         let opponentId : string;
+        let myUsername: string;
+        let opponentUsername: string;
         if (getUserIndex(game) == 1)
         {
             myScore = game.score1;
             opponentScore = game.score2;
             opponentId = game.user2.id;
+            myUsername = game.user1.username;
+            opponentUsername = game.user2.username;
         }
         else
         {
             myScore = game.score2;
             opponentScore = game.score1;
             opponentId = game.user1.id;
+            myUsername = game.user2.username;
+            opponentUsername = game.user1.username;
         }
         blocks.push (
             <OneScoreBlock
@@ -143,6 +149,8 @@ const Add = () => {
             myScore={myScore}
             opponentScore={opponentScore}
             opponentId={opponentId}
+            myUsername={myUsername}
+            opponentUsername={opponentUsername}
             key={i}
             />
         )
