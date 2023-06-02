@@ -10,9 +10,10 @@ function Auth() {
 	localStorage.removeItem('Error');
 	localStorage.removeItem('id');
 	useEffect(() => {
-
+	const myVariable = process.env.REACT_APP_IP;
+	console.log(myVariable + " what is this");
 		if (cookies.get('jwtAuthorization') != null) {
-			axios.get("http://localhost:3000/auth/2fa/is2FA", {
+			axios.get(process.env.REACT_APP_IP + "auth/2fa/is2FA", {
 				headers: {
 					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
 				},
@@ -32,7 +33,7 @@ function Auth() {
 			<h1>Transcendence</h1>
 		</div>
 		<div className="Auth-button">
-			<Link to="http://localhost:3000/auth/login">
+			<Link to={process.env.REACT_APP_IP + "auth/login"}>
 				<button className="login42">
 					Login with 42
 				</button>

@@ -16,7 +16,7 @@ function AuthenticateComponentsTwoFa() {
 
 	useEffect(() => {
 		if (cookies.get('jwtAuthorization') != null) {
-			axios.get("http://localhost:3000/auth/2fa/is2FA", {
+			axios.get(process.env.REACT_APP_IP + "auth/2fa/is2FA", {
 				headers: {
 					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
 				},
@@ -42,7 +42,7 @@ function AuthenticateComponentsTwoFa() {
 		setResult(res);
 		if (res.length === 6) {
 			console.log("result of input create 2fa " + res);
-			axios.post("http://localhost:3000/auth/authenticate", 
+			axios.post(process.env.REACT_APP_IP + "auth/authenticate", 
 			{
 				code: res
 			},
