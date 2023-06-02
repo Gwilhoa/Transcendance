@@ -1,0 +1,11 @@
+.auth-page{
+    background-color: var(--light-color);
+    border-radius: 30px;
+    width: 40rem;
+    margin: auto;
+    text-align: center;
+}
+
+.transcendence-image{
+    border-radius: 50%;
+}

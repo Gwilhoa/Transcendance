@@ -188,10 +188,11 @@ export default function CV() {
 
     if (!isFriend && !isMe) {
         retu.push(
-			<div key="notFriend">
+			<div key="notFriend" className='other-user-profil'>
 				<button>
 					Add friend
 				</button>
+				<br/>
 				<button>
 					Challenge
 				</button>
@@ -201,10 +202,11 @@ export default function CV() {
 
     if (isFriend && !isMe) {
         retu.push(
-			<div key="Friend">
+			<div key="Friend" className='other-user-profil'>
 				<button>
 					Unfriend
 				</button>
+				<br/>
 				<button>
 					Challenge
 				</button>

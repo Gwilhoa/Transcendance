@@ -3,6 +3,8 @@ import React, { useEffect } from 'react';
 import { Link, useNavigate } from "react-router-dom";
 import Cookies from 'universal-cookie';
 const cookies = new Cookies();
+import './css/auth.css'
+import logo from '../images/transcendence.webp'
 
 function Auth() {
 	const navigate = useNavigate();
@@ -27,11 +29,12 @@ function Auth() {
 	}, [navigate]);
 
   return (
-	<div className="Auth">
-		<div className="Auth-title">
+	<div className="auth-page">
+		<header className="auth-title">
+			<img className='transcendence-image' src={logo}/>
 			<h1>Transcendence</h1>
-		</div>
-		<div className="Auth-button">
+		</header>
+		<div className="auth-button">
 			<Link to="http://localhost:3000/auth/login">
 				<button className="login42">
 					Login with 42

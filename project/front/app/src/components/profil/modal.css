@@ -40,13 +40,14 @@
 
 .close-button-modal {
   position: absolute;
-  right: 25px;
+  right: 17px;
   background-color: rgb(189, 39, 39);
   color: var(--light-color);
   border: none;
   padding: 0.25rem 0.5rem 0.25rem 0.5rem;
   border-radius: 50%;
   cursor: pointer;
+  font-weight: bold;
 }
 
 .modalCorps {
@@ -67,6 +68,9 @@
   font-size: 1rem;
   width: 8rem;
 }
+
+
+/* Your profil */
 
 .browse-file > input{
   display: none;
@@ -170,4 +174,22 @@ input:checked + .slider:before {
   
   color : var(--light-color);
 
+}
+
+
+/* Other user profil */
+
+.other-user-profil{
+  display:inline-block;
+}
+
+.other-user-profil > button{
+  border: 0.2rem solid rgb(57, 49, 114);
+  background-color: var(--light-color);
+  border-radius: 1rem;
+  padding: 0.2rem;
+  height: 2rem;
+  width: 8rem;
+  font-size: 1rem;
+  margin: 0.5rem
 }
