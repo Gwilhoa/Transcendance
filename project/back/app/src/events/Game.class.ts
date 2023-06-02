@@ -153,6 +153,7 @@ export class Game {
       console.log(this._angle);
       console.log(Math.random());
     }
+    this._angle = 180;
     this._loopid = setInterval(this.gameLoop, Game.default_update);
   }
 
@@ -175,7 +176,7 @@ export class Game {
     this.executeFinishCallbacks();
   }
 
-  private endBattle = async (scoreWin:number) :Promise<number> => {
+  private endBattle = (scoreWin:number) :number => {
     scoreWin++;
     if (scoreWin != Game.default_victorygoal) {
       this._rack1y = Game.default_positionR;
@@ -199,85 +200,72 @@ export class Game {
     let minposition = this._minY + Game.default_rackwidth + Game.default_radiusball;
     let maxposition = ((this._maxY - Game.default_rackwidth) - Game.default_radiusball)
     
-    if (
-      this._bally <= minposition
-      ) {
-        console.log(this._angle);
-        if (
-          this._futurballx >= this._rack1y &&
-          this._futurballx <= this._rack1y + Game.default_racklenght
-          ) {
-            //this._speedball += 1;
-            this._angle = Math.PI - this._angle;
-            let distbar = this._futurbally - minposition;
-            this._futurbally -= 2 * distbar;
-            if (this._futurballx < (this._rack2y + (Game.default_racklenght / 3)) && this._angle > 100)
-            this._angle += 10;
-            if (this._futurballx > (this._rack2y + ( 2 * (Game.default_racklenght / 3))) && this._angle < 170)
-            this._angle -= 10;
-          }
-          else {
-              this.endBattle(this._score1)
-              .then((resolvedScore: number) => {
-                this._score1 = resolvedScore;
-                if (this._score1 >= Game.default_victorygoal)
-                this.endWar(this._user1, this._user2);
-              })
-            }
-            console.log(this._angle);
-          }
+    if (this._bally <= minposition) {
+      console.log(this._angle);
+      if (this._futurballx >= this._rack1y &&
+        this._futurballx <= this._rack1y + Game.default_racklenght ) {
+        this._speedball *= 1.15;
+        this._angle = Math.PI - this._angle;
+        let distbar = this._futurbally - minposition;
+        this._futurbally -= 2 * distbar;
+        // if (this._futurballx < (this._rack2y + (Game.default_racklenght / 3)) && this._angle > 100)
+        // this._angle += 10;
+        // if (this._futurballx > (this._rack2y + ( 2 * (Game.default_racklenght / 3))) && this._angle < 170)
+        // this._angle -= 10;
+      }
+      else if (this._ballx) {
+        this._score1 = this.endBattle(this._score1)
+        if (this._score1 >= Game.default_victorygoal)
+          this.endWar(this._user1, this._user2);
           
-          if (
-            this._futurbally >= maxposition
-            
-            ) {
-              console.log(this._angle);
-              if (
-                this._futurballx >= this._rack2y &&
-                this._futurballx <= (this._rack2y + Game.default_racklenght)
-                ) {
-                  //this._speedball += 1;
-                  this._angle = Math.PI - this._angle;
-                  let distbar = this._futurbally - maxposition;
-                  this._futurbally -= 2 * distbar;
-
-                  if (this._futurballx < (this._rack1y + (Game.default_racklenght / 3)) && this._angle < 80)
-                    this._angle -= 10;
-                  if (this._futurballx > (this._rack1y + ( 2 * (Game.default_racklenght / 3))) && this._angle > 280)
-                    this._angle += 10;
-        }
-        else {
-          this.endBattle(this._score1)
-          .then((resolvedScore: number) => {
-            this._score2 = resolvedScore;
-            if (this._score2 >= Game.default_victorygoal)
-            this.endWar(this._user2, this._user1);
-          })
-        }
-        console.log(this._angle);
       }
+      console.log(this._angle);
+    }
+          
+    if (this._futurbally >= maxposition) {
+      console.log(this._angle);
+      if (this._futurballx >= this._rack2y &&
+        this._futurballx <= (this._rack2y + Game.default_racklenght)) {
+        this._speedball *= 1.15;
+        this._angle = Math.PI - this._angle;
+        let distbar = this._futurbally - maxposition;
+        this._futurbally -= 2 * distbar;
 
-      if (this._futurballx < this._minX + Game.default_radiusball || this._futurballx > this._maxX - Game.default_radiusball) {
-        if (this._futurballx < this._minX + Game.default_radiusball) {
-          let distbar = this._futurballx - (this._minX + Game.default_radiusball);
-          this._futurballx -= 2 * distbar;
-        }
-        else {
-          let distbar = this._futurballx - (this._maxX + Game.default_radiusball);
-          this._futurballx -= 2 * distbar;
-        }
-        this._angle = - this._angle;
+        //if (this._futurballx < (this._rack1y + (Game.default_racklenght / 3)) && this._angle < 80)
+        //  this._angle -= 10;
+        //if (this._futurballx > (this._rack1y + ( 2 * (Game.default_racklenght / 3))) && this._angle > 280)
+        //  this._angle += 10;
       }
-      this._ballx = this._futurballx;
-      this._bally = this._futurbally;
+      else {
+        this._score2 = this.endBattle(this._score1)
+        if (this._score2 >= Game.default_victorygoal)
+          this.endWar(this._user2, this._user1);
+      }
+      console.log(this._angle);
+    }
 
-      this._io.to(this._id).emit('update_game', this.getGameInfo());
-    };
+    if (this._futurballx < this._minX + Game.default_radiusball || this._futurballx > this._maxX - Game.default_radiusball) {
+      if (this._futurballx < this._minX + Game.default_radiusball) {
+        let distbar = this._futurballx - (this._minX + Game.default_radiusball);
+        this._futurballx -= 2 * distbar;
+      }
+      else {
+        let distbar = this._futurballx - (this._maxX + Game.default_radiusball);
+        this._futurballx -= 2 * distbar;
+      }
+      this._angle = - this._angle;
+    }
+    this._ballx = this._futurballx;
+    this._bally = this._futurbally;
+
+    this._io.to(this._id).emit('update_game', this.getGameInfo());
+  };
     
-    private executeFinishCallbacks() {
+  private executeFinishCallbacks() {
     console.log('Callbacks:', this._finishCallback);
     this._finishCallback.forEach((callback) => callback());
   }
+
   onFinish(callback) {
     this._finishCallback.push(callback);
   }
