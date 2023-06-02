@@ -38,13 +38,6 @@
     height: calc(100vh - (var(--footer-size) + var(--header-size)));
     top:var(--header-size);
     width: var(--main-width);
-    overflow: hidden;
-    
-    display: flex;
-    /*width: calc(100% - 401px);*/
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
   }
   
   .page {
