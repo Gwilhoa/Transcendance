@@ -21,6 +21,8 @@ export class UserService {
   constructor(
     private jwt: JwtService,
     @InjectRepository(User) private userRepository: Repository<User>,
+    @InjectRepository(RequestFriend)
+    private requestsRepository: Repository<RequestFriend>,
     private authService: AuthService,
   ) {}
 
@@ -223,12 +225,12 @@ export class UserService {
   public async addFriendRequest(id: string, friend_id: string) {
     const user = await this.userRepository
       .createQueryBuilder('user')
-      .leftJoinAndSelect('user.friendRequests', 'friendRequests')
+      .leftJoinAndSelect('user.requests', 'RequestFriend')
       .where('user.id = :id', { id })
       .getOne();
     const friend = await this.userRepository
       .createQueryBuilder('user')
-      .leftJoinAndSelect('user.friendRequests', 'friendRequests')
+      .leftJoinAndSelect('user.requests', 'RequestFriend')
       .where('user.id = :id', { id })
       .getOne();
     if (user == null || friend == null) {
@@ -245,6 +247,7 @@ export class UserService {
     friendrequest.receiver = friend;
     user.requestsReceived.push(friendrequest);
     const user_rep = await this.userRepository.save(user);
+    await this.requestsRepository.save(friendrequest);
     await this.userRepository.save(friend);
     return user_rep;
   }
