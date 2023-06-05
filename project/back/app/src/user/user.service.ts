@@ -496,7 +496,13 @@ export class UserService {
     return await this.userRepository.save(user);
   }
 
-  private async removeFriend(user: User, blocked: User) {
+  async removeFriends(id: string, friend_id: string) {
+    return await this.removeFriend(
+      await this.getUserById(id),
+      await this.getUserById(friend_id),
+    );
+  }
+  async removeFriend(user: User, blocked: User) {
     user.friends = user.friends.filter((element) => element.id != blocked.id);
     blocked.friends = blocked.friends.filter(
       (element) => element.id != user.id,

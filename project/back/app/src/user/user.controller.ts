@@ -156,21 +156,18 @@ export class UserController {
 
     return response.status(HttpStatus.OK).send(ret);
   }
-  @Post('/friend')
-  async addFriend(
+  @Delete('/friend')
+  async removeFriend(
     @GetUser('sub') id: string,
     @Body('friend_id') friend_id: string,
     @Res() response,
   ) {
     let ret;
     try {
-      ret = await this.userService.addFriend(friend_id, id);
+      ret = await this.userService.removeFriends(friend_id, id);
     } catch (e) {
       response.status(400).send('Bad Request ' + e);
       return;
-    }
-    if (ret == null) {
-      response.status(201).send('Friend Request Sent');
     }
     response.status(200).send(ret);
   }
