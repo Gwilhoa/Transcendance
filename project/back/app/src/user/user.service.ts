@@ -272,6 +272,8 @@ export class UserService {
         throw new Error('Username already taken');
       }
     });
+    if (name.length > 10)
+      throw new Error('Username must be less or equals than 10 characters');
     user.username = name;
     await this.userRepository.save(user);
     const send = {

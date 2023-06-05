@@ -16,6 +16,7 @@ import { authenticator } from 'otplib';
 import { toDataURL } from 'qrcode';
 import { UserStatus } from '../utils/user.enum';
 import { UserService } from 'src/user/user.service';
+import * as process from "process";
 
 @Controller('auth')
 export class AuthController {
@@ -37,8 +38,9 @@ export class AuthController {
 
   @Get('callback')
   async getLogin(@Query() id, @Res() res) {
+    const ip = process.env.IP;
     if (id.code == null) {
-      return res.redirect('http://localhost:8080/error');
+      return res.redirect(ip + ':8080/error');
     }
 
     const user = await this.userService.createUsers(id.code);
@@ -51,9 +53,7 @@ export class AuthController {
       user.email,
       false,
     );
-    res.redirect(
-      'http://localhost:8080/authenticate?access_token=' + code.access_token,
-    );
+    res.redirect(ip + ':8080/authenticate?access_token=' + code.access_token);
     return;
   }
 
@@ -209,18 +209,5 @@ export class AuthController {
       }
       res.redirect('/');
     });
-  }
-
-  @Get('temp')
-  async temp(@Res() res) {
-    const user = await this.userService.test();
-    const code = await this.userService.signJwtToken(
-        user.id,
-        user.email,
-        true,
-        );
-    res.redirect(
-      'http://localhost:8080/authenticate?access_token=' + code.access_token,
-    );
   }
 }

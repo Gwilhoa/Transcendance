@@ -16,7 +16,7 @@ const Head = () => {
 
 	useEffect(() => {
 		if (localStorage.getItem('id') === null) {
-			axios.get("http://localhost:3000/user/id", {
+			axios.get(process.env.REACT_APP_IP + ":3000/user/id", {
 				headers: {
 					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
 				},
