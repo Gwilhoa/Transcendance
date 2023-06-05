@@ -8,10 +8,16 @@ import { AuthService } from '../auth/auth.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import {EventsGateway} from "../events/events.gateway";
+import {RequestFriend} from "./requestfriend.entity";
 
 @Module({
   providers: [UserService, AuthService, JwtService, ConfigService],
   controllers: [UserController],
-  imports: [TypeOrmModule.forFeature([User]), AuthModule, ConfigModule],
+  imports: [
+    TypeOrmModule.forFeature([User]),
+    AuthModule,
+    ConfigModule,
+    TypeOrmModule.forFeature([RequestFriend]),
+  ],
 })
 export class UserModule {}

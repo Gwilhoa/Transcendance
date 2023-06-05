@@ -21,6 +21,8 @@ export class UserService {
   constructor(
     private jwt: JwtService,
     @InjectRepository(User) private userRepository: Repository<User>,
+    @InjectRepository(RequestFriend)
+    private requestsRepository: Repository<RequestFriend>,
     private authService: AuthService,
   ) {}
 
@@ -245,6 +247,7 @@ export class UserService {
     friendrequest.receiver = friend;
     user.requestsReceived.push(friendrequest);
     const user_rep = await this.userRepository.save(user);
+    await this.requestsRepository.save(friendrequest);
     await this.userRepository.save(friend);
     return user_rep;
   }
