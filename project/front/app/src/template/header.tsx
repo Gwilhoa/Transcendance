@@ -22,6 +22,7 @@ const Head = () => {
 				},
 			})
 				.then((response) => {
+					console.log(response.data.id);
 					setId(response.data.id);
 					localStorage.setItem('id', response.data.id);
 				})
@@ -35,13 +36,6 @@ const Head = () => {
 			setId(localStorage.getItem('id'));	
 		}
 	}, [navigate]);
-
-  const buttonChat = () => {
-    if (IsInAChat())
-      return LeaveChat();
-    else
-      return JoinChat();
-  }
 
 	const dispatch = useDispatch();
 
@@ -59,7 +53,7 @@ const Head = () => {
             </Link>
           </div>
           <div className="navbar__links">
-            <Link to={buttonChat()} className="navbar__link">
+            <Link to="/chat" className="navbar__link">
               Chat
             </Link>
             <Link to="/game" className="navbar__link">

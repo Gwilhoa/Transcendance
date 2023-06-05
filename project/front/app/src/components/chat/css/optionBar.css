@@ -1,0 +1,13 @@
+.chatPage .chatOptionBar {
+	position: relative;
+	flex: 0 0 5%;
+	background: #363a4f;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: center;
+}
+
+.chatPage .chatOptionBar button {
+	margin-top: 10px;
+}

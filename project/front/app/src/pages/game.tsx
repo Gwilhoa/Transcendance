@@ -4,6 +4,8 @@ import { useSpring, animated } from 'react-spring';
 import { socket } from '../components/utils/API';
 import Cookies from 'universal-cookie';
 import { useNavigate } from 'react-router-dom';
+import { openModal } from '../redux/modal/modalSlice';
+import { useDispatch } from 'react-redux';
 const cookies = new Cookies();
 
 const Game = () => {
@@ -106,6 +108,9 @@ const Game = () => {
     };
   }, [onGame]);
 
+	const dispatch = useDispatch();
+
+	dispatch(openModal("94645"));
   return (
     <>
       {onGame == 0 && 
@@ -158,3 +163,4 @@ const Game = () => {
 }
 
 export default Game;
+

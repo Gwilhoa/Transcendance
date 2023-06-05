@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { ButtonInputToggle } from '../utils/inputButton';
 import LogoutButton from './logout';
 import { setErrorLocalStorage } from "../IfError"
-import axios from '../utils/API';
+import axios, { socket } from '../utils/API';
 import Cookies from 'universal-cookie';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../redux/store';
@@ -58,6 +58,17 @@ export default function CV() {
 	useEffect(() => {
 		if (id === localStorage.getItem('id')) {
 			setIsMe(true);
+		}
+		else {
+			axios.get(process.env.REACT_APP_IP + ":3000/user/isfriend", { 
+				headers: { Authorization:  `Bearer ${cookies.get('jwtAuthorization')}`, },
+			})
+				.then((Response) => {
+					console.log(Response);
+				})
+				.catch((error) => {
+					console.error(error);
+				})
 		}
 		refresh(id);
 		
@@ -140,6 +151,11 @@ export default function CV() {
 				});
 		}
 	};
+	
+	const handleAddFriend = (id: string | null) => {
+		console.log("add friend " + id)
+		socket.emit('friend_request', { token: cookies.get('jwtAuthorization') ,friend_id: id });
+	};
 
 	retu.push(
         <div key={"image"}>
@@ -193,7 +209,7 @@ export default function CV() {
     if (!isFriend && !isMe) {
         retu.push(
 			<div key="notFriend">
-				<button>
+				<button onClick={() => handleAddFriend(id)}>
 					Add friend
 				</button>
 				<button>
