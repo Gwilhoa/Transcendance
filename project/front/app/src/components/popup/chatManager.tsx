@@ -25,8 +25,6 @@ export function DynamicIsInAChat(): boolean {
 
 export function LeaveChat() {
     const location = window.location;
-    const r = document.querySelector<HTMLElement>(':root')!;
-    r.style.setProperty('--main-width', '75%');
     if (IsInAChat()) {
         return location.pathname.substring(0, location.pathname.indexOf('/', location.pathname.indexOf('/') + 1));
     }
@@ -35,8 +33,6 @@ export function LeaveChat() {
 
 export function JoinChat() {
     const location = window.location;
-    const r = document.querySelector<HTMLElement>(':root')!;
-    r.style.setProperty('--main-width', '100%');
     if (!IsInAChat()) {
         let str = location.pathname.split('/')[1];
         str += "/chat";
