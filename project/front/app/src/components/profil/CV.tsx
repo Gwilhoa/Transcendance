@@ -157,6 +157,10 @@ export default function CV() {
 		socket.emit('friend_request', { token: cookies.get('jwtAuthorization') ,friend_id: id });
 	};
 
+	socket.on('friend_code', (data: any) => {
+		console.log(data);
+	})
+
 	retu.push(
         <div key={"image"}>
             <img className='circle-image' src={image} alt="selected" />

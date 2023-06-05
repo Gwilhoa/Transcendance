@@ -123,6 +123,7 @@ export class EventsGateway
   //on friend request
   @SubscribeMessage('friend_request') //reception d'une demande d'ami / accepter une demande d'ami
   async handleFriendRequest(client: Socket, payload: any) {
+    this.logger.debug('friend_request ' + payload.friend_id + ' ' + payload.token);
     let send;
     const token = payload.token;
     const friend_id = payload.friend_id;
