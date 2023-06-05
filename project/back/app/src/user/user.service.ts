@@ -223,12 +223,12 @@ export class UserService {
   public async addFriendRequest(id: string, friend_id: string) {
     const user = await this.userRepository
       .createQueryBuilder('user')
-      .leftJoinAndSelect('user.friendRequests', 'friendRequests')
+      .leftJoinAndSelect('user.requests', 'RequestFriend')
       .where('user.id = :id', { id })
       .getOne();
     const friend = await this.userRepository
       .createQueryBuilder('user')
-      .leftJoinAndSelect('user.friendRequests', 'friendRequests')
+      .leftJoinAndSelect('user.requests', 'RequestFriend')
       .where('user.id = :id', { id })
       .getOne();
     if (user == null || friend == null) {

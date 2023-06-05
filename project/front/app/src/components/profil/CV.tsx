@@ -65,6 +65,7 @@ export default function CV() {
 			})
 				.then((Response) => {
 					console.log(Response);
+					setIsFriend(Response.data);
 				})
 				.catch((error) => {
 					console.error(error);
