@@ -170,7 +170,8 @@ export class EventsGateway
       ret = {
         code: FriendCode.SUCCESS,
       };
-      await this.userService.addFriendRequest(user_id, friend_id);
+      const rep = await this.userService.addFriendRequest(user_id, friend_id);
+      this.logger.debug(rep);
       if (this.clients[friend_id] != null) {
         send = {
           code: FriendCode.FRIEND_REQUEST,

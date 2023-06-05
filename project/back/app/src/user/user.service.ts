@@ -221,8 +221,16 @@ export class UserService {
   }
 
   public async addFriendRequest(id: string, friend_id: string) {
-    const user = await this.userRepository.findOneBy({ id: id });
-    const friend = await this.userRepository.findOneBy({ id: friend_id });
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.friendRequests', 'friendRequests')
+      .where('user.id = :id', { id })
+      .getOne();
+    const friend = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.friendRequests', 'friendRequests')
+      .where('user.id = :id', { id })
+      .getOne();
     if (user == null || friend == null) {
       throw new Error('User not found');
     }
@@ -236,9 +244,9 @@ export class UserService {
     friendrequest.sender = user;
     friendrequest.receiver = friend;
     user.requestsReceived.push(friendrequest);
-    await this.userRepository.save(user);
+    const user_rep = await this.userRepository.save(user);
     await this.userRepository.save(friend);
-    return user;
+    return user_rep;
   }
 
   public async removeFriendRequest(id: string, friend_id: string) {
