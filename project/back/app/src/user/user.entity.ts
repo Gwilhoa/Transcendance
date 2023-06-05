@@ -71,4 +71,7 @@ export class User {
 
   @Column({ default: UserStatus.DISCONNECTED })
   status: UserStatus;
+
+  @OneToMany((type) => Channel, (channel) => channel.creator)
+  createdChannels: Channel[];
 }
