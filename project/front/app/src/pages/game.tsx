@@ -7,7 +7,8 @@ import { useNavigate } from 'react-router-dom';
 const cookies = new Cookies();
 
 const Game = () => {
-  
+
+  const navigate = useNavigate();
   const [onGame, findGame] = useState(0);
   const [score1, setScore1] = useState(0);
   const [score2, setScore2] = useState(0);
@@ -16,26 +17,30 @@ const Game = () => {
   const [paddle1, setPaddle1] = useState(42.5 );
   const [paddle2, setPaddle2] = useState(42.5 );
   const [finalScore, setFinalScore] = useState("");
-  const navigate = useNavigate();
-  
+
   
   let gameId = 0;
+
+  const homebutton = () => {
+    socket.emit('game_finished', {rematch : false});
+    navigate("/home");
+  }
   const handleKeyDown = (event: KeyboardEvent) => {
     console.log(gameId);
     switch (event.code) {
       case "KeyW":
-        //setPaddle1((paddle) => ({ y: (paddle.y - 1) < 0 ? 0: paddle.y - 1}));
         socket.emit("input_game", {game_id: gameId, type: 0})
         console.log(gameId);
         break;
         case "KeyS":
-          //setPaddle1((paddle) => ({ y: (paddle.y + 1) > 85 ? 85: paddle.y + 1}));
-          //socket.emit()
         socket.emit("input_game", {game_id: gameId, type: 1})
         console.log(gameId);
         break;
     }
   };
+  const replaybutton = () => {
+    socket.emit('game_finished', {rematch : true})
+  }
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -83,7 +88,6 @@ const Game = () => {
   socket.on('create_game', (any) => {
     console.log("WESH")
     console.log(any);
-    //setGameId(any)
   })
 
 
@@ -140,19 +144,36 @@ const Game = () => {
         onGame == 2 &&
     
         
-   <div className="defeat-screen">
-      <h1 className="defeat-screen__title">{"you " + finalScore}</h1>
-      <div className="defeat-screen__buttons">
-        <button className="defeat-screen__button">Replay</button>
-        <button className="defeat-screen__button">Home</button>
+   <div className="end_game">
+      <h1 className="end_game">{"you " + finalScore}</h1>
+      <div className="end_game">
+        {revenge &&
+          <p>ton adversaire veut une revenche</p>}
+        {replay &&
+        <button className="replay_endgame" onClick={replaybutton}>Replay</button>
+        }
+        <button className="home_button" onClick={homebutton}>Home</button>
       </div>
     </div>
-
 
     }
     </>
 
   );
 }
+
+let revenge = false;
+let replay = true;
+
+socket.on('rematch', (any) => {
+  const rematch = any.rematch;
+  if (rematch) {
+    revenge = true;
+  } else {
+    replay = false;
+  }
+});
+
+
 
 export default Game;
