@@ -129,7 +129,7 @@ export class EventsGateway
     const friend_id = payload.friend_id;
     let user_id = null;
     try {
-      user_id = verifyToken(token, this.authService);
+      verifyToken(token, this.authService);
     } catch (error) {
       wrongtoken(client);
       return;
@@ -138,6 +138,7 @@ export class EventsGateway
       client.emit('friend_code', FriendCode.UNAUTHORIZED);
       return;
     }
+    user_id = getIdFromSocket(client, this.clients);
     const user = await this.userService.getUserById(user_id);
     const friend = await this.userService.getUserById(friend_id);
     let ret;
