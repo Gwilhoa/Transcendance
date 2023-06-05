@@ -125,20 +125,8 @@ export class EventsGateway
   async handleFriendRequest(client: Socket, payload: any) {
     this.logger.debug('friend_request ' + payload.friend_id + ' ' + payload.token);
     let send;
-    const token = payload.token;
     const friend_id = payload.friend_id;
-    let user_id = null;
-    try {
-      verifyToken(token, this.authService);
-    } catch (error) {
-      wrongtoken(client);
-      return;
-    }
-    if (user_id == null) {
-      client.emit('friend_code', FriendCode.UNAUTHORIZED);
-      return;
-    }
-    user_id = getIdFromSocket(client, this.clients);
+    const user_id = getIdFromSocket(client, this.clients);
     const user = await this.userService.getUserById(user_id);
     const friend = await this.userService.getUserById(friend_id);
     let ret;
