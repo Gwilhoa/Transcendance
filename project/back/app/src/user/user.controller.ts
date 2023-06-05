@@ -172,6 +172,19 @@ export class UserController {
     response.status(200).send(ret);
   }
 
+  @Get('/similar')
+  async getSimilarUsers(
+    @Body() body,
+    @GetUser('sub') id: string,
+    @Res() response,
+  ) {
+    const ret = await this.userService.getUserBySimilarNames(id);
+    if (ret == null) {
+      return response.status(204).send('No Content');
+    }
+    return response.status(200).send(ret);
+  }
+
   @Get('/friend')
   async getFriends(@GetUser('sub') id: string, @Res() response) {
     const ret = await this.userService.getFriends(id);

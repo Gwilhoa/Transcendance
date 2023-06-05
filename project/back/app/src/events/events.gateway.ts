@@ -611,4 +611,18 @@ export class EventsGateway
       }
     }
   }
+
+  @SubscribeMessage('leave_game')
+  async leave_game(client: Socket, payload: any) {
+    const id = getIdFromSocket(client, this.clients);
+    const game_id = this.ingame.get(id);
+    const game = this.games[game_id];
+    if (game != null) {
+      this.ingame.delete(getIdFromSocket(game.getUser1(), this.clients));
+      this.ingame.delete(getIdFromSocket(game.getUser2(), this.clients));
+      game.remake();
+    } else {
+      this.ingame.delete(id);
+    }
+  }
 }

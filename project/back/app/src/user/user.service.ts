@@ -344,7 +344,11 @@ export class UserService {
   }
 
   public async set2FASecret(secret: string, id: string) {
-    const user = await this.userRepository.findOneBy({ id: id });
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .select('user.secret2FA')
+      .where('user.id = :id', { id })
+      .getOne();
     if (user == null) {
       return null;
     }
@@ -353,8 +357,11 @@ export class UserService {
   }
 
   public async enabled2FA(id: string) {
-    const user = await this.userRepository.findOneBy({ id: id });
-    if (user == null) {
+    const user = await this.userRepository
+        .createQueryBuilder('user')
+        .select('user.secret2FA')
+        .where('user.id = :id', { id })
+        .getOne();if (user == null) {
       return false;
     }
     user.enabled2FA = true;
@@ -423,6 +430,16 @@ export class UserService {
     return user.games;
   }
 
+  public async getUserBySimilarNames(names: string) {
+    const users = await this.userRepository
+      .createQueryBuilder('user')
+      .where('user.username LIKE :name', { name: `%${names}%` })
+      .getMany();
+    if (users == null) {
+      return null;
+    }
+    return users;
+  }
   public async changeStatus(id: string, status: number) {
     const user = await this.userRepository.findOneBy({ id: id });
     if (user == null) {
@@ -441,7 +458,10 @@ export class UserService {
   }
 
   public async check2FAenabled(id: string) {
-    const user = await this.userRepository.findOneBy({ id: id });
+    const user = await this.userRepository.createQueryBuilder('user')
+        .select('user.enabled2FA')
+        .where('user.id = :id', { id })
+        .getOne();
     if (user == null) {
       throw new Error('User not found');
     }
@@ -510,5 +530,14 @@ export class UserService {
     await this.userRepository.save(user);
     await this.userRepository.save(blocked);
     return true;
+  }
+
+  async getSecret2fa(id: string) {
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .select('user.secret2FA')
+      .where('user.id = :id', { id })
+      .getOne();
+    return user.secret2FA;
   }
 }
