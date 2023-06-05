@@ -86,6 +86,7 @@ const Game = () => {
     //setGameId(any)
   })
 
+
   useEffect(() => {
       socket.on('update_game', (data) => {
         setScore1(data.score1);
@@ -93,14 +94,11 @@ const Game = () => {
         setBall({x: (data.ballx), y: (data.bally)});
         setPaddle2(data.rack2y)
         setPaddle1(data.rack1y);
-        console.log(paddle2);
-        console.log(paddle1);
         if (!onGame) {
           findGame(1);
         }
       });
       
-    console.log("ENTER");
     return () => {
       socket.off('update_game');
     };
