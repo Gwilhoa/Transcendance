@@ -4,18 +4,13 @@ import { useSpring, animated } from 'react-spring';
 import { socket } from '../components/utils/API';
 import Cookies from 'universal-cookie';
 import { useNavigate } from 'react-router-dom';
-import { cp } from 'fs';
 import ErrorToken from '../components/IfError';
 const cookies = new Cookies();
 
 const Game = () => {
-
-  const Height = document.documentElement.clientHeight * 0.8;
-  const Width = document.documentElement.clientWidth - 802;
   
   const [onGame, findGame] = useState(0);
   const [score1, setScore1] = useState(0);
-  const [playerId, setPlayerId] = useState(0);
   const [score2, setScore2] = useState(0);
   
   const [ball, setBall] = useState({ x: 50, y: 50});
@@ -45,10 +40,6 @@ const Game = () => {
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const [windowSize, setWindowSize] = useState({
-    width: window.innerWidth,
-    height: window.innerHeight
-  });
   const spinnerAnimation = useSpring({
     from: { transform: 'rotate(0deg)' },
     to: { transform: 'rotate(360deg)' },
@@ -56,16 +47,6 @@ const Game = () => {
     config: { duration: 4000 },
   });
 
-  useEffect(() => {
-    function handleResize() {
-      setWindowSize({
-        width: window.innerWidth,
-        height: window.innerHeight
-      });
-    }
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
   
 
   useEffect(() => {
@@ -105,17 +86,12 @@ const Game = () => {
     console.log(any);
     //setGameId(any)
   })
-  
 
   useEffect(() => {
-
-
-    
-
       socket.on('update_game', (data) => {
         setScore1(data.score1);
         setScore2(data.score2);
-        setBall({x: (data.ballx - 0.5), y: (data.bally - 0.5)});
+        setBall({x: (data.ballx), y: (data.bally)});
         setPaddle2(data.rack2y)
         setPaddle1(data.rack1y);
         console.log(paddle2);
@@ -130,14 +106,6 @@ const Game = () => {
       socket.off('update_game');
     };
   }, [onGame]);
-
-
-
-
-  const inputGame = () => {
-    const token = localStorage.getItem('token');
-  };
-
 
   return (
     <>
@@ -168,25 +136,26 @@ const Game = () => {
           </div>
           <div className="paddle1" style={{ top: paddle1 + '%' }} />
           <div className="paddle2" style={{ top: paddle2 + '%'}} />
-          <div className="ball" style={{ top: ball.x + '%', left: ball.y + '%' }} />
+          <div className="ball" style={{ top: ball.x + '%', left: ball.y + '%'}} />
         </>
       }
 
       {
         onGame == 2 &&
-        <>
-        <h1>
-          
-          {"you " + finalScore}
+    
+        
+   <div className="defeat-screen">
+      <h1 className="defeat-screen__title">{"you " + finalScore}</h1>
+      <div className="defeat-screen__buttons">
+        <button className="defeat-screen__button">Replay</button>
+        <button className="defeat-screen__button">Home</button>
+      </div>
+    </div>
 
-          <button>
-            {"Back to the Home !!"}
-          </button>
-        </h1>
 
-        </>
-      }
+    }
     </>
+
   );
 }
 

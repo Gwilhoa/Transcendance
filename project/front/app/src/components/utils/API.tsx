@@ -4,9 +4,9 @@ import io from "socket.io-client";
 import Cookies from 'universal-cookie';
 import { setErrorLocalStorage } from '../IfError';
 const cookies = new Cookies();
-axios.defaults.baseURL = 'http://localhost:3000/'
+axios.defaults.baseURL = process.env.REACT_APP_IP + ":3000/";
 axios.defaults.headers.common = {'Authorization': `bearer ${cookies.get('jwtAuthorization')}`}
-export const socket = io('http://localhost:3000', {
+export const socket = io(process.env.REACT_APP_IP + ":3000", {
     transports: ['websocket']
 });
 socket.on('connect', () => {
@@ -88,7 +88,7 @@ export async function getMessages(channel_id:string) : Promise<Message[]> {
 
     const config: AxiosRequestConfig = {
         method: 'get',
-        url: 'http://localhost:3000/channel/message',
+        url: process.env.REACT_APP_IP + ':3000/channel/message',
         params: {
             channel_id: name,
         },

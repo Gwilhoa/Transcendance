@@ -25,7 +25,7 @@ export default function CV() {
 	const dispatch = useDispatch();
 
 	const refresh = useCallback(( id: string | null ) => {
-		axios.get("http://localhost:3000/user/image/" + id, {
+		axios.get(process.env.REACT_APP_IP + ":3000/user/image/" + id, {
 			headers: {
 				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
 			},
@@ -40,7 +40,7 @@ export default function CV() {
 				navigate('/Error');
 			});
 
-		axios.get("http://localhost:3000/user/id/" + id, {
+		axios.get(process.env.REACT_APP_IP + ":3000/user/id/" + id, {
 			headers: {
 				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
 			},
@@ -61,7 +61,7 @@ export default function CV() {
 		}
 		refresh(id);
 		
-		axios.get("http://localhost:3000/auth/2fa/is2FA", {
+		axios.get(process.env.REACT_APP_IP + ":3000/auth/2fa/is2FA", {
 			headers: {
 				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
 			},
@@ -80,7 +80,7 @@ export default function CV() {
 	}, [navigate, id, refresh]);
 
 	const changeName = (str: string) => {
-			axios.post("http://localhost:3000/user/name", 
+			axios.post(process.env.REACT_APP_IP + ":3000/user/name",
 				{ name: str }, 
 				{ headers: {
 					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`, 
@@ -101,7 +101,7 @@ export default function CV() {
 			dispatch(closeModal());
 		}
 		else {
-			axios.get("http://localhost:3000/auth/2fa/disable", {
+			axios.get(process.env.REACT_APP_IP + ":3000/auth/2fa/disable", {
 				headers: {
 					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
 				},
@@ -123,7 +123,7 @@ export default function CV() {
 
 			axios({
 				method: 'post',
-				url: 'http://localhost:3000/user/image',
+				url: process.env.REACT_APP_IP + ':3000/user/image',
 				headers: {
 					'Authorization': `Bearer ${cookies.get('jwtAuthorization')}`,
 					'Content-Type': 'multipart/form-data',

@@ -10,14 +10,14 @@ function AuthenticateComponentsNotTwoFa() {
 	const [error, setError] = useState<boolean>(false);
 
 	useEffect(() => {
-			const url = "http://localhost:3000/auth/authenticate";
+			const url = process.env.REACT_APP_IP + ":3000/auth/authenticate";
 
 			const setCookieJwt = (jwtToken: string) => {
 				cookies.set('jwtAuthorization', jwtToken, {sameSite: 'lax', maxAge: 2 * 60 * 60 });
 			};
 
 		if (cookies.get('jwtAuthorization') != null) {
-			axios.get("http://localhost:3000/auth/2fa/is2FA", {
+			axios.get(process.env.REACT_APP_IP + ":3000/auth/2fa/is2FA", {
 				headers: {
 					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
 				},

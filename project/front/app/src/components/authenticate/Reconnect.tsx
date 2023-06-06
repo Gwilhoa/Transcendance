@@ -5,7 +5,7 @@ function Reconnect() {
 	return (
 		<div className="Error-page">
 			<p className="Error-description">{localStorage.getItem('Error')}</p>
-			<Link to="http://localhost:8080/">
+			<Link to= {process.env.REACT_APP_IP + ":8080"}>
 				<button className="login-button">
 					Try to reconnect
 				</button>
