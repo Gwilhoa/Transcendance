@@ -1,9 +1,9 @@
 import { Route, Routes } from "react-router-dom";
 import Auth from './pages/Auth';
-import NotFound from './pages/NotFound';
+import NotFound from './pages/PageNotFound';
 import CreateTwoFaPage from './pages/CreateTwoFa';
 import Game from './pages/game';
-import TryToReconnect from './pages/TryToReconnect';
+import TryToReconnect from './pages/BackError';
 import Home from './pages/home';
 import History from './pages/history';
 import Template from "./template/template";

@@ -5,6 +5,7 @@ import { socket } from '../components/utils/API';
 import Cookies from 'universal-cookie';
 import { useNavigate } from 'react-router-dom';
 import { cp } from 'fs';
+import ErrorToken from '../components/IfError';
 const cookies = new Cookies();
 
 const Game = () => {
@@ -140,6 +141,7 @@ const Game = () => {
 
   return (
     <>
+    <ErrorToken />
       {onGame == 0 && 
         <>
           <h2 style={{color: 'white'}}> Searching players... </h2>

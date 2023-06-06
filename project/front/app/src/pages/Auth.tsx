@@ -33,8 +33,8 @@ function Auth() {
 		<div className="auth-page">
 			<div className='auth-block'>
 				<header className="auth-title">
-					<h1>Transcendence</h1>
 					<img className='transcendence-image' src={logo}/>
+					<h1>Transcendence</h1>
 				</header>
 				<div className="auth-button">
 					<Link to="http://localhost:3000/auth/login">
