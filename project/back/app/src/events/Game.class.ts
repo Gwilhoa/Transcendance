@@ -169,6 +169,7 @@ export class Game {
     });
     await this._gameService.finishGame(this._id, this._score1, this._score2);
     clearInterval(this._loopid);
+    console.log("nous avons finit" +  this._id)
     this.executeFinishCallbacks();
   };
 
@@ -249,8 +250,7 @@ export class Game {
     }
     this._ballx = this._futurballx;
     this._bally = this._futurbally;
-
-    this._io.to(this._id).emit('update_game', this.getGameInfo());
+     this._io.to(this._id).emit('update_game', this.getGameInfo());
   };
 
   private executeFinishCallbacks() {
@@ -273,5 +273,9 @@ export class Game {
     this._user1.leave(this._id);
     clearInterval(this._loopid);
     this.executeFinishCallbacks();
+  }
+
+  public clear() {
+    clearInterval(this._loopid);
   }
 }

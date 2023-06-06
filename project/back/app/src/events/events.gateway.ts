@@ -490,6 +490,7 @@ export class EventsGateway
       this.logger.debug(game);
       this.sendconnected();
       this.logger.log(game.getId() + ' finished');
+      game.clear();
     });
     const tempmatchmaking = [];
     for (const t of this.matchmaking) {
