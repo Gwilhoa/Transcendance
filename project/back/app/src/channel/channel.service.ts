@@ -45,6 +45,12 @@ export class ChannelService {
   }
 
   public async createMPChannel(user_id, user_id1) {
+    const channels = await this.channelRepository.find();
+    for (const chan of channels) {
+      if (chan.type == ChannelType.MP_CHANNEL) {
+        if (chan.name == user_id + ' - ' + user_id1) throw new Error('Channel already exists');
+      }
+    }
     const chan = new Channel();
     chan.name = user_id + ' - ' + user_id1;
     chan.admins = [];

@@ -140,18 +140,19 @@ export class EventsGateway
       };
     } else if (await this.userService.asfriendrequestby(user_id, friend_id)) {
       await this.userService.removeFriendRequest(user_id, friend_id);
+      this.logger.debug(this.clients[friend_id]);
       if (this.clients[friend_id] != null) {
         send = {
           code: FriendCode.NEW_FRIEND,
-          id: user.id,
+          id: friend_id,
         };
         this.server.sockets[this.clients[friend_id]].emit(
           'friend_request',
           send,
         );
-        await this.userService.addFriend(user_id, friend_id);
-        await this.userService.addFriend(friend_id, user_id);
       }
+      await this.userService.addFriend(user_id, friend_id);
+      await this.userService.addFriend(friend_id, user_id);
       ret = {
         code: FriendCode.NEW_FRIEND,
       };

@@ -138,6 +138,7 @@ export class UserService {
   }
 
   public async addFriend(id: string, friend_id: string) {
+    console.log('add friend of ' + id + ' friend_id ' + friend_id);
     const user = await this.userRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.friends', 'friends')
@@ -271,31 +272,18 @@ export class UserService {
   }
 
   public async removeFriendRequest(id: string, friend_id: string) {
-    const user = await this.userRepository
-      .createQueryBuilder('user')
-      .leftJoinAndSelect('user.requests', 'RequestFriend')
-      .where('user.id = :id', { id: id })
-      .getOne();
-    const friend = await this.userRepository
-      .createQueryBuilder('user')
-      .leftJoinAndSelect('user.requests', 'RequestFriend')
-      .where('user.id = :id', { id: friend_id })
-      .getOne();
-    if (user == null || friend == null) {
-      return null;
-    }
-    if (user == friend) {
-      return null;
-    }
-    if (!user.requestsReceived || user.requestsReceived.length == 0) {
-      return null;
-    }
-    user.requestsReceived = user.requestsReceived.filter(
-      (request) => request.receiver.id != friend.id,
-    );
-    await this.userRepository.save(user);
-    await this.userRepository.save(friend);
-    return user;
+    const requests = await this.requestsRepository
+      .createQueryBuilder('request')
+      .leftJoinAndSelect('request.sender', 'sender')
+      .leftJoinAndSelect('request.receiver', 'receiver')
+      .getMany();
+    requests.forEach((request) => {
+      if (request.sender.id == id && request.receiver.id == friend_id) {
+        this.requestsRepository.delete(request);
+      } else if (request.sender.id == friend_id && request.receiver.id == id) {
+        this.requestsRepository.delete(request);
+      }
+    });
   }
 
   public async setName(id: string, name: string) {
