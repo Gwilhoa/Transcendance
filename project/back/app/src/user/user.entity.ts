@@ -60,7 +60,7 @@ export class User {
   @OneToMany((type) => RequestFriend, (request) => request.receiver)
   requestsReceived: RequestFriend[];
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, select: false })
   secret2FA: string;
 
   @Column({ default: false })
@@ -71,4 +71,7 @@ export class User {
 
   @Column({ default: UserStatus.DISCONNECTED })
   status: UserStatus;
+
+  @OneToMany((type) => Channel, (channel) => channel.creator)
+  createdChannels: Channel[];
 }

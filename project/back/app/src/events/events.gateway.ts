@@ -40,6 +40,7 @@ export class EventsGateway
   private rematch: Map<string, boolean> = new Map<string, boolean>();
   private matchmaking: Array<Socket> = [];
   private logger: Logger = new Logger('EventsGateway');
+  private dual: Map<string, string> = new Map<string, string>();
 
   constructor(
     private userService: UserService,
@@ -47,6 +48,7 @@ export class EventsGateway
     private channelService: ChannelService,
     private gameService: GameService,
   ) {}
+
   sendconnected() {
     send_connection_server(this.clients, this.ingame, this.server);
   }
@@ -465,7 +467,14 @@ export class EventsGateway
     const create_game = await this.gameService.createGame(create_gameDTO);
     this.ingame.set(create_gameDTO.user1_id, create_game.id);
     this.ingame.set(create_gameDTO.user2_id, create_game.id);
-    this.logger.debug('game created ' + create_game.id + ' ' + create_gameDTO.user1_id + ' ' + create_gameDTO.user2_id);
+    this.logger.debug(
+      'game created ' +
+        create_game.id +
+        ' ' +
+        create_gameDTO.user1_id +
+        ' ' +
+        create_gameDTO.user2_id,
+    );
     player.emit('game_found', {
       game_id: create_game.id,
       user: 1,
@@ -568,6 +577,53 @@ export class EventsGateway
           }
         }
       }
+    }
+  }
+
+  @SubscribeMessage('dualrequest')
+  async dual_request(client: Socket, payload: any) {
+    const rival_id = payload.rival_id;
+    const socket = this.server.sockets.sockets.get(rival_id);
+    if (socket != null) {
+      if (this.dual.get(rival_id) != null) {
+        if (this.dual.get(rival_id) == getIdFromSocket(client, this.clients)) {
+          this.dual.delete(rival_id);
+          socket.emit('receive_dualrequest', {
+            message: 'ok game will started soon',
+          });
+          client.emit('receive_dualrequest', {
+            message: 'ok game will started soon',
+          });
+          await this.play_game(client, socket);
+        } else {
+          client.emit('receive_dualrequest', {
+            message: 'user is in dual',
+          });
+          return;
+        }
+        this.dual.set(getIdFromSocket(client, this.clients), rival_id);
+        socket.emit('receive_dualrequest', {
+          rival: getIdFromSocket(client, this.clients),
+        });
+      } else {
+        client.emit('receive_dualrequest', {
+          message: 'user is not connected',
+        });
+      }
+    }
+  }
+
+  @SubscribeMessage('leave_game')
+  async leave_game(client: Socket, payload: any) {
+    const id = getIdFromSocket(client, this.clients);
+    const game_id = this.ingame.get(id);
+    const game = this.games[game_id];
+    if (game != null) {
+      this.ingame.delete(getIdFromSocket(game.getUser1(), this.clients));
+      this.ingame.delete(getIdFromSocket(game.getUser2(), this.clients));
+      game.remake();
+    } else {
+      this.ingame.delete(id);
     }
   }
 }

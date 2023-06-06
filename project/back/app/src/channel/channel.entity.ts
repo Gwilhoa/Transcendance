@@ -4,6 +4,7 @@ import {
   Entity,
   JoinTable,
   ManyToMany,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -56,4 +57,7 @@ export class Channel {
 
   @Column({ nullable: true })
   pwd: string;
+
+  @ManyToOne((type) => User, (user) => user.createdChannels)
+  creator: User;
 }
