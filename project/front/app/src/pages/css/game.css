@@ -102,6 +102,5 @@
 .gameimg {
   width: 150px;
   height: 150px;
-  -webkit-filter: invert(100%); /* Safari/Chrome */
   filter: invert(1);
 }
