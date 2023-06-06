@@ -16,7 +16,7 @@ import { authenticator } from 'otplib';
 import { toDataURL } from 'qrcode';
 import { UserStatus } from '../utils/user.enum';
 import { UserService } from 'src/user/user.service';
-import * as process from "process";
+import * as process from 'process';
 
 @Controller('auth')
 export class AuthController {

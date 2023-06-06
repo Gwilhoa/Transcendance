@@ -358,10 +358,11 @@ export class UserService {
 
   public async enabled2FA(id: string) {
     const user = await this.userRepository
-        .createQueryBuilder('user')
-        .select('user.secret2FA')
-        .where('user.id = :id', { id })
-        .getOne();if (user == null) {
+      .createQueryBuilder('user')
+      .select('user.secret2FA')
+      .where('user.id = :id', { id })
+      .getOne();
+    if (user == null) {
       return false;
     }
     user.enabled2FA = true;
@@ -458,10 +459,11 @@ export class UserService {
   }
 
   public async check2FAenabled(id: string) {
-    const user = await this.userRepository.createQueryBuilder('user')
-        .select('user.enabled2FA')
-        .where('user.id = :id', { id })
-        .getOne();
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .select('user.enabled2FA')
+      .where('user.id = :id', { id })
+      .getOne();
     if (user == null) {
       throw new Error('User not found');
     }

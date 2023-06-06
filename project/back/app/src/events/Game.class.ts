@@ -169,7 +169,6 @@ export class Game {
     });
     await this._gameService.finishGame(this._id, this._score1, this._score2);
     clearInterval(this._loopid);
-    console.log("nous avons finit" +  this._id)
     this.executeFinishCallbacks();
   };
 
@@ -184,8 +183,6 @@ export class Game {
       this._futurbally = this._bally;
       this._speedball = Game.default_speedBall;
       this._io.to(this._id).emit('update_game', this.getGameInfo());
-      clearInterval(this._loopid);
-      this.start();
     }
     return scoreWin;
   };
@@ -210,8 +207,14 @@ export class Game {
         this._futurbally -= 2 * distbar;
       } else if (this._ballx) {
         this._score1 = this.endBattle(this._score1);
-        if (this._score1 >= Game.default_victorygoal)
-          this.endWar(this._user1, this._user2);
+        if (this._score1 >= Game.default_victorygoal) {
+          await this.endWar(this._user1, this._user2);
+          return;
+        } else {
+          clearInterval(this._loopid);
+          this.start();
+          return;
+        }
       }
       console.log(this._angle);
     }
@@ -227,10 +230,15 @@ export class Game {
         this._futurbally -= 2 * distbar;
       } else {
         this._score2 = this.endBattle(this._score2);
-        if (this._score2 >= Game.default_victorygoal)
-          this.endWar(this._user2, this._user1);
+        if (this._score2 >= Game.default_victorygoal) {
+          await this.endWar(this._user2, this._user1);
+          return;
+        } else {
+          clearInterval(this._loopid);
+          this.start();
+          return;
+        }
       }
-      console.log(this._angle);
     }
 
     if (
@@ -250,7 +258,7 @@ export class Game {
     }
     this._ballx = this._futurballx;
     this._bally = this._futurbally;
-     this._io.to(this._id).emit('update_game', this.getGameInfo());
+    this._io.to(this._id).emit('update_game', this.getGameInfo());
   };
 
   private executeFinishCallbacks() {
