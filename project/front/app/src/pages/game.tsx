@@ -111,11 +111,11 @@ const Game = () => {
     <>
     <ErrorToken />
       {onGame == 0 && 
-        <>
+        <div className='center-page'>
           <h2 style={{color: 'white'}}> Searching players... </h2>
           <p></p>
           <animated.img src={"https://pic.onlinewebfonts.com/svg/img_155544.png"} className={"gameimg"} style={spinnerAnimation}></animated.img>
-        </>
+        </div>
       }
 
       {onGame == 1 && 
