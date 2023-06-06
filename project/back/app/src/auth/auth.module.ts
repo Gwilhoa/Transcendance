@@ -7,7 +7,7 @@ import { User } from 'src/user/user.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtIsAuthStrategy, JwtStrategy } from './strategy';
-import {RequestFriend} from "../user/requestfriend.entity";
+import { RequestFriend } from '../user/requestfriend.entity';
 
 @Module({
   imports: [

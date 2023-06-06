@@ -10,7 +10,7 @@ import { AuthService } from 'src/auth/auth.service';
 import { JwtService } from '@nestjs/jwt';
 import { AuthModule } from 'src/auth/auth.module';
 import { UserModule } from 'src/user/user.module';
-import {RequestFriend} from "../user/requestfriend.entity";
+import { RequestFriend } from '../user/requestfriend.entity';
 
 @Module({
   providers: [GameService, AuthService, JwtService, ConfigService, UserService],

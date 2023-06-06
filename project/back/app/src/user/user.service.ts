@@ -53,8 +53,6 @@ export class UserService {
       .leftJoinAndSelect('user.requestsReceived', 'requestsReceived')
       .where('user.id = :id', { id: friend_id })
       .getOne();
-    console.log('research request received of ' + user_id);
-    console.log(user.requestsReceived);
     if (user.requestsReceived == null) {
       return false;
     }
@@ -72,7 +70,18 @@ export class UserService {
     return false;
   }
 
-  public isfriend(user: User, friend: User) {
+  public async isfriend(user_id: string, friend_id: string) {
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.friends', 'friends')
+      .where('user.id = :id', { id: user_id })
+      .getOne();
+
+    const friend = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.friends', 'friends')
+      .where('user.id = :id', { id: friend_id })
+      .getOne();
     if (user.friends == null) {
       return false;
     }
@@ -138,7 +147,6 @@ export class UserService {
   }
 
   public async addFriend(id: string, friend_id: string) {
-    console.log('add friend of ' + id + ' friend_id ' + friend_id);
     const user = await this.userRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.friends', 'friends')
@@ -318,7 +326,6 @@ export class UserService {
         if (error) {
           console.error('Error deleting last image:', error);
         } else {
-          console.log('Last image deleted successfully');
         }
       });
     }
@@ -357,7 +364,7 @@ export class UserService {
     if (user == friend) {
       throw new Error('user id and friend id are the same');
     }
-    return this.isfriend(user, friend);
+    return await this.isfriend(id, friend_id);
   }
 
   public async getMpChannels(id: string) {

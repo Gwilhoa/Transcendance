@@ -32,7 +32,6 @@ export function send_connection_server(
     connected: connectedlist,
     ingame: ingamelist,
   };
-  console.log(send);
   server.emit('connection_server', send);
 }
 

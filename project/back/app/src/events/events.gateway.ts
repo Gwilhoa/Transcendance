@@ -99,6 +99,7 @@ export class EventsGateway
         wrongtoken(client);
         return;
       }
+      this.logger.debug(`Client connected: ${id} for ${client.id}`);
       this.clients.set(id, client);
       this.sendconnected();
       let channels = null;
@@ -112,7 +113,6 @@ export class EventsGateway
         wrongtoken(client);
         return;
       }
-      this.logger.debug(channels);
       for (const channel of channels) {
         client.join(channel.id);
       }
@@ -126,7 +126,7 @@ export class EventsGateway
     let send;
     const friend_id = payload.friend_id;
     const user_id = getIdFromSocket(client, this.clients);
-    this.logger.debug(`friend request from ${user_id} to ${friend_id}`);
+    this.logger.log(`new friend request from ${user_id} to ${friend_id}`);
     const user = await this.userService.getUserById(user_id);
     const friend = await this.userService.getUserById(friend_id);
     let ret;
@@ -134,13 +134,12 @@ export class EventsGateway
       ret = {
         code: FriendCode.UNEXISTING_USER,
       };
-    } else if (this.userService.isfriend(user, friend)) {
+    } else if (await this.userService.isfriend(user_id, friend_id)) {
       ret = {
         code: FriendCode.ALREADY_FRIEND,
       };
     } else if (await this.userService.asfriendrequestby(user_id, friend_id)) {
       await this.userService.removeFriendRequest(user_id, friend_id);
-      this.logger.debug(this.clients[friend_id]);
       if (this.clients[friend_id] != null) {
         send = {
           code: FriendCode.NEW_FRIEND,
@@ -161,7 +160,6 @@ export class EventsGateway
         code: FriendCode.SUCCESS,
       };
       const rep = await this.userService.addFriendRequest(user_id, friend_id);
-      this.logger.debug(rep);
       if (this.clients[friend_id] != null) {
         send = {
           code: FriendCode.FRIEND_REQUEST,
@@ -365,7 +363,7 @@ export class EventsGateway
       }
       i++;
     }
-    this.logger.debug('new in matchmaking ' + id);
+    this.logger.log(id + ' has joined matchmaking');
     this.matchmaking.push(client);
     const send = {
       code: 0,
@@ -375,10 +373,8 @@ export class EventsGateway
   }
 
   async check_matchmaking() {
-    this.logger.debug('checking matchmaking');
     let i = 0;
     while (i < this.matchmaking.length) {
-      this.logger.debug(this.matchmaking[i].id);
       const player = this.matchmaking[i];
       const authorized_player = [];
       let j = 0;
@@ -405,7 +401,6 @@ export class EventsGateway
           authorized_player[
             Math.floor(Math.random() * authorized_player.length)
           ];
-        this.logger.debug('found rival ' + rival.id);
         if (this.server.sockets.sockets.get(player.id) == null) {
           const tempmatchmaking = [];
           for (const p of this.matchmaking) {
@@ -464,7 +459,6 @@ export class EventsGateway
         );
         this.games[game.getId()] = game;
         game.onFinish((finishedGame) => {
-          this.logger.debug(game);
           this.ingame.delete(getIdFromSocket(game.getUser1(), this.clients));
           this.ingame.delete(getIdFromSocket(game.getUser2(), this.clients));
           this.sendconnected();
@@ -489,7 +483,6 @@ export class EventsGateway
   async input_game(client: Socket, payload: any) {
     const game_id = payload.game_id;
     const type = payload.type;
-    this.logger.debug('game id = ' + game_id + ' ' + type);
     this.games[game_id].updateRacket(client, type);
     this.server
       .to(game_id)
@@ -516,7 +509,6 @@ export class EventsGateway
       }
     }
     this.matchmaking = tempmatchmaking;
-    this.logger.debug('leaving matchmaking ' + id);
     client.emit('matchmaking_code', send);
   }
 }

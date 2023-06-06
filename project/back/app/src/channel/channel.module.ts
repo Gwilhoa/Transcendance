@@ -11,7 +11,7 @@ import { JwtService } from '@nestjs/jwt';
 import { AuthModule } from 'src/auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Message } from './message.entity';
-import {RequestFriend} from "../user/requestfriend.entity";
+import { RequestFriend } from '../user/requestfriend.entity';
 
 @Module({
   providers: [
