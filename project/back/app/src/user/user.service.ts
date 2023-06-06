@@ -209,7 +209,7 @@ export class UserService {
       user.blockedUsers = [];
     }
     user.blockedUsers.push(blocked);
-    if (this.isfriend(user, blocked)) {
+    if (await this.isfriend(id, blocked_id)) {
       await this.removeFriend(user, blocked);
     }
     await this.userRepository.save(user);
