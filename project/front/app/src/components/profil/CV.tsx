@@ -53,13 +53,6 @@ export default function CV() {
 				console.error(error);
 				navigate('/Error');
 			});
-	}, [navigate]);
-
-	useEffect(() => {
-		if (id === localStorage.getItem('id')) {
-			setIsMe(true);
-		}
-		else {
 			axios.get(process.env.REACT_APP_IP + ":3000/user/isfriend", { 
 				headers: { Authorization:  `Bearer ${cookies.get('jwtAuthorization')}`, },
 			})
@@ -70,6 +63,11 @@ export default function CV() {
 				.catch((error) => {
 					console.error(error);
 				})
+	}, [navigate]);
+
+	useEffect(() => {
+		if (id === localStorage.getItem('id')) {
+			setIsMe(true);
 		}
 		refresh(id);
 		
@@ -155,11 +153,31 @@ export default function CV() {
 	
 	const handleAddFriend = (id: string | null) => {
 		console.log("add friend " + id)
-		socket.emit('friend_request', { token: cookies.get('jwtAuthorization') ,friend_id: id });
+		socket.emit('friend_request', { friend_id: id });
 	};
 
 	socket.on('friend_code', (data: any) => {
 		console.log(data);
+		if (data.code === 2) {
+			axios.post(process.env.REACT_APP_IP + ':3000/channel/mp/create',
+				{ 
+					user_id: '' + id, 
+				},
+				{ 
+					headers: {
+						Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+					},
+				})
+				.then((response) => {
+					console.log(response);
+					refresh(id);
+				})
+				.catch((error) => {
+					setErrorLocalStorage("Error " + error.response.status);
+					console.error(error);
+					navigate('/Error');
+				});
+		}
 	})
 
 	retu.push(
