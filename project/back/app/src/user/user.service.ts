@@ -271,8 +271,16 @@ export class UserService {
   }
 
   public async removeFriendRequest(id: string, friend_id: string) {
-    const user = await this.userRepository.findOneBy({ id: id });
-    const friend = await this.userRepository.findOneBy({ id: friend_id });
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.requests', 'RequestFriend')
+      .where('user.id = :id', { id: id })
+      .getOne();
+    const friend = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.requests', 'RequestFriend')
+      .where('user.id = :id', { id: friend_id })
+      .getOne();
     if (user == null || friend == null) {
       return null;
     }
