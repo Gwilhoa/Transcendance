@@ -171,17 +171,13 @@ export default function CV() {
             )
             
         retu.push(
-                <div key={"change2FA"} className="change2FA">
-                {/* <input type='checkbox' name='2FA' checked={checked} onChange={clicked}  /> */}
-                {/* <label htmlFor="scales">
+			<div className='change2FA'>
+				<label className="switch">
 					<input type='checkbox' name='2FA' checked={checked} onChange={clicked} />
-					<span></span>
-					<p>2FA</p>
-				</label> */}
-				<label htmlFor="toggleSwitch"></label>
-				<input type='checkbox' name='2FA' checked={checked} onChange={clicked} id="toggleSwitch"/>
-					<p>2FA</p>
-				</div>
+					<span className='slider'></span>
+				</label>
+				<p>2FA</p>
+			</div>
             )
 		retu.push(
 			<div key={"logout"} className="logout">
@@ -192,10 +188,11 @@ export default function CV() {
 
     if (!isFriend && !isMe) {
         retu.push(
-			<div key="notFriend">
+			<div key="notFriend" className='other-user-profil'>
 				<button>
 					Add friend
 				</button>
+				<br/>
 				<button>
 					Challenge
 				</button>
@@ -205,10 +202,11 @@ export default function CV() {
 
     if (isFriend && !isMe) {
         retu.push(
-			<div key="Friend">
+			<div key="Friend" className='other-user-profil'>
 				<button>
 					Unfriend
 				</button>
+				<br/>
 				<button>
 					Challenge
 				</button>

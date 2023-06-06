@@ -3,6 +3,8 @@ import React, { useEffect } from 'react';
 import { Link, useNavigate } from "react-router-dom";
 import Cookies from 'universal-cookie';
 const cookies = new Cookies();
+import './css/auth.css'
+import logo from '../images/pegi18.png'
 
 function Auth() {
 	const navigate = useNavigate();
@@ -26,16 +28,21 @@ function Auth() {
 	}, [navigate]);
 
   return (
-	<div className="Auth">
-		<div className="Auth-title">
-			<h1>Transcendence</h1>
-		</div>
-		<div className="Auth-button">
-			<Link to={process.env.REACT_APP_IP + ":3000/auth/login"}>
-				<button className="login42">
-					Login with 42
-				</button>
-			</Link>
+	<div className='center-auth'>
+		<div className="auth-page">
+			<div className='auth-block'>
+				<header className="auth-title">
+					<img className='transcendence-image' src={logo}/>
+					<h1>Transcendence</h1>
+				</header>
+				<div className="auth-button">
+					<Link to={process.env.REACT_APP_IP + ":3000/auth/login"}>
+						<button className="login-button">
+							Login
+						</button>
+					</Link>
+				</div>
+			</div>
 		</div>
     </div>
   );
