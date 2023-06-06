@@ -123,10 +123,10 @@ export class EventsGateway
   //on friend request
   @SubscribeMessage('friend_request') //reception d'une demande d'ami / accepter une demande d'ami
   async handleFriendRequest(client: Socket, payload: any) {
-    this.logger.debug('friend_request ' + payload.friend_id + ' ' + payload.token);
     let send;
     const friend_id = payload.friend_id;
     const user_id = getIdFromSocket(client, this.clients);
+    this.logger.debug(`friend request from ${user_id} to ${friend_id}`);
     const user = await this.userService.getUserById(user_id);
     const friend = await this.userService.getUserById(friend_id);
     let ret;
@@ -138,7 +138,7 @@ export class EventsGateway
       ret = {
         code: FriendCode.ALREADY_FRIEND,
       };
-    } else if (this.userService.asfriendrequestby(user, friend)) {
+    } else if (await this.userService.asfriendrequestby(user_id, friend_id)) {
       await this.userService.removeFriendRequest(user_id, friend_id);
       if (this.clients[friend_id] != null) {
         send = {

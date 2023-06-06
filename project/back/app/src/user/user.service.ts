@@ -40,12 +40,32 @@ export class UserService {
     return path.join(imageDir, matchingFiles[0]);
   }
 
-  public asfriendrequestby(user: User, friend: User) {
+  public async asfriendrequestby(user_id: string, friend_id: string) {
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.requests', 'requests')
+      .leftJoinAndSelect('user.requestsReceived', 'requestsReceived')
+      .where('user.id = :id', { id: user_id })
+      .getOne();
+    const friend = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.requests', 'requests')
+      .leftJoinAndSelect('user.requestsReceived', 'requestsReceived')
+      .where('user.id = :id', { id: friend_id })
+      .getOne();
+    console.log('research request received of ' + user_id);
+    console.log(user.requestsReceived);
     if (user.requestsReceived == null) {
       return false;
     }
     for (let i = 0; i < user.requestsReceived.length; i++) {
-      if (user.requestsReceived[i].sender.id == friend.id) {
+      const request = await this.requestsRepository
+        .createQueryBuilder('request')
+        .leftJoinAndSelect('request.sender', 'sender')
+        .leftJoinAndSelect('request.receiver', 'receiver')
+        .where('request.id = :id', { id: user.requestsReceived[i].id })
+        .getOne();
+      if (request.sender.id == friend.id) {
         return true;
       }
     }
@@ -118,8 +138,16 @@ export class UserService {
   }
 
   public async addFriend(id: string, friend_id: string) {
-    const user = await this.userRepository.findOneBy({ id: id });
-    const friend = await this.userRepository.findOneBy({ id: friend_id });
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.friends', 'friends')
+      .where('user.id = :id', { id })
+      .getOne();
+    const friend = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.friends', 'friends')
+      .where('user.id = :id', { id: friend_id })
+      .getOne();
     if (user == null || friend == null) {
       throw new Error('User not found');
     }
@@ -129,14 +157,8 @@ export class UserService {
     if (!user.friends) {
       user.friends = [];
     }
-    if (!user.requestsReceived.find((e) => e.sender.id == friend.id)) {
-      await this.addFriendRequest(id, friend_id);
-      return null;
-    }
     user.friends.push(friend);
-    await this.userRepository.save(user);
-    await this.userRepository.save(friend);
-    return user;
+    return await this.userRepository.save(user);
   }
 
   public async getFriends(id: string) {
@@ -226,12 +248,12 @@ export class UserService {
     const user = await this.userRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.requests', 'RequestFriend')
-      .where('user.id = :id', { id })
+      .where('user.id = :id', { id: id })
       .getOne();
     const friend = await this.userRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.requests', 'RequestFriend')
-      .where('user.id = :id', { id })
+      .where('user.id = :id', { id: friend_id })
       .getOne();
     if (user == null || friend == null) {
       throw new Error('User not found');
@@ -245,11 +267,7 @@ export class UserService {
     const friendrequest = new RequestFriend();
     friendrequest.sender = user;
     friendrequest.receiver = friend;
-    user.requestsReceived.push(friendrequest);
-    const user_rep = await this.userRepository.save(user);
-    await this.requestsRepository.save(friendrequest);
-    await this.userRepository.save(friend);
-    return user_rep;
+    return await this.requestsRepository.save(friendrequest);
   }
 
   public async removeFriendRequest(id: string, friend_id: string) {
