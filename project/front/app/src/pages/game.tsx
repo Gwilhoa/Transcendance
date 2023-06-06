@@ -6,8 +6,10 @@ import Cookies from 'universal-cookie';
 import { useNavigate } from 'react-router-dom';
 const cookies = new Cookies();
 
-const Game = () => {
+let isCall = true;
 
+const Game = () => {
+  isCall = true;
   const navigate = useNavigate();
   const [onGame, findGame] = useState(0);
   const [score1, setScore1] = useState(0);
@@ -18,29 +20,22 @@ const Game = () => {
   const [paddle2, setPaddle2] = useState(42.5 );
   const [finalScore, setFinalScore] = useState("");
 
+
   
   let gameId = 0;
 
-  const homebutton = () => {
-    socket.emit('game_finished', {rematch : false});
-    navigate("/home");
-  }
+  
   const handleKeyDown = (event: KeyboardEvent) => {
-    console.log(gameId);
     switch (event.code) {
       case "KeyW":
         socket.emit("input_game", {game_id: gameId, type: 0})
-        console.log(gameId);
         break;
-        case "KeyS":
+      case "KeyS":
         socket.emit("input_game", {game_id: gameId, type: 1})
-        console.log(gameId);
         break;
     }
   };
-  const replaybutton = () => {
-    socket.emit('game_finished', {rematch : true})
-  }
+
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -77,12 +72,16 @@ const Game = () => {
         alert("Error, you are already in game");
       }
     });
-    
   }, []);
   
   socket.on('finish_game', (any) => {
-    setFinalScore(any.status);
-    findGame(2);
+    if (isCall) {
+
+      setFinalScore(any.status);
+      console.log("dzjj")
+      navigate('/endGame')
+      isCall = !isCall;
+    }
   });
 
   socket.on('create_game', (any) => {
@@ -105,6 +104,7 @@ const Game = () => {
       
     return () => {
       socket.off('update_game');
+      socket.emit('');
     };
   }, [onGame]);
 
@@ -124,8 +124,6 @@ const Game = () => {
           ref={canvasRef}
           className="game-canvas"
           > </canvas>
-        
-
           <div className="parentscore">
             <div className="score">
               <h1>
@@ -139,40 +137,12 @@ const Game = () => {
           <div className="ball" style={{ top: ball.x + '%', left: ball.y + '%'}} />
         </>
       }
-
-      {
-        onGame == 2 &&
-    
-        
-   <div className="end_game">
-      <h1 className="end_game">{"you " + finalScore}</h1>
-      <div className="end_game">
-        {revenge &&
-          <p>ton adversaire veut une revenche</p>}
-        {replay &&
-        <button className="replay_endgame" onClick={replaybutton}>Replay</button>
-        }
-        <button className="home_button" onClick={homebutton}>Home</button>
-      </div>
-    </div>
-
-    }
     </>
 
   );
 }
 
-let revenge = false;
-let replay = true;
 
-socket.on('rematch', (any) => {
-  const rematch = any.rematch;
-  if (rematch) {
-    revenge = true;
-  } else {
-    replay = false;
-  }
-});
 
 
 

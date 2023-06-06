@@ -3,6 +3,7 @@ import Auth from './pages/Auth';
 import NotFound from './pages/NotFound';
 import CreateTwoFaPage from './pages/CreateTwoFa';
 import Game from './pages/game';
+import EndGame from "./pages/endgame";
 import TryToReconnect from './pages/TryToReconnect';
 import Home from './pages/home';
 import History from './pages/history';
@@ -33,6 +34,7 @@ const AppInsideBrowser = () => {
 					<Route path="/game/*" element={<Game></Game>} />
 					<Route path="/CreateTwoFa/*" element={<CreateTwoFaPage></CreateTwoFaPage>}/>
 					<Route path="/history/*" element={<History></History>} />
+					<Route path="/endgame/*" element={<EndGame result="dj"></EndGame>} />
 				</Route>
 			</Routes>
 			

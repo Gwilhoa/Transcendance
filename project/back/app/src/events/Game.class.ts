@@ -16,7 +16,7 @@ export class Game {
   static default_speedBall = 0.5;
   static default_sizeMinX = 0;
   static default_sizeMinY = 0;
-  static default_victorygoal = 6;
+  static default_victorygoal = 1;
 
   private _io: Server;
   private _loopid: NodeJS.Timeout;
