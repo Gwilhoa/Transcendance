@@ -1,5 +1,5 @@
 import { Message } from "../utils/API";
-import CV from "../profil/CV";
+import Profil from "../profil/profil";
 import React, { ReactNode } from "react";
 import { useDispatch } from "react-redux";
 import { openModal } from "../../redux/modal/modalSlice";
@@ -9,7 +9,7 @@ export function parthMessages ( listMessageGet:Message[], chan:string ) {
     const messagesRet = [];
     
     // const clickName = (i:number) => {
-    //   setContent(<CV id={i.toString()} closeModal={setIsOpen}/>);
+    //   setContent(<Profil id={i.toString()} closeModal={setIsOpen}/>);
     //   setIsOpen(true);
     // }
 
