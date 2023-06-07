@@ -364,7 +364,8 @@ export class UserService {
     if (user == friend) {
       throw new Error('user id and friend id are the same');
     }
-    return await this.isfriend(id, friend_id);
+	const res = { isfriend: await this.isfriend(id, friend_id) };
+    return res;
   }
 
   public async getMpChannels(id: string) {

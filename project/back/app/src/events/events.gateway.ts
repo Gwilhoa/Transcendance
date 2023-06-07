@@ -86,6 +86,7 @@ export class EventsGateway
   //on connection
   async handleConnection(client: Socket) {
     let id;
+	this.logger.debug("New connexion");
     await client.on('connection', async (data) => {
       try {
         id = this.authService.getIdFromToken(data.token);

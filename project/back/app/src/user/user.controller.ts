@@ -268,7 +268,7 @@ export class UserController {
       response.status(400).send('Bad Request ' + e);
       return;
     }
-    response.status(200).send(ret);
+    response.status(200).json(ret);
   }
 
   @Get('/mpchannel')
