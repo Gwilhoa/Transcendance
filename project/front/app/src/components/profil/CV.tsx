@@ -69,6 +69,29 @@ export default function CV() {
 			})
 	}, [navigate]);
 
+	socket.on('friend_code', (data: any) => {
+		console.log("receive friend code");
+		if (data.code === 2 && !isFriend) {
+			axios.post(process.env.REACT_APP_IP + ':3000/channel/mp/create',
+				{
+					user_id: '' + id,
+				},
+				{
+					headers: {
+						Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+					},
+				})
+				.then((response) => {
+					console.log(response);
+					refresh(id);
+				})
+				.catch((error) => {
+					console.error(error);
+				});
+			return;
+		}
+		return;
+	})
 	useEffect(() => {
 		if (id === localStorage.getItem('id')) {
 			setIsMe(true);
@@ -156,31 +179,9 @@ export default function CV() {
 	};
 
 	const handleAddFriend = (id: string | null) => {
-		console.log("add friend " + id)
+		console.log("add friend " + id);
 		socket.emit('friend_request', { friend_id: id });
 	};
-
-	socket.on('friend_code', (data: any) => {
-		console.log(data);
-		if (data.code === 2 && isFriend === false) {
-			axios.post(process.env.REACT_APP_IP + ':3000/channel/mp/create',
-				{
-					user_id: '' + id,
-				},
-				{
-					headers: {
-						Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
-					},
-				})
-				.then((response) => {
-					console.log(response);
-					refresh(id);
-				})
-				.catch((error) => {
-					console.error(error);
-				});
-		}
-	})
 
 	retu.push(
         <div key={"image"}>
@@ -267,3 +268,5 @@ export default function CV() {
         </div>
     )
 }
+
+

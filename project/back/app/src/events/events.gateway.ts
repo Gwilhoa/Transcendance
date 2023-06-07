@@ -175,6 +175,7 @@ export class EventsGateway
         );
       }
     }
+    this.logger.debug(`friend request code: ${ret.code}`);
     client.emit('friend_code', ret);
   }
 
