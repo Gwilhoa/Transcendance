@@ -234,7 +234,7 @@ export default function Profil() {
     return (
         <div className="profil-modal">
 			<div className='profil-title'>
-				<button className="close-profil" onClick={() => dispatch(closeModal())}> X </button>
+				<button className="close-profil" onClick={() => dispatch(closeModal())}></button>
 				<h2> {name} </h2>
 			</div>
             <div> 
