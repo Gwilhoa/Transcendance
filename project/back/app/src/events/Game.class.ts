@@ -7,16 +7,16 @@ export class Game {
   static default_positionBx = this.default_sizeMaxX / 2;
   static default_sizeMaxY = 100;
   static default_positionBy = this.default_sizeMaxY / 2;
-  static default_update = 60;
+  static default_update = 16;
   static default_racklenght = 15;
   static default_positionR = 50 - this.default_racklenght / 2;
   static default_rackwidth = 2;
   static default_steprack = 1;
   static default_radiusball = 1;
-  static default_speedBall = 2;
+  static default_speedBall = 0.5;
   static default_sizeMinX = 0;
   static default_sizeMinY = 0;
-  static default_victorygoal = 6;
+  static default_victorygoal = 1;
 
   private _io: Server;
   private _loopid: NodeJS.Timeout;
@@ -148,22 +148,22 @@ export class Game {
     ) {
       this._angle = Math.random() * 360;
     }
-    this._angle = 180;
     this._loopid = setInterval(this.gameLoop, Game.default_update);
   }
 
   private endWar = async (userWin: Socket, userDefeat: Socket) => {
+    console.log('game finish ' + this._id);
     this._user1.leave(this._id);
     this._user2.leave(this._id);
     userWin.emit('finish_game', {
       score1: this._score1,
       score2: this._score2,
-      status: 'win',
+      status: 'lose',
     });
     userDefeat.emit('finish_game', {
       score1: this._score1,
       score2: this._score2,
-      status: 'lose',
+      status: 'win',
     });
     await this._gameService.finishGame(this._id, this._score1, this._score2);
     clearInterval(this._loopid);
@@ -181,8 +181,6 @@ export class Game {
       this._futurbally = this._bally;
       this._speedball = Game.default_speedBall;
       this._io.to(this._id).emit('update_game', this.getGameInfo());
-      clearInterval(this._loopid);
-      this.start();
     }
     return scoreWin;
   };
@@ -196,6 +194,7 @@ export class Game {
       this._maxY - Game.default_rackwidth - Game.default_radiusball;
 
     if (this._bally <= minposition) {
+      console.log(this._angle);
       if (
         this._futurballx >= this._rack1y &&
         this._futurballx <= this._rack1y + Game.default_racklenght
@@ -204,14 +203,16 @@ export class Game {
         this._angle = Math.PI - this._angle;
         const distbar = this._futurbally - minposition;
         this._futurbally -= 2 * distbar;
-        // if (this._futurballx < (this._rack2y + (Game.default_racklenght / 3)) && this._angle > 100)
-        // this._angle += 10;
-        // if (this._futurballx > (this._rack2y + ( 2 * (Game.default_racklenght / 3))) && this._angle < 170)
-        // this._angle -= 10;
       } else if (this._ballx) {
         this._score1 = this.endBattle(this._score1);
-        if (this._score1 >= Game.default_victorygoal)
-          this.endWar(this._user1, this._user2);
+        if (this._score1 >= Game.default_victorygoal) {
+          await this.endWar(this._user1, this._user2);
+          return;
+        } else {
+          clearInterval(this._loopid);
+          this.start();
+          return;
+        }
       }
     }
 
@@ -224,15 +225,16 @@ export class Game {
         this._angle = Math.PI - this._angle;
         const distbar = this._futurbally - maxposition;
         this._futurbally -= 2 * distbar;
-
-        //if (this._futurballx < (this._rack1y + (Game.default_racklenght / 3)) && this._angle < 80)
-        //  this._angle -= 10;
-        //if (this._futurballx > (this._rack1y + ( 2 * (Game.default_racklenght / 3))) && this._angle > 280)
-        //  this._angle += 10;
       } else {
-        this._score2 = this.endBattle(this._score1);
-        if (this._score2 >= Game.default_victorygoal)
-          this.endWar(this._user2, this._user1);
+        this._score2 = this.endBattle(this._score2);
+        if (this._score2 >= Game.default_victorygoal) {
+          await this.endWar(this._user2, this._user1);
+          return;
+        } else {
+          clearInterval(this._loopid);
+          this.start();
+          return;
+        }
       }
     }
 
@@ -253,7 +255,6 @@ export class Game {
     }
     this._ballx = this._futurballx;
     this._bally = this._futurbally;
-
     this._io.to(this._id).emit('update_game', this.getGameInfo());
   };
 
@@ -275,5 +276,9 @@ export class Game {
     this._user1.leave(this._id);
     clearInterval(this._loopid);
     this.executeFinishCallbacks();
+  }
+
+  public clear() {
+    clearInterval(this._loopid);
   }
 }

@@ -23,15 +23,6 @@
     margin-right: 40px;
   }
   
-  .footer {
-    position: fixed;
-    width: 100%;
-    background-color: #333;
-    height: var(--footer-size);
-    bottom: 0px;
-    text-align: center;
-  }
-  
   .main-template {
     position: absolute; 
     /* top: var(--header-size); */

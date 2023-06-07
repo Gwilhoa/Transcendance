@@ -53,7 +53,7 @@ export default function CV() {
 				console.error(error);
 				navigate('/Error');
 			});
-		axios.get(process.env.REACT_APP_IP + ":3000/user/isfriend", { 
+		axios.get(process.env.REACT_APP_IP + ":3000/user/isfriend", {
 			headers: { Authorization:  `Bearer ${cookies.get('jwtAuthorization')}`, },
 		})
 			.then((Response) => {
@@ -154,7 +154,7 @@ export default function CV() {
 				});
 		}
 	};
-	
+
 	const handleAddFriend = (id: string | null) => {
 		console.log("add friend " + id)
 		socket.emit('friend_request', { friend_id: id });
@@ -164,10 +164,10 @@ export default function CV() {
 		console.log(data);
 		if (data.code === 2 && isFriend === false) {
 			axios.post(process.env.REACT_APP_IP + ':3000/channel/mp/create',
-				{ 
-					user_id: '' + id, 
+				{
+					user_id: '' + id,
 				},
-				{ 
+				{
 					headers: {
 						Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
 					},
@@ -212,17 +212,13 @@ export default function CV() {
             )
             
         retu.push(
-                <div key={"change2FA"} className="change2FA">
-                {/* <input type='checkbox' name='2FA' checked={checked} onChange={clicked}  /> */}
-                {/* <label htmlFor="scales">
+			<div className='change2FA'>
+				<label className="switch">
 					<input type='checkbox' name='2FA' checked={checked} onChange={clicked} />
-					<span></span>
-					<p>2FA</p>
-				</label> */}
-				<label htmlFor="toggleSwitch"></label>
-				<input type='checkbox' name='2FA' checked={checked} onChange={clicked} id="toggleSwitch"/>
-					<p>2FA</p>
-				</div>
+					<span className='slider'></span>
+				</label>
+				<p>2FA</p>
+			</div>
             )
 		retu.push(
 			<div key={"logout"} className="logout">
@@ -233,10 +229,11 @@ export default function CV() {
 
     if (!isFriend && !isMe) {
         retu.push(
-			<div key="notFriend">
+			<div key="notFriend" className='other-user-profil'>
 				<button onClick={() => handleAddFriend(id)}>
 					Add friend
 				</button>
+				<br/>
 				<button>
 					Challenge
 				</button>
@@ -246,10 +243,11 @@ export default function CV() {
 
     if (isFriend && !isMe) {
         retu.push(
-			<div key="Friend">
+			<div key="Friend" className='other-user-profil'>
 				<button>
 					Unfriend
 				</button>
+				<br/>
 				<button>
 					Challenge
 				</button>

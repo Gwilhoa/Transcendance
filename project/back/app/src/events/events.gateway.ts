@@ -37,8 +37,10 @@ export class EventsGateway
   private clients: Map<string, Socket> = new Map<string, Socket>();
   private ingame: Map<string, string> = new Map<string, string>();
   private games: Map<string, Game> = new Map<string, Game>();
+  private rematch: Map<string, boolean> = new Map<string, boolean>();
   private matchmaking: Array<Socket> = [];
   private logger: Logger = new Logger('EventsGateway');
+  private dual: Map<string, string> = new Map<string, string>();
 
   constructor(
     private userService: UserService,
@@ -46,6 +48,7 @@ export class EventsGateway
     private channelService: ChannelService,
     private gameService: GameService,
   ) {}
+
   sendconnected() {
     send_connection_server(this.clients, this.ingame, this.server);
   }
@@ -387,6 +390,7 @@ export class EventsGateway
           this.clients,
         );
         if (
+          pretended_player_id != null &&
           pretended_player_id != player_id &&
           !(await this.userService.OneOfTwoBlocked(
             pretended_player_id,
@@ -424,60 +428,77 @@ export class EventsGateway
           this.check_matchmaking();
           return;
         }
-        const create_gameDTO = new CreateGameDTO();
-        create_gameDTO.user1_id = getIdFromSocket(player, this.clients);
-        create_gameDTO.user2_id = getIdFromSocket(rival, this.clients);
-        await this.userService.changeStatus(
-          create_gameDTO.user1_id,
-          UserStatus.IN_GAME,
-        );
-        await this.userService.changeStatus(
-          create_gameDTO.user2_id,
-          UserStatus.IN_GAME,
-        );
-        this.sendconnected();
-        const create_game = await this.gameService.createGame(create_gameDTO);
-        this.ingame.set(create_gameDTO.user1_id, create_game.id);
-        this.ingame.set(create_gameDTO.user2_id, create_game.id);
-        player.emit('game_found', {
-          game_id: create_game.id,
-          user: 1,
-          rival: rival.id,
-        });
-        rival.emit('game_found', {
-          game_id: create_game.id,
-          user: 2,
-          rival: player.id,
-        });
-        player.join(create_game.id);
-        rival.join(create_game.id);
-        const game = new Game(
-          create_game.id,
-          player,
-          rival,
-          this.server,
-          this.gameService,
-        );
-        this.games[game.getId()] = game;
-        game.onFinish((finishedGame) => {
-          this.ingame.delete(getIdFromSocket(game.getUser1(), this.clients));
-          this.ingame.delete(getIdFromSocket(game.getUser2(), this.clients));
-          this.sendconnected();
-          this.logger.log(game.getId() + ' finished');
-        });
-        const tempmatchmaking = [];
-        for (const t of this.matchmaking) {
-          if (t.id != rival.id && player.id != t.id) {
-            tempmatchmaking.push(player);
-          }
+        if (
+          this.server.sockets.sockets.get(player.id) != null ||
+          this.server.sockets.sockets.get(rival.id) != null
+        ) {
+          await this.play_game(player, rival);
         }
-        this.matchmaking = tempmatchmaking;
-        this.server.to(game.getId()).emit('game_start', game.getId());
-        this.logger.log('game ' + game.getId() + ' started');
-        game.start();
       }
       i++;
     }
+  }
+
+  async play_game(player: Socket, rival: Socket) {
+    const create_gameDTO = new CreateGameDTO();
+    create_gameDTO.user1_id = getIdFromSocket(player, this.clients);
+    create_gameDTO.user2_id = getIdFromSocket(rival, this.clients);
+    await this.userService.changeStatus(
+      create_gameDTO.user1_id,
+      UserStatus.IN_GAME,
+    );
+    await this.userService.changeStatus(
+      create_gameDTO.user2_id,
+      UserStatus.IN_GAME,
+    );
+    this.sendconnected();
+    const create_game = await this.gameService.createGame(create_gameDTO);
+    this.ingame.set(create_gameDTO.user1_id, create_game.id);
+    this.ingame.set(create_gameDTO.user2_id, create_game.id);
+    this.logger.debug(
+      'game created ' +
+        create_game.id +
+        ' ' +
+        create_gameDTO.user1_id +
+        ' ' +
+        create_gameDTO.user2_id,
+    );
+    player.emit('game_found', {
+      game_id: create_game.id,
+      user: 1,
+      rival: rival.id,
+    });
+    rival.emit('game_found', {
+      game_id: create_game.id,
+      user: 2,
+      rival: player.id,
+    });
+    player.join(create_game.id);
+    rival.join(create_game.id);
+    const game = new Game(
+      create_game.id,
+      player,
+      rival,
+      this.server,
+      this.gameService,
+    );
+    this.games[game.getId()] = game;
+    game.onFinish((finishedGame) => {
+      this.logger.debug(game);
+      this.sendconnected();
+      this.logger.log(game.getId() + ' finished');
+      return;
+    });
+    const tempmatchmaking = [];
+    for (const t of this.matchmaking) {
+      if (t.id != rival.id && player.id != t.id) {
+        tempmatchmaking.push(player);
+      }
+    }
+    this.matchmaking = tempmatchmaking;
+    this.server.to(game.getId()).emit('game_start', game.getId());
+    this.logger.log('game ' + game.getId() + ' started');
+    game.start();
   }
 
   @SubscribeMessage('input_game')
@@ -511,5 +532,84 @@ export class EventsGateway
     }
     this.matchmaking = tempmatchmaking;
     client.emit('matchmaking_code', send);
+  }
+
+  @SubscribeMessage('game_finished')
+  async game_finished(client: Socket, payload: any) {
+    const rematch = payload.rematch;
+    const id = getIdFromSocket(client, this.clients);
+    this.logger.debug('game finished ' + id);
+    const game_id = this.ingame.get(id);
+    const game = this.games[game_id];
+    if (game != null) {
+      if (!rematch) {
+        this.ingame.delete(getIdFromSocket(game.getUser1(), this.clients));
+        this.ingame.delete(getIdFromSocket(game.getUser2(), this.clients));
+      } else {
+        if (this.rematch.get(game_id) == null) {
+          this.rematch.set(game_id, true);
+          if (game.getUser1().id == client.id) {
+            game.getUser2().emit('rematch', true);
+          }
+          if (game.getUser2().id == client.id) {
+            game.getUser1().emit('rematch', true);
+          }
+        } else {
+          if (
+            this.server.sockets.sockets.get(game.getUser1()) != null ||
+            this.server.sockets.sockets.get(game.getUser2()) != null
+          ) {
+            this.play_game(game.getUser1(), game.getUser2());
+          }
+        }
+      }
+    }
+  }
+
+  @SubscribeMessage('dualrequest')
+  async dual_request(client: Socket, payload: any) {
+    const rival_id = payload.rival_id;
+    const socket = this.server.sockets.sockets.get(rival_id);
+    if (socket != null) {
+      if (this.dual.get(rival_id) != null) {
+        if (this.dual.get(rival_id) == getIdFromSocket(client, this.clients)) {
+          this.dual.delete(rival_id);
+          socket.emit('receive_dualrequest', {
+            message: 'ok game will started soon',
+          });
+          client.emit('receive_dualrequest', {
+            message: 'ok game will started soon',
+          });
+          await this.play_game(client, socket);
+        } else {
+          client.emit('receive_dualrequest', {
+            message: 'user is in dual',
+          });
+          return;
+        }
+        this.dual.set(getIdFromSocket(client, this.clients), rival_id);
+        socket.emit('receive_dualrequest', {
+          rival: getIdFromSocket(client, this.clients),
+        });
+      } else {
+        client.emit('receive_dualrequest', {
+          message: 'user is not connected',
+        });
+      }
+    }
+  }
+
+  @SubscribeMessage('leave_game')
+  async leave_game(client: Socket, payload: any) {
+    const id = getIdFromSocket(client, this.clients);
+    const game_id = this.ingame.get(id);
+    const game = this.games[game_id];
+    if (game != null) {
+      this.ingame.delete(getIdFromSocket(game.getUser1(), this.clients));
+      this.ingame.delete(getIdFromSocket(game.getUser2(), this.clients));
+      game.remake();
+    } else {
+      this.ingame.delete(id);
+    }
   }
 }

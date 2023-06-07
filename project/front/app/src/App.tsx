@@ -1,9 +1,10 @@
 import { Route, Routes } from "react-router-dom";
 import Auth from './pages/Auth';
-import NotFound from './pages/NotFound';
+import NotFound from './pages/PageNotFound';
 import CreateTwoFaPage from './pages/CreateTwoFa';
 import Game from './pages/game';
-import TryToReconnect from './pages/TryToReconnect';
+import EndGame from "./pages/endgame";
+import TryToReconnect from './pages/BackError';
 import Home from './pages/home';
 import Chat from './pages/chat';
 import History from './pages/history';
@@ -35,6 +36,7 @@ const AppInsideBrowser = () => {
 					<Route path="/chat/*" element={<Chat></Chat>} />
 					<Route path="/CreateTwoFa" element={<CreateTwoFaPage></CreateTwoFaPage>}/>
 					<Route path="/history" element={<History></History>} />
+					<Route path="/endgame/*" element={<EndGame result="dj"></EndGame>} />
 				</Route>
 			</Routes>
 			
