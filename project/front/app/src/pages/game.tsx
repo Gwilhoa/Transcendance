@@ -108,9 +108,6 @@ const Game = () => {
     };
   }, [onGame]);
 
-	const dispatch = useDispatch();
-
-	dispatch(openModal("94645"));
   return (
     <>
       {onGame == 0 && 

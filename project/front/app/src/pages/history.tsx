@@ -160,9 +160,7 @@ const Add = () => {
 }
 
 const History = () => {
-	const dispatch = useDispatch();
     console.log('aaa');
-	dispatch(openModal("92000"));
     return (
         <div className="page-history">
 			<ErrorToken />
