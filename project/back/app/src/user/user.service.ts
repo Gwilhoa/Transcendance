@@ -1,15 +1,16 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { AuthService } from '../auth/auth.service';
-import { Repository } from 'typeorm';
-import { User } from './user.entity';
+import {Injectable} from '@nestjs/common';
+import {InjectRepository} from '@nestjs/typeorm';
+import {AuthService} from '../auth/auth.service';
+import {Repository} from 'typeorm';
+import {User} from './user.entity';
 import fetch from 'node-fetch';
-import { RequestFriend } from './requestfriend.entity';
-import { ChannelType } from 'src/utils/channel.enum';
-import { JwtService } from '@nestjs/jwt';
-import { UserStatus } from '../utils/user.enum';
-import { WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
-import { Server } from 'socket.io';
+import {RequestFriend} from './requestfriend.entity';
+import {ChannelType} from 'src/utils/channel.enum';
+import {JwtService} from '@nestjs/jwt';
+import {UserStatus} from '../utils/user.enum';
+import {WebSocketGateway, WebSocketServer} from '@nestjs/websockets';
+import {Server} from 'socket.io';
+
 @WebSocketGateway({
   cors: {
     origin: '*',
@@ -134,8 +135,27 @@ export class UserService {
     return await this.userRepository.find();
   }
 
-  public async getUserById(id: string) {
-    return await this.userRepository.findOneBy({ id: id });
+  public async getUserById(id: string, withsecret = false) {
+    if (withsecret) {
+      const userWithSecret = await this.userRepository
+        .createQueryBuilder('user')
+        .select([
+          'user.id',
+          'user.email',
+          'user.username',
+          'user.experience',
+          'user.secret2FA',
+          'user.status',
+          'user.enabled2FA',
+        ])
+        .where('user.id = :id', { id })
+        .getOne();
+
+      console.debug(userWithSecret);
+      return userWithSecret;
+    }
+
+    return await this.userRepository.findOneBy({id: id});
   }
 
   public async getImageById(id: string) {
@@ -364,7 +384,7 @@ export class UserService {
     if (user == friend) {
       throw new Error('user id and friend id are the same');
     }
-	const res = { isfriend: await this.isfriend(id, friend_id) };
+    const res = { isfriend: await this.isfriend(id, friend_id) };
     return res;
   }
 
@@ -377,11 +397,7 @@ export class UserService {
   }
 
   public async set2FASecret(secret: string, id: string) {
-    const user = await this.userRepository
-      .createQueryBuilder('user')
-      .select('user.secret2FA')
-      .where('user.id = :id', { id })
-      .getOne();
+    const user = await this.getUserById(id, true);
     if (user == null) {
       return null;
     }
@@ -390,11 +406,7 @@ export class UserService {
   }
 
   public async enabled2FA(id: string) {
-    const user = await this.userRepository
-      .createQueryBuilder('user')
-      .select('user.secret2FA')
-      .where('user.id = :id', { id })
-      .getOne();
+    const user = await this.getUserById(id, true);
     if (user == null) {
       return false;
     }
@@ -492,11 +504,7 @@ export class UserService {
   }
 
   public async check2FAenabled(id: string) {
-    const user = await this.userRepository
-      .createQueryBuilder('user')
-      .select('user.enabled2FA')
-      .where('user.id = :id', { id })
-      .getOne();
+    const user = await this.getUserById(id, true);
     if (user == null) {
       throw new Error('User not found');
     }
@@ -568,11 +576,10 @@ export class UserService {
   }
 
   async getSecret2fa(id: string) {
-    const user = await this.userRepository
-      .createQueryBuilder('user')
-      .select('user.secret2FA')
-      .where('user.id = :id', { id })
-      .getOne();
+    const user = await this.getUserById(id, true);
+    if (user.secret2FA == null) {
+      return null;
+    }
     return user.secret2FA;
   }
 }
