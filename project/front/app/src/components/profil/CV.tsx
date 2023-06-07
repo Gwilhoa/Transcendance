@@ -213,7 +213,7 @@ export default function CV() {
             )
             
         retu.push(
-			<div className='change2FA'>
+			<div className='change2FA' key="2FA">
 				<label className="switch">
 					<input type='checkbox' name='2FA' checked={checked} onChange={clicked} />
 					<span className='slider'></span>
@@ -268,5 +268,4 @@ export default function CV() {
         </div>
     )
 }
-
 
