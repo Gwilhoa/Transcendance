@@ -13,7 +13,7 @@ const cookies = new Cookies();
 
 
 export default function Profil() {
-	const [retu, setRetu] = useState<JSX.Element[]>([]);
+	const initialElement = [];
 	const navigate = useNavigate();
 	const [isMe, setIsMe] =  useState<boolean>(false);
 	const [isFriend, setIsFriend] =  useState<boolean>(false);
@@ -24,6 +24,7 @@ export default function Profil() {
 	const id = useSelector((state: RootState) => state.modal.id);
 	const dispatch = useDispatch();
 
+	console.log(id);
 	const refresh = useCallback(( id: string | null ) => {
 		axios.get(process.env.REACT_APP_IP + ":3000/user/image/" + id, {
 			headers: {
@@ -88,6 +89,18 @@ export default function Profil() {
 				.catch((error) => {
 					console.error(error);
 				});
+
+			// setRetu( prevRetu => [...prevRetu,
+			// 	<div key="notFriend" className='other-user-profil'>
+			// 		<button onClick={() => handleAddFriend(id)}>
+			// 			Add friend
+			// 		</button>
+			// 		<br/>
+			// 		<button>
+			// 			Challenge
+			// 		</button>
+			// 	</div>
+			// ]);
 			return;
 		}
 		return;
@@ -183,7 +196,7 @@ export default function Profil() {
 		socket.emit('friend_request', { friend_id: id });
 	};
 
-	retu.push(
+	initialElement.push(
         <div key={"image"}>
             <img className='circle-image' src={image} alt="selected" />
             <br/> <br/>
@@ -191,7 +204,7 @@ export default function Profil() {
     )
     
     if (isMe) {
-        retu.push(
+        initialElement.push(
 			<div className="browse-file" key={"changeImage"}>
 				<input type="file" onChange={handleImageChange} id="files"/>
 				<label htmlFor="files" className='profil-button'>Change image</label>
@@ -199,7 +212,7 @@ export default function Profil() {
 
         )
         
-        retu.push(
+        initialElement.push(
             <div key={"changeName"} className="ChangeNameDiv">
 					<ButtonInputToggle
 					onInputSubmit={changeName}
@@ -212,7 +225,7 @@ export default function Profil() {
             </div>
             )
             
-        retu.push(
+        initialElement.push(
 			<div className='change2FA' key="2FA">
 				<label className="switch">
 					<input type='checkbox' name='2FA' checked={checked} onChange={clicked} />
@@ -221,7 +234,7 @@ export default function Profil() {
 				<p>2FA</p>
 			</div>
             )
-		retu.push(
+		initialElement.push(
 			<div key={"logout"} className="logout">
 				<LogoutButton/>
 			</div>	
@@ -229,7 +242,7 @@ export default function Profil() {
 	}
 
     if (!isFriend && !isMe) {
-        retu.push(
+        initialElement.push(
 			<div key="notFriend" className='other-user-profil'>
 				<button onClick={() => handleAddFriend(id)}>
 					Add friend
@@ -243,7 +256,7 @@ export default function Profil() {
     }
 
     if (isFriend && !isMe) {
-        retu.push(
+        initialElement.push(
 			<div key="Friend" className='other-user-profil'>
 				<button>
 					Unfriend
@@ -262,7 +275,7 @@ export default function Profil() {
 				<button className="close-profil" onClick={() => dispatch(closeModal())}> X </button>
 				<h2> {name} </h2>
 			</div>
-            <div> {retu} </div>
+            <div> {initialElement} </div>
             <br/>
         </div>
     )
