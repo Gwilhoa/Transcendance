@@ -1,5 +1,5 @@
 .user{
-    background-color: rgb(31, 42, 83);
+    background-color: var(--box-color);
     border-radius: 30px;
     height: 4rem;
     display: flex;
@@ -17,7 +17,7 @@
     margin-left: 1rem;
     margin-right: 1rem;
     font-size: 1.5rem;
-    color: rgb(209, 209, 209);
+    color: var(--light-color);
 }
 
 
