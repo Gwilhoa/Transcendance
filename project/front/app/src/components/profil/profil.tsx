@@ -73,7 +73,6 @@ export default function Profil() {
 	}, [navigate]);
 
 	socket.on('friend_code', (data: any) => {
-		console.log("receive friend code");
 		if (data.code === 2 && !isFriend) {
 			axios.post(process.env.REACT_APP_IP + ':3000/channel/mp/create',
 				{
@@ -95,6 +94,31 @@ export default function Profil() {
 		}
 		return;
 	})
+
+	socket.on('friend_request', (data: any) => {
+		console.log("receive friend code " + data.code);
+		if (data.code === 2 && !isFriend) {
+			axios.post(process.env.REACT_APP_IP + ':3000/channel/mp/create',
+				{
+					user_id: '' + id,
+				},
+				{
+					headers: {
+						Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+					},
+				})
+				.then((response) => {
+					console.log(response);
+					refresh(id);
+				})
+				.catch((error) => {
+					console.error(error);
+				});
+			return;
+		}
+		return;
+	})
+
 	useEffect(() => {
 		if (id === localStorage.getItem('id')) {
 			setIsMe(true);
