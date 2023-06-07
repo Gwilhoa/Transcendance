@@ -1,4 +1,4 @@
-import './modal.css'
+import './profil.css'
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ButtonInputToggle } from '../utils/inputButton';
@@ -12,8 +12,8 @@ import { closeModal } from '../../redux/modal/modalSlice';
 const cookies = new Cookies();
 
 
-export default function CV() {
-    const retu = [];
+export default function Profil() {
+	const [retu, setRetu] = useState<JSX.Element[]>([]);
 	const navigate = useNavigate();
 	const [isMe, setIsMe] =  useState<boolean>(false);
 	const [isFriend, setIsFriend] =  useState<boolean>(false);
@@ -194,7 +194,7 @@ export default function CV() {
         retu.push(
 			<div className="browse-file" key={"changeImage"}>
 				<input type="file" onChange={handleImageChange} id="files"/>
-				<label htmlFor="files">Change image</label>
+				<label htmlFor="files" className='profil-button'>Change image</label>
 			</div>
 
         )
@@ -205,8 +205,8 @@ export default function CV() {
 					onInputSubmit={changeName}
 					textInButton='Change name'
 					placeHolder='New name'
-					classInput='button_notif'
-					classButton='button_notif'
+					classInput='profil-button'
+					classButton='profil-button'
 					/>
 				{errorName ? <p className="Error-msg">*Name already Exist</p> : <></>}
             </div>
@@ -257,13 +257,12 @@ export default function CV() {
     }
 
     return (
-        <div className="modalCorps">
-            <h2>
-                {name}
-            </h2>
-            <div>
-                {retu}
-            </div>
+        <div className="profil-modal">
+			<div className='profil-title'>
+				<button className="close-profil" onClick={() => dispatch(closeModal())}> X </button>
+				<h2> {name} </h2>
+			</div>
+            <div> {retu} </div>
             <br/>
         </div>
     )

@@ -2,7 +2,6 @@ import { Link, useNavigate } from "react-router-dom";
 import './template.css'
 import React, { useEffect, useState } from "react";
 import axios from "../components/utils/API";
-import { IsInAChat, JoinChat, LeaveChat } from "../components/popup/chatManager";
 import { setErrorLocalStorage } from "../components/IfError";
 import Cookies from 'universal-cookie';
 import { useDispatch } from "react-redux";
@@ -45,14 +44,12 @@ const Head = () => {
 
     return (
         <div className="navbar">
-          <div className="title">
-            <Link to="/home" className="navbar__link">
-              <h2>
+          <div className="navbar__link">
+            <Link to="/home" className="transcendance-link">
                 Transcendence
-              </h2>
             </Link>
           </div>
-          <div className="navbar__links">
+          <div>
             <Link to="/chat" className="navbar__link">
               Chat
             </Link>
@@ -63,9 +60,7 @@ const Head = () => {
               History
             </Link>
             <button onClick={() => handleOpenModal(id)} className="navbar__link"> 
-              <h3>
-                Profil
-              </h3>
+              Profil
             </button>
           </div>
         </div>
