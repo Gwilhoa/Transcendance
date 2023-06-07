@@ -16,7 +16,7 @@ import { authenticator } from 'otplib';
 import { toDataURL } from 'qrcode';
 import { UserStatus } from '../utils/user.enum';
 import { UserService } from 'src/user/user.service';
-import * as process from "process";
+import * as process from 'process';
 
 @Controller('auth')
 export class AuthController {
@@ -91,7 +91,7 @@ export class AuthController {
       res.status(400).send('Bad User');
       return;
     }
-    if (user.secret2FA == null) {
+    if ((await this.userService.getSecret2fa(user.id)) == null) {
       return res
         .status(400)
         .send(

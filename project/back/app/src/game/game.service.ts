@@ -70,7 +70,7 @@ export class GameService {
       .leftJoinAndSelect('game.user1', 'user1')
       .leftJoinAndSelect('game.user2', 'user2')
       .where('game.id = :id', { id: id })
-        .getOne();
+      .getOne();
     if (game == null) throw new Error('Game not found');
     game.finished = GameStatus.REMAKE;
     return await this.gameRepository.save(game);
