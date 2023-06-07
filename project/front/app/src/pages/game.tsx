@@ -7,8 +7,11 @@ import { useNavigate } from 'react-router-dom';
 import ErrorToken from '../components/IfError';
 const cookies = new Cookies();
 
+let isCall = true;
+
 const Game = () => {
-  
+  isCall = true;
+  const navigate = useNavigate();
   const [onGame, findGame] = useState(0);
   const [score1, setScore1] = useState(0);
   const [score2, setScore2] = useState(0);
@@ -17,26 +20,23 @@ const Game = () => {
   const [paddle1, setPaddle1] = useState(42.5 );
   const [paddle2, setPaddle2] = useState(42.5 );
   const [finalScore, setFinalScore] = useState("");
-  const navigate = useNavigate();
-  
+
+
   
   let gameId = 0;
+
+  
   const handleKeyDown = (event: KeyboardEvent) => {
-    console.log(gameId);
     switch (event.code) {
       case "KeyW":
-        //setPaddle1((paddle) => ({ y: (paddle.y - 1) < 0 ? 0: paddle.y - 1}));
         socket.emit("input_game", {game_id: gameId, type: 0})
-        console.log(gameId);
         break;
-        case "KeyS":
-          //setPaddle1((paddle) => ({ y: (paddle.y + 1) > 85 ? 85: paddle.y + 1}));
-          //socket.emit()
+      case "KeyS":
         socket.emit("input_game", {game_id: gameId, type: 1})
-        console.log(gameId);
         break;
     }
   };
+
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -73,19 +73,23 @@ const Game = () => {
         alert("Error, you are already in game");
       }
     });
-    
   }, []);
   
   socket.on('finish_game', (any) => {
-    setFinalScore(any.status);
-    findGame(2);
+    if (isCall) {
+
+      setFinalScore(any.status);
+      console.log("dzjj")
+      navigate('/endGame')
+      isCall = !isCall;
+    }
   });
 
   socket.on('create_game', (any) => {
     console.log("WESH")
     console.log(any);
-    //setGameId(any)
   })
+
 
   useEffect(() => {
       socket.on('update_game', (data) => {
@@ -94,16 +98,14 @@ const Game = () => {
         setBall({x: (data.ballx), y: (data.bally)});
         setPaddle2(data.rack2y)
         setPaddle1(data.rack1y);
-        console.log(paddle2);
-        console.log(paddle1);
         if (!onGame) {
           findGame(1);
         }
       });
       
-    console.log("ENTER");
     return () => {
       socket.off('update_game');
+      socket.emit('');
     };
   }, [onGame]);
 
@@ -124,8 +126,6 @@ const Game = () => {
           ref={canvasRef}
           className="game-canvas"
           > </canvas>
-        
-
           <div className="parentscore">
             <div className="score">
               <h1>
@@ -139,24 +139,13 @@ const Game = () => {
           <div className="ball" style={{ top: ball.x + '%', left: ball.y + '%'}} />
         </>
       }
-
-      {
-        onGame == 2 &&
-    
-        
-   <div className="defeat-screen">
-      <h1 className="defeat-screen__title">{"you " + finalScore}</h1>
-      <div className="defeat-screen__buttons">
-        <button className="defeat-screen__button">Replay</button>
-        <button className="defeat-screen__button">Home</button>
-      </div>
-    </div>
-
-
-    }
     </>
 
   );
 }
+
+
+
+
 
 export default Game;
