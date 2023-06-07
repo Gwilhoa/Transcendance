@@ -18,7 +18,7 @@ import { CreateGameDTO } from 'src/dto/create-game.dto';
 import { UserStatus } from 'src/utils/user.enum';
 import {
   getIdFromSocket,
-  getKeys,
+  getKeys, getSocketFromId,
   send_connection_server,
   verifyToken,
   wrongtoken,
@@ -89,7 +89,7 @@ export class EventsGateway
   //on connection
   async handleConnection(client: Socket) {
     let id;
-	this.logger.debug("New connexion");
+    this.logger.debug('New connexion');
     await client.on('connection', async (data) => {
       try {
         id = this.authService.getIdFromToken(data.token);
@@ -144,15 +144,14 @@ export class EventsGateway
       };
     } else if (await this.userService.asfriendrequestby(user_id, friend_id)) {
       await this.userService.removeFriendRequest(user_id, friend_id);
-      if (this.clients[friend_id] != null) {
+      this.logger.debug('friend id : ' + friend_id);
+      if (getSocketFromId(friend_id, this.clients) != null) {
+        this.logger.debug('socket friend id : ' + getSocketFromId(friend_id, this.clients) .id);
         send = {
           code: FriendCode.NEW_FRIEND,
           id: friend_id,
         };
-        this.clients[friend_id].emit(
-          'friend_request',
-          send,
-        );
+        getSocketFromId(friend_id, this.clients).emit('friend_request', send);
       }
       await this.userService.addFriend(user_id, friend_id);
       await this.userService.addFriend(friend_id, user_id);
@@ -163,16 +162,20 @@ export class EventsGateway
       ret = {
         code: FriendCode.SUCCESS,
       };
-      const rep = await this.userService.addFriendRequest(user_id, friend_id);
-      if (this.clients[friend_id] != null) {
+      const requestFriend = await this.userService.addFriendRequest(
+        user_id,
+        friend_id,
+      );
+      this.logger.debug('friend id : ' + friend_id);
+      console.log(this.clients);
+      if (getSocketFromId(friend_id, this.clients) != null) {
+        this.logger.debug('socket friend id : ' + getSocketFromId(friend_id, this.clients) .id);
         send = {
           code: FriendCode.FRIEND_REQUEST,
           id: user.id,
+          request: requestFriend.id,
         };
-        this.server.sockets[this.clients[friend_id]].emit(
-          'friend_request',
-          send,
-        );
+        getSocketFromId(friend_id, this.clients).emit('friend_request', send);
       }
     }
     this.logger.debug(`friend request code: ${ret.code}`);

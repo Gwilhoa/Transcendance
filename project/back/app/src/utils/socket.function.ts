@@ -47,3 +47,13 @@ export function getIdFromSocket(
   });
   return ret;
 }
+
+export function getSocketFromId(id: string, connected: Map<string, Socket>) {
+  let ret = null;
+  connected.forEach((value, key) => {
+    if (key == id) {
+      ret = value;
+    }
+  });
+  return ret;
+}
