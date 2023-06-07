@@ -1,35 +1,36 @@
 import { Server, Socket } from 'socket.io';
+import { AuthService } from '../auth/auth.service';
 
-export function verifyToken(token: string) {
+export function verifyToken(token: string, authService: AuthService) {
   try {
-    return this.authService.getIdFromToken(token);
+    return authService.getIdFromToken(token);
   } catch (error) {
-    return null;
+    throw Error('Invalid token');
   }
 }
 
 export function getKeys(map: Map<any, any>) {
   const list = [];
   map.forEach((key, value) => {
-    list.push(key);
+    list.push(value);
   });
   return list;
 }
 
 export function wrongtoken(client: Socket) {
   client.emit('connection_error', 'Invalid token');
-  client.disconnect();
 }
 
 export function send_connection_server(
   connected: Map<string, Socket>,
-  ingame,
+  ingame: Map<string, string>,
   server: Server,
 ) {
   const connectedlist = getKeys(connected);
+  const ingamelist = getKeys(ingame);
   const send = {
     connected: connectedlist,
-    ingame: ingame,
+    ingame: ingamelist,
   };
   console.log(send);
   server.emit('connection_server', send);
@@ -39,11 +40,11 @@ export function getIdFromSocket(
   socket: Socket,
   connected: Map<string, Socket>,
 ) {
-  let id = null;
+  let ret = null;
   connected.forEach((value, key) => {
-    if (value == socket) {
-      id = key;
+    if (value.id == socket.id) {
+      ret = key;
     }
   });
-  return id;
+  return ret;
 }

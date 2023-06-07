@@ -1,35 +1,46 @@
-import { BrowserRouter, Route, Routes} from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import Auth from './pages/Auth';
-import AuthToken from './pages/AuthToken';
-import NotFound from './pages/NotFound';
+import NotFound from './pages/PageNotFound';
+import CreateTwoFaPage from './pages/CreateTwoFa';
 import Game from './pages/game';
-import Accueil from './pages/accueil';
-import PopupChat from "./popup/popupChat";
-import { DynamicIsInAChat, KnowMyChannel } from "./popup/chatManager";
-import TokenPage from "./pages/authenticate";
+import EndGame from "./pages/endgame";
+import TryToReconnect from './pages/BackError';
+import Home from './pages/home';
+import History from './pages/history';
 import Template from "./template/template";
-import { ReactNode } from "react";
+import PopupChat from "./components/popup/popupChat";
+import { DynamicIsInAChat, KnowMyChannel } from "./components/popup/chatManager";
+import TokenPage from "./pages/authenticate";
+import NotTwoFa from "./components/authenticate/AuthenticateComponentsNotTwoFa"
+import TwoFa from "./components/authenticate/AuthenticateComponentsTwoFa"
+import React from "react";
+import Cookies from 'universal-cookie';
 
-export interface MyComponentProps {
-	openModal: (param: boolean) => void;
-	setContent: (param: ReactNode) => void;
-}
+export const cookies = new Cookies();
 
-const AppInsideBrowser = ({ openModal, setContent }: MyComponentProps) => {
+
+const AppInsideBrowser = () => {
 	return (
 		<>
 			<Routes>
 				<Route path="/" Component={Auth}/>
-				<Route path="/auth" Component={AuthToken}/>
 				<Route path="*" Component={NotFound}/>
 				<Route path="/authenticate" Component={TokenPage} />
-				<Route path="/accueil/*" element={<Template openModal={openModal} setContent={setContent} child={Accueil}/>} />
-				<Route path="/game/*" element={<Template openModal={openModal} setContent={setContent} child={Game}/>} />
+				<Route path="/authenticate/NotTwoFa" Component={NotTwoFa} />
+				<Route path="/authenticate/TwoFa" Component={TwoFa} />
+				<Route path="/Error" Component={TryToReconnect} />
+				<Route element={<Template/>}>
+					<Route path="/home/*" element={<Home></Home>} />
+					<Route path="/game/*" element={<Game></Game>} />
+					<Route path="/CreateTwoFa/*" element={<CreateTwoFaPage></CreateTwoFaPage>}/>
+					<Route path="/history/*" element={<History></History>} />
+					<Route path="/endgame/*" element={<EndGame result="dj"></EndGame>} />
+				</Route>
 			</Routes>
 			
-				{DynamicIsInAChat() && 
-					<PopupChat path={KnowMyChannel()} openModal={openModal} setContent={setContent}/>
-				}
+			{DynamicIsInAChat() && 
+				<PopupChat path={KnowMyChannel()}/>
+			}
 		</>
 	);
 }
@@ -37,11 +48,9 @@ const AppInsideBrowser = ({ openModal, setContent }: MyComponentProps) => {
 
 
 
-function App({ openModal, setContent }: MyComponentProps) {
+function App() {
 	return (
-		<BrowserRouter>
-			<AppInsideBrowser openModal={openModal} setContent={setContent} />
-		</BrowserRouter>
+			<AppInsideBrowser/>
 	);
 
 }

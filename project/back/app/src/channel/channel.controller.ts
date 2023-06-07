@@ -38,7 +38,7 @@ export class ChannelController {
       response.status(400).send(e.message);
       return;
     }
-    response.status(200).send(ret);
+    return response.status(200).send(ret);
   }
 
   @Post('create')
@@ -47,6 +47,7 @@ export class ChannelController {
     @GetUser('sub') id: string,
     @Res() response,
   ) {
+    body.creator_id = id;
     let ret;
     try {
       ret = await this.channelService.createChannel(body);
@@ -71,7 +72,7 @@ export class ChannelController {
       response.status(400).send(e.message);
       return;
     }
-    response.status(201).send(ret);
+    return response.status(201).send(ret);
   }
 
   @Post('leave')
@@ -87,7 +88,7 @@ export class ChannelController {
       response.status(400).send(e.message);
       return;
     }
-    response.status(200).send(ret);
+    return response.status(200).send(ret);
   }
 
   @Post('admin')
@@ -189,7 +190,7 @@ export class ChannelController {
       resp.status(204).send('No content');
       return;
     }
-    resp.status(200).send(ret);
+    return resp.status(200).send(ret);
   }
 
   @Post('message')
@@ -202,14 +203,12 @@ export class ChannelController {
     try {
       ret = await this.channelService.sendMessage(body, id);
     } catch (e) {
-      resp.status(400).send(e.message);
-      return;
+      return resp.status(400).send(e.message);
     }
     if (ret == null) {
-      resp.status(204).send('No content');
-      return;
+      return resp.status(204).send('No content');
     }
-    resp.status(200).send(ret);
+    return resp.status(200).send(ret);
   }
 
   @Post('/mp/create')
@@ -225,23 +224,33 @@ export class ChannelController {
       resp.status(400).send(e.message);
       return;
     }
-    resp.status(200).send(ret);
+    return resp.status(200).send(ret);
   }
 
   @Get('/name/:name')
   async getChannelsByName(@Param('name') name: string, @Res() resp) {
     const channels = await this.channelService.getChannelsByName(name);
     if (channels == null) {
-      resp.status(204).send('No content');
+      return resp.status(204).send('No content');
     }
+    return resp.status(200).send(channels);
+  }
+
+  @Get('/id/:id')
+  async getChannelById(@Param('id') id: string, @Res() resp) {
+    const channel = await this.channelService.getChannelById(id);
+    if (channel == null) {
+      return resp.status(204).send('No content');
+    }
+    return resp.status(200).send(channel);
   }
 
   @Get('/available')
   async getAvailableChannels(@GetUser('sub') id: string, @Res() resp) {
     const channels = await this.channelService.getAvailableChannels(id);
     if (channels == null) {
-      resp.status(204).send('No content');
+      return resp.status(204).send('No content');
     }
-    resp.status(200).send(channels);
+    return resp.status(200).send(channels);
   }
 }

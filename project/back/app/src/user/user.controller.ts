@@ -17,14 +17,16 @@ import { UserService } from './user.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtIsAuthGuard } from '../auth/guard/jwt.guard';
 import { GetUser } from '../auth/decorator/auth.decorator';
-import path, { extname } from 'path';
-import fs from 'fs';
+import * as path from 'path';
+import * as fs from 'fs';
+import { extname } from 'path';
+import { promisify } from 'util';
+import fetch from 'node-fetch';
 
 @UseGuards(JwtIsAuthGuard)
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
-
   @Get()
   async getUsers(): Promise<User[]> {
     return this.userService.getUsers();
@@ -58,34 +60,53 @@ export class UserController {
     try {
       imagePath = await this.userService.getImageById(id);
     } catch (e) {
-      response.status(404).send('Not Found');
-      return;
+      const request = await fetch(
+        'https://cdn.bitume2000.fr/achievement/0.png',
+      );
+      const buffer = await request.buffer();
+      fs.mkdirSync(__dirname + '/../../../images', { recursive: true });
+      await this.userService.setAvatar(id, buffer, '.png');
+      imagePath = await this.userService.getImageById(id);
     }
-    const stream = fs.createReadStream(imagePath);
-    const fileExt = path.extname(imagePath).substr(1);
-    response.setHeader('Content-Type', 'image/' + fileExt);
-    stream.on('error', (error) => {
-      response.status(400).send('Bad Request');
-    });
-    stream.pipe(response);
+    try {
+      const asyncReadFile = promisify(fs.readFile);
+      const image = await asyncReadFile(imagePath);
+      const fileExt = path.extname(imagePath).substr(1);
+      const base64Image = image.toString('base64');
+      const dataUri = `data:image/${fileExt};base64,${base64Image}`;
+      response.setHeader('Content-Type', `image/${fileExt}`);
+      response.status(200).send(dataUri);
+    } catch (error) {
+      response.status(500).send('Internal Server Error');
+    }
   }
 
   @Get('/image/:id')
-  async getImageById(@Param() id: string, @Res() response) {
+  async getImageById(@Param('id') id: string, @Res() response) {
     let imagePath;
     try {
       imagePath = await this.userService.getImageById(id);
     } catch (e) {
-      response.status(404).send('Not Found');
-      return;
+      const request = await fetch(
+        'https://cdn.bitume2000.fr/achievement/0.png',
+      );
+      const buffer = await request.buffer();
+      fs.mkdirSync(__dirname + '/../../../images', { recursive: true });
+      await this.userService.setAvatar(id, buffer, '.png');
+      imagePath = await this.userService.getImageById(id);
     }
-    const stream = fs.createReadStream(imagePath);
-    const fileExt = path.extname(imagePath).substr(1);
-    response.setHeader('Content-Type', 'image/' + fileExt);
-    stream.on('error', (error) => {
-      response.status(400).send('Bad Request');
-    });
-    stream.pipe(response);
+
+    try {
+      const asyncReadFile = promisify(fs.readFile);
+      const image = await asyncReadFile(imagePath);
+      const fileExt = path.extname(imagePath).substr(1);
+      const base64Image = image.toString('base64');
+      const dataUri = `data:image/${fileExt};base64,${base64Image}`;
+      response.setHeader('Content-Type', `image/${fileExt}`);
+      response.status(200).send(dataUri);
+    } catch (error) {
+      response.status(500).send('Internal Server Error');
+    }
   }
 
   @Post('/image')
@@ -116,35 +137,52 @@ export class UserController {
     @Res() response,
     @UploadedFile() file,
   ) {
+    if (!file) {
+      throw new HttpException('No file uploaded', HttpStatus.BAD_REQUEST);
+    }
+
     const ret = await this.userService.setAvatar(
       id,
       file.buffer,
       extname(file.originalname),
     );
-    if (ret == null) {
-      response.send('Error while uploading image').status(400);
-      return;
-    }
-    response.status(200).send(ret);
-  }
 
-  @Post('/friend')
-  async addFriend(
+    if (!ret) {
+      throw new HttpException(
+        'Error while uploading image',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+
+    return response.status(HttpStatus.OK).send(ret);
+  }
+  @Delete('/friend')
+  async removeFriend(
     @GetUser('sub') id: string,
     @Body('friend_id') friend_id: string,
     @Res() response,
   ) {
     let ret;
     try {
-      ret = await this.userService.addFriend(friend_id, id);
+      ret = await this.userService.removeFriends(friend_id, id);
     } catch (e) {
       response.status(400).send('Bad Request ' + e);
       return;
     }
-    if (ret == null) {
-      response.status(201).send('Friend Request Sent');
-    }
     response.status(200).send(ret);
+  }
+
+  @Get('/similar')
+  async getSimilarUsers(
+    @Body() body,
+    @GetUser('sub') id: string,
+    @Res() response,
+  ) {
+    const ret = await this.userService.getUserBySimilarNames(id);
+    if (ret == null) {
+      return response.status(204).send('No Content');
+    }
+    return response.status(200).send(ret);
   }
 
   @Get('/friend')
@@ -215,12 +253,16 @@ export class UserController {
     @Body('name') name: string,
     @Res() response,
   ) {
-    const ret = await this.userService.setName(id, name);
-    if (ret == null) {
-      response.status(204).send('No Content');
-      return;
+    let ret;
+    try {
+      ret = await this.userService.setName(id, name);
+    } catch (e) {
+      return response.status(400).send('Bad Request ' + e);
     }
-    response.status(200).send(ret);
+    if (ret == null) {
+      return response.status(204).send('No Content');
+    }
+    return response.status(200).send(ret);
   }
 
   @Get('isfriend')
@@ -259,5 +301,13 @@ export class UserController {
     }
     response.status(200).send(ret);
     return;
+  }
+
+  @Get('/channels')
+  async getChannels(@GetUser('sub') id: string, @Res() response) {
+    const ret = await this.userService.getChannels(id);
+    if (ret == null) {
+      return response.status(204).send('No Channels');
+    }
   }
 }

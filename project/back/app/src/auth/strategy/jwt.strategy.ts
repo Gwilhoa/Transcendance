@@ -40,7 +40,8 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     if (user == null) return null;
     if (
       user.status == UserStatus.IN_CONNECTION ||
-      user.status == UserStatus.CONNECTED
+      user.status == UserStatus.CONNECTED ||
+      user.status == UserStatus.OFFLINE
     )
       return payload;
     return null;

@@ -7,7 +7,7 @@ Possedant :
 - Un jeux de pong epoustouflant
 - Et une authentifcation inviolable*
 
-*Ceci est une information ne reflete pas forcement la realite
+*Cette est une information ne reflete pas forcement la realite
 
 ### Lien utile pour le projet :
 

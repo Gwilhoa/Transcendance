@@ -1,0 +1,36 @@
+:root {
+    --colorside: #b8b7b7;
+}
+
+.close-button {
+    position: absolute;
+    right: 7px;
+    background-color: rgb(189, 39, 39);
+    color: var(--light-color);
+    border: none;
+    padding: 6px;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+
+.popup {
+    position: fixed;
+    top: var(--header-size);
+    bottom: var(--footer-size);
+    width: 400px;
+    height: calc(100vh - (var(--header-size) + var(--footer-size)));
+    background-color: rgba(255, 193, 211, 0.669);
+    border-left: 1px solid var(--colorside);
+    border-right: 1px solid var (--colorside);
+}
+
+.popup_up {
+    border-bottom: 1px solid var(--colorside);
+    margin-top: 10px;
+    height: 30px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+}

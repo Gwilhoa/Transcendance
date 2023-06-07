@@ -7,6 +7,7 @@ import { AuthModule } from '../auth/auth.module';
 import { AuthService } from '../auth/auth.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { EventsGateway } from '../events/events.gateway';
 
 @Module({
   providers: [UserService, AuthService, JwtService, ConfigService],

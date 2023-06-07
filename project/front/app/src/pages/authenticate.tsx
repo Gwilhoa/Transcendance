@@ -1,49 +1,38 @@
-import React, { useState, useEffect } from "react";
-import { useCookies, Cookies } from "react-cookie";
+import React from "react";
+import Cookies from "universal-cookie";
+const cookies = new Cookies();
 import axios from "axios";
-import TwoFa from "../components/AuthenticateComponentsTwoFa"
-import NotTwoFa from "../components/AuthenticateComponentsNotTwoFa"
-import Reconnect from "../components/Reconnect"
-import { error } from "console";
-import { Link } from "react-router-dom";
-
-
-export var bigToken:string;
+import { setErrorLocalStorage } from "../components/IfError"
+import { useNavigate } from "react-router-dom";
 
 export function TokenPage() {
-	const [error, setError] = useState("");
-	const [twoFa, setTwoFa] = useState(false);
 	const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get("access_token");
+	const token = urlParams.get("access_token");
+	cookies.set('tenMinToken', token, { maxAge : 5 * 60 });
 
-	useEffect(() => {
-	axios.get("http://localhost:3000/auth/2fa/is2FA", {
-		headers: {
-			Authorization: `Bearer ${token}`,
-		},
-	})
-		.then((response) => {
-			setTwoFa(response.data);
-			console.log(response.data);
+	const navigate = useNavigate(); 
+
+		axios.get(process.env.REACT_APP_IP + ":3000/auth/2fa/is2FA", {
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
 		})
-		.catch((error) => {
-			setError("Error " + error.response.status);
-			console.error("Error status " + error.response.status);
-		});
-	}, []);
+			.then((response) => {
+				if (response.data == false)
+					navigate("/authenticate/NotTwoFa");
+				else
+					navigate('/authenticate/TwoFa');
+			})
+			.catch((error) => {
+				setErrorLocalStorage("Error " + error.response.status);
+				console.error(error);
+				navigate('/Error');
+			});
 
 	return (
-		<div>
-			{ error ? ( 
-				<Reconnect message={error} />
-			) : (
-				<>
-					{twoFa ? <TwoFa/> : <NotTwoFa/>}
-				</>
-			)}
-		</div>
+		<>
+		</>
 	);
 }
-
 
 export default TokenPage;

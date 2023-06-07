@@ -1,6 +1,15 @@
+:root {
+  --header-size: 90px;
+  --footer-size: 60px;
+  --main-width:100%;
+  --light-color:white;
+}
+
 .App {
   text-align: center;
 }
+
+
 
 .App-logo {
   height: 40vmin;
@@ -21,7 +30,7 @@
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
-  color: white;
+  color: var(--light-color);
 }
 
 .api42-link {
@@ -35,4 +44,9 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.Error-msg {
+  color: red;
+  font-size: 1rem;
 }

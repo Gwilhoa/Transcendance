@@ -91,13 +91,21 @@ database:
 # ~~~~~~~~~~~~~~ BACKEND ~~~~~~~~~~~~~~
 
 back: database
-	docker-compose up -d back
+	docker-compose -f docker-compose.yml build back
+	docker-compose -f docker-compose.yml create back
+	docker-compose up back
+# ~~~~~~~~~~~~~~ FRONTEND ~~~~~~~~~~~~~~
 
 # ~~~~~~~~~~~~~~~~ STOP ~~~~~~~~~~~~~~~~
 
 stop clean:
 	printf "%-62b%b" "$(BOLD)$(PURPLE)Stoping$(END) containers"
 	docker-compose -f docker-compose.yml stop
+	printf "$(GREEN)[✓]$(END)\n\n"
+
+down :
+	printf "%-62b%b" "$(BOLD)$(PURPLE)Destroy$(END) containers"
+	docker-compose -f docker-compose.yml down
 	printf "$(GREEN)[✓]$(END)\n\n"
 
 # ~~~~~~~~~~~~ CLEANNING RULES ~~~~~~~~~~~~
@@ -157,5 +165,5 @@ help :
 	echo "	show		same as the debug argument"
 	echo "	help		printing help message"
 
-.PHONY: all clean fclean re header show database
+.PHONY: all clean fclean re header show database front
 .SILENT:

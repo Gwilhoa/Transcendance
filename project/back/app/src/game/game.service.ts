@@ -14,9 +14,22 @@ export class GameService {
   ) {}
 
   async getGames(id) {
-    return await this.gameRepository.find({
-      where: [{ user1: id }, { user2: id }],
-    });
+    let tabgame = [];
+    const games1 = await this.gameRepository
+      .createQueryBuilder('game')
+      .leftJoinAndSelect('game.user1', 'user1')
+      .leftJoinAndSelect('game.user2', 'user2')
+      .where('user1.id = :id', { id: id })
+      .getMany();
+
+    const games2 = await this.gameRepository
+      .createQueryBuilder('game')
+      .leftJoinAndSelect('game.user1', 'user1')
+      .leftJoinAndSelect('game.user2', 'user2')
+      .where('user2.id = :id', { id: id })
+      .getMany();
+    tabgame = [...games1, ...games2];
+    return tabgame;
   }
 
   async createGame(body: CreateGameDTO) {
@@ -52,7 +65,12 @@ export class GameService {
   }
 
   async remakeGame(id: string) {
-    const game = await this.gameRepository.findOneBy({ id: id });
+    const game = await this.gameRepository
+      .createQueryBuilder('game')
+      .leftJoinAndSelect('game.user1', 'user1')
+      .leftJoinAndSelect('game.user2', 'user2')
+      .where('game.id = :id', { id: id })
+      .getOne();
     if (game == null) throw new Error('Game not found');
     game.finished = GameStatus.REMAKE;
     return await this.gameRepository.save(game);

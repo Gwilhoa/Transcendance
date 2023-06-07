@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AuthService } from '../auth/auth.service';
 import { Repository } from 'typeorm';
@@ -8,9 +8,16 @@ import { RequestFriend } from './requestfriend.entity';
 import { ChannelType } from 'src/utils/channel.enum';
 import { JwtService } from '@nestjs/jwt';
 import { UserStatus } from '../utils/user.enum';
-
+import { WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { Server } from 'socket.io';
+@WebSocketGateway({
+  cors: {
+    origin: '*',
+  },
+})
 @Injectable()
 export class UserService {
+  @WebSocketServer() server: Server;
   constructor(
     private jwt: JwtService,
     @InjectRepository(User) private userRepository: Repository<User>,
@@ -59,10 +66,10 @@ export class UserService {
     if (retIntra == null) {
       return null;
     }
-    await this.test();
     const retUser = await this.authService.getUserIntra(retIntra.access_token);
-    if ((await this.userRepository.findOneBy({ id: retUser.id })) != null) {
-      return await this.userRepository.findOneBy({ id: retUser.id });
+    const verif_user = await this.userRepository.findOneBy({ id: retUser.id });
+    if (verif_user != null) {
+      return await this.changeStatus(verif_user.id, UserStatus.IN_CONNECTION);
     }
     let login = retUser.login;
     let nbr = 0;
@@ -141,13 +148,12 @@ export class UserService {
       return null;
     }
 
-    console.log(user.friends);
     return user.friends;
   }
 
   public async test() {
     if ((await this.userRepository.findOneBy({ id: '1' })) != null) {
-      return null;
+      return await this.userRepository.findOneBy({ id: '1' });
     }
     const user = new User();
     user.id = '1';
@@ -260,19 +266,36 @@ export class UserService {
     if (user == null) {
       return null;
     }
+    const users = await this.userRepository.find();
+    users.forEach((user) => {
+      if (user.username == name) {
+        throw new Error('Username already taken');
+      }
+    });
+    if (name.length > 10)
+      throw new Error('Username must be less or equals than 10 characters');
     user.username = name;
     await this.userRepository.save(user);
+    const send = {
+      id: user.id,
+      type: 'name',
+    };
+    this.server.emit('updateprofil', send);
     return user;
   }
 
   public async setAvatar(id, buffer, extname) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const fs = require('fs');
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const path = require('path');
     const lastimage = await this.getPathImage(id);
     if (lastimage != null) {
-      fs.unlink(lastimage);
+      fs.unlink(lastimage, (error) => {
+        if (error) {
+          console.error('Error deleting last image:', error);
+        } else {
+          console.log('Last image deleted successfully');
+        }
+      });
     }
     const imagePath = path.join(
       __dirname,
@@ -283,13 +306,17 @@ export class UserService {
       `${id}${extname}`,
     );
     try {
-      await fs.access(path.dirname(imagePath));
+      await fs.promises.access(path.dirname(imagePath));
     } catch (error) {
       fs.mkdirSync(path.dirname(imagePath), { recursive: true });
     }
     try {
       fs.writeFileSync(imagePath, buffer);
-      console.log(id + ' image updated');
+      const send = {
+        id: id,
+        type: 'name',
+      };
+      this.server.emit('updateprofil', send);
       return imagePath;
     } catch (error) {
       return null;
@@ -317,7 +344,11 @@ export class UserService {
   }
 
   public async set2FASecret(secret: string, id: string) {
-    const user = await this.userRepository.findOneBy({ id: id });
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .select('user.secret2FA')
+      .where('user.id = :id', { id })
+      .getOne();
     if (user == null) {
       return null;
     }
@@ -326,7 +357,11 @@ export class UserService {
   }
 
   public async enabled2FA(id: string) {
-    const user = await this.userRepository.findOneBy({ id: id });
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .select('user.secret2FA')
+      .where('user.id = :id', { id })
+      .getOne();
     if (user == null) {
       return false;
     }
@@ -362,9 +397,17 @@ export class UserService {
     myuser_id: string,
     user_id: string,
   ): Promise<boolean> {
-    const myuser = await this.getUserById(myuser_id);
-    const user = await this.getUserById(user_id);
-    if (user == null && myuser == null) {
+    const myuser = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.blockedUsers', 'blockedUsers')
+      .where('user.id = :id', { id: myuser_id })
+      .getOne();
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.blockedUsers', 'blockedUsers')
+      .where('user.id = :id', { id: user_id })
+      .getOne();
+    if (user == null || myuser == null) {
       return false;
     }
     myuser.blockedUsers.forEach((element) => {
@@ -388,6 +431,16 @@ export class UserService {
     return user.games;
   }
 
+  public async getUserBySimilarNames(names: string) {
+    const users = await this.userRepository
+      .createQueryBuilder('user')
+      .where('user.username LIKE :name', { name: `%${names}%` })
+      .getMany();
+    if (users == null) {
+      return null;
+    }
+    return users;
+  }
   public async changeStatus(id: string, status: number) {
     const user = await this.userRepository.findOneBy({ id: id });
     if (user == null) {
@@ -406,7 +459,11 @@ export class UserService {
   }
 
   public async check2FAenabled(id: string) {
-    const user = await this.userRepository.findOneBy({ id: id });
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .select('user.enabled2FA')
+      .where('user.id = :id', { id })
+      .getOne();
     if (user == null) {
       throw new Error('User not found');
     }
@@ -415,7 +472,7 @@ export class UserService {
 
   async signJwtToken(
     userId: string,
-    email : string,
+    email: string,
     isauth: boolean,
   ): Promise<{ access_token: string }> {
     let expiresTime = '5m';
@@ -433,7 +490,6 @@ export class UserService {
       enabled2FA: check2FA,
     };
     // const payload = { sub: parseInt(userId), isauth: isauth ,enabled2FA: 1};
-    console.log(process.env.JWT_SECRET);
 
     return {
       access_token: await this.jwt.signAsync(payload, {
@@ -462,7 +518,13 @@ export class UserService {
     return await this.userRepository.save(user);
   }
 
-  private async removeFriend(user: User, blocked: User) {
+  async removeFriends(id: string, friend_id: string) {
+    return await this.removeFriend(
+      await this.getUserById(id),
+      await this.getUserById(friend_id),
+    );
+  }
+  async removeFriend(user: User, blocked: User) {
     user.friends = user.friends.filter((element) => element.id != blocked.id);
     blocked.friends = blocked.friends.filter(
       (element) => element.id != user.id,
@@ -470,5 +532,14 @@ export class UserService {
     await this.userRepository.save(user);
     await this.userRepository.save(blocked);
     return true;
+  }
+
+  async getSecret2fa(id: string) {
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .select('user.secret2FA')
+      .where('user.id = :id', { id })
+      .getOne();
+    return user.secret2FA;
   }
 }

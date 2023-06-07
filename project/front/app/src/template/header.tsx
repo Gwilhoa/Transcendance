@@ -1,44 +1,74 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import './template.css'
-import { useState } from "react";
-import PopupHisto from "../popup/popupHisto"
-import CV from "../profil/CV";
-import { MyComponentProps } from "../App";
-import { getName } from "../API";
+import React, { useEffect, useState } from "react";
+import axios from "../components/utils/API";
+import { IsInAChat, JoinChat, LeaveChat } from "../components/popup/chatManager";
+import { setErrorLocalStorage } from "../components/IfError";
+import Cookies from 'universal-cookie';
+import { useDispatch } from "react-redux";
+import { openModal } from "../redux/modal/modalSlice";
+const cookies = new Cookies();
 
-const Head = ({ openModal, setContent }: MyComponentProps) => {
+const Head = () => {
+	const [id, setId] = useState<string | null>(null);
+	const navigate = useNavigate();
 
-  const [showPopupHisto, setShowPopupHisto] = useState(false);  
-  const handlePopupCloseHisto = () => {
-    setShowPopupHisto(false);
-  };
 
-  const profilStart = () => {
-    setContent(<CV name={getName()} isFriend={false} isMe={true} photoUrl={"https://www.treehugger.com/thmb/9fuOGVoJ23ZwziKRNtAEMHw8opU=/750x0/filters:no_upscale():max_bytes(150000):strip_icc():format(webp)/piglet-grass-dandelions-01-b21d7ef8f881496f8346dbe01859537e.jpg"}/>);
-    openModal(true);
+	useEffect(() => {
+		if (localStorage.getItem('id') === null) {
+			axios.get(process.env.REACT_APP_IP + ":3000/user/id", {
+				headers: {
+					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+				},
+			})
+				.then((response) => {
+					setId(response.data.id);
+					localStorage.setItem('id', response.data.id);
+				})
+				.catch((error) => {
+					setErrorLocalStorage("Error " + error.response.status);
+					console.error(error);
+					navigate('/Error');
+				});
+		}
+		else {
+			setId(localStorage.getItem('id'));	
+		}
+	}, [navigate]);
+
+  const buttonChat = () => {
+    if (IsInAChat())
+      return LeaveChat();
+    else
+      return JoinChat();
   }
+
+	const dispatch = useDispatch();
+
+	const handleOpenModal = (id: string | null) => {
+		dispatch(openModal(id));
+	};
 
     return (
         <div className="navbar">
           <div className="title">
-            <h3>Transcendence</h3>
+            <Link to="/home" className="navbar__link">
+              <h2>
+                Transcendence
+              </h2>
+            </Link>
           </div>
           <div className="navbar__links">
-            <Link to="/accueil" className="navbar__link">
-              Accueil
-            </Link>
-
-            <Link to={"chat"} className="navbar__link">
+            <Link to={buttonChat()} className="navbar__link">
               Chat
             </Link>
             <Link to="/game" className="navbar__link">
               Jeu
             </Link>
-            <button onClick={() => setShowPopupHisto(true)} className="navbar__link">
-              <h3>Historique</h3>
-            </button>
-            {showPopupHisto && <PopupHisto onClose={handlePopupCloseHisto} />}
-            <button onClick={profilStart} className="navbar__link"> 
+            <Link to='/history' className="navbar__link">
+              History
+            </Link>
+            <button onClick={() => handleOpenModal(id)} className="navbar__link"> 
               <h3>
                 Profil
               </h3>

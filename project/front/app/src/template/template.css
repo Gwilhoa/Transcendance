@@ -1,15 +1,15 @@
 .navbar {
-    position:fixed;
-    width: 100%;
-    height: var(--header-size);
-    top:0px;
-    background-color: #333;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 20px;
-  }
-  
+  position:fixed;
+  width: 100%;
+  height: var(--header-size);
+  top:0px;
+  background-color: #333;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+}
+
   .title h3 {
     color: #fff;
   }
@@ -22,28 +22,16 @@
     cursor: pointer;
     margin-right: 40px;
   }
-
-  .footer {
-    position: fixed;
-    width: 100%;
-    background-color: #333;
-    height: var(--footer-size);
-    bottom: 0px;
-    text-align: center;
-  }
   
   .main-template {
+    position: absolute; 
+    /* top: var(--header-size); */
     height: calc(100vh - (var(--footer-size) + var(--header-size)));
     top:var(--header-size);
-    position: absolute; 
-    left: 401px;
-    width: calc(100% - 802px);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    width: var(--main-width);
   }
   
   .page {
     overflow: hidden;
   }
+  
