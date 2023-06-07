@@ -73,7 +73,7 @@ export default function Profil() {
 					dispatch(closeModal());
 				}
 			})
-	}, [navigate]);
+	}, [navigate, dispatch]);
 
 	socket.on('friend_code', (data: any) => {
 		if (data.code === 2 && !isFriend) {
@@ -99,8 +99,8 @@ export default function Profil() {
 	})
 
 	socket.on('friend_request', (data: any) => {
-		console.log("receive friend code " + data.code);
-		if (data.code === 2 && !isFriend) {
+		console.log("receive friend code " + data.code + " " + data.id + " " + id);
+		if (data.code === 2 && data.id === id && !isFriend) {
 			refresh(id);
 			return;
 		}
@@ -130,7 +130,7 @@ export default function Profil() {
 				navigate('/Error');
 				dispatch(closeModal());
 			});
-	}, [navigate, id, refresh]);
+	}, [navigate, id, refresh, dispatch]);
 
 	const changeName = (str: string) => {
 			axios.post(process.env.REACT_APP_IP + ":3000/user/name",
