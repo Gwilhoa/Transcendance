@@ -8,7 +8,7 @@ import axios, { socket } from '../utils/API';
 import Cookies from 'universal-cookie';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../redux/store';
-import { closeModal, openModal } from '../../redux/modal/modalSlice';
+import { closeModal } from '../../redux/modal/modalSlice';
 const cookies = new Cookies();
 
 
@@ -39,6 +39,7 @@ export default function Profil() {
 				setErrorLocalStorage("Error " + error.response.status);
 				console.error(error);
 				navigate('/Error');
+				dispatch(closeModal());
 			});
 
 		axios.get(process.env.REACT_APP_IP + ":3000/user/id/" + id, {
@@ -53,6 +54,7 @@ export default function Profil() {
 				setErrorLocalStorage("Error " + error.response.status);
 				console.error(error);
 				navigate('/Error');
+				dispatch(closeModal());
 			});
 		axios.post(process.env.REACT_APP_IP + ":3000/user/isfriend", 
 		{ friend_id: id },
@@ -68,6 +70,7 @@ export default function Profil() {
 				if (error.response.status === 401 || error.response.status === 500) {
 					setErrorLocalStorage("Error " + error.response.status);
 					navigate('/Error');
+					dispatch(closeModal());
 				}
 			})
 	}, [navigate]);
@@ -98,22 +101,7 @@ export default function Profil() {
 	socket.on('friend_request', (data: any) => {
 		console.log("receive friend code " + data.code);
 		if (data.code === 2 && !isFriend) {
-			axios.post(process.env.REACT_APP_IP + ':3000/channel/mp/create',
-				{
-					user_id: '' + id,
-				},
-				{
-					headers: {
-						Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
-					},
-				})
-				.then((response) => {
-					console.log(response);
-					refresh(id);
-				})
-				.catch((error) => {
-					console.error(error);
-				});
+			refresh(id);
 			return;
 		}
 		return;
@@ -140,6 +128,7 @@ export default function Profil() {
 				setErrorLocalStorage("Error " + error.response.status);
 				console.error(error);
 				navigate('/Error');
+				dispatch(closeModal());
 			});
 	}, [navigate, id, refresh]);
 
@@ -210,6 +199,11 @@ export default function Profil() {
 		socket.emit('friend_request', { friend_id: id });
 	};
 
+	const handleUnFriend = (id: string | null) => {
+		console.log("add friend " + id);
+		// socket.emit('friend_request', { friend_id: id });
+	};
+
 	initialElement.push(
         <div key={"image"}>
             <img className='circle-image' src={image} alt="selected" />
@@ -277,7 +271,7 @@ export default function Profil() {
 							</div>
 						) : (
 							<div className='other-user-profil'>
-								<button>
+								<button onClick={() => handleAddFriend(id)}>
 									Unfriend
 								</button>
 								<br/>
