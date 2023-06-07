@@ -3,10 +3,10 @@ import { Link } from "react-router-dom";
 
 function Reconnect() {
 	return (
-		<div>
-			<p>{localStorage.getItem('Error')}</p>
+		<div className="Error-page">
+			<p className="Error-description">{localStorage.getItem('Error')}</p>
 			<Link to= {process.env.REACT_APP_IP + ":8080"}>
-				<button>
+				<button className="login-button">
 					Try to reconnect
 				</button>
 			</Link>

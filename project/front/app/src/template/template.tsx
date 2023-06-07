@@ -1,6 +1,5 @@
 import React from "react";
 import Head from "./header";
-import Foot from "./footer";
 import  '../App.css'
 import Notification from "../components/notification/notification";
 import { Outlet } from "react-router-dom";
@@ -16,9 +15,6 @@ const Template = () => {
         <header>
             <Head/>
         </header>
-        <footer>
-            <Foot/>
-        </footer>
       </div>
     );
   }

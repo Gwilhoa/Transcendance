@@ -4,6 +4,7 @@ import { useSpring, animated } from 'react-spring';
 import { socket } from '../components/utils/API';
 import Cookies from 'universal-cookie';
 import { useNavigate } from 'react-router-dom';
+import ErrorToken from '../components/IfError';
 const cookies = new Cookies();
 
 let isCall = true;
@@ -110,6 +111,7 @@ const Game = () => {
 
   return (
     <>
+    <ErrorToken />
       {onGame == 0 && 
         <>
           <h2 style={{color: 'white'}}> Searching players... </h2>
