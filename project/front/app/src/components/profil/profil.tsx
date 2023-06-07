@@ -8,7 +8,7 @@ import axios, { socket } from '../utils/API';
 import Cookies from 'universal-cookie';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../redux/store';
-import { closeModal } from '../../redux/modal/modalSlice';
+import { closeModal, openModal } from '../../redux/modal/modalSlice';
 const cookies = new Cookies();
 
 
@@ -54,7 +54,9 @@ export default function Profil() {
 				console.error(error);
 				navigate('/Error');
 			});
-		axios.get(process.env.REACT_APP_IP + ":3000/user/isfriend", {
+		axios.post(process.env.REACT_APP_IP + ":3000/user/isfriend", 
+		{ friend_id: id },
+		{
 			headers: { Authorization:  `Bearer ${cookies.get('jwtAuthorization')}`, },
 		})
 			.then((Response) => {
@@ -89,18 +91,6 @@ export default function Profil() {
 				.catch((error) => {
 					console.error(error);
 				});
-
-			// setRetu( prevRetu => [...prevRetu,
-			// 	<div key="notFriend" className='other-user-profil'>
-			// 		<button onClick={() => handleAddFriend(id)}>
-			// 			Add friend
-			// 		</button>
-			// 		<br/>
-			// 		<button>
-			// 			Challenge
-			// 		</button>
-			// 	</div>
-			// ]);
 			return;
 		}
 		return;
@@ -241,41 +231,40 @@ export default function Profil() {
 		)
 	}
 
-    if (!isFriend && !isMe) {
-        initialElement.push(
-			<div key="notFriend" className='other-user-profil'>
-				<button onClick={() => handleAddFriend(id)}>
-					Add friend
-				</button>
-				<br/>
-				<button>
-					Challenge
-				</button>
-			</div>
-		)
-    }
-
-    if (isFriend && !isMe) {
-        initialElement.push(
-			<div key="Friend" className='other-user-profil'>
-				<button>
-					Unfriend
-				</button>
-				<br/>
-				<button>
-					Challenge
-				</button>
-			</div>
-		)
-    }
-
     return (
         <div className="profil-modal">
 			<div className='profil-title'>
 				<button className="close-profil" onClick={() => dispatch(closeModal())}> X </button>
 				<h2> {name} </h2>
 			</div>
-            <div> {initialElement} </div>
+            <div> 
+				{initialElement}
+				{ isMe === false ? (
+					<>
+						{ isFriend  === false ? (
+							<div className='other-user-profil'>
+								<button onClick={() => handleAddFriend(id)}>
+									Add friend
+								</button>
+								<br/>
+								<button>
+									Challenge
+								</button>
+							</div>
+						) : (
+							<div className='other-user-profil'>
+								<button>
+									Unfriend
+								</button>
+								<br/>
+								<button>
+									Challenge
+								</button>
+							</div>
+						)}
+					</>
+				) : (<></>)}
+			</div>
             <br/>
         </div>
     )

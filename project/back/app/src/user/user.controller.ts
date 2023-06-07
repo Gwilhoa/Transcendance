@@ -265,7 +265,7 @@ export class UserController {
     return response.status(200).send(ret);
   }
 
-  @Get('isfriend')
+  @Post('isfriend')
   async isFriend(
     @GetUser('sub') id: string,
     @Body('friend_id') friend_id: string,
