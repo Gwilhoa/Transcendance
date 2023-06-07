@@ -325,6 +325,10 @@ export class UserService {
         throw new Error('Username already taken');
       }
     });
+
+    const regex = /^[a-zA-Z0-9-_]+$/;
+    if (!regex.test(name))
+      throw new Error('Username must contain only alphanumeric characters');
     if (name.length > 10)
       throw new Error('Username must be less or equals than 10 characters');
     user.username = name;

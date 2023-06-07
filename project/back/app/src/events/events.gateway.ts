@@ -149,7 +149,7 @@ export class EventsGateway
           code: FriendCode.NEW_FRIEND,
           id: friend_id,
         };
-        this.server.sockets[this.clients[friend_id]].emit(
+        this.clients[friend_id].emit(
           'friend_request',
           send,
         );
