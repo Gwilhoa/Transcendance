@@ -265,7 +265,7 @@ export class UserController {
     return response.status(200).send(ret);
   }
 
-  @Get('isfriend')
+  @Post('isfriend')
   async isFriend(
     @GetUser('sub') id: string,
     @Body('friend_id') friend_id: string,
@@ -278,7 +278,7 @@ export class UserController {
       response.status(400).send('Bad Request ' + e);
       return;
     }
-    response.status(200).send(ret);
+    response.status(200).json(ret);
   }
 
   @Get('/mpchannel')

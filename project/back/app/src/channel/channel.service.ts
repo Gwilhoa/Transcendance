@@ -45,7 +45,16 @@ export class ChannelService {
   }
 
   public async createMPChannel(user_id, user_id1) {
+    const channels = await this.channelRepository.find();
+    console.log(channels);
+    for (const chan of channels) {
+      if (chan.type == ChannelType.MP_CHANNEL) {
+        if (chan.name == user_id + ' - ' + user_id1)
+          throw new Error('Channel already exists');
+      }
+    }
     const chan = new Channel();
+    console.log('create mp channel ' + user_id + ' ' + user_id1);
     chan.name = user_id + ' - ' + user_id1;
     chan.admins = [];
     chan.bannedUsers = [];
@@ -55,8 +64,7 @@ export class ChannelService {
     const user1 = await this.userService.getUserById(user_id1);
     chan.users.push(user);
     chan.users.push(user1);
-    await this.channelRepository.save(chan);
-    return chan;
+    return await this.channelRepository.save(chan);
   }
 
   public async getChannelById(id) {
@@ -210,7 +218,6 @@ export class ChannelService {
     const user = await this.userService.getUserById(user_id);
     if (user == null) throw new Error('User not found');
     const channels = await this.channelRepository.find();
-    console.log(channels);
     let channel;
     for (channel of channels) {
       if (!channel.users.includes(user))
@@ -304,5 +311,34 @@ export class ChannelService {
       throw new Error('User is not banned of this channel');
     channel.bannedUsers.filter((u) => u.id != target.id);
     return await this.channelRepository.save(channel);
+  }
+
+  async getmpchannel(user_id: any, friend_id: any) {
+    const friend = await this.userService.getUserById(friend_id);
+    const c = await this.userService.getMpChannels(user_id);
+    const channelmps = [];
+    if (c == null) return null;
+    for (const channel of c) {
+      channelmps.push(
+        await this.channelRepository
+          .createQueryBuilder('channel')
+          .leftJoinAndSelect('channel.users', 'users')
+          .where('channel.id = :id', { id: channel.id })
+          .getOne(),
+      );
+    }
+    let ret = null;
+    for (const channel of channelmps) {
+      for (const user of channel.users) {
+        if (user.id == friend.id) ret = channel;
+      }
+    }
+    return ret;
+  }
+
+  async deletechannel(id) {
+    const channel = await this.channelRepository.findOne(id);
+    if (channel == null) throw new Error('Channel not found');
+    return await this.channelRepository.delete(id);
   }
 }

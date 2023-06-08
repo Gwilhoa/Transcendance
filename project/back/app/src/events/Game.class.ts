@@ -67,7 +67,6 @@ export class Game {
     this._io = io;
     this._angle = 180;
     this._gameService = gameService;
-    console.log('game created' + this._id);
   }
 
   public getId() {
@@ -140,7 +139,6 @@ export class Game {
     };
   }
   public async start() {
-    console.log('game launch ' + this._id);
     await sleep(3000);
     while (
       Math.cos(this._angle) < 0.5 &&
@@ -216,7 +214,6 @@ export class Game {
           return;
         }
       }
-      console.log(this._angle);
     }
 
     if (this._futurbally >= maxposition) {
@@ -262,7 +259,6 @@ export class Game {
   };
 
   private executeFinishCallbacks() {
-    console.log('Callbacks:', this._finishCallback);
     this._finishCallback.forEach((callback) => callback());
   }
 
@@ -271,7 +267,6 @@ export class Game {
   }
 
   public remake() {
-    console.log('game finish ' + this._id);
     this._io.to(this._id).emit('finish_game', {
       score1: 0,
       score2: 0,

@@ -6,6 +6,7 @@ import Game from './pages/game';
 import EndGame from "./pages/endgame";
 import TryToReconnect from './pages/BackError';
 import Home from './pages/home';
+import Chat from './pages/chat';
 import History from './pages/history';
 import Template from "./template/template";
 import PopupChat from "./components/popup/popupChat";
@@ -30,10 +31,11 @@ const AppInsideBrowser = () => {
 				<Route path="/authenticate/TwoFa" Component={TwoFa} />
 				<Route path="/Error" Component={TryToReconnect} />
 				<Route element={<Template/>}>
-					<Route path="/home/*" element={<Home></Home>} />
-					<Route path="/game/*" element={<Game></Game>} />
-					<Route path="/CreateTwoFa/*" element={<CreateTwoFaPage></CreateTwoFaPage>}/>
-					<Route path="/history/*" element={<History></History>} />
+					<Route path="/home" element={<Home></Home>} />
+					<Route path="/game" element={<Game></Game>} />
+					<Route path="/chat/*" element={<Chat></Chat>} />
+					<Route path="/CreateTwoFa" element={<CreateTwoFaPage></CreateTwoFaPage>}/>
+					<Route path="/history" element={<History></History>} />
 					<Route path="/endgame/*" element={<EndGame result="dj"></EndGame>} />
 				</Route>
 			</Routes>
