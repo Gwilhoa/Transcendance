@@ -74,4 +74,10 @@ export class User {
 
   @OneToMany((type) => Channel, (channel) => channel.creator)
   createdChannels: Channel[];
+
+  @Column({ nullable: false, default: 0 })
+  victories: number;
+
+  @Column({ nullable: false, default: 0 })
+  defeats: number;
 }

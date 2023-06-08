@@ -496,22 +496,22 @@ export class EventsGateway
       this.logger.debug(game);
       this.sendconnected();
       if (game.getScore1() > game.getScore2()) {
-        this.userService.addPoints(
+        this.userService.endgame(
           getIdFromSocket(game.getUser1(), this.clients),
-          500,
+          true,
         );
-        this.userService.addPoints(
+        this.userService.endgame(
           getIdFromSocket(game.getUser2(), this.clients),
-          200,
+          false,
         );
       } else if (game.getScore1() < game.getScore2()) {
-        this.userService.addPoints(
-          getIdFromSocket(game.getUser2(), this.clients),
-          500,
-        );
-        this.userService.addPoints(
+        this.userService.endgame(
           getIdFromSocket(game.getUser1(), this.clients),
-          200,
+          false,
+        );
+        this.userService.endgame(
+          getIdFromSocket(game.getUser2(), this.clients),
+          true,
         );
       }
       this.logger.log(game.getId() + ' finished');

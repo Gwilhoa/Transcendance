@@ -600,12 +600,17 @@ export class UserService {
     return user.secret2FA;
   }
 
-  async addPoints(user_id, points) {
+  async endgame(user_id, iswin) {
     const user = await this.getUserById(user_id);
     if (user == null) {
       throw new Error('User not found');
     }
-    user.experience += points;
+    if (iswin) {
+      user.victories += 1;
+      user.experience += 500;
+    } else {
+      user.experience += 100;
+    }
     await this.userRepository.save(user);
   }
 }
