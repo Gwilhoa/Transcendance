@@ -498,6 +498,25 @@ export class EventsGateway
     game.onFinish((finishedGame) => {
       this.logger.debug(game);
       this.sendconnected();
+      if (game.getScore1() > game.getScore2()) {
+        this.userService.addPoints(
+          getIdFromSocket(game.getUser1(), this.clients),
+          500,
+        );
+        this.userService.addPoints(
+          getIdFromSocket(game.getUser2(), this.clients),
+          200,
+        );
+      } else if (game.getScore1() < game.getScore2()) {
+        this.userService.addPoints(
+          getIdFromSocket(game.getUser2(), this.clients),
+          500,
+        );
+        this.userService.addPoints(
+          getIdFromSocket(game.getUser1(), this.clients),
+          200,
+        );
+      }
       this.logger.log(game.getId() + ' finished');
       return;
     });

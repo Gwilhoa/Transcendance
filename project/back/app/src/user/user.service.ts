@@ -542,4 +542,13 @@ export class UserService {
       .getOne();
     return user.secret2FA;
   }
+
+  async addPoints(user_id, points) {
+    const user = await this.getUserById(user_id);
+    if (user == null) {
+      throw new Error('User not found');
+    }
+    user.experience += points;
+    await this.userRepository.save(user);
+  }
 }
