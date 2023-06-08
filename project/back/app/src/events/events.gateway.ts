@@ -549,14 +549,19 @@ export class EventsGateway
       if (!rematch) {
         this.ingame.delete(getIdFromSocket(game.getUser1(), this.clients));
         this.ingame.delete(getIdFromSocket(game.getUser2(), this.clients));
+        game.getUser1().send('rematch', { rematch: false });
+        game.getUser2().send('rematch', { rematch: false });
       } else {
         if (this.rematch.get(game_id) == null) {
           this.rematch.set(game_id, true);
+          const send = {
+            rematch: true,
+          };
           if (game.getUser1().id == client.id) {
-            game.getUser2().emit('rematch', true);
+            game.getUser2().emit('rematch', send);
           }
           if (game.getUser2().id == client.id) {
-            game.getUser1().emit('rematch', true);
+            game.getUser1().emit('rematch', send);
           }
         } else {
           if (
