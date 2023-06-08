@@ -5,6 +5,8 @@ import { socket } from '../components/utils/API';
 import Cookies from 'universal-cookie';
 import { useNavigate } from 'react-router-dom';
 import ErrorToken from '../components/IfError';
+import { openModal } from '../redux/modal/modalSlice';
+import { useDispatch } from 'react-redux';
 const cookies = new Cookies();
 
 let isCall = true;
@@ -25,7 +27,7 @@ const Game = () => {
   
   let gameId = 0;
 
-  
+
   const handleKeyDown = (event: KeyboardEvent) => {
     switch (event.code) {
       case "KeyW":
@@ -102,7 +104,7 @@ const Game = () => {
           findGame(1);
         }
       });
-      
+
     return () => {
       socket.off('update_game');
       socket.emit('');
@@ -148,3 +150,4 @@ const Game = () => {
 
 
 export default Game;
+

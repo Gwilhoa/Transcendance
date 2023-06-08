@@ -45,7 +45,16 @@ export class ChannelService {
   }
 
   public async createMPChannel(user_id, user_id1) {
+    const channels = await this.channelRepository.find();
+	console.log(channels);
+    for (const chan of channels) {
+      if (chan.type == ChannelType.MP_CHANNEL) {
+        if (chan.name == user_id + ' - ' + user_id1)
+          throw new Error('Channel already exists');
+      }
+    }
     const chan = new Channel();
+	console.log("create mp channel " + user_id + " " + user_id1);
     chan.name = user_id + ' - ' + user_id1;
     chan.admins = [];
     chan.bannedUsers = [];
@@ -55,8 +64,7 @@ export class ChannelService {
     const user1 = await this.userService.getUserById(user_id1);
     chan.users.push(user);
     chan.users.push(user1);
-    await this.channelRepository.save(chan);
-    return chan;
+    return await this.channelRepository.save(chan);
   }
 
   public async getChannelById(id) {
@@ -210,7 +218,6 @@ export class ChannelService {
     const user = await this.userService.getUserById(user_id);
     if (user == null) throw new Error('User not found');
     const channels = await this.channelRepository.find();
-    console.log(channels);
     let channel;
     for (channel of channels) {
       if (!channel.users.includes(user))

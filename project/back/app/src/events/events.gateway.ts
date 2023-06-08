@@ -18,7 +18,7 @@ import { CreateGameDTO } from 'src/dto/create-game.dto';
 import { UserStatus } from 'src/utils/user.enum';
 import {
   getIdFromSocket,
-  getKeys,
+  getKeys, getSocketFromId,
   send_connection_server,
   verifyToken,
   wrongtoken,
@@ -89,6 +89,7 @@ export class EventsGateway
   //on connection
   async handleConnection(client: Socket) {
     let id;
+    this.logger.debug('New connexion');
     await client.on('connection', async (data) => {
       try {
         id = this.authService.getIdFromToken(data.token);
@@ -102,6 +103,7 @@ export class EventsGateway
         wrongtoken(client);
         return;
       }
+      this.logger.debug(`Client connected: ${id} for ${client.id}`);
       this.clients.set(id, client);
       this.sendconnected();
       let channels = null;
@@ -115,7 +117,6 @@ export class EventsGateway
         wrongtoken(client);
         return;
       }
-      this.logger.debug(channels);
       for (const channel of channels) {
         client.join(channel.id);
       }
@@ -127,19 +128,9 @@ export class EventsGateway
   @SubscribeMessage('friend_request') //reception d'une demande d'ami / accepter une demande d'ami
   async handleFriendRequest(client: Socket, payload: any) {
     let send;
-    const token = payload.token;
     const friend_id = payload.friend_id;
-    let user_id = null;
-    try {
-      user_id = verifyToken(token, this.authService);
-    } catch (error) {
-      wrongtoken(client);
-      return;
-    }
-    if (user_id == null) {
-      client.emit('friend_code', FriendCode.UNAUTHORIZED);
-      return;
-    }
+    const user_id = getIdFromSocket(client, this.clients);
+    this.logger.log(`new friend request from ${user_id} to ${friend_id}`);
     const user = await this.userService.getUserById(user_id);
     const friend = await this.userService.getUserById(friend_id);
     let ret;
@@ -147,24 +138,23 @@ export class EventsGateway
       ret = {
         code: FriendCode.UNEXISTING_USER,
       };
-    } else if (this.userService.isfriend(user, friend)) {
+    } else if (await this.userService.isfriend(user_id, friend_id)) {
       ret = {
         code: FriendCode.ALREADY_FRIEND,
       };
-    } else if (this.userService.asfriendrequestby(user, friend)) {
+    } else if (await this.userService.asfriendrequestby(user_id, friend_id)) {
       await this.userService.removeFriendRequest(user_id, friend_id);
-      if (this.clients[friend_id] != null) {
+      this.logger.debug('friend id : ' + friend_id);
+      if (getSocketFromId(friend_id, this.clients) != null) {
+        this.logger.debug('socket friend id : ' + getSocketFromId(friend_id, this.clients) .id);
         send = {
           code: FriendCode.NEW_FRIEND,
-          id: user.id,
+          id: friend_id,
         };
-        this.server.sockets[this.clients[friend_id]].emit(
-          'friend_request',
-          send,
-        );
-        await this.userService.addFriend(user_id, friend_id);
-        await this.userService.addFriend(friend_id, user_id);
+        getSocketFromId(friend_id, this.clients).emit('friend_request', send);
       }
+      await this.userService.addFriend(user_id, friend_id);
+      await this.userService.addFriend(friend_id, user_id);
       ret = {
         code: FriendCode.NEW_FRIEND,
       };
@@ -172,18 +162,23 @@ export class EventsGateway
       ret = {
         code: FriendCode.SUCCESS,
       };
-      await this.userService.addFriendRequest(user_id, friend_id);
-      if (this.clients[friend_id] != null) {
+      const requestFriend = await this.userService.addFriendRequest(
+        user_id,
+        friend_id,
+      );
+      this.logger.debug('friend id : ' + friend_id);
+      console.log(this.clients);
+      if (getSocketFromId(friend_id, this.clients) != null) {
+        this.logger.debug('socket friend id : ' + getSocketFromId(friend_id, this.clients) .id);
         send = {
           code: FriendCode.FRIEND_REQUEST,
           id: user.id,
+          request: requestFriend.id,
         };
-        this.server.sockets[this.clients[friend_id]].emit(
-          'friend_request',
-          send,
-        );
+        getSocketFromId(friend_id, this.clients).emit('friend_request', send);
       }
     }
+    this.logger.debug(`friend request code: ${ret.code}`);
     client.emit('friend_code', ret);
   }
 
@@ -376,7 +371,7 @@ export class EventsGateway
       }
       i++;
     }
-    this.logger.debug('new in matchmaking ' + id);
+    this.logger.log(id + ' has joined matchmaking');
     this.matchmaking.push(client);
     const send = {
       code: 0,
@@ -386,10 +381,8 @@ export class EventsGateway
   }
 
   async check_matchmaking() {
-    this.logger.debug('checking matchmaking');
     let i = 0;
     while (i < this.matchmaking.length) {
-      this.logger.debug(this.matchmaking[i].id);
       const player = this.matchmaking[i];
       const authorized_player = [];
       let j = 0;
@@ -417,7 +410,6 @@ export class EventsGateway
           authorized_player[
             Math.floor(Math.random() * authorized_player.length)
           ];
-        this.logger.debug('found rival ' + rival.id);
         if (this.server.sockets.sockets.get(player.id) == null) {
           const tempmatchmaking = [];
           for (const p of this.matchmaking) {
@@ -517,7 +509,6 @@ export class EventsGateway
   async input_game(client: Socket, payload: any) {
     const game_id = payload.game_id;
     const type = payload.type;
-    this.logger.debug('game id = ' + game_id + ' ' + type);
     this.games[game_id].updateRacket(client, type);
     this.server
       .to(game_id)
@@ -544,7 +535,6 @@ export class EventsGateway
       }
     }
     this.matchmaking = tempmatchmaking;
-    this.logger.debug('leaving matchmaking ' + id);
     client.emit('matchmaking_code', send);
   }
 

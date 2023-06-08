@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { ButtonInputToggle } from '../utils/inputButton';
 import LogoutButton from './logout';
 import { setErrorLocalStorage } from "../IfError"
-import axios from '../utils/API';
+import axios, { socket } from '../utils/API';
 import Cookies from 'universal-cookie';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../redux/store';
@@ -13,7 +13,7 @@ const cookies = new Cookies();
 
 
 export default function Profil() {
-    const retu = [];
+	const initialElement = [];
 	const navigate = useNavigate();
 	const [isMe, setIsMe] =  useState<boolean>(false);
 	const [isFriend, setIsFriend] =  useState<boolean>(false);
@@ -24,6 +24,7 @@ export default function Profil() {
 	const id = useSelector((state: RootState) => state.modal.id);
 	const dispatch = useDispatch();
 
+	console.log(id);
 	const refresh = useCallback(( id: string | null ) => {
 		axios.get(process.env.REACT_APP_IP + ":3000/user/image/" + id, {
 			headers: {
@@ -38,6 +39,7 @@ export default function Profil() {
 				setErrorLocalStorage("Error " + error.response.status);
 				console.error(error);
 				navigate('/Error');
+				dispatch(closeModal());
 			});
 
 		axios.get(process.env.REACT_APP_IP + ":3000/user/id/" + id, {
@@ -52,8 +54,58 @@ export default function Profil() {
 				setErrorLocalStorage("Error " + error.response.status);
 				console.error(error);
 				navigate('/Error');
+				dispatch(closeModal());
 			});
-	}, [navigate]);
+		axios.post(process.env.REACT_APP_IP + ":3000/user/isfriend", 
+		{ friend_id: id },
+		{
+			headers: { Authorization:  `Bearer ${cookies.get('jwtAuthorization')}`, },
+		})
+			.then((Response) => {
+				console.log(Response);
+				setIsFriend(Response.data.isfriend);
+			})
+			.catch((error) => {
+				console.error(error);
+				if (error.response.status === 401 || error.response.status === 500) {
+					setErrorLocalStorage("Error " + error.response.status);
+					navigate('/Error');
+					dispatch(closeModal());
+				}
+			})
+	}, [navigate, dispatch]);
+
+	socket.on('friend_code', (data: any) => {
+		if (data.code === 2 && !isFriend) {
+			axios.post(process.env.REACT_APP_IP + ':3000/channel/mp/create',
+				{
+					user_id: '' + id,
+				},
+				{
+					headers: {
+						Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+					},
+				})
+				.then((response) => {
+					console.log(response);
+					refresh(id);
+				})
+				.catch((error) => {
+					console.error(error);
+				});
+			return;
+		}
+		return;
+	})
+
+	socket.on('friend_request', (data: any) => {
+		console.log("receive friend code " + data.code + " " + data.id + " " + id);
+		if (data.code === 2 && data.id === id && !isFriend) {
+			refresh(id);
+			return;
+		}
+		return;
+	})
 
 	useEffect(() => {
 		if (id === localStorage.getItem('id')) {
@@ -76,8 +128,9 @@ export default function Profil() {
 				setErrorLocalStorage("Error " + error.response.status);
 				console.error(error);
 				navigate('/Error');
+				dispatch(closeModal());
 			});
-	}, [navigate, id, refresh]);
+	}, [navigate, id, refresh, dispatch]);
 
 	const changeName = (str: string) => {
 			axios.post(process.env.REACT_APP_IP + ":3000/user/name",
@@ -141,7 +194,17 @@ export default function Profil() {
 		}
 	};
 
-	retu.push(
+	const handleAddFriend = (id: string | null) => {
+		console.log("add friend " + id);
+		socket.emit('friend_request', { friend_id: id });
+	};
+
+	const handleUnFriend = (id: string | null) => {
+		console.log("add friend " + id);
+		// socket.emit('friend_request', { friend_id: id });
+	};
+
+	initialElement.push(
         <div key={"image"}>
             <img className='circle-image' src={image} alt="selected" />
             <br/> <br/>
@@ -149,7 +212,7 @@ export default function Profil() {
     )
     
     if (isMe) {
-        retu.push(
+        initialElement.push(
 			<div className="browse-file" key={"changeImage"}>
 				<input type="file" onChange={handleImageChange} id="files"/>
 				<label htmlFor="files" className='profil-button'>Change image</label>
@@ -157,7 +220,7 @@ export default function Profil() {
 
         )
         
-        retu.push(
+        initialElement.push(
             <div key={"changeName"} className="ChangeNameDiv">
 					<ButtonInputToggle
 					onInputSubmit={changeName}
@@ -170,8 +233,8 @@ export default function Profil() {
             </div>
             )
             
-        retu.push(
-			<div className='change2FA'>
+        initialElement.push(
+			<div className='change2FA' key="2FA">
 				<label className="switch">
 					<input type='checkbox' name='2FA' checked={checked} onChange={clicked} />
 					<span className='slider'></span>
@@ -179,40 +242,12 @@ export default function Profil() {
 				<p>2FA</p>
 			</div>
             )
-		retu.push(
+		initialElement.push(
 			<div key={"logout"} className="logout">
 				<LogoutButton/>
 			</div>	
 		)
 	}
-
-    if (!isFriend && !isMe) {
-        retu.push(
-			<div key="notFriend" className='other-user-profil'>
-				<button>
-					Add friend
-				</button>
-				<br/>
-				<button>
-					Challenge
-				</button>
-			</div>
-		)
-    }
-
-    if (isFriend && !isMe) {
-        retu.push(
-			<div key="Friend" className='other-user-profil'>
-				<button>
-					Unfriend
-				</button>
-				<br/>
-				<button>
-					Challenge
-				</button>
-			</div>
-		)
-    }
 
     return (
         <div className="profil-modal">
@@ -220,8 +255,36 @@ export default function Profil() {
 				<button className="close-profil" onClick={() => dispatch(closeModal())}></button>
 				<h2> {name} </h2>
 			</div>
-            <div> {retu} </div>
+            <div> 
+				{initialElement}
+				{ isMe === false ? (
+					<>
+						{ isFriend  === false ? (
+							<div className='other-user-profil'>
+								<button onClick={() => handleAddFriend(id)}>
+									Add friend
+								</button>
+								<br/>
+								<button>
+									Challenge
+								</button>
+							</div>
+						) : (
+							<div className='other-user-profil'>
+								<button onClick={() => handleAddFriend(id)}>
+									Unfriend
+								</button>
+								<br/>
+								<button>
+									Challenge
+								</button>
+							</div>
+						)}
+					</>
+				) : (<></>)}
+			</div>
             <br/>
         </div>
     )
 }
+

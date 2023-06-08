@@ -19,7 +19,6 @@ export class GameController {
 
   @Get()
   async getGames(@GetUser('sub') id: string, @Res() response) {
-    console.log(await this.gameService.getGames(id));
     return response.status(200).send(await this.gameService.getGames(id));
   }
 

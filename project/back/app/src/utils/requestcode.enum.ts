@@ -4,7 +4,6 @@ export enum FriendCode {
   NEW_FRIEND = 2,
   ALREADY_FRIEND = 3,
   FRIEND_REQUEST = 4,
-  FRIEND_REQUEST_ACCEPTED = 5,
   UNAUTHORIZED = 401,
 }
 

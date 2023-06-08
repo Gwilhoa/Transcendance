@@ -93,6 +93,7 @@ const CreateTwoFaPage = () => {
 					setDataImage(response.data);
 				})
 				.catch((error) => {
+					console.error(error);
 					setErrorLocalStorage("Error " + error.response.status);
 					navigate('/Error');
 				});

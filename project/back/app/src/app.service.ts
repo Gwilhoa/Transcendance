@@ -27,7 +27,6 @@ export class AppService {
     user.username = botName;
     user.email = botName + '@student.42lyon.fr';
     await this.userRepository.save(user);
-    console.log('add bot: ' + botName);
     return user;
   }
 

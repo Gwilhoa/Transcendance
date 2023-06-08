@@ -32,7 +32,6 @@ export function send_connection_server(
     connected: connectedlist,
     ingame: ingamelist,
   };
-  console.log(send);
   server.emit('connection_server', send);
 }
 
@@ -44,6 +43,16 @@ export function getIdFromSocket(
   connected.forEach((value, key) => {
     if (value.id == socket.id) {
       ret = key;
+    }
+  });
+  return ret;
+}
+
+export function getSocketFromId(id: string, connected: Map<string, Socket>) {
+  let ret = null;
+  connected.forEach((value, key) => {
+    if (key == id) {
+      ret = value;
     }
   });
   return ret;

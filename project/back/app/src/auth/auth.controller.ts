@@ -47,7 +47,6 @@ export class AuthController {
     if (user == null) {
       return res.status(400).send('Bad User');
     }
-    console.log('id : ' + user.id);
     const code = await this.userService.signJwtToken(
       user.id,
       user.email,
@@ -60,7 +59,7 @@ export class AuthController {
   @UseGuards(JwtIsAuthGuard)
   @Get('2fa/create')
   async create2fa(@GetUser('sub') id, @Res() res) {
-    const user = await this.userService.getUserById(id);
+    const user = await this.userService.getUserById(id, true);
     if (user == null) {
       return res.status(400).send('Bad User');
     }
@@ -86,7 +85,7 @@ export class AuthController {
   @UseGuards(JwtIsAuthGuard)
   @Post('2fa/enable')
   async turnOn2FA(@GetUser('sub') id, @Res() res, @Body() body) {
-    const user = await this.userService.getUserById(id);
+    const user = await this.userService.getUserById(id, true);
     if (user == null) {
       res.status(400).send('Bad User');
       return;
@@ -129,7 +128,7 @@ export class AuthController {
   @Post('authenticate')
   async authenticate2FA(@GetUser() jwtUser, @Res() res, @Body() body) {
     const id = jwtUser.sub;
-    let user = await this.userService.getUserById(id);
+    let user = await this.userService.getUserById(id, true);
     if (user == null) {
       return res.status(400).send('Bad User');
     }
