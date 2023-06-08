@@ -59,7 +59,7 @@
 
 .profil-button {
   display: inline-block;
-  border: 0.2rem solid var(--priamry-color);
+  border: 0.2rem solid var(--primary-color);
   border-radius: 1rem;
   background-color: var(--box-color);
   padding: 0.1rem;
@@ -119,11 +119,11 @@
 }
 
 input:checked + .slider {
-  background-color: var(--priamry-color);
+  background-color: var(--primary-color);
 }
 
 input:focus + .slider {
-  box-shadow: 0 0 1px var(--priamry-color);
+  box-shadow: 0 0 1px var(--primary-color);
 }
 
 input:checked + .slider:before {
@@ -157,7 +157,7 @@ input:checked + .slider:before {
   border-radius: 1rem;
   padding: 1rem;
   margin-top: 1rem;
-  background-color: var(--priamry-color);
+  background-color: var(--primary-color);
   
   color : var(--light-color);
 
@@ -171,7 +171,7 @@ input:checked + .slider:before {
 }
 
 .other-user-profil > button{
-  border: 0.2rem solid var(--priamry-color);
+  border: 0.2rem solid var(--primary-color);
   background-color: var(--light-color);
   border-radius: 1rem;
   padding: 0.2rem;

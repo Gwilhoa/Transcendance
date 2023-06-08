@@ -11,7 +11,6 @@ import { IUser } from '../components/utils/interface';
 
 
 const Add = () => {
-    // const users = [];
     const [listUser, setListUser] = useState<Array<IUser>>([]);
 
     const navigate = useNavigate();
@@ -42,8 +41,8 @@ const Add = () => {
                 <div className="user" key={user.id}>
                     <img className='image' src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/42_Logo.svg/1200px-42_Logo.svg.png"></img>
                     <p className="name">{user.username}</p>
-                    <p className="status">Status</p>
-                    <p className='xp'>5000XP</p>
+                    <p className="status">{user.status}</p>
+                    <p className='xp'>{user.experience}XP</p>
                 </div>
             ))}
         </div>

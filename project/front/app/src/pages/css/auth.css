@@ -6,7 +6,7 @@
 }
 
 .auth-page{
-    background-color: var(--light-color);
+    background-color: var(--box-color);
     border-radius: 30px;
     text-align: center;
     width: 30rem;
@@ -22,13 +22,14 @@
     border-radius: 50%;
 }
 .auth-title{
-font-size: 1.5rem;
+    font-size: 1.5rem;
+    color: var(--light-color);
 }
 
 .login-button{
     margin-top: 1.5rem;
     border: none;
-    background-color: rgb(20, 169, 20);
+    background-color: var(--primary-color);
     border-radius: 10px;
     height: 5rem;
     width: 21rem;
