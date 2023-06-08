@@ -4,22 +4,15 @@ import '../components/notification/notification.css'
 import ErrorToken, { setErrorLocalStorage } from '../components/IfError';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { cookies } from '../App'
-
-type Friend = {
-    id: number;
-    name: string;
-    photo: string;
-    numberVictory: number;
-    numberDefeat: number;
-
-};
+import { cookies } from '../App';
+import { IUser } from '../components/utils/interface';
 
 
 
 
 const Add = () => {
-    const [response, setResponse] = useState<any>(null);
+    // const users = [];
+    const [listUser, setListUser] = useState<Array<IUser>>([]);
 
     const navigate = useNavigate();
     useEffect(() =>{
@@ -30,7 +23,7 @@ const Add = () => {
         })
         .then((res) => {
             console.log(res);
-            setResponse(res.data);
+            setListUser(res.data);
         })
         .catch((error) => {
             console.error(error);
@@ -38,26 +31,21 @@ const Add = () => {
             navigate('/Error');
         })
     }, [navigate]);
-
-    if (response == null || response.length == 0)
+    if (listUser == null || listUser.length == 0)
     {
-        return (<p className="no-friend">{"Knowing how to enjoy your own company is an art.<small>Natasha Adamo</small>"}</p>);
+        return (<p className="no-friend">Knowing how to enjoy your own company is an art.<small>Natasha Adamo</small></p>);
     }
-    console.log(response)
-    let i = 0;
-    for (const user of response)
-    {
-        console.log(user);
-        i++;
-    }
+    console.log(listUser);
     return (
         <div className="users-list">
-            <div className="user">
-                <img className='image' src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/42_Logo.svg/1200px-42_Logo.svg.png"></img>
-                <p className="name">Friend1</p>
-                <p className="status">Status</p>
-                <p className='xp'>5000XP</p>
-            </div>
+            {listUser.map((user) => (
+                <div className="user" key={user.id}>
+                    <img className='image' src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/42_Logo.svg/1200px-42_Logo.svg.png"></img>
+                    <p className="name">{user.username}</p>
+                    <p className="status">Status</p>
+                    <p className='xp'>5000XP</p>
+                </div>
+            ))}
         </div>
     );
 }
