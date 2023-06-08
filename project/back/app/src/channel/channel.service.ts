@@ -337,7 +337,7 @@ export class ChannelService {
   }
 
   async deletechannel(id) {
-    const channel = await this.channelRepository.findOne(id);
+    const channel = await this.channelRepository.findOneBy({ id: id });
     if (channel == null) throw new Error('Channel not found');
     return await this.channelRepository.delete(id);
   }

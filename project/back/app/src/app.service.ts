@@ -42,7 +42,6 @@ export class AppService {
     }
     user.friends.push(friend);
     await this.userRepository.save(user);
-    await this.userRepository.save(friend);
     return user;
   }
 
