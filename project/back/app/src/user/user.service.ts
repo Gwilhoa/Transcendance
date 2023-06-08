@@ -609,6 +609,7 @@ export class UserService {
       user.victories += 1;
       user.experience += 500;
     } else {
+      user.defeats += 1;
       user.experience += 100;
     }
     await this.userRepository.save(user);
