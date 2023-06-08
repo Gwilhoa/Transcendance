@@ -329,13 +329,11 @@ export class ChannelService {
     }
     let ret = null;
     for (const channel of channelmps) {
-      if (channel.users.includes(friend))
-        ret = await this.channelRepository
-          .createQueryBuilder('channel')
-          .leftJoinAndSelect('channel.users', 'users')
-          .where('channel.id = :id', { id: channel.id })
-          .getOne();
+      for (const user of channel.users) {
+        if (user.id == friend.id) ret = channel;
+      }
     }
+    return ret;
   }
 
   async deletechannel(id) {
