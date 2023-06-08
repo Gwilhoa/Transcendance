@@ -149,7 +149,7 @@ export class EventsGateway
         this.logger.debug('socket friend id : ' + getSocketFromId(friend_id, this.clients) .id);
         send = {
           code: FriendCode.NEW_FRIEND,
-          id: friend_id,
+          id: user_id,
         };
         getSocketFromId(friend_id, this.clients).emit('friend_request', send);
       }
