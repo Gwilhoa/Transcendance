@@ -25,10 +25,11 @@ const EndGame = ({ result }: { result: string }) => {
     let replay = true;
 
     socket.on('rematch', (any) => {
+        console.log("rematch")
+        console.log(any);
     const rematch = any.rematch;
     if (rematch) {
         revenge = true;
-        console.log("sjsjs");
     } else {
         replay = false;
     }
@@ -52,16 +53,5 @@ const EndGame = ({ result }: { result: string }) => {
   );
 }
 
-let revenge = false;
-let replay = true;
-
-socket.on('rematch', (any) => {
-  const rematch = any.rematch;
-  if (rematch) {
-    revenge = true;
-  } else {
-    replay = false;
-  }
-});
 
 export default EndGame;
