@@ -46,7 +46,7 @@ export class ChannelService {
 
   public async createMPChannel(user_id, user_id1) {
     const channels = await this.channelRepository.find();
-	console.log(channels);
+    console.log(channels);
     for (const chan of channels) {
       if (chan.type == ChannelType.MP_CHANNEL) {
         if (chan.name == user_id + ' - ' + user_id1)
@@ -54,7 +54,7 @@ export class ChannelService {
       }
     }
     const chan = new Channel();
-	console.log("create mp channel " + user_id + " " + user_id1);
+    console.log('create mp channel ' + user_id + ' ' + user_id1);
     chan.name = user_id + ' - ' + user_id1;
     chan.admins = [];
     chan.bannedUsers = [];
@@ -311,5 +311,36 @@ export class ChannelService {
       throw new Error('User is not banned of this channel');
     channel.bannedUsers.filter((u) => u.id != target.id);
     return await this.channelRepository.save(channel);
+  }
+
+  async getmpchannel(user_id: any, friend_id: any) {
+    const friend = await this.userService.getUserById(friend_id);
+    const c = await this.userService.getMpChannels(user_id);
+    const channelmps = [];
+    if (c == null) return null;
+    for (const channel of c) {
+      channelmps.push(
+        await this.channelRepository
+          .createQueryBuilder('channel')
+          .leftJoinAndSelect('channel.users', 'users')
+          .where('channel.id = :id', { id: channel.id })
+          .getOne(),
+      );
+    }
+    let ret = null;
+    for (const channel of channelmps) {
+      if (channel.users.includes(friend))
+        ret = await this.channelRepository
+          .createQueryBuilder('channel')
+          .leftJoinAndSelect('channel.users', 'users')
+          .where('channel.id = :id', { id: channel.id })
+          .getOne();
+    }
+  }
+
+  async deletechannel(id) {
+    const channel = await this.channelRepository.findOne(id);
+    if (channel == null) throw new Error('Channel not found');
+    return await this.channelRepository.delete(id);
   }
 }

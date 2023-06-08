@@ -628,6 +628,11 @@ export class EventsGateway
     const user_id = getIdFromSocket(client, this.clients);
     if (await this.userService.isfriend(user_id, friend_id)) {
       await this.userService.removeFriends(user_id, friend_id);
+      const mpchannel = await this.channelService.getmpchannel(
+        user_id,
+        friend_id,
+      );
+      await this.channelService.deletechannel(mpchannel.id);
       client.emit('friend_code', {
         code: FriendCode.UNFRIEND_SUCCESS,
       });
