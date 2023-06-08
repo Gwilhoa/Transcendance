@@ -83,6 +83,9 @@ export class UserService {
       .leftJoinAndSelect('user.friends', 'friends')
       .where('user.id = :id', { id: friend_id })
       .getOne();
+    if (user == null || friend == null) {
+      return false;
+    }
     if (user.friends == null) {
       return false;
     }
