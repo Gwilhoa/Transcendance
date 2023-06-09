@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Conversation from '../components/chat/conversation';
+import CreateChannel from '../components/chat/createChannel/CreateChannel';
 import OptionBar from '../components/chat/optionBar/optionBar';
 import SideBarChat from '../components/chat/sidebar';
 import ErrorToken from '../components/IfError';
@@ -21,16 +22,19 @@ export interface Channel {
 	name: string;
 	topic: string | null;
 	type: number;
-	pwd: string;
+	pwd: string | null;
 	users: Array<User>;
 }
+
 function Chat() {
 	const isOpenSideBar = useSelector((state: RootState) => state.modalChat.isOpenSideBar);
+	const isOpenCreateChannel = useSelector((state: RootState) => state.modalChat.isOpenCreateChannel);
 
 	return (
 		<div className="chatPage">
 			<ErrorToken />
 			{isOpenSideBar && ( <SideBarChat /> )}
+			{isOpenCreateChannel && ( <CreateChannel /> )}
 			<OptionBar/>
 			<div className="rightPart">
 			<Conversation />
