@@ -102,12 +102,9 @@ export default function Profil() {
 	})
 
 	socket.on('friend_request', (data: any) => {
-		if (data.code == 2 && data.id == id) {
+		if (data.id == id && (data.code == 2 || data.code == 7)) {
 			refresh(id);
 			return;
-		}
-		else if (data.code == 7) {
-			refresh(id);
 		}
 		return;
 	})
