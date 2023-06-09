@@ -6,7 +6,9 @@ import Cookies from 'universal-cookie';
 import { useNavigate } from 'react-router-dom';
 import ErrorToken from '../components/IfError';
 import { openModal } from '../redux/modal/modalSlice';
-import { useDispatch } from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
+import {setFinalStatus} from "../redux/game/gameSlice";
+import {RootState} from "../redux/store";
 const cookies = new Cookies();
 
 let isCall = true;
@@ -21,7 +23,9 @@ const Game = () => {
   const [ball, setBall] = useState({ x: 50, y: 50});
   const [paddle1, setPaddle1] = useState(42.5 );
   const [paddle2, setPaddle2] = useState(42.5 );
-  const [finalScore, setFinalScore] = useState("");
+  const dispatch = useDispatch();
+  const finalStatus = useSelector((state: RootState) => state.finalGame.finalStatus);
+
 
 
   
@@ -79,10 +83,9 @@ const Game = () => {
   
   socket.on('finish_game', (any) => {
     if (isCall) {
-
-      setFinalScore(any.status);
-      console.log("dzjj")
-      navigate('/endGame')
+      const content = {status: any.status, adversary: any.adversary, score1: any.score1, score2: any.score2};
+      dispatch(setFinalStatus(content));
+      navigate('/endGame');
       isCall = !isCall;
     }
   });
