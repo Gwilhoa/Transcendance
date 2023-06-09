@@ -599,4 +599,5 @@ export class UserService {
     }
     return user.secret2FA;
   }
+
 }

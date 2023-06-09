@@ -13,7 +13,7 @@ const cookies = new Cookies();
   let revenge = false;
   let replay = true;
   let myrevenge = false;
-const EndGame = ({ result }: { result: string }) => {
+const EndGame = () => {
     const navigate = useNavigate();
     const finalStatus = useSelector((state: RootState) => state.finalGame.finalStatus);
 

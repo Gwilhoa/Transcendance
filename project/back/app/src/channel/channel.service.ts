@@ -341,4 +341,28 @@ export class ChannelService {
     if (channel == null) throw new Error('Channel not found');
     return await this.channelRepository.delete(id);
   }
+
+  async inviteChannel(sender_id: any, receiver_id: any, channel_id: any) {
+    const channel = await this.channelRepository
+      .createQueryBuilder('channel')
+      .leftJoinAndSelect('channel.users', 'users')
+      .leftJoinAndSelect('channel.admins', 'admins')
+      .where('channel.id = :id', { id: channel_id })
+      .getOne();
+
+    let f = false;
+    for (const user of channel.admins) {
+      if (user.id == sender_id) {
+        f = true;
+      }
+    }
+    if (!f) throw new Error('User is not admin of this channel');
+    const user = await this.userService.getUserById(receiver_id);
+    if (user == null) throw new Error('User not found');
+    for (const u of channel.users) {
+      if (u.id == user.id) throw new Error('User already in this channel');
+    }
+    channel.users.push(user);
+    return await this.channelRepository.save(channel);
+  }
 }
