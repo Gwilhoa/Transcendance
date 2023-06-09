@@ -496,11 +496,23 @@ export class UserService {
     return user.games;
   }
 
-  public async getUserBySimilarNames(names: string) {
+  public async getUserBySimilarNames(names: string, id: string) {
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.blockedUsers', 'blockedUsers')
+      .where('user.id = :id', { id: id })
+      .getOne();
     const users = await this.userRepository
       .createQueryBuilder('user')
       .where('user.username LIKE :name', { name: `%${names}%` })
       .getMany();
+    for (const user of users) {
+      for (const blockedUser of user.blockedUsers) {
+        if (blockedUser.id == id) {
+          users.splice(users.indexOf(user), 1);
+        }
+      }
+    }
     if (users == null) {
       return null;
     }
