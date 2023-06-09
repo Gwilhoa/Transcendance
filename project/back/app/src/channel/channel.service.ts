@@ -172,11 +172,15 @@ export class ChannelService {
       .createQueryBuilder('channel')
       .leftJoinAndSelect('channel.messages', 'messages')
       .leftJoinAndSelect('messages.user', 'user')
+      .leftJoinAndSelect('channel.users', 'users')
       .where('channel.id = :id', { id: channel_id })
       .getOne();
     if (chan == null) throw new Error('Channel not found');
-    if (!chan.users.includes(user))
-      throw new Error('User is not in this channel');
+    let f = false;
+    for (const u of chan.users) {
+      if (u.id == user.id) f = true;
+    }
+    if (!f) throw new Error('User not in channel');
     if (chan.messages == null || chan.messages.length == 0) return null;
     return chan.messages.filter(
       async (m) =>
