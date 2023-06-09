@@ -13,10 +13,15 @@ const cookies = new Cookies();
 
 let isCall = true;
 
-const Game = (gameId:any) => {
+interface GameProps {
+  gameId: number;
+}
+
+const Game: React.FC<GameProps> = ({ gameId }) => {
   isCall = true;
   const navigate = useNavigate();
-  const [onGame, findGame] = useState(0);
+  const [onGame, findGame] = useState(gameId);
+  console.log(onGame);
   const [score1, setScore1] = useState(0);
   const [score2, setScore2] = useState(0);
   
