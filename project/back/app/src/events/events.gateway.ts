@@ -18,7 +18,8 @@ import { CreateGameDTO } from 'src/dto/create-game.dto';
 import { UserStatus } from 'src/utils/user.enum';
 import {
   getIdFromSocket,
-  getKeys, getSocketFromId,
+  getKeys,
+  getSocketFromId,
   send_connection_server,
   verifyToken,
   wrongtoken,
@@ -146,10 +147,12 @@ export class EventsGateway
       await this.userService.removeFriendRequest(user_id, friend_id);
       this.logger.debug('friend id : ' + friend_id);
       if (getSocketFromId(friend_id, this.clients) != null) {
-        this.logger.debug('socket friend id : ' + getSocketFromId(friend_id, this.clients) .id);
+        this.logger.debug(
+          'socket friend id : ' + getSocketFromId(friend_id, this.clients).id,
+        );
         send = {
           code: FriendCode.NEW_FRIEND,
-          id: friend_id,
+          id: user_id,
         };
         getSocketFromId(friend_id, this.clients).emit('friend_request', send);
       }
@@ -160,7 +163,7 @@ export class EventsGateway
       };
     } else {
       ret = {
-        code: FriendCode.SUCCESS,
+        code: FriendCode.FRIEND_REQUEST_SENT,
       };
       const requestFriend = await this.userService.addFriendRequest(
         user_id,
@@ -169,7 +172,9 @@ export class EventsGateway
       this.logger.debug('friend id : ' + friend_id);
       console.log(this.clients);
       if (getSocketFromId(friend_id, this.clients) != null) {
-        this.logger.debug('socket friend id : ' + getSocketFromId(friend_id, this.clients) .id);
+        this.logger.debug(
+          'socket friend id : ' + getSocketFromId(friend_id, this.clients).id,
+        );
         send = {
           code: FriendCode.FRIEND_REQUEST,
           id: user.id,
@@ -619,6 +624,33 @@ export class EventsGateway
       game.remake();
     } else {
       this.ingame.delete(id);
+    }
+  }
+
+  @SubscribeMessage('unfriend_request')
+  async unfriend_request(client: Socket, payload: any) {
+    const friend_id = payload.friend_id;
+    const user_id = getIdFromSocket(client, this.clients);
+    if (await this.userService.isfriend(user_id, friend_id)) {
+      await this.userService.removeFriends(user_id, friend_id);
+      const mpchannel = await this.channelService.getmpchannel(
+        user_id,
+        friend_id,
+      );
+      await this.channelService.deletechannel(mpchannel.id);
+      client.emit('friend_code', {
+        code: FriendCode.UNFRIEND_SUCCESS,
+      });
+      if (getSocketFromId(friend_id, this.clients)) {
+        getSocketFromId(friend_id, this.clients).emit('friend_code', {
+          code: FriendCode.NEW_UNFRIEND,
+          id: user_id,
+        });
+      }
+    } else {
+      client.emit('friend_code', {
+        code: FriendCode.UNEXISTING_FRIEND,
+      });
     }
   }
 }

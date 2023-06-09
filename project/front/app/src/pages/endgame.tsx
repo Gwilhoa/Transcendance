@@ -10,8 +10,6 @@ const cookies = new Cookies();
 const EndGame = ({ result }: { result: string }) => {
     const navigate = useNavigate();
 
-
-
   const homebutton = () => {
     socket.emit('game_finished', {rematch : false});
     navigate("/home");
@@ -28,6 +26,8 @@ const EndGame = ({ result }: { result: string }) => {
         console.log("rematch")
         console.log(any);
     const rematch = any.rematch;
+    console.log("rematch");
+    console.log(rematch);
     if (rematch) {
         revenge = true;
     } else {
@@ -53,5 +53,16 @@ const EndGame = ({ result }: { result: string }) => {
   );
 }
 
+let revenge = false;
+let replay = true;
+
+socket.on('rematch', (any) => {
+  const rematch = any.rematch;
+  if (rematch) {
+    revenge = true;
+  } else {
+    replay = false;
+  }
+});
 
 export default EndGame;

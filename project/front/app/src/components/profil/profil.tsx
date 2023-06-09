@@ -88,21 +88,26 @@ export default function Profil() {
 				})
 				.then((response) => {
 					console.log(response);
-					refresh(id);
 				})
 				.catch((error) => {
 					console.error(error);
 				});
+			refresh(id);
 			return;
+		}
+		else if (data.code === 5 || data.code === 7) {
+			refresh(id);
 		}
 		return;
 	})
 
 	socket.on('friend_request', (data: any) => {
-		console.log("receive friend code " + data.code + " " + data.id + " " + id);
-		if (data.code === 2 && data.id === id && !isFriend) {
+		if (data.code == 2 && data.id == id) {
 			refresh(id);
 			return;
+		}
+		else if (data.code == 7) {
+			refresh(id);
 		}
 		return;
 	})
@@ -200,8 +205,8 @@ export default function Profil() {
 	};
 
 	const handleUnFriend = (id: string | null) => {
-		console.log("add friend " + id);
-		// socket.emit('friend_request', { friend_id: id });
+		console.log("unFriend " + id);
+		socket.emit('unfriend_request', { friend_id: id });
 	};
 
 	initialElement.push(
@@ -271,7 +276,7 @@ export default function Profil() {
 							</div>
 						) : (
 							<div className='other-user-profil'>
-								<button onClick={() => handleAddFriend(id)}>
+								<button onClick={() => handleUnFriend(id)}>
 									Unfriend
 								</button>
 								<br/>

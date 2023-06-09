@@ -1,10 +1,12 @@
 export enum FriendCode {
-  SUCCESS = 0,
+  FRIEND_REQUEST_SENT = 0,
   UNEXISTING_USER = 1,
   NEW_FRIEND = 2,
   ALREADY_FRIEND = 3,
   FRIEND_REQUEST = 4,
-  UNAUTHORIZED = 401,
+  UNFRIEND_SUCCESS = 5,
+  UNEXISTING_FRIEND = 6,
+  NEW_UNFRIEND = 7,
 }
 
 export enum messageCode {

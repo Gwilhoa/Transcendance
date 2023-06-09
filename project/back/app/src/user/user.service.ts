@@ -1,15 +1,15 @@
-import {Injectable} from '@nestjs/common';
-import {InjectRepository} from '@nestjs/typeorm';
-import {AuthService} from '../auth/auth.service';
-import {Repository} from 'typeorm';
-import {User} from './user.entity';
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { AuthService } from '../auth/auth.service';
+import { Repository } from 'typeorm';
+import { User } from './user.entity';
 import fetch from 'node-fetch';
-import {RequestFriend} from './requestfriend.entity';
-import {ChannelType} from 'src/utils/channel.enum';
-import {JwtService} from '@nestjs/jwt';
-import {UserStatus} from '../utils/user.enum';
-import {WebSocketGateway, WebSocketServer} from '@nestjs/websockets';
-import {Server} from 'socket.io';
+import { RequestFriend } from './requestfriend.entity';
+import { ChannelType } from 'src/utils/channel.enum';
+import { JwtService } from '@nestjs/jwt';
+import { UserStatus } from '../utils/user.enum';
+import { WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { Server } from 'socket.io';
 
 @WebSocketGateway({
   cors: {
@@ -83,6 +83,9 @@ export class UserService {
       .leftJoinAndSelect('user.friends', 'friends')
       .where('user.id = :id', { id: friend_id })
       .getOne();
+    if (user == null || friend == null) {
+      return false;
+    }
     if (user.friends == null) {
       return false;
     }
@@ -99,6 +102,9 @@ export class UserService {
       return null;
     }
     const retUser = await this.authService.getUserIntra(retIntra.access_token);
+    if (retUser == null) {
+      return null;
+    }
     const verif_user = await this.userRepository.findOneBy({ id: retUser.id });
     if (verif_user != null) {
       return await this.changeStatus(verif_user.id, UserStatus.IN_CONNECTION);
@@ -155,7 +161,7 @@ export class UserService {
       return userWithSecret;
     }
 
-    return await this.userRepository.findOneBy({id: id});
+    return await this.userRepository.findOneBy({ id: id });
   }
 
   public async getImageById(id: string) {
@@ -230,7 +236,7 @@ export class UserService {
     }
     user.blockedUsers.push(blocked);
     if (await this.isfriend(id, blocked_id)) {
-      await this.removeFriend(user, blocked);
+      await this.removeFriends(user.id, blocked.id);
     }
     await this.userRepository.save(user);
     await this.userRepository.save(blocked);
@@ -564,10 +570,17 @@ export class UserService {
   }
 
   async removeFriends(id: string, friend_id: string) {
-    return await this.removeFriend(
-      await this.getUserById(id),
-      await this.getUserById(friend_id),
-    );
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.friends', 'friends')
+      .where('user.id = :id', { id: id })
+      .getOne();
+    const friend = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.friends', 'friends')
+      .where('user.id = :id', { id: friend_id })
+      .getOne();
+    return await this.removeFriend(user, friend);
   }
   async removeFriend(user: User, blocked: User) {
     user.friends = user.friends.filter((element) => element.id != blocked.id);

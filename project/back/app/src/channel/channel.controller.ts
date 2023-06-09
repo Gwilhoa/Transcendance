@@ -173,15 +173,16 @@ export class ChannelController {
     return ret;
   }
 
-  @Get('message')
+  @Get('message/:id')
   async getMessages(
     @Body() body: GetMessageDto,
     @GetUser('sub') id: string,
     @Res() resp,
+    @Param('id') channel_id,
   ) {
     let ret;
     try {
-      ret = await this.channelService.getMessage(body.channel_id, id);
+      ret = await this.channelService.getMessage(channel_id, id);
     } catch (e) {
       resp.status(400).send(e.message);
       return;
@@ -189,24 +190,6 @@ export class ChannelController {
     if (ret == null) {
       resp.status(204).send('No content');
       return;
-    }
-    return resp.status(200).send(ret);
-  }
-
-  @Post('message')
-  async createMessage(
-    @Body() body: sendMessageDTO,
-    @GetUser('sub') id: string,
-    @Res() resp,
-  ) {
-    let ret;
-    try {
-      ret = await this.channelService.sendMessage(body, id);
-    } catch (e) {
-      return resp.status(400).send(e.message);
-    }
-    if (ret == null) {
-      return resp.status(204).send('No content');
     }
     return resp.status(200).send(ret);
   }
