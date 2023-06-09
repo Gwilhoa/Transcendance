@@ -520,10 +520,6 @@ export class EventsGateway
       .emit('update_game', this.games[game_id].getGameInfo());
   }
 
-  async sendchangename(id: string, name: string) {
-    this.server.emit('change_name', { id: id, name: name });
-  }
-
   @SubscribeMessage('leave_matchmaking')
   async leave_matchmaking(client: Socket, payload: any) {
     const id = getIdFromSocket(client, this.clients);
@@ -569,23 +565,15 @@ export class EventsGateway
             game.getUser1().emit('rematch', send);
           }
         } else {
+          this.logger.debug('rematch');
           const send = {
             rematch: true,
           };
-          if (
-            this.server.sockets.sockets.get(game.getUser1()) != null ||
-            this.server.sockets.sockets.get(game.getUser2()) != null
-          ) {
-            if (game.getUser1().id == client.id) {
-              game.getUser2().emit('rematch', send);
-            }
-            if (game.getUser2().id == client.id) {
-              game.getUser1().emit('rematch', send);
-            }
+            game.getUser1().emit('rematch', send);
+            game.getUser2().emit('rematch', send);
             this.ingame.delete(getIdFromSocket(game.getUser1(), this.clients));
             this.ingame.delete(getIdFromSocket(game.getUser2(), this.clients));
             this.play_game(game.getUser1(), game.getUser2());
-          }
         }
       }
     }
