@@ -10,10 +10,10 @@ import {RootState} from "../redux/store";
 const cookies = new Cookies();
 
 
-  let revenge = false;
-  let replay = true;
-  let myrevenge = false;
-const EndGame = ({ result }: { result: string }) => {
+const EndGame = () => {
+  const [revenge, setRevenge] = useState(false);
+  const [myrevenge, setMyrevenge] = useState(false);
+  const [replay, setMyReplay] = useState(true);
     const navigate = useNavigate();
     const finalStatus = useSelector((state: RootState) => state.finalGame.finalStatus);
 
@@ -24,26 +24,31 @@ const EndGame = ({ result }: { result: string }) => {
 
   const replaybutton = () => {
     socket.emit('game_finished', {rematch : true})
-    if (revenge)
+    if (revenge) {
       navigate("/game", {state:{gameID:1}})
+    }
     else
-      myrevenge = true;
+      setMyrevenge(true);
   }
 
     socket.on('rematch', (any) => {
-        console.log("rematch")
-        console.log(any);
+    console.log("rematch")
+    console.log(any);
     const rematch = any.rematch;
     console.log("rematch");
     console.log(rematch);
     if (rematch) {
-      if (myrevenge)
+      console.log("b")
+      if (myrevenge) {
+        console.log("a")
+        socket.emit('game_finished', {rematch : true});
         navigate("/game", {state:{gameID:1}})
+      }
       else
-        revenge = true;
+        setRevenge(true);
     }
     else {
-        replay = false;
+        setMyReplay(false);
     }
     });
 
@@ -58,6 +63,9 @@ const EndGame = ({ result }: { result: string }) => {
         <div className="end_game_buttons">
             {revenge &&
             <p>ton adversaire veut une revenche</p>}
+
+            {myrevenge &&
+            <p>demande prise en compte</p>}
 
             {replay &&
             <button className="end_game_button" onClick={replaybutton}>Replay</button>}
