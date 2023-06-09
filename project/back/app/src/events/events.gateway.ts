@@ -673,6 +673,7 @@ export class EventsGateway
   async research_name(client: Socket, payload: any) {
     const name = payload.name;
     const user_id = getIdFromSocket(client, this.clients);
+    this.logger.debug('research name ' + name, user_id);
     const users = await this.userService.getUserBySimilarNames(name, user_id);
     client.emit('research_name', users);
   }

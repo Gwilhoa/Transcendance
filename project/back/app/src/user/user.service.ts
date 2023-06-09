@@ -440,12 +440,13 @@ export class UserService {
     const myuser = await this.userRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.blockedUsers', 'blockedUsers')
-        .where('user.id = :id', { id: myuser_id })
-        .getOne();
-    const user = await this.userRepository.createQueryBuilder('user')
-        .leftJoinAndSelect('user.blockedUsers', 'blockedUsers')
-        .where('user.id = :id', { id: user_id })
-        .getOne();
+      .where('user.id = :id', { id: myuser_id })
+      .getOne();
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.blockedUsers', 'blockedUsers')
+      .where('user.id = :id', { id: user_id })
+      .getOne();
     if (user == null || myuser == null) {
       return false;
     }
@@ -506,10 +507,12 @@ export class UserService {
       .createQueryBuilder('user')
       .where('user.username LIKE :name', { name: `%${names}%` })
       .getMany();
-    for (const user of users) {
-      for (const blockedUser of user.blockedUsers) {
-        if (blockedUser.id == id) {
-          users.splice(users.indexOf(user), 1);
+    if (user.blockedUsers != null && user.blockedUsers.length > 0) {
+      for (const u of users) {
+        for (const blockedUser of user.blockedUsers) {
+          if (blockedUser.id == id) {
+            users.splice(users.indexOf(u), 1);
+          }
         }
       }
     }
