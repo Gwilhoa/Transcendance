@@ -11,7 +11,7 @@ import { IUser } from '../components/utils/interface';
 const Search = () => {
     const navigate = useNavigate();
     useEffect(() => {
-        socket.emit('research_name', {name: 'jc'});
+        socket.emit('research_name', {name: 'bot'});
     }, [navigate]);
     
     socket.on('research_name', (data: any) => {
