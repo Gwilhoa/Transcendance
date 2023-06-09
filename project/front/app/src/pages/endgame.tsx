@@ -14,8 +14,14 @@ const EndGame = () => {
   const [revenge, setRevenge] = useState(false);
   const [myrevenge, setMyrevenge] = useState(false);
   const [replay, setMyReplay] = useState(true);
-    const navigate = useNavigate();
-    const finalStatus = useSelector((state: RootState) => state.finalGame.finalStatus);
+  const navigate = useNavigate();
+  const finalStatus = useSelector((state: RootState) => state.finalGame.finalStatus);
+
+  useEffect(() => {
+    return () => {
+      socket.emit('game_finished', { rematch: false });
+    };
+  }, []);
 
   const homebutton = () => {
     socket.emit('game_finished', {rematch : false});
@@ -67,7 +73,7 @@ const EndGame = () => {
             {myrevenge &&
             <p>demande prise en compte</p>}
 
-            {replay &&
+            {replay && !myrevenge &&
             <button className="end_game_button" onClick={replaybutton}>Replay</button>}
 
             <button className='end_game_button' onClick={homebutton}> Home</button>
