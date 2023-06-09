@@ -1,0 +1,39 @@
+.CreateChannel {
+  position: absolute;
+  bottom: 0;
+  text-align: center;
+  position: fixed;
+  z-index: 2;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) ;
+  width: 500px;
+  height: 650px;
+  overflow: auto;
+  background-color: var(--box-color);
+  color: var(--light-color);
+  border-radius: 20px;
+}
+
+.PageShadow {
+  z-index: 1;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  position: fixed;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.CloseCreateChannel {
+  position: absolute;
+  right: 17px;
+  top: 17px;
+  background-color: rgb(189, 39, 39);
+  color: var(--light-color);
+  border: none;
+  padding: 0.75rem;
+  border-radius: 50%;
+  cursor: pointer;
+  font-weight: bold;
+}
