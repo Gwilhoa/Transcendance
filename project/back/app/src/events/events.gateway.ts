@@ -569,10 +569,21 @@ export class EventsGateway
             game.getUser1().emit('rematch', send);
           }
         } else {
+          const send = {
+            rematch: true,
+          };
           if (
             this.server.sockets.sockets.get(game.getUser1()) != null ||
             this.server.sockets.sockets.get(game.getUser2()) != null
           ) {
+            if (game.getUser1().id == client.id) {
+              game.getUser2().emit('rematch', send);
+            }
+            if (game.getUser2().id == client.id) {
+              game.getUser1().emit('rematch', send);
+            }
+            this.ingame.delete(getIdFromSocket(game.getUser1(), this.clients));
+            this.ingame.delete(getIdFromSocket(game.getUser2(), this.clients));
             this.play_game(game.getUser1(), game.getUser2());
           }
         }
