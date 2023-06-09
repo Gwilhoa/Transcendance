@@ -7,6 +7,10 @@ import { Link } from 'react-router-dom';
 
 const cookies = new Cookies();
 
+
+  let revenge = false;
+  let replay = true;
+  let myrevenge = false;
 const EndGame = ({ result }: { result: string }) => {
     const navigate = useNavigate();
 
@@ -17,10 +21,11 @@ const EndGame = ({ result }: { result: string }) => {
 
   const replaybutton = () => {
     socket.emit('game_finished', {rematch : true})
+    if (revenge)
+      navigate("/game", {state:{gameID:1}})
+    else
+      myrevenge = true;
   }
-
-    let revenge = false;
-    let replay = true;
 
     socket.on('rematch', (any) => {
         console.log("rematch")
@@ -29,8 +34,12 @@ const EndGame = ({ result }: { result: string }) => {
     console.log("rematch");
     console.log(rematch);
     if (rematch) {
+      if (myrevenge)
+        navigate("/game", {state:{gameID:1}})
+      else
         revenge = true;
-    } else {
+    }
+    else {
         replay = false;
     }
     });
@@ -52,17 +61,5 @@ const EndGame = ({ result }: { result: string }) => {
     </>
   );
 }
-
-let revenge = false;
-let replay = true;
-
-socket.on('rematch', (any) => {
-  const rematch = any.rematch;
-  if (rematch) {
-    revenge = true;
-  } else {
-    replay = false;
-  }
-});
 
 export default EndGame;

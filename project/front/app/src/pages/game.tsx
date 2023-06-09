@@ -11,7 +11,7 @@ const cookies = new Cookies();
 
 let isCall = true;
 
-const Game = () => {
+const Game = (gameId:any) => {
   isCall = true;
   const navigate = useNavigate();
   const [onGame, findGame] = useState(0);
@@ -25,7 +25,6 @@ const Game = () => {
 
 
   
-  let gameId = 0;
 
 
   const handleKeyDown = (event: KeyboardEvent) => {
@@ -48,8 +47,6 @@ const Game = () => {
     loop: true,
     config: { duration: 4000 },
   });
-
-  
 
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
