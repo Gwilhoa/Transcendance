@@ -9,9 +9,18 @@ axios.defaults.headers.common = {'Authorization': `bearer ${cookies.get('jwtAuth
 export const socket = io(process.env.REACT_APP_IP + ":3000", {
     transports: ['websocket']
 });
-socket.on('connect', () => {
-    socket.emit('connection', { token: cookies.get('jwtAuthorization')})
+
+socket.on('connect', async () => {
+    let jwtAuthorization = cookies.get('jwtAuthorization');
+
+    while (!jwtAuthorization) {
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        jwtAuthorization = cookies.get('jwtAuthorization');
+    }
+
+    socket.emit('connection', { token: jwtAuthorization });
 });
+
 
 socket.on('connection_server', (data: any) => {
     console.log(data);

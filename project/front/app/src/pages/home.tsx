@@ -41,6 +41,8 @@ type Friend = {
 // }
 
 const Home = () => {
+    
+
         return (
             <div className='home'>
 				<ErrorToken />

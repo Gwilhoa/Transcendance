@@ -25,6 +25,7 @@ const EndGame = ({ result }: { result: string }) => {
     let replay = true;
 
     socket.on('rematch', (any) => {
+      console.log(any);
     const rematch = any.rematch;
     if (rematch) {
         revenge = true;
