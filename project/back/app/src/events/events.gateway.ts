@@ -193,7 +193,8 @@ export class EventsGateway
     if (
       payload.token == null ||
       payload.channel_id == null ||
-      payload.content == null
+      payload.content == null ||
+      payload.channel_id.length <= 0
     ) {
       client.emit('message_code', messageCode.INVALID_FORMAT);
     }
