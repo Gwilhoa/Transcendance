@@ -673,5 +673,6 @@ export class EventsGateway
     const name = payload.name;
     const user_id = getIdFromSocket(client, this.clients);
     const users = await this.userService.getUserBySimilarNames(name, user_id);
+    client.emit('research_name', users);
   }
 }
