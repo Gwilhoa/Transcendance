@@ -1,6 +1,6 @@
 import React from "react"
 import { useDispatch } from "react-redux";
-import { switchChatModal } from "../../../../redux/chat/modalChatSlice";
+import { switchChatModalSideBar } from "../../../../redux/chat/modalChatSlice";
 import { MdViewList } from "react-icons/md/index"
 import "../../css/optionBar.css"
 
@@ -9,7 +9,7 @@ const ButtonOpenModalSideBar = () => {
 
   return (
 			<button 
-				onClick={() => dispatch(switchChatModal())} 
+				onClick={() => dispatch(switchChatModalSideBar())} 
 				className="buttonShowModal"
 			>
 				<MdViewList />

@@ -25,12 +25,12 @@ export interface Channel {
 	users: Array<User>;
 }
 function Chat() {
-	const isOpen = useSelector((state: RootState) => state.modalChat.isOpen);
+	const isOpenSideBar = useSelector((state: RootState) => state.modalChat.isOpenSideBar);
 
 	return (
 		<div className="chatPage">
 			<ErrorToken />
-			{isOpen && ( <SideBarChat /> )}
+			{isOpenSideBar && ( <SideBarChat /> )}
 			<OptionBar/>
 			<div className="rightPart">
 			<Conversation />
