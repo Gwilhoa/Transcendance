@@ -9,8 +9,6 @@ import Home from './pages/home';
 import Chat from './pages/chat';
 import History from './pages/history';
 import Template from "./template/template";
-import PopupChat from "./components/popup/popupChat";
-import { DynamicIsInAChat, KnowMyChannel } from "./components/popup/chatManager";
 import TokenPage from "./pages/authenticate";
 import NotTwoFa from "./components/authenticate/AuthenticateComponentsNotTwoFa"
 import TwoFa from "./components/authenticate/AuthenticateComponentsTwoFa"
@@ -39,10 +37,6 @@ const AppInsideBrowser = () => {
 					<Route path="/endgame/*" element={<EndGame result="dj"></EndGame>} />
 				</Route>
 			</Routes>
-			
-			{DynamicIsInAChat() && 
-				<PopupChat path={KnowMyChannel()}/>
-			}
 		</>
 	);
 }
