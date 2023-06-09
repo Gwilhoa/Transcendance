@@ -4,6 +4,8 @@ import { socket } from '../components/utils/API';
 import Cookies from 'universal-cookie';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
+import {useSelector} from "react-redux";
+import {RootState} from "../redux/store";
 
 const cookies = new Cookies();
 
@@ -13,6 +15,7 @@ const cookies = new Cookies();
   let myrevenge = false;
 const EndGame = ({ result }: { result: string }) => {
     const navigate = useNavigate();
+    const finalStatus = useSelector((state: RootState) => state.finalGame.finalStatus);
 
   const homebutton = () => {
     socket.emit('game_finished', {rematch : false});
@@ -44,10 +47,14 @@ const EndGame = ({ result }: { result: string }) => {
     }
     });
 
+    if (finalStatus == null) {
+        navigate("/home");
+    }
+
   return (
     <>  
     <div className="end_game">
-        <h1 className="end_game_title">{"you " + result}</h1>
+        <h1 className="end_game_title">{"you " + finalStatus.status + " against " + finalStatus.adversary}</h1>
         <div className="end_game_buttons">
             {revenge &&
             <p>ton adversaire veut une revenche</p>}

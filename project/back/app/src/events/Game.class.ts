@@ -151,21 +151,36 @@ export class Game {
     this._loopid = setInterval(this.gameLoop, Game.default_update);
   }
 
-  private endWar = async (userWin: Socket, userDefeat: Socket) => {
+  private endWar = async (userWin: Socket, userDefeat: Socket, winuser) => {
     console.log('game finish ' + this._id);
     this._user1.leave(this._id);
     this._user2.leave(this._id);
+    const g = await this._gameService.finishGame(
+      this._id,
+      this._score1,
+      this._score2,
+    );
+    let username1 = '';
+    let username2 = '';
+    if (winuser == 1) {
+      username1 = g.user1.username;
+      username2 = g.user2.username;
+    } else {
+      username1 = g.user2.username;
+      username2 = g.user1.username;
+    }
     userWin.emit('finish_game', {
       score1: this._score1,
       score2: this._score2,
       status: 'lose',
+      adversary: username1,
     });
     userDefeat.emit('finish_game', {
       score1: this._score1,
       score2: this._score2,
       status: 'win',
+      adversary: username2,
     });
-    await this._gameService.finishGame(this._id, this._score1, this._score2);
     clearInterval(this._loopid);
     this.executeFinishCallbacks();
   };
@@ -206,7 +221,7 @@ export class Game {
       } else if (this._ballx) {
         this._score1 = this.endBattle(this._score1);
         if (this._score1 >= Game.default_victorygoal) {
-          await this.endWar(this._user1, this._user2);
+          await this.endWar(this._user1, this._user2, 1);
           return;
         } else {
           clearInterval(this._loopid);
@@ -228,7 +243,7 @@ export class Game {
       } else {
         this._score2 = this.endBattle(this._score2);
         if (this._score2 >= Game.default_victorygoal) {
-          await this.endWar(this._user2, this._user1);
+          await this.endWar(this._user2, this._user1, 2);
           return;
         } else {
           clearInterval(this._loopid);
