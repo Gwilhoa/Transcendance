@@ -69,7 +69,7 @@ const EndGame = () => {
   return (
     <>  
     <div className="end_game">
-        <h1 className="end_game_title">{"you " + finalStatus.status + " against " + finalStatus.adversary}</h1>
+        <h1 className="end_game_title">{"you " + finalStatus?.status + " against " + finalStatus?.adversary}</h1>
         <div className="end_game_buttons">
             {revenge &&
             <p>ton adversaire veut une revenche</p>}
