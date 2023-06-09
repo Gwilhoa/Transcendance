@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Conversation from '../components/chat/conversation';
-import OptionBar from '../components/chat/optionBar';
+import OptionBar from '../components/chat/optionBar/optionBar';
 import SideBarChat from '../components/chat/sidebar';
 import ErrorToken from '../components/IfError';
 import { RootState } from '../redux/store';
