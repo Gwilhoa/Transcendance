@@ -52,9 +52,13 @@ const EndGame = () => {
     }
     });
 
+  useEffect(() => {
     if (finalStatus == null) {
-        navigate("/home");
+      navigate("/home");
     }
+  } , [finalStatus, navigate]);
+
+
 
   return (
     <>  
