@@ -667,4 +667,11 @@ export class EventsGateway
       });
     }
   }
+
+  @SubscribeMessage('research_name')
+  async research_name(client: Socket, payload: any) {
+    const name = payload.name;
+    const user_id = getIdFromSocket(client, this.clients);
+    const users = await this.userService.getUserBySimilarNames(name, user_id);
+  }
 }
