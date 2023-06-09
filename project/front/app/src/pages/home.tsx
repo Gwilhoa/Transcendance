@@ -1,20 +1,34 @@
 import './css/home.css'
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import '../components/notification/notification.css'
 import ErrorToken, { setErrorLocalStorage } from '../components/IfError';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { Navigate, useNavigate } from 'react-router-dom';
+import axios, { socket } from '../components/utils/API';
 import { cookies } from '../App';
 import { IUser } from '../components/utils/interface';
 
 
-
+const Search = () => {
+    const navigate = useNavigate();
+    useEffect(() => {
+        socket.emit('research_name', {name: 'bot'});    
+    }, [navigate]);
+    
+    socket.on('research_name', (data: any) => {
+        console.log('research_name');
+        console.log(data);
+        return;
+    })
+        return (
+        <input type='search' placeholder='Search'></input>
+    );
+}
 
 const Add = () => {
     const [listUser, setListUser] = useState<Array<IUser>>([]);
 
     const navigate = useNavigate();
-    useEffect(() =>{
+    const refresh = useCallback(() => {
         axios.get(process.env.REACT_APP_IP + ":3000/user/friend", {
             headers: {
                 Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
@@ -30,9 +44,34 @@ const Add = () => {
             navigate('/Error');
         })
     }, [navigate]);
+    
+	socket.on('friend_code', (data: any) => {
+        if (data.code == 2) {
+            refresh()
+            return;
+        }
+		else if (data.code === 5 || data.code === 7) {
+			refresh();
+		}
+        return;
+    })
+    
+    socket.on('friend_request', (data: any) => {
+        if (data.code == 2 || data.code == 7) {
+            refresh();
+            return;
+        }
+        return;
+    })
+    
+    useEffect(() =>{
+        refresh();
+    }, [navigate]);
+
+
     if (listUser == null || listUser.length == 0)
     {
-        return (<p className="no-friend">Knowing how to enjoy your own company is an art.<small>Natasha Adamo</small></p>);
+        return (<p className="no-friend">Knowing how to enjoy your own company is an art. <span>Natasha Adamo</span></p>);
     }
     console.log(listUser);
     return (
@@ -54,13 +93,13 @@ const Home = () => {
             <div className='home'>
 				<ErrorToken />
                 <div className="scrollBlock">
+                    <Search/>
                     <Add/>
                 </div>
             </div>
         );
 
 }
-//<GetTokenUser url="http://localhost:3000/auth/login"/>
 
 export default Home;
 

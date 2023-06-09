@@ -20,12 +20,22 @@
     color: var(--light-color);
 }
 
-
-/* .home {
-    overflow-y: scroll;
-    width: 100%;
+.no-friend{
+    color: var(--light-color);
 }
 
+.no-friend > span{
+    font-size: 1rem;
+}
+
+.home {
+    /* overflow-y: scroll;
+    width: 100%; */
+    padding-left: 3rem;
+    padding-right: 3rem;
+}
+
+/* 
 .scrollBlock {
     overflow: auto;
     max-height: 94%;
