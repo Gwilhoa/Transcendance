@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useEffect } from "react";
 import './notification.css';
-import { ChangeChannel} from "../popup/chatManager";
 import { Link } from "react-router-dom";
 
 interface NotificationProps {
@@ -22,7 +21,6 @@ export default function Notification({ message, isInChannel, channel }: Notifica
     }, []);
 
     const handleClose = () => {
-      ChangeChannel(channel);
       setVisible(false);
     };
 
@@ -30,14 +28,6 @@ export default function Notification({ message, isInChannel, channel }: Notifica
       return (
         <div className="not">
           <h2>
-            {isInChannel} &&
-          <Link to={"/" + ChangeChannel(channel)} className="notific" onClick={handleClose}>
-            {message}
-          </Link>
-            {!isInChannel} &&
-          <Link to={"/game"} className="notific" onClick={handleClose}>
-            {message}
-          </Link>
           </h2>
         </div>
       );

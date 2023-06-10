@@ -75,42 +75,45 @@ export default function Profil() {
 			})
 	}, [navigate, dispatch]);
 
-	socket.on('friend_code', (data: any) => {
-		if (data.code === 2 && !isFriend) {
-			axios.post(process.env.REACT_APP_IP + ':3000/channel/mp/create',
-				{
-					user_id: '' + id,
-				},
-				{
-					headers: {
-						Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+	useEffect(() => {
+		socket.on('friend_code', (data: any) => {
+			console.log(data.code);
+			if (data.code === 2 && !isFriend) {
+				axios.post(process.env.REACT_APP_IP + ':3000/channel/mp/create',
+					{
+						user_id: '' + id,
 					},
-				})
-				.then((response) => {
-					console.log(response);
-				})
-				.catch((error) => {
-					console.error(error);
-				});
-			refresh(id);
+					{
+						headers: {
+							Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+						},
+					})
+					.then((response) => {
+						console.log(response);
+					})
+					.catch((error) => {
+						console.error(error);
+						setErrorLocalStorage("Error " + error.response.status);
+						navigate('/Error');
+					});
+				setIsFriend(!isFriend);
+				return;
+			}
+			else if (data.code === 5 || data.code === 7) {
+				setIsFriend(!isFriend);
+			}
 			return;
-		}
-		else if (data.code === 5 || data.code === 7) {
-			refresh(id);
-		}
-		return;
-	})
+		})
 
-	socket.on('friend_request', (data: any) => {
-		if (data.code == 2 && data.id == id) {
-			refresh(id);
+		socket.on('friend_request', (data: any) => {
+			console.log(data.code);
+			if (data.id == id && (data.code == 2 || data.code == 7)) {
+				setIsFriend(!isFriend);
+				return;
+			}
 			return;
-		}
-		else if (data.code == 7) {
-			refresh(id);
-		}
-		return;
-	})
+		})
+	}, [socket])
 
 	useEffect(() => {
 		if (id === localStorage.getItem('id')) {
@@ -145,7 +148,7 @@ export default function Profil() {
 				},})
 				.then(() => {
 					setErrorName(false);
-					refresh(id)
+					setName(str);
 				})
 				.catch((error) => {
 					console.error(error);
@@ -189,7 +192,21 @@ export default function Profil() {
 				data: formData,
 			})
 				.then(() => {
-					refresh(id);
+					axios.get(process.env.REACT_APP_IP + ":3000/user/image/" + id, {
+						headers: {
+							Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+						},
+					})
+						.then((response) => {
+							const data = response.data;
+							setImage(data);
+						})
+						.catch((error) => {
+							setErrorLocalStorage("Error " + error.response.status);
+							console.error(error);
+							navigate('/Error');
+							dispatch(closeModal());
+						});
 				})
 				.catch((error) => {
 					setErrorLocalStorage("Error " + error.response.status);

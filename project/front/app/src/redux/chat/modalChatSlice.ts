@@ -1,23 +1,29 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 interface ModalState {
-	isOpen: boolean;
+	isOpenSideBar: boolean;
+	isOpenCreateChannel: boolean;
 }
 
 const initialState: ModalState = {
-	isOpen: false,
+	isOpenSideBar: false,
+	isOpenCreateChannel: false,
 };
 
 const modalChatSlice = createSlice({
 	name: 'modal',
 	initialState,
 	reducers: {
-		switchChatModal: (state) => {
-			state.isOpen = !state.isOpen;
+		switchChatModalSideBar: (state) => {
+			state.isOpenSideBar = !state.isOpenSideBar;
 		},
+		switchChatModalCreateChannel: (state) => {
+			state.isOpenCreateChannel = !state.isOpenCreateChannel;
+		},
+
 	},
 });
 
-export const { switchChatModal } = modalChatSlice.actions;
+export const { switchChatModalSideBar, switchChatModalCreateChannel } = modalChatSlice.actions;
 
 export default modalChatSlice.reducer;

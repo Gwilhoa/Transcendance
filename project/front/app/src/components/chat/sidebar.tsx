@@ -5,6 +5,7 @@ import { cookies } from "../../App";
 import { Channel } from "../../pages/chat";
 import { setConversation } from "../../redux/chat/conversationIdSlice";
 import { RootState } from "../../redux/store";
+import { socket } from "../utils/API";
 import "./css/sidebar.css"
 
 function SideBarChat() {
@@ -13,19 +14,29 @@ function SideBarChat() {
 	const conversationId = useSelector((state: RootState) => state.conversation.id);
 
 	useEffect(() =>{
-		axios.get(process.env.REACT_APP_IP + ':3000/channel',
-				{
-					headers: {
-						Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
-					},
-				})
-				.then((response) => {
-					console.log(response);
-					setListChannel(response.data);
-				})
-				.catch((error) => {
-					console.error(error);
-				});
+		socket.on('join_code', (data: any) => {
+			console.log(data);
+			fetchChannel();
+			return ;
+		});
+	}, [socket])
+	
+	const fetchChannel = async () => {
+      try {
+        const response = await axios.get(process.env.REACT_APP_IP + ':3000/channel', {
+          headers: {
+            Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+          },
+        });
+        console.log(response);
+        setListChannel(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+	
+	useEffect(() =>{
+		fetchChannel();
 		console.log(conversationId)
 	},[])
 

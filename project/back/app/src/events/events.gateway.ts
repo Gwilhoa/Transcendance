@@ -197,7 +197,8 @@ export class EventsGateway
     if (
       payload.token == null ||
       payload.channel_id == null ||
-      payload.content == null
+      payload.content == null ||
+      payload.channel_id.length <= 0
     ) {
       client.emit('message_code', messageCode.INVALID_FORMAT);
     }
@@ -260,9 +261,8 @@ export class EventsGateway
   @SubscribeMessage('join_channel')
   async handleJoinChannel(client: Socket, payload: any) {
     let send;
-    const token = payload.token;
     const channel_id = payload.channel_id;
-    const user_id = verifyToken(token, this.authService);
+    const user_id = getIdFromSocket(client, this.clients);
     if (user_id == null) {
       send = {
         code: 401,
