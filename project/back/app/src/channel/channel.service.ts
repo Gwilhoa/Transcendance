@@ -10,7 +10,7 @@ import { Channel } from './channel.entity';
 import { Message } from './message.entity';
 import { ChannelType } from 'src/utils/channel.enum';
 import { BanUserDto } from '../dto/ban-user.dto';
-import * as argon2 from 'argon2';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class ChannelService {
@@ -35,7 +35,7 @@ export class ChannelService {
       if (body.password == null)
         throw new Error('Password is required for PROTECTED_CHANNEL');
       try {
-        chan.pwd = await argon2.hash(body.password);
+        chan.pwd = await bcrypt.hash(body.password, 10);
       } catch (err) {
         throw new Error('Can not hash password');
       }
@@ -99,7 +99,7 @@ export class ChannelService {
         throw new Error('Password is required for PROTECTED_CHANNEL');
       let isvalid = false;
       try {
-        isvalid = await argon2.verify(chan.pwd, body.password);
+        isvalid = await bcrypt.compare(chan.pwd, body.password);
       } catch (err) {
         throw new Error('Can not verify password');
       }
