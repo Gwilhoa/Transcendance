@@ -24,7 +24,11 @@ import {
   verifyToken,
   wrongtoken,
 } from 'src/utils/socket.function';
-import { FriendCode, messageCode } from 'src/utils/requestcode.enum';
+import {
+  ChannelCode,
+  FriendCode,
+  messageCode,
+} from 'src/utils/requestcode.enum';
 
 @WebSocketGateway({
   cors: {
@@ -193,7 +197,8 @@ export class EventsGateway
     if (
       payload.token == null ||
       payload.channel_id == null ||
-      payload.content == null
+      payload.content == null ||
+      payload.channel_id.length <= 0
     ) {
       client.emit('message_code', messageCode.INVALID_FORMAT);
     }
@@ -256,9 +261,8 @@ export class EventsGateway
   @SubscribeMessage('join_channel')
   async handleJoinChannel(client: Socket, payload: any) {
     let send;
-    const token = payload.token;
     const channel_id = payload.channel_id;
-    const user_id = verifyToken(token, this.authService);
+    const user_id = getIdFromSocket(client, this.clients);
     if (user_id == null) {
       send = {
         code: 401,
@@ -520,10 +524,6 @@ export class EventsGateway
       .emit('update_game', this.games[game_id].getGameInfo());
   }
 
-  async sendchangename(id: string, name: string) {
-    this.server.emit('change_name', { id: id, name: name });
-  }
-
   @SubscribeMessage('leave_matchmaking')
   async leave_matchmaking(client: Socket, payload: any) {
     const id = getIdFromSocket(client, this.clients);
@@ -545,31 +545,41 @@ export class EventsGateway
 
   @SubscribeMessage('game_finished')
   async game_finished(client: Socket, payload: any) {
+    this.logger.debug('game_finished');
     const rematch = payload.rematch;
+    this.logger.debug('rematched ' + rematch);
     const id = getIdFromSocket(client, this.clients);
-    this.logger.debug('game finished ' + id);
     const game_id = this.ingame.get(id);
     const game = this.games[game_id];
     if (game != null) {
-      if (!rematch) {
+      if (rematch == false) {
+        game.getUser1().emit('rematch', { rematch: false });
+        game.getUser2().emit('rematch', { rematch: false });
         this.ingame.delete(getIdFromSocket(game.getUser1(), this.clients));
         this.ingame.delete(getIdFromSocket(game.getUser2(), this.clients));
       } else {
         if (this.rematch.get(game_id) == null) {
           this.rematch.set(game_id, true);
+          const send = {
+            rematch: true,
+          };
           if (game.getUser1().id == client.id) {
-            game.getUser2().emit('rematch', true);
+            game.getUser2().emit('rematch', send);
           }
           if (game.getUser2().id == client.id) {
-            game.getUser1().emit('rematch', true);
+            game.getUser1().emit('rematch', send);
           }
         } else {
-          if (
-            this.server.sockets.sockets.get(game.getUser1()) != null ||
-            this.server.sockets.sockets.get(game.getUser2()) != null
-          ) {
-            this.play_game(game.getUser1(), game.getUser2());
-          }
+          this.logger.debug('rematch');
+          const send = {
+            rematch: true,
+          };
+          game.getUser1().emit('rematch', send);
+          game.getUser2().emit('rematch', send);
+          this.ingame.delete(getIdFromSocket(game.getUser1(), this.clients));
+          this.ingame.delete(getIdFromSocket(game.getUser2(), this.clients));
+          this.rematch.delete(game_id);
+          this.play_game(game.getUser1(), game.getUser2());
         }
       }
     }
@@ -646,6 +656,47 @@ export class EventsGateway
       client.emit('friend_code', {
         code: FriendCode.UNEXISTING_FRIEND,
       });
+    }
+  }
+
+  @SubscribeMessage('invite_channel')
+  async invite_channel(client: Socket, payload: any) {
+    const channel_id = payload.channel_id;
+    const receiver_id = payload.receiver_id;
+    const sender_id = getIdFromSocket(client, this.clients);
+
+    const receiver = await this.userService.getUserById(receiver_id);
+    const sender = await this.userService.getUserById(sender_id);
+    if (receiver == null || sender == null) {
+      client.emit('invite_request', {
+        code: ChannelCode.UNEXISTING_USER,
+      });
+      return;
+    }
+    const channel = await this.channelService.getChannelById(channel_id);
+    if (channel == null) {
+      client.emit('invite_request', {
+        code: ChannelCode.UNEXISTING_CHANNEL,
+      });
+      let ch = null;
+      try {
+        ch = await this.channelService.inviteChannel(
+          sender_id,
+          receiver_id,
+          channel_id,
+        );
+      } catch (e) {
+        client.emit('invite_request', {
+          message: e.message,
+        });
+        return;
+      }
+      if (ch != null) {
+        client.emit('invite_request', {
+          code: ChannelCode.INVITE_SUCCESS,
+        });
+      }
+      return;
     }
   }
 }
