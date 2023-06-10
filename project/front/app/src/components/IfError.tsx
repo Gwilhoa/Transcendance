@@ -25,6 +25,8 @@ function ErrorToken() {
 			.catch((error) => {
 				setErrorLocalStorage("Error " + error.response.status);
 				console.error(error);
+				if (cookies.get('jwtAuthorization') != null)
+					cookies.remove('jwtAuthorization');
 				navigate('/Error');
 			});
 	}, [navigate]);

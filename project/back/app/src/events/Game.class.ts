@@ -160,26 +160,27 @@ export class Game {
       this._score1,
       this._score2,
     );
-    let username1 = '';
-    let username2 = '';
+    let winname = '';
+    let losename = '';
     if (winuser == 1) {
-      username1 = g.user1.username;
-      username2 = g.user2.username;
+      losename = g.user1.username;
+      winname = g.user2.username;
     } else {
-      username1 = g.user2.username;
-      username2 = g.user1.username;
+      losename = g.user2.username;
+      winname = g.user1.username;
     }
+    console.log('game finish ' + winname + ' ' + losename);
     userWin.emit('finish_game', {
       score1: this._score1,
       score2: this._score2,
       status: 'lose',
-      adversary: username1,
+      adversary: winname,
     });
     userDefeat.emit('finish_game', {
       score1: this._score1,
       score2: this._score2,
       status: 'win',
-      adversary: username2,
+      adversary: losename,
     });
     clearInterval(this._loopid);
     this.executeFinishCallbacks();

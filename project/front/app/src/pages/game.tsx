@@ -28,6 +28,8 @@ const Game: React.FC<GameProps> = ({ gameId }) => {
   const [ball, setBall] = useState({ x: 50, y: 50});
   const [paddle1, setPaddle1] = useState(42.5 );
   const [paddle2, setPaddle2] = useState(42.5 );
+  const [color1, setColor1] = useState("white");
+    const [color2, setColor2] = useState("white");
   const dispatch = useDispatch();
   const finalStatus = useSelector((state: RootState) => state.finalGame.finalStatus);
 
@@ -63,16 +65,10 @@ const Game: React.FC<GameProps> = ({ gameId }) => {
     socket.emit('join_matchmaking', {token : cookies.get('jwtAuthorization')});
 
     socket.on('matchmaking_code', (data:any) => {
-      console.log(data);
-      
       if (data["code"] === 0) {
         console.log('enter matchmaking successfull');
         socket.on('game_start', (code:any) => {
-          console.log(code);
-          console.log("join game")
           gameId = (code)
-          console.log("code")
-          console.log(gameId);
           socket.emit('input_game', { game_id: gameId, position: paddle1, token: cookies.get('jwtAuthorization')});
         });
       }
@@ -89,6 +85,16 @@ const Game: React.FC<GameProps> = ({ gameId }) => {
       dispatch(setFinalStatus(content));
       navigate('/endGame');
       isCall = !isCall;
+    }
+  });
+  socket.on('game_found', (data) => {
+    console.log("game found");
+    if (data.user == 1) {
+      setColor1('blue');
+      setColor2('red');
+    } else {
+      setColor2('blue');
+      setColor1('red');
     }
   });
 
@@ -140,8 +146,8 @@ const Game: React.FC<GameProps> = ({ gameId }) => {
               </h1>
             </div>
           </div>
-          <div className="paddle1" style={{ top: paddle1 + '%' }} />
-          <div className="paddle2" style={{ top: paddle2 + '%'}} />
+          <div className="paddle1" style={{ top: paddle1 + '%', background: color1 }} />
+          <div className="paddle2" style={{ top: paddle2 + '%', background: color2 }} />
           <div className="ball" style={{ top: ball.x + '%', left: ball.y + '%'}} />
         </>
       }

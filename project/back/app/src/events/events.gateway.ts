@@ -456,6 +456,9 @@ export class EventsGateway
     const create_gameDTO = new CreateGameDTO();
     create_gameDTO.user1_id = getIdFromSocket(player, this.clients);
     create_gameDTO.user2_id = getIdFromSocket(rival, this.clients);
+    if (create_gameDTO.user1_id == null || create_gameDTO.user2_id == null) {
+      return;
+    }
     await this.userService.changeStatus(
       create_gameDTO.user1_id,
       UserStatus.IN_GAME,
@@ -553,6 +556,7 @@ export class EventsGateway
     const game = this.games[game_id];
     if (game != null) {
       if (rematch == false) {
+        this.games.delete(game_id);
         game.getUser1().emit('rematch', { rematch: false });
         game.getUser2().emit('rematch', { rematch: false });
         this.ingame.delete(getIdFromSocket(game.getUser1(), this.clients));
@@ -570,6 +574,7 @@ export class EventsGateway
             game.getUser1().emit('rematch', send);
           }
         } else {
+          this.rematch.delete(game_id);
           this.logger.debug('rematch');
           const send = {
             rematch: true,
@@ -580,6 +585,7 @@ export class EventsGateway
           this.ingame.delete(getIdFromSocket(game.getUser2(), this.clients));
           this.rematch.delete(game_id);
           this.play_game(game.getUser1(), game.getUser2());
+          return;
         }
       }
     }
