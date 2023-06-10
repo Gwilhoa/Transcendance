@@ -192,7 +192,21 @@ export default function Profil() {
 				data: formData,
 			})
 				.then(() => {
-					refresh(id);
+					axios.get(process.env.REACT_APP_IP + ":3000/user/image/" + id, {
+						headers: {
+							Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+						},
+					})
+						.then((response) => {
+							const data = response.data;
+							setImage(data);
+						})
+						.catch((error) => {
+							setErrorLocalStorage("Error " + error.response.status);
+							console.error(error);
+							navigate('/Error');
+							dispatch(closeModal());
+						});
 				})
 				.catch((error) => {
 					setErrorLocalStorage("Error " + error.response.status);
