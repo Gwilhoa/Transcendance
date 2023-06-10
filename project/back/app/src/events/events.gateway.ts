@@ -584,7 +584,7 @@ export class EventsGateway
           this.ingame.delete(getIdFromSocket(game.getUser1(), this.clients));
           this.ingame.delete(getIdFromSocket(game.getUser2(), this.clients));
           this.rematch.delete(game_id);
-          this.play_game(game.getUser1(), game.getUser2());
+          await this.play_game(game.getUser1(), game.getUser2());
           return;
         }
       }
