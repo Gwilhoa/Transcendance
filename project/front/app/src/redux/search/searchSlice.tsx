@@ -16,12 +16,15 @@ const searchSlice = createSlice({
 		setUsers: (state, action: PayloadAction<any>) => {
 			state.users = action.payload;
 		},
+        addUser: (state, action: PayloadAction<any>) => {
+            state.users?.push(action.payload);
+        },
         setUsersNull:(state) =>{
             state.users = null;
         },
 	},
 });
 
-export const { setUsers, setUsersNull } = searchSlice.actions;
+export const { setUsers, setUsersNull, addUser } = searchSlice.actions;
 
 export default searchSlice.reducer;

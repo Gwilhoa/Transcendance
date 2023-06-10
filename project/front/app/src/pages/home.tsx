@@ -8,7 +8,7 @@ import { cookies } from '../App';
 import { IUser } from '../components/utils/interface';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from "../redux/store";
-import { setUsers, setUsersNull } from '../redux/search/searchSlice';
+import { setUsers, addUser, setUsersNull } from '../redux/search/searchSlice';
 import { openModal } from "../redux/modal/modalSlice";
 
 
@@ -36,8 +36,12 @@ export const Search = ({ defaultAllUsers }: { defaultAllUsers: boolean }) => {
             dispatch(setUsers(UsersWithoutYou));
             console.log('research_name');
             console.log(data);
-            return;
-        })
+        });
+
+        socket.on('new_user', (data: IUser) => {
+            console.log(data);
+            dispatch(addUser(data));
+        });
     }, [navigate, dispatch, socket]);
     
         return (
