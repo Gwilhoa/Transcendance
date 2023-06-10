@@ -133,8 +133,9 @@ export class UserService {
     if ((await this.userRepository.findOneBy({ id: user.id })) != null) {
       return user;
     }
-    await this.userRepository.save(user);
-    return user;
+    const ret = await this.userRepository.save(user);
+    this.server.emit('new_user', ret);
+    return ret;
   }
 
   public async getUsers() {
