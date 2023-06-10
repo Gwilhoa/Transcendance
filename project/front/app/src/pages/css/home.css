@@ -1,10 +1,25 @@
+.search-bar{
+    display: inline-block;
+    border: 0;
+    border-radius: 3rem;
+    background-color: var(--box-color);
+    padding: 0.1rem;
+    color: var(--light-color);
+    font-size: 1rem;
+    width: 25%;
+    height: 3rem;
+    margin-top: 2rem;
+    padding: 1rem;
+    outline: none;
+}
+
 .user{
     background-color: var(--box-color);
     border-radius: 30px;
     height: 4rem;
     display: flex;
     align-items: center;
-    margin: 1rem 1rem 0 1rem;
+    margin-top: 1rem;
 }
 
 .image--home {

@@ -41,7 +41,7 @@ export const Search = ({ defaultAllUsers }: { defaultAllUsers: boolean }) => {
     }, [navigate, dispatch, socket]);
     
         return (
-        <input type='search' placeholder='Search' onChange={handleOnChange}></input>
+        <input type='search' placeholder='Search' className='search-bar' onChange={handleOnChange}></input>
     );
 }
 
