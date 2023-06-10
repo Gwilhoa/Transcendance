@@ -9,16 +9,19 @@ import { IUser } from '../components/utils/interface';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from "../redux/store";
 import { setUsers, setUsersNull } from '../redux/search/searchSlice';
+import { openModal } from "../redux/modal/modalSlice";
 
 
 export const Search = ({ defaultAllUsers }: { defaultAllUsers: boolean }) => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const id = localStorage.getItem('id');
 
     const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const res = event.target.value;
         if (res.length === 0 && defaultAllUsers === false) {
             dispatch(setUsersNull());
+            console.log('handleOnChange null');
         }
         else {
             console.log('handleOnChange');
@@ -29,7 +32,8 @@ export const Search = ({ defaultAllUsers }: { defaultAllUsers: boolean }) => {
     
     useEffect(() => {
         socket.on('research_name', (data: any) => {
-            dispatch(setUsers(data));
+            const UsersWithoutYou = data.filter((user: IUser) => user.id !== id);
+            dispatch(setUsers(UsersWithoutYou));
             console.log('research_name');
             console.log(data);
             return;
@@ -42,9 +46,20 @@ export const Search = ({ defaultAllUsers }: { defaultAllUsers: boolean }) => {
 }
 
 const Add = () => {
-    const [listUser, setListUser] = useState<Array<IUser>>([]);
+    const [listUser, setListUser] = useState<Array<IUser> | null >([]);
 
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+    
+    console.log('Add');
+    const searchUser = (useSelector((state: RootState) => state.searchUser.users));
+    useEffect(() => {
+        setListUser(searchUser);
+    },[searchUser]);
+
+    console.log(listUser?.length);
+    if (listUser == null)
+        console.log('listUser null');
     const refresh = useCallback(() => {
         axios.get(process.env.REACT_APP_IP + ":3000/user/friend", {
             headers: {
@@ -61,35 +76,36 @@ const Add = () => {
             navigate('/Error');
         })
     }, [navigate]);
-    
-	socket.on('friend_code', (data: any) => {
-        if (data.code == 2) {
-            refresh()
-            return;
-        }
-		else if (data.code === 5 || data.code === 7) {
-			refresh();
-		}
-        return;
-    })
-    
-    socket.on('friend_request', (data: any) => {
-        if (data.code == 2 || data.code == 7) {
+
+
+    useEffect(() => {
+        if (listUser == null)
+        {
             refresh();
-            return;
+            socket.on('friend_code', (data: any) => {
+                if (data.code == 2) {
+                    refresh()
+                    return;
+                }
+                else if (data.code === 5 || data.code === 7) {
+                    refresh();
+                }
+                return;
+            })
+            
+            socket.on('friend_request', (data: any) => {
+                if (data.code == 2 || data.code == 7) {
+                    refresh();
+                    return;
+                }
+                return;
+            })
         }
-        return;
-    })
+    }, [listUser, refresh, socket]);
     
-    useEffect(() =>{
-        refresh();
-    }, [navigate]);
 
 
-    useSelector((state: RootState) => state.searchUser.users);
-    console.log('useSelector');
-    console.log(useSelector((state: RootState) => state.searchUser.users));
-    console.log('end useSelector');
+
 
 
 
@@ -102,7 +118,7 @@ const Add = () => {
     return (
         <div className="users-list">
             {listUser.map((user) => (
-                <div className="user" key={user.id}>
+                <div className="user" key={user.id} onClick={() => dispatch(openModal(user.id))}>
                     <img className='image' src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/42_Logo.svg/1200px-42_Logo.svg.png"></img>
                     <p className="name">{user.username}</p>
                     <p className="status">{user.status}</p>
