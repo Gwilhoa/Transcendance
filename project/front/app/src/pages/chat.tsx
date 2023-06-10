@@ -26,6 +26,12 @@ export interface Channel {
 	users: Array<User>;
 }
 
+export interface Message {
+	content: string;
+	date: string;
+	id: string;
+	user: User;
+}
 function Chat() {
 	const isOpenSideBar = useSelector((state: RootState) => state.modalChat.isOpenSideBar);
 	const isOpenCreateChannel = useSelector((state: RootState) => state.modalChat.isOpenCreateChannel);

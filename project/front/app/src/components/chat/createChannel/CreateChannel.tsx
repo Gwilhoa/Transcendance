@@ -4,6 +4,10 @@ import { switchChatModalCreateChannel } from "../../../redux/chat/modalChatSlice
 import "../css/CreateChannel.css"
 import { Channel } from "../../../pages/chat";
 import { ButtonInputToggle } from "../../utils/inputButton";
+import { cookies } from "../../../App";
+import axios from "axios";
+import { socket } from "../../utils/API";
+import { setConversation } from "../../../redux/chat/conversationIdSlice";
 
 const initialState: Channel= {
 	id: '',
@@ -40,6 +44,32 @@ const CreateChannel = () => {
 
 	const handleNewChannel = () => {
 		console.log('send');
+		let id;
+		console.log(channelParams);
+		axios.post('/channel/create', 
+			{
+				name: channelParams.name,
+				creator_id: localStorage.getItem('id'), 
+				type: channelParams.type,
+				password: channelParams.pwd,
+			},
+			{
+				headers: {Authorization: `bearer ${cookies.get('jwtAuthorization')}`,}
+			})
+			.then((response) => {
+				console.log(response);
+				id = response.data.id;
+			})
+			.catch((error) => {
+				console.error(error)
+			});
+		if (channelParams.type == 0 ) {
+			console.log("hey need an other call")
+		}
+		socket.emit('join_channel', {id: id});
+		dispatch(setConversation(channelParams.id));
+		dispatch(switchChatModalCreateChannel());
+		return;
 	};
 
 	const getTypeLabel = (type: number) => {
@@ -90,8 +120,17 @@ const CreateChannel = () => {
 				</div>
 			</>
 			) : (<></>)}
+			{channelParams.type === 0 ? (
+			<>
+				<br />
+				<div className="divFindUser">
+					<h3>Invite some friend:</h3>
+				</div>
+			</>
+			) : (<></>)}
+
 			<br />
-			<button onClick={() => handleNewChannel}>New Channel</button>
+			<button onClick={() => handleNewChannel()}>New Channel</button>
 		</div>
 	</div>
 	);

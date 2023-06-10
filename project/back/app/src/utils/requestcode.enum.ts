@@ -16,3 +16,9 @@ export enum messageCode {
   INVALID_FORMAT = 3,
   UNAUTHORIZED = 401,
 }
+
+export enum ChannelCode {
+  INVITE_SUCCESS = 0,
+    UNEXISTING_USER = 1,
+    UNEXISTING_CHANNEL = 2,
+}
