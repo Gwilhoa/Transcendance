@@ -107,7 +107,7 @@ export default function Profil() {
 
 		socket.on('friend_request', (data: any) => {
 			console.log(data.code);
-			if (data.id == id && (data.code == 2 || data.code == 7)) {
+			if (data.id == id && (data.code == 2 || data.code == 7 || data.code == 5)) {
 				setIsFriend(!isFriend);
 				return;
 			}
