@@ -6,21 +6,38 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import axios, { socket } from '../components/utils/API';
 import { cookies } from '../App';
 import { IUser } from '../components/utils/interface';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState } from "../redux/store";
+import { setUsers, setUsersNull } from '../redux/search/searchSlice';
 
 
-const Search = () => {
+export const Search = ({ defaultAllUsers }: { defaultAllUsers: boolean }) => {
     const navigate = useNavigate();
-    useEffect(() => {
-        socket.emit('research_name', {name: 'bot'});
-    }, [navigate]);
+    const dispatch = useDispatch();
+
+    const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const res = event.target.value;
+        if (res.length === 0 && defaultAllUsers === false) {
+            dispatch(setUsersNull());
+        }
+        else {
+            console.log('handleOnChange');
+            console.log('emit: ' + res);
+            socket.emit('research_name', {name: res});
+        }
+    };
     
-    socket.on('research_name', (data: any) => {
-        console.log('research_name');
-        console.log(data);
-        return;
-    })
+    useEffect(() => {
+        socket.on('research_name', (data: any) => {
+            dispatch(setUsers(data));
+            console.log('research_name');
+            console.log(data);
+            return;
+        })
+    }, [navigate, dispatch, socket]);
+    
         return (
-        <input type='search' placeholder='Search'></input>
+        <input type='search' placeholder='Search' onChange={handleOnChange}></input>
     );
 }
 
@@ -69,6 +86,14 @@ const Add = () => {
     }, [navigate]);
 
 
+    useSelector((state: RootState) => state.searchUser.users);
+    console.log('useSelector');
+    console.log(useSelector((state: RootState) => state.searchUser.users));
+    console.log('end useSelector');
+
+
+
+
     if (listUser == null || listUser.length == 0)
     {
         return (<p className="no-friend">Knowing how to enjoy your own company is an art. <span>Natasha Adamo</span></p>);
@@ -95,7 +120,7 @@ const Home = () => {
             <div className='home'>
 				<ErrorToken />
                 <div className="scrollBlock">
-                    <Search/>
+                    <Search defaultAllUsers={false}/>
                     <Add/>
                 </div>
             </div>
