@@ -54,7 +54,7 @@ const Head = () => {
               Chat
             </Link>
             <Link to="/game" className="navbar__link">
-              Jeu
+              Game
             </Link>
             <Link to='/history' className="navbar__link">
               History

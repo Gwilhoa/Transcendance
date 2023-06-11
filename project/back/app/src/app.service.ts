@@ -32,8 +32,16 @@ export class AppService {
 
   public async addfriend(myId: string) {
     const bot = await this.addbot();
-    const user = await this.userRepository.findOneBy({ id: myId });
-    const friend = await this.userRepository.findOneBy({ id: bot.id });
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.friends', 'friends')
+      .where('user.id = :id', { id: myId })
+      .getOne();
+    const friend = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.friends', 'friends')
+      .where('user.id = :id', { id: bot.id })
+      .getOne();
     if (user == null || friend == null) {
       throw new Error('User not found');
     }
