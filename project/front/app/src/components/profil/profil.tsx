@@ -92,7 +92,7 @@ export default function Profil() {
 					setHasFriendRequest(1);
 					return;
 				}
-				if (request.sender.id === id && request.receiver.id === id) { //TODO: check if sender is me and receiver is him (waiting...)
+				if (request.receiver.id === id && request.sender.id === localStorage.getItem('id')) {
 					console.log('has friend request');
 					setHasFriendRequest(2);
 					return;
@@ -313,13 +313,13 @@ export default function Profil() {
 			</div>
             <div> 
 				{initialElement}
+				<div className='result-profil'>
+					<h3>Result</h3>
+					<p>Win: {victories}  - Loose: {defeats}</p>
+					<p>experiences : {experience}</p>
+				</div>
 				{ !isMe ? (
 					<>
-						<div className='result-profil'>
-							<h3>Result</h3>
-							<p>Win: {victories}  - Loose: {defeats}</p>
-							<p>experiences : {experience}</p>
-						</div>
 						{ !isFriend ? (
 							<div className='other-user-profil'>
 								<button onClick={() => handleAddFriend(id)}>
