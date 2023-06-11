@@ -22,13 +22,13 @@ const Template = () => {
         //});
         //}, []);
         
-        const confirmFriend = () => {
-          console.log("confirm friend")
-          socket.emit('friend_request', {data: friendId})
-        }
+    const confirmFriend = () => {
+      console.log("confirm friend")
+      socket.emit('friend_request', {friend_id: friendId})
+    }
         
-        const rejectFriend = () => {
-          console.log("reject friend")
+    const rejectFriend = () => {
+      console.log("reject friend")
     }
 
     socket.on('message', (data:any) => {

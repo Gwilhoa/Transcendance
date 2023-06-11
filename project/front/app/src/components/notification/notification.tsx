@@ -17,7 +17,7 @@ export default function Notification({ message, onConfirm, onCancel, hasButton }
   useEffect(() => {
     const timer = setTimeout(() => {
       setVisible(false);
-    }, 600000);
+    }, 60000);
 
     return () => clearTimeout(timer);
     }, []);
