@@ -11,7 +11,6 @@ export class Game {
   static default_racklenght = 15;
   static default_positionR = 50 - this.default_racklenght / 2;
   static default_rackwidth = 2;
-  static default_steprack = 1;
   static default_radiusball = 1;
   static default_speedBall = 0.5;
   static default_sizeMinX = 0;
@@ -51,6 +50,7 @@ export class Game {
     this._id = id;
     this._user1 = user1;
     this._user2 = user2;
+    this._finishCallback = finishCallback;
     this._rack1y = Game.default_positionR;
     this._rack2y = Game.default_positionR;
     this._score1 = 0;
@@ -79,30 +79,6 @@ export class Game {
 
   public getUser2() {
     return this._user2;
-  }
-
-  public getRack1y() {
-    return this._rack1y;
-  }
-
-  public getRack2y() {
-    return this._rack2y;
-  }
-
-  public getScore1() {
-    return this._score1;
-  }
-
-  public getScore2() {
-    return this._score2;
-  }
-
-  public getBallx() {
-    return this._ballx;
-  }
-
-  public getBally() {
-    return this._bally;
   }
 
   public updateRacket(player: Socket, y: number) {
@@ -160,28 +136,31 @@ export class Game {
       this._score1,
       this._score2,
     );
-    let username1 = '';
-    let username2 = '';
+    let winname: string;
+    let losename: string;
     if (winuser == 1) {
-      username1 = g.user1.username;
-      username2 = g.user2.username;
+      losename = g.user1.username;
+      winname = g.user2.username;
     } else {
-      username1 = g.user2.username;
-      username2 = g.user1.username;
+      losename = g.user2.username;
+      winname = g.user1.username;
     }
+    console.log('game finish ' + winname + ' ' + losename);
+    this._user2.leave(this._id);
+    this._user1.leave(this._id);
     userWin.emit('finish_game', {
       score1: this._score1,
       score2: this._score2,
       status: 'lose',
-      adversary: username1,
+      adversary: winname,
     });
     userDefeat.emit('finish_game', {
       score1: this._score1,
       score2: this._score2,
       status: 'win',
-      adversary: username2,
+      adversary: losename,
     });
-    clearInterval(this._loopid);
+    this.clear();
     this.executeFinishCallbacks();
   };
 
@@ -209,7 +188,6 @@ export class Game {
       this._maxY - Game.default_rackwidth - Game.default_radiusball;
 
     if (this._bally <= minposition) {
-      console.log(this._angle);
       if (
         this._futurballx >= this._rack1y &&
         this._futurballx <= this._rack1y + Game.default_racklenght
@@ -218,13 +196,13 @@ export class Game {
         this._angle = Math.PI - this._angle;
         const distbar = this._futurbally - minposition;
         this._futurbally -= 2 * distbar;
-      } else if (this._ballx) {
+      } else {
         this._score1 = this.endBattle(this._score1);
         if (this._score1 >= Game.default_victorygoal) {
           await this.endWar(this._user1, this._user2, 1);
           return;
         } else {
-          clearInterval(this._loopid);
+          this.clear();
           this.start();
           return;
         }
@@ -246,7 +224,7 @@ export class Game {
           await this.endWar(this._user2, this._user1, 2);
           return;
         } else {
-          clearInterval(this._loopid);
+          this.clear();
           this.start();
           return;
         }
@@ -289,11 +267,12 @@ export class Game {
     });
     this._user2.leave(this._id);
     this._user1.leave(this._id);
-    clearInterval(this._loopid);
+    this.clear();
     this.executeFinishCallbacks();
   }
 
   public clear() {
-    clearInterval(this._loopid);
+    if (this._loopid != null) clearInterval(this._loopid);
+    this._loopid = null;
   }
 }

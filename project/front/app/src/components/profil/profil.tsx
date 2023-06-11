@@ -21,6 +21,10 @@ export default function Profil() {
     const [image, setImage] = useState<string>("");
     const [checked, setChecked] = useState(false);
 	const [errorName, setErrorName] = useState<boolean>(false);
+	const [victories, setVictory] = useState<number>(0);
+	const [defeats, setDefeat] = useState<number>(0);
+	const [experience, setExperience] = useState<number>(0);
+	const [hasFriendRequest, setHasFriendRequest] = useState<number>(0);
 	const id = useSelector((state: RootState) => state.modal.id);
 	const dispatch = useDispatch();
 
@@ -48,7 +52,11 @@ export default function Profil() {
 			},
 		})
 			.then((response) => {
+				console.log(response.data);
 				setName(response.data.username);
+				setVictory(response.data.victories);
+				setDefeat(response.data.defeats);
+				setExperience(response.data.experience);
 			})
 			.catch((error) => {
 				setErrorLocalStorage("Error " + error.response.status);
@@ -56,13 +64,12 @@ export default function Profil() {
 				navigate('/Error');
 				dispatch(closeModal());
 			});
-		axios.post(process.env.REACT_APP_IP + ":3000/user/isfriend", 
-		{ friend_id: id },
-		{
-			headers: { Authorization:  `Bearer ${cookies.get('jwtAuthorization')}`, },
-		})
+		axios.post(process.env.REACT_APP_IP + ":3000/user/isfriend",
+			{friend_id: id},
+			{
+				headers: {Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,},
+			})
 			.then((Response) => {
-				console.log(Response);
 				setIsFriend(Response.data.isfriend);
 			})
 			.catch((error) => {
@@ -73,9 +80,31 @@ export default function Profil() {
 					dispatch(closeModal());
 				}
 			})
+		axios.get(process.env.REACT_APP_IP + ":3000/user/friend/request", {
+			headers: { Authorization: `Bearer ${cookies.get('jwtAuthorization')}`, },
+		}).then((Response) => {
+			console.log('friend request');
+			console.log(Response.data);
+			for (const request of Response.data) {
+				console.log(request);
+				if (request.sender.id === id) {
+					console.log('has friend request');
+					setHasFriendRequest(1);
+					return;
+				}
+				if (request.sender.id === id && request.receiver.id === id) { //TODO: check if sender is me and receiver is him (waiting...)
+					console.log('has friend request');
+					setHasFriendRequest(2);
+					return;
+				}
+			}
+		});
 	}, [navigate, dispatch]);
 
 	useEffect(() => {
+		socket.on('receive_challenge', (data: any) => {
+			console.log(data);
+		});
 		socket.on('friend_code', (data: any) => {
 			console.log(data.code);
 			if (data.code === 2 && !isFriend) {
@@ -226,6 +255,11 @@ export default function Profil() {
 		socket.emit('unfriend_request', { friend_id: id });
 	};
 
+	const handlechallenge = (id: string | null) => {
+		console.log("challenge " + id);
+		socket.emit('challenge', { rival_id: id });
+	}
+
 	initialElement.push(
         <div key={"image"}>
             <img className='circle-image' src={image} alt="selected" />
@@ -279,15 +313,20 @@ export default function Profil() {
 			</div>
             <div> 
 				{initialElement}
-				{ isMe === false ? (
+				{ !isMe ? (
 					<>
-						{ isFriend  === false ? (
+						<div className='result-profil'>
+							<h3>Result</h3>
+							<p>Win: {victories}  - Loose: {defeats}</p>
+							<p>experiences : {experience}</p>
+						</div>
+						{ !isFriend ? (
 							<div className='other-user-profil'>
 								<button onClick={() => handleAddFriend(id)}>
-									Add friend
+									{ hasFriendRequest == 1 ? "accept request" : hasFriendRequest == 2 ? "waiting" : "add friend" }
 								</button>
 								<br/>
-								<button>
+								<button onClick={() => handlechallenge(id)}>
 									Challenge
 								</button>
 							</div>
