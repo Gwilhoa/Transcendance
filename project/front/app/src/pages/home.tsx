@@ -60,7 +60,9 @@ const Add = () => {
             })
             
             socket.on('friend_request', (data: any) => {
+                console.log('before code');
                 if (data.code == 2 || data.code == 7) {
+                    console.log('refresh friend request');
                     refresh();
                     return;
                 }
