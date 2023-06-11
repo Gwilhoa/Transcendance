@@ -40,6 +40,7 @@ const OneScoreBlock = ({status, myScore, opponentScore, opponentId, myUsername, 
 				setErrorLocalStorage("Error " + error.response.status);
 				console.error(error);
 				navigate('/Error');
+                return;
 			});
         axios.get(process.env.REACT_APP_IP + ":3000/user/image/" + opponentId, {
             headers: {
@@ -54,8 +55,9 @@ const OneScoreBlock = ({status, myScore, opponentScore, opponentId, myUsername, 
                 setErrorLocalStorage("Error " + error.response.status);
                 console.error(error);
                 navigate('/Error');
+                return;
             });
-        }, [navigate]);
+        }, [id, navigate, opponentId]);
 
     return (
       <div className="score-block">
