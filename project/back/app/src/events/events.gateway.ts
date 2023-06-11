@@ -582,36 +582,38 @@ export class EventsGateway
     }
   }
 
-  @SubscribeMessage('dualrequest')
+  @SubscribeMessage('challenge')
   async dual_request(client: Socket, payload: any) {
+    this.logger.debug('challenge');
     const rival_id = payload.rival_id;
     const socket = this.server.sockets.sockets.get(rival_id);
     if (socket != null) {
       if (this.dual.get(rival_id) != null) {
         if (this.dual.get(rival_id) == getIdFromSocket(client, this.clients)) {
           this.dual.delete(rival_id);
-          socket.emit('receive_dualrequest', {
+          socket.emit('receive_challenge', {
             message: 'ok game will started soon',
           });
-          client.emit('receive_dualrequest', {
+          client.emit('receive_challenge', {
             message: 'ok game will started soon',
           });
           await this.play_game(client, socket);
         } else {
-          client.emit('receive_dualrequest', {
+          client.emit('receive_challenge', {
             message: 'user is in dual',
           });
           return;
         }
+      } else {
         this.dual.set(getIdFromSocket(client, this.clients), rival_id);
-        socket.emit('receive_dualrequest', {
+        socket.emit('receive_challenge', {
           rival: getIdFromSocket(client, this.clients),
         });
-      } else {
-        client.emit('receive_dualrequest', {
-          message: 'user is not connected',
-        });
       }
+    } else {
+      client.emit('receive_challenge', {
+        message: 'user is not connected',
+      });
     }
   }
 
@@ -654,6 +656,15 @@ export class EventsGateway
         code: FriendCode.UNEXISTING_FRIEND,
       });
     }
+  }
+
+  @SubscribeMessage('research_name')
+  async research_name(client: Socket, payload: any) {
+    const name = payload.name;
+    const user_id = getIdFromSocket(client, this.clients);
+    this.logger.debug('research name ' + name, user_id);
+    const users = await this.userService.getUserBySimilarNames(name, user_id);
+    client.emit('research_name', users);
   }
 
   @SubscribeMessage('invite_channel')

@@ -25,6 +25,7 @@ export const Search = ({ defaultAllUsers }: { defaultAllUsers: boolean }) => {
     
     useEffect(() => {
         socket.on('research_name', (data: any) => {
+            console.log('research_name received');
             const UsersWithoutYou = data.filter((user: IUser) => user.id !== id);
             dispatch(setUsers(UsersWithoutYou));
             console.log('research_name');
