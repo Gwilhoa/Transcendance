@@ -92,7 +92,7 @@ export default function Profil() {
 					setHasFriendRequest(1);
 					return;
 				}
-				if (request.sender.id === id && request.receiver.id === id) { //TODO: check if sender is me and receiver is him (waiting...)
+				if (request.receiver.id === id && request.sender.id === localStorage.getItem('id')) {
 					console.log('has friend request');
 					setHasFriendRequest(2);
 					return;
