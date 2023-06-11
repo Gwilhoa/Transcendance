@@ -101,7 +101,7 @@ const Game: React.FC<GameProps> = ({ gameId }) => {
       socket.on('update_game', (data) => {
         setScore1(data.score1);
         setScore2(data.score2);
-        setBall({x: (data.ballx), y: (data.bally)});
+        setBall({x: (data.ballx - 4), y: (data.bally)});
         setPaddle2(data.rack2y)
         setPaddle1(data.rack1y);
         if (!onGame) {

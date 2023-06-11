@@ -8,16 +8,15 @@ interface NotificationProps {
   onConfirm: () => void;
   onCancel:  () => void;
   hasButton:boolean
+  setVisible: (arg: boolean) => void;
 }
 
-export default function Notification({ message, onConfirm, onCancel, hasButton }: NotificationProps) {
-  const [visible, setVisible] = useState(true);
-
-
+export default function Notification({ message, onConfirm, onCancel, hasButton, setVisible }: NotificationProps) {
+ 
   useEffect(() => {
     const timer = setTimeout(() => {
       setVisible(false);
-    }, 60000);
+    }, 3000);
 
     return () => clearTimeout(timer);
     }, []);
@@ -26,7 +25,7 @@ export default function Notification({ message, onConfirm, onCancel, hasButton }
       setVisible(false);
     };
 
-  if (visible) {
+  
       return (
         <div className="notific" onClick={handleClose}>
           <h2>
@@ -50,8 +49,5 @@ export default function Notification({ message, onConfirm, onCancel, hasButton }
           
         </div>
       );
-  }
-    else
-        return null;
 }
 

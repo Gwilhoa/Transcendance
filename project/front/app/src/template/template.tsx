@@ -10,6 +10,7 @@ import { socket } from "../components/utils/API";
 const Template = () => {
   let friendId = 0;
   const [notif, setNotif] = useState(<></>);
+  const [notifVisible, setNotifVisible] = useState(false);
   
   //const location = useLocation();
   
@@ -38,7 +39,8 @@ const Template = () => {
       if (data.code == 4) {
         console.log(data);
         friendId = data.id;
-        setNotif(<Notification message={"New friend"} onConfirm={confirmFriend} onCancel={rejectFriend} hasButton={true}/>);
+        setNotif(<Notification message={"New friend"} onConfirm={confirmFriend} onCancel={rejectFriend} hasButton={true} setVisible={setNotifVisible}/>);
+        setNotifVisible(true)
 			}
 		})
 
@@ -49,7 +51,11 @@ const Template = () => {
     
     return (
       <div className="page">
-        {notif}
+        {notifVisible &&
+        <>
+          {notif}
+        </>
+        }
         <main className="main-template">
           <Outlet></Outlet>
         </main>
