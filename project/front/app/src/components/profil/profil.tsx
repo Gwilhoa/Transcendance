@@ -313,13 +313,13 @@ export default function Profil() {
 			</div>
             <div> 
 				{initialElement}
+				<div className='result-profil'>
+					<h3>Result</h3>
+					<p>Win: {victories}  - Loose: {defeats}</p>
+					<p>experiences : {experience}</p>
+				</div>
 				{ !isMe ? (
 					<>
-						<div className='result-profil'>
-							<h3>Result</h3>
-							<p>Win: {victories}  - Loose: {defeats}</p>
-							<p>experiences : {experience}</p>
-						</div>
 						{ !isFriend ? (
 							<div className='other-user-profil'>
 								<button onClick={() => handleAddFriend(id)}>
