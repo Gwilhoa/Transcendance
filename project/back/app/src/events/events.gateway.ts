@@ -457,6 +457,11 @@ export class EventsGateway
     create_gameDTO.user1_id = getIdFromSocket(player, this.clients);
     create_gameDTO.user2_id = getIdFromSocket(rival, this.clients);
     if (create_gameDTO.user1_id == null || create_gameDTO.user2_id == null) {
+      player.emit('game_found', {
+        game_id: null,
+        user: null,
+        rival: null,
+      });
       return;
     }
     await this.userService.changeStatus(
@@ -471,14 +476,6 @@ export class EventsGateway
     const create_game = await this.gameService.createGame(create_gameDTO);
     this.ingame.set(create_gameDTO.user1_id, create_game.id);
     this.ingame.set(create_gameDTO.user2_id, create_game.id);
-    this.logger.debug(
-      'game created ' +
-        create_game.id +
-        ' ' +
-        create_gameDTO.user1_id +
-        ' ' +
-        create_gameDTO.user2_id,
-    );
     player.emit('game_found', {
       game_id: create_game.id,
       user: 1,
@@ -499,12 +496,6 @@ export class EventsGateway
       this.gameService,
     );
     this.games[game.getId()] = game;
-    game.onFinish((finishedGame) => {
-      this.logger.debug(game);
-      this.sendconnected();
-      this.logger.log(game.getId() + ' finished');
-      return;
-    });
     const tempmatchmaking = [];
     for (const t of this.matchmaking) {
       if (t.id != rival.id && player.id != t.id) {
@@ -548,19 +539,18 @@ export class EventsGateway
 
   @SubscribeMessage('game_finished')
   async game_finished(client: Socket, payload: any) {
-    this.logger.debug('game_finished');
     const rematch = payload.rematch;
-    this.logger.debug('rematched ' + rematch);
     const id = getIdFromSocket(client, this.clients);
     const game_id = this.ingame.get(id);
     const game = this.games[game_id];
     if (game != null) {
-      if (rematch == false) {
+      if (!rematch) {
         this.games.delete(game_id);
         game.getUser1().emit('rematch', { rematch: false });
         game.getUser2().emit('rematch', { rematch: false });
         this.ingame.delete(getIdFromSocket(game.getUser1(), this.clients));
         this.ingame.delete(getIdFromSocket(game.getUser2(), this.clients));
+        this.logger.debug('game ' + game_id + ' finished');
       } else {
         if (this.rematch.get(game_id) == null) {
           this.rematch.set(game_id, true);
@@ -584,7 +574,8 @@ export class EventsGateway
           this.ingame.delete(getIdFromSocket(game.getUser1(), this.clients));
           this.ingame.delete(getIdFromSocket(game.getUser2(), this.clients));
           this.rematch.delete(game_id);
-          await this.play_game(game.getUser1(), game.getUser2());
+          this.logger.debug('game ' + game_id + ' finished and rematch');
+          this.play_game(game.getUser1(), game.getUser2());
           return;
         }
       }
