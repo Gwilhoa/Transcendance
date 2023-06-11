@@ -25,11 +25,21 @@ export default function Profil() {
 	const [defeats, setDefeat] = useState<number>(0);
 	const [experience, setExperience] = useState<number>(0);
 	const [hasFriendRequest, setHasFriendRequest] = useState<number>(0);
+	const [userStatus, setUserStatus] = useState("");
 	const id = useSelector((state: RootState) => state.modal.id);
 	const dispatch = useDispatch();
+	
+	enum UserStatus {
+		CONNECTED = 0,
+		IN_CONNECTION = 1,
+		IN_GAME = 2,
+		OFFLINE = 3,
+		DISCONNECTED = 4,
+	}
 
 	console.log(id);
 	const refresh = useCallback(( id: string | null ) => {
+		setUserStatus('profil-status-disconnected');
 		axios.get(process.env.REACT_APP_IP + ":3000/user/image/" + id, {
 			headers: {
 				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
@@ -57,6 +67,15 @@ export default function Profil() {
 				setVictory(response.data.victories);
 				setDefeat(response.data.defeats);
 				setExperience(response.data.experience);
+
+				if (response.data.status === UserStatus.CONNECTED)
+				{
+					setUserStatus("profil-status-connected");
+				}
+				if (response.data.status === UserStatus.IN_GAME)
+				{
+					setUserStatus("profil-status-in-game");
+				}
 			})
 			.catch((error) => {
 				setErrorLocalStorage("Error " + error.response.status);
@@ -260,9 +279,27 @@ export default function Profil() {
 		socket.emit('challenge', { rival_id: id });
 	}
 
+	useEffect(() => {
+		// setUserStatus('profil-status-disconnected');
+		socket.on('connection_server', (data: any) => {
+			console.log('status')
+			if (data.connected.includes() != null){
+				console.log("satus connected");
+				setUserStatus('profil-status-connected');
+			}
+			if (data.connected.includes() != null){
+				console.log("satus in game");
+				setUserStatus('profil-status-in-game');
+			}
+			console.log(data.connected);
+			console.log(data.in_game);
+		})
+	},[socket] )
+
 	initialElement.push(
-        <div key={"image"}>
+        <div key={"image"} className='profil-image'>
             <img className='circle-image' src={image} alt="selected" />
+			<div className={'profil-status' + ' ' + userStatus}></div>
             <br/> <br/>
         </div>
     )
