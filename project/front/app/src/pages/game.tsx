@@ -5,7 +5,6 @@ import { socket } from '../components/utils/API';
 import Cookies from 'universal-cookie';
 import { useNavigate } from 'react-router-dom';
 import ErrorToken from '../components/IfError';
-import { openModal } from '../redux/modal/modalSlice';
 import {useDispatch, useSelector} from 'react-redux';
 import {setFinalStatus} from "../redux/game/gameSlice";
 import {RootState} from "../redux/store";

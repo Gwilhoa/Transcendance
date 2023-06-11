@@ -79,7 +79,6 @@ const EndGame = () => {
 
             {replay && !myrevenge &&
             <button className="end_game_button" onClick={replaybutton}>Replay</button>}
-
             <button className='end_game_button' onClick={homebutton}> Home</button>
         </div>
         </div>

@@ -3,7 +3,8 @@
     background-color: red;
     color: var(--light-color);
     padding: 1em;
-    top:0;
+    top:100;
+    z-index: 120;
     left:50%;
     transform: translate(-50%);
     position: absolute;
