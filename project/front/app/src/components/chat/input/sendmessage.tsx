@@ -13,8 +13,6 @@ export default function SendMessage(){
 
 	function handleSendMessage()
 	{
-		console.log(message);
-		console.log(conversation);
 		socket.emit('send_message', {token: cookies.get('jwtAuthorization'), channel_id: conversation , content: message});
 	}
 
