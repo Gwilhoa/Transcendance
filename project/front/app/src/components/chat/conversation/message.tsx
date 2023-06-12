@@ -93,6 +93,7 @@ function Messages({ message }: { message: Message}) {
 			
 			<div className="dateMessage">
 				<Timer dateString={message.date} />
+
 			</div>
 		</div>
 	);

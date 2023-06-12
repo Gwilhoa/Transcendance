@@ -21,7 +21,7 @@ function Conversation() {
 		});
 
 		socket.on('message', (data: any) => {
-			console.log('receive message');
+			console.log('receive message ' + conversationId + " " + data.channel);
 			console.log(data);
 			if (data.channel === conversationId) {
 				const newItemMessage: Message = {

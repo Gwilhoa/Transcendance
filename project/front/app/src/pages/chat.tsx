@@ -8,6 +8,7 @@ import ErrorToken from '../components/IfError';
 import { RootState } from '../redux/store';
 import "./css/chat.css"
 import SendMessage from "../components/chat/input/sendmessage";
+import { setConversation } from '../redux/chat/conversationIdSlice';
 
 export interface User {
 	id: string;
@@ -35,8 +36,13 @@ export interface Message {
 }
 
 function Chat() {
+	const dispatch = useDispatch();
 	const isOpenSideBar = useSelector((state: RootState) => state.modalChat.isOpenSideBar);
 	const isOpenCreateChannel = useSelector((state: RootState) => state.modalChat.isOpenCreateChannel);
+	const conversationId = useSelector((state: RootState) => state.conversation.id);
+	if (conversationId === '' && localStorage.getItem('conversationId') != '') {
+		dispatch(setConversation('' + localStorage.getItem('conversationId')));
+	}
 
 	return (
 		<div className="chatPage">
