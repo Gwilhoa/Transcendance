@@ -93,7 +93,6 @@ export default function Profil() {
 					return;
 				}
 				if (request.sender.id === localStorage.getItem('id') && request.receiver.id === id) {
-					console.log('has friend request');
 					setHasFriendRequest(2);
 					return;
 				}
@@ -103,7 +102,7 @@ export default function Profil() {
 
 	useEffect(() => {
 		socket.on('receive_challenge', (data: any) => {
-			console.log(data);
+			console.log('receive_challenge');
 		});
 		socket.on('friend_code', (data: any) => {
 			console.log(data.code);
@@ -135,7 +134,7 @@ export default function Profil() {
 		})
 
 		socket.on('friend_request', (data: any) => {
-			console.log(data.code);
+			console.log('friend request => ' + data.code);
 			if (data.id == id && (data.code == 2 || data.code == 7 || data.code == 5)) {
 				setIsFriend(!isFriend);
 				return;
@@ -186,7 +185,7 @@ export default function Profil() {
     }
 
     const clicked = () => {
-		if (checked === false) {
+		if (!checked) {
 			navigate('/CreateTwoFa');
 			dispatch(closeModal());
 		}
@@ -251,7 +250,7 @@ export default function Profil() {
 	};
 
 	const handleUnFriend = (id: string | null) => {
-		console.log("unFriend " + id);
+		console.log("add friend " + id);
 		socket.emit('unfriend_request', { friend_id: id });
 	};
 
