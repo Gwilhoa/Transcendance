@@ -1,21 +1,19 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux";
-import { cookies } from "../../App";
-import { RootState } from "../../redux/store";
-import { Message } from "../../pages/chat"
-import "./css/sidebar.css"
-import SocketSingleton from "../../socket";
+import { cookies } from "../../../App";
+import { RootState } from "../../../redux/store";
+import { Message } from "../../../pages/chat"
+import "../css/sidebar.css"
+import SocketSingleton from "../../../socket";
 
 function Conversation() {
 	const conversationId = useSelector((state: RootState) => state.conversation.id);
 	const [listMessage, setListMessage] = useState<Array<Message>>([]);
 	const socketInstance = SocketSingleton.getInstance();
 	const socket = socketInstance.getSocket();
-	socket.on('message_code', (data: any) => {
-		console.log(data);
-	});
 	useEffect(() => {	
+
 		socket.on('message_code', (data: any) => {
 			console.log(data);
 		});
