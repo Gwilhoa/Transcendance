@@ -49,7 +49,10 @@ export class ChannelService {
     console.log(channels);
     for (const chan of channels) {
       if (chan.type == ChannelType.MP_CHANNEL) {
-        if (chan.name == user_id + ' - ' + user_id1)
+        if (
+          chan.name == user_id + ' - ' + user_id1 ||
+          chan.name == user_id1 + ' - ' + user_id
+        )
           throw new Error('Channel already exists');
       }
     }
@@ -166,6 +169,18 @@ export class ChannelService {
   }
 
   public async getMessage(channel_id, user_id) {
+    if (user_id == null) {
+      const chan = await this.channelRepository
+        .createQueryBuilder('channel')
+        .leftJoinAndSelect('channel.messages', 'messages')
+        .leftJoinAndSelect('messages.user', 'user')
+        .leftJoinAndSelect('channel.users', 'users')
+        .where('channel.id = :id', { id: channel_id })
+        .getOne();
+      if (chan == null) throw new Error('Channel not found');
+      if (chan.messages == null || chan.messages.length == 0) return null;
+      return chan.messages;
+    }
     const user = await this.userService.getUserById(user_id);
     if (user == null) throw new Error('User not found');
     const chan = await this.channelRepository
@@ -207,8 +222,8 @@ export class ChannelService {
     if (channel.messages == null) channel.messages = [];
     channel.messages.push(message);
     await this.channelRepository.save(channel);
-    const ret = await this.messageRepository.save(message);
-    ret.channel = null;
+    const ret: any = await this.messageRepository.save(message);
+    ret.channel = channel.id;
     return ret;
   }
 
@@ -341,8 +356,15 @@ export class ChannelService {
   }
 
   async deletechannel(id) {
+    console.log('delete channel id : ', id);
     const channel = await this.channelRepository.findOneBy({ id: id });
     if (channel == null) throw new Error('Channel not found');
+    const messages = await this.getMessage(channel.id, null);
+    if (messages != null && messages.length > 0) {
+      for (const message of messages) {
+        await this.messageRepository.delete(message);
+      }
+    }
     return await this.channelRepository.delete(id);
   }
 
@@ -368,5 +390,27 @@ export class ChannelService {
     }
     channel.users.push(user);
     return await this.channelRepository.save(channel);
+  }
+
+  async updateChannel(channel_id: any, user_id: any, body: any) {
+    const channel = await this.channelRepository
+      .createQueryBuilder('channel')
+      .leftJoinAndSelect('channel.creator', 'creator')
+      .where('channel.id = :id', { id: channel_id })
+      .getOne();
+    if (channel == null) throw new Error('Channel not found');
+    if (channel.creator.id != user_id)
+      throw new Error('User is not creator of this channel');
+    if (channel.pwd == null && body.password != null) {
+      channel.type = ChannelType.PROTECTED_CHANNEL;
+    }
+    if (body.password != null) {
+      if ((await bcrypt.compare(body.old_password, channel.pwd)) == false)
+        throw new Error('Wrong password');
+      channel.pwd = await bcrypt.hash(body.password, 10);
+    }
+    if (body.name != null) channel.name = body.name;
+    const ret = await this.channelRepository.save(channel);
+    return { channel_id: ret.id, name: ret.name };
   }
 }

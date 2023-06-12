@@ -8,8 +8,10 @@ import Cookies from 'universal-cookie';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { closeModal } from '../../redux/modal/modalSlice';
+import { ProfilImage } from "./ProfilImage";
 import axios from 'axios';
 import SocketSingleton from "../../socket";
+import {ProfilName} from "./ProfilName";
 const cookies = new Cookies();
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
@@ -20,8 +22,6 @@ export default function Profil() {
 	const navigate = useNavigate();
 	const [isMe, setIsMe] =  useState<boolean>(false);
 	const [isFriend, setIsFriend] =  useState<boolean>(false);
-    const [name, setName] = useState<string>("");
-    const [image, setImage] = useState<string>("");
     const [checked, setChecked] = useState(false);
 	const [errorName, setErrorName] = useState<boolean>(false);
 	const [victories, setVictory] = useState<number>(0);
@@ -33,21 +33,6 @@ export default function Profil() {
 
 	console.log(id);
 	const refresh = useCallback(( id: string | null ) => {
-		axios.get(process.env.REACT_APP_IP + ":3000/user/image/" + id, {
-			headers: {
-				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
-			},
-		})
-			.then((response) => {
-				const data = response.data;
-				setImage(data);
-			})
-			.catch((error) => {
-				setErrorLocalStorage("Error " + error.response.status);
-				console.error(error);
-				navigate('/Error');
-				dispatch(closeModal());
-			});
 
 		axios.get(process.env.REACT_APP_IP + ":3000/user/id/" + id, {
 			headers: {
@@ -56,7 +41,6 @@ export default function Profil() {
 		})
 			.then((response) => {
 				console.log(response.data);
-				setName(response.data.username);
 				setVictory(response.data.victories);
 				setDefeat(response.data.defeats);
 				setExperience(response.data.experience);
@@ -93,7 +77,6 @@ export default function Profil() {
 					return;
 				}
 				if (request.sender.id === localStorage.getItem('id') && request.receiver.id === id) {
-					console.log('has friend request');
 					setHasFriendRequest(2);
 					return;
 				}
@@ -103,7 +86,7 @@ export default function Profil() {
 
 	useEffect(() => {
 		socket.on('receive_challenge', (data: any) => {
-			console.log(data);
+			console.log('receive_challenge');
 		});
 		socket.on('friend_code', (data: any) => {
 			console.log(data.code);
@@ -135,8 +118,8 @@ export default function Profil() {
 		})
 
 		socket.on('friend_request', (data: any) => {
-			console.log(data.code);
-			if (data.id == id && (data.code == 2 || data.code == 7)) {
+			console.log('friend request => ' + data.code);
+			if (data.id == id && (data.code == 2 || data.code == 7 || data.code == 5)) {
 				setIsFriend(!isFriend);
 				return;
 			}
@@ -177,7 +160,6 @@ export default function Profil() {
 				},})
 				.then(() => {
 					setErrorName(false);
-					setName(str);
 				})
 				.catch((error) => {
 					console.error(error);
@@ -186,7 +168,7 @@ export default function Profil() {
     }
 
     const clicked = () => {
-		if (checked === false) {
+		if (!checked) {
 			navigate('/CreateTwoFa');
 			dispatch(closeModal());
 		}
@@ -220,23 +202,6 @@ export default function Profil() {
 				},
 				data: formData,
 			})
-				.then(() => {
-					axios.get(process.env.REACT_APP_IP + ":3000/user/image/" + id, {
-						headers: {
-							Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
-						},
-					})
-						.then((response) => {
-							const data = response.data;
-							setImage(data);
-						})
-						.catch((error) => {
-							setErrorLocalStorage("Error " + error.response.status);
-							console.error(error);
-							navigate('/Error');
-							dispatch(closeModal());
-						});
-				})
 				.catch((error) => {
 					setErrorLocalStorage("Error " + error.response.status);
 					console.error(error);
@@ -251,7 +216,7 @@ export default function Profil() {
 	};
 
 	const handleUnFriend = (id: string | null) => {
-		console.log("unFriend " + id);
+		console.log("add friend " + id);
 		socket.emit('unfriend_request', { friend_id: id });
 	};
 
@@ -261,15 +226,34 @@ export default function Profil() {
 	}
 
 	initialElement.push(
-        <div key={"image"}>
-            <img className='circle-image' src={image} alt="selected" />
-            <br/> <br/>
-        </div>
+		<div key="ProfilImage">
+        <ProfilImage id = {'' + id} OnClickOpenProfil={false} diameter = '50'/>
+		</div>
+    )
+
+	initialElement.push(
+		<div className='score-profil' key="score-profil">
+			<div className='profil-game-info'>
+				<p>
+					<span className='profil-game-info-title'>Win</span>
+					<span>{victories}</span>
+				</p>
+				<p className='profil-score-middlle-one'>
+				<span className='profil-game-info-title'>Loose</span>
+				<span>{defeats}</span>
+				</p>
+				<p>
+				<span className='profil-game-info-title'>Ratio</span>
+				<span>{defeats === 0 ? (victories === 0 ? 0 : 1) : victories/defeats}</span>
+				</p>
+			</div>
+			<p className='profil-experience'>{experience} XP</p>
+		</div>
     )
     
     if (isMe) {
         initialElement.push(
-			<div className="browse-file" key={"changeImage"}>
+			<div className="browse-file" key="changeImage">
 				<input type="file" onChange={handleImageChange} id="files"/>
 				<label htmlFor="files" className='profil-button'>Change image</label>
 			</div>
@@ -277,7 +261,7 @@ export default function Profil() {
         )
         
         initialElement.push(
-            <div key={"changeName"} className="ChangeNameDiv">
+            <div key="changeName" className="ChangeNameDiv">
 					<ButtonInputToggle
 					onInputSubmit={changeName}
 					textInButton='Change name'
@@ -299,7 +283,7 @@ export default function Profil() {
 			</div>
             )
 		initialElement.push(
-			<div key={"logout"} className="logout">
+			<div key="logout" className="logout">
 				<LogoutButton/>
 			</div>	
 		)
@@ -309,17 +293,12 @@ export default function Profil() {
         <div className="profil-modal">
 			<div className='profil-title'>
 				<button className="close-profil" onClick={() => dispatch(closeModal())}></button>
-				<h2> {name} </h2>
+				<h2> <ProfilName  id={id}/> </h2>
 			</div>
             <div> 
 				{initialElement}
 				{ !isMe ? (
 					<>
-						<div className='result-profil'>
-							<h3>Result</h3>
-							<p>Win: {victories}  - Loose: {defeats}</p>
-							<p>experiences : {experience}</p>
-						</div>
 						{ !isFriend ? (
 							<div className='other-user-profil'>
 								<button onClick={() => handleAddFriend(id)}>

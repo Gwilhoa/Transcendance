@@ -42,7 +42,7 @@ const EndGame = () => {
       setMyrevenge(true);
   }
 
-    socket.on('rematch', (any) => {
+    socket.on('rematch', (any: { rematch: any; }) => {
     const rematch = any.rematch;
     if (rematch) {
       if (myrevenge) {

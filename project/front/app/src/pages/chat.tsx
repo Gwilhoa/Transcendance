@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import Conversation from '../components/chat/conversation';
+import Conversation from '../components/chat/conversation/conversation';
 import CreateChannel from '../components/chat/createChannel/CreateChannel';
 import OptionBar from '../components/chat/optionBar/optionBar';
 import SideBarChat from '../components/chat/sidebar';
 import ErrorToken from '../components/IfError';
 import { RootState } from '../redux/store';
 import "./css/chat.css"
+import SendMessage from "../components/chat/input/sendmessage";
+import { setConversation } from '../redux/chat/conversationIdSlice';
 
 export interface User {
 	id: string;
@@ -32,9 +34,15 @@ export interface Message {
 	id: string;
 	user: User;
 }
+
 function Chat() {
+	const dispatch = useDispatch();
 	const isOpenSideBar = useSelector((state: RootState) => state.modalChat.isOpenSideBar);
 	const isOpenCreateChannel = useSelector((state: RootState) => state.modalChat.isOpenCreateChannel);
+	const conversationId = useSelector((state: RootState) => state.conversation.id);
+	if (conversationId === '' && localStorage.getItem('conversationId') != '') {
+		dispatch(setConversation('' + localStorage.getItem('conversationId')));
+	}
 
 	return (
 		<div className="chatPage">
@@ -43,7 +51,8 @@ function Chat() {
 			{isOpenCreateChannel && ( <CreateChannel /> )}
 			<OptionBar/>
 			<div className="rightPart">
-			<Conversation />
+				<Conversation />
+				<SendMessage />
 			</div>
 		</div>
 	);

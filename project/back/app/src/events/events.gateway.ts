@@ -247,8 +247,7 @@ export class EventsGateway
       const sendmsg = {
         id: msg.id,
         content: msg.content,
-        user: msg.user.id,
-        username: msg.user.username,
+        user: msg.user,
         channel: msg.channel,
         date: msg.date,
       };
@@ -706,5 +705,24 @@ export class EventsGateway
       }
       return;
     }
+  }
+
+  @SubscribeMessage('update_channel')
+  async update_channel(client: Socket, payload: any) {
+    const channel_id = payload.channel_id;
+    const user_id = getIdFromSocket(client, this.clients);
+    let ret = null;
+    try {
+      ret = await this.channelService.updateChannel(
+        channel_id,
+        user_id,
+        payload,
+      );
+    } catch (e) {
+      client.emit('update_channel', {
+        message: e.message,
+      });
+    }
+    client.emit('update_channel', ret);
   }
 }
