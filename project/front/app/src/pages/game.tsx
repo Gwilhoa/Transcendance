@@ -35,53 +35,38 @@ const Game: React.FC<GameProps> = ({ gameId }) => {
   const socketInstance = SocketSingleton.getInstance();
   const socket = socketInstance.getSocket();
 
-
-
-
+  
+  
   const handleKeyPress = (event: KeyboardEvent) => {
     switch (event.code) {
       case "KeyW":
         socket.emit("input_game", {game_id: gameId, type: 0})
         break;
-      case "KeyS":
-        socket.emit("input_game", {game_id: gameId, type: 1})
-        break;
-      case "ArrowUp":
+        case "KeyS":
+          socket.emit("input_game", {game_id: gameId, type: 1})
+          break;
+          case "ArrowUp":
         socket.emit("input_game", {game_id: gameId, type: 0})
         break;
       case "ArrowDown":
         socket.emit("input_game", {game_id: gameId, type: 1})
-    }
-  };
-
-
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-
-
-  useEffect(() => {
-    const socket = socketInstance.getSocket();
-    window.addEventListener("keydown", handleKeyPress);
-
-    socket.emit('join_matchmaking', {token : cookies.get('jwtAuthorization')});
-
-    socket.on('matchmaking_code', (data:any) => {
-      if (data["code"] === 0) {
-        console.log('enter matchmaking successfull');
-        socket.on('game_start', (code:any) => {
-          gameId = (code)
-          socket.emit('input_game', { game_id: gameId, position: paddle1, token: cookies.get('jwtAuthorization')});
-        });
       }
-      else {
-        navigate("/home");
-        alert("Error, you are already in game");
-      }
-    });
-  }, []);
-
-  socket.on('finish_game', (any) => {
-    if (isCall) {
+    };
+    
+    
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+    useEffect(() => {
+      window.addEventListener("keydown", handleKeyPress);
+      socket.on('game_start', (code:any) => {
+        gameId = (code)
+        socket.emit('input_game', { game_id: gameId, position: paddle1, token: cookies.get('jwtAuthorization')});
+      });
+    }, [])
+    
+    
+    
+    socket.on('finish_game', (any) => {
+      if (isCall) {
       const content = {status: any.status, adversary: any.adversary, score1: any.score1, score2: any.score2};
       dispatch(setFinalStatus(content));
       navigate('/endGame');
@@ -89,7 +74,7 @@ const Game: React.FC<GameProps> = ({ gameId }) => {
     }
   });
   
-
+  
   socket.on('create_game', (any) => {
     console.log("WESH")
     console.log(any);
@@ -136,9 +121,5 @@ const Game: React.FC<GameProps> = ({ gameId }) => {
 
   );
 }
-
-
-
-
 
 export default Game;

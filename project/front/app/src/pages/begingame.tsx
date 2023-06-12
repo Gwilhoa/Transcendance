@@ -1,20 +1,38 @@
 import './css/begingame.css'
 import Cookies from 'universal-cookie';
 import { animated, useSpring } from 'react-spring';
-import React from 'react';
+import React, { useEffect } from 'react';
 import SocketSingleton from '../socket';
+import { useNavigate } from 'react-router-dom';
 
 
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
-
+const cookies = new Cookies();
 const BeginGame = () => {
 
+    let gameId;
+    let paddle1;
+    const navigate = useNavigate();
+    useEffect(() => {
+        
+    
+        socket.emit('join_matchmaking', {token : cookies.get('jwtAuthorization')});
+    
+        socket.on('matchmaking_code', (data:any) => {
+          if (data["code"] === 0) {
+            console.log('enter matchmaking successfull');
+            socket.on('found_game', (data) => {
+                console.log(data);
+            });
+          }
+          else {
+            navigate("/home");
+            alert("Error, you are already in game");
+          }
+        });
+      }, []);
 
-
-    socket.on('found_game', (data) => {
-        console.log(data);
-    });
 
     const spinnerAnimation = useSpring({
         from: { transform: 'rotate(0deg)' },
