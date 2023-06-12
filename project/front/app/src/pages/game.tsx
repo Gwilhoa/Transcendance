@@ -158,7 +158,7 @@ const Game: React.FC<GameProps> = ({ gameId }) => {
               </div>
               <div className="paddle1" style={{ top: paddle1 + '%', background: color1 }} />
               <div className="paddle2" style={{ top: paddle2 + '%', background: color2 }} />
-              <div className="ball" style={{ top: ball.x + '%', left: ball.y + '%'}} />
+              <div className="ball" style={{ top: ball.x + '%', left: ball.y - 1 + '%'}} />
             </>
         }
       </>
