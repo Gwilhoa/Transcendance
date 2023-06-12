@@ -7,6 +7,7 @@ import SideBarChat from '../components/chat/sidebar';
 import ErrorToken from '../components/IfError';
 import { RootState } from '../redux/store';
 import "./css/chat.css"
+import SendMessage from "../components/chat/input/sendmessage";
 
 export interface User {
 	id: string;
@@ -44,6 +45,7 @@ function Chat() {
 			<OptionBar/>
 			<div className="rightPart">
 			<Conversation />
+				<SendMessage />
 			</div>
 		</div>
 	);

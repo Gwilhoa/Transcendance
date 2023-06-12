@@ -49,7 +49,10 @@ export class ChannelService {
     console.log(channels);
     for (const chan of channels) {
       if (chan.type == ChannelType.MP_CHANNEL) {
-        if (chan.name == user_id + ' - ' + user_id1)
+        if (
+          chan.name == user_id + ' - ' + user_id1 ||
+          chan.name == user_id1 + ' - ' + user_id
+        )
           throw new Error('Channel already exists');
       }
     }
