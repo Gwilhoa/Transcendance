@@ -21,24 +21,26 @@ export const ProfilImage = ({ id, diameter}: { id: string, diameter: string }) =
     const navigate = useNavigate();
     const [image, setImage] = useState<string>("");
 
-    useEffect(() => {
-
+    const changeImage = () => {
         axios.get(process.env.REACT_APP_IP + ":3000/user/image/" + id, {
-			headers: {
-				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
-			},
-		})
-			.then((response) => {
-				const data = response.data;
-				setImage(data);
-			})
-			.catch((error) => {
-				setErrorLocalStorage("Error " + error.response.status);
-				console.error(error);
-				navigate('/Error');
-			});
+            headers: {
+                Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+            },
+        })
+            .then((response) => {
+                const data = response.data;
+                setImage(data);
+            })
+            .catch((error) => {
+                setErrorLocalStorage("Error " + error.response.status);
+                console.error(error);
+                navigate('/Error');
+            });
+    }
 
+    useEffect(() => {
         setUserStatus('profil-status-disconnected');
+        changeImage();
         axios.get(process.env.REACT_APP_IP + ":3000/user/id/" + id, {
 			headers: {
 				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
@@ -61,22 +63,15 @@ export const ProfilImage = ({ id, diameter}: { id: string, diameter: string }) =
         });
 
         socket.on('connection_server', (data: any) => {
-			console.log('status')
-			if (data.connected.includes() != null){
-				console.log("satus connected");
+			if (data.connected.includes() != null)
 				setUserStatus('profil-status-connected');
-			}
-			if (data.connected.includes() != null){
-				console.log("satus in game");
+			if (data.connected.includes() != null)
 				setUserStatus('profil-status-in-game');
-			}
-			console.log(data.connected);
-			console.log(data.in_game);
 		});
 
         socket.on('update_profil', (data: any) => {
             if (data.type === 'image')
-                console.log('photo de profil')
+                changeImage();
         });
     
     },[navigate, socket])
