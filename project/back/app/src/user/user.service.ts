@@ -346,7 +346,7 @@ export class UserService {
       id: user.id,
       type: 'name',
     };
-    this.server.emit('updateprofil', send);
+    this.server.emit('update_profil', send);
     return user;
   }
 
@@ -381,7 +381,7 @@ export class UserService {
         id: id,
         type: 'name',
       };
-      this.server.emit('updateprofil', send);
+      this.server.emit('update_profil', send);
       return imagePath;
     } catch (error) {
       return null;
