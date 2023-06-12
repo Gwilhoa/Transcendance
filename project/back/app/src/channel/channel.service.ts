@@ -210,8 +210,8 @@ export class ChannelService {
     if (channel.messages == null) channel.messages = [];
     channel.messages.push(message);
     await this.channelRepository.save(channel);
-    const ret = await this.messageRepository.save(message);
-    ret.channel = null;
+    const ret: any = await this.messageRepository.save(message);
+    ret.channel = channel.id;
     return ret;
   }
 

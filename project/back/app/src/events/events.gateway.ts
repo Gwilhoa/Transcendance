@@ -247,8 +247,7 @@ export class EventsGateway
       const sendmsg = {
         id: msg.id,
         content: msg.content,
-        user: msg.user.id,
-        username: msg.user.username,
+        user: msg.user,
         channel: msg.channel,
         date: msg.date,
       };
