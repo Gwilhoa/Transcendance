@@ -3,7 +3,7 @@ import Head from "./header";
 import  '../App.css'
 import Notification from "../components/notification/notification";
 import { Outlet, useLocation } from "react-router-dom";
-import { socket } from "../components/utils/API";
+import SocketSingleton from "../socket";
 
 
 
@@ -11,6 +11,12 @@ const Template = () => {
   let friendId = 0;
   const [notif, setNotif] = useState(<></>);
   const [notifVisible, setNotifVisible] = useState(false);
+
+  const socketInstance = SocketSingleton.getInstance();
+  const socket = socketInstance.getSocket();
+  socket.on('message_code', (data: any) => {
+    console.log(data);
+  });
   
   //const location = useLocation();
   

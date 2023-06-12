@@ -1,11 +1,11 @@
 import './css/endgame.css'
 import React, { useState, useEffect, useRef } from "react";
-import { socket } from '../components/utils/API';
 import Cookies from 'universal-cookie';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import {useSelector} from "react-redux";
 import {RootState} from "../redux/store";
+import SocketSingleton from "../socket";
 
 const cookies = new Cookies();
 
@@ -16,12 +16,17 @@ const EndGame = () => {
   const [replay, setMyReplay] = useState(true);
   const navigate = useNavigate();
   const finalStatus = useSelector((state: RootState) => state.finalGame.finalStatus);
+  const socketInstance = SocketSingleton.getInstance();
+  const socket = socketInstance.getSocket();
+  socket.on('message_code', (data: any) => {
+    console.log(data);
+  });
 
   useEffect(() => {
     return () => {
       socket.emit('game_finished', { rematch: false });
     };
-  }, []);
+  }, [socket]);
 
   const homebutton = () => {
     socket.emit('game_finished', {rematch : false});
@@ -38,15 +43,9 @@ const EndGame = () => {
   }
 
     socket.on('rematch', (any) => {
-    console.log("rematch")
-    console.log(any);
     const rematch = any.rematch;
-    console.log("rematch");
-    console.log(rematch);
     if (rematch) {
-      console.log("b")
       if (myrevenge) {
-        console.log("a")
         socket.emit('game_finished', {rematch : true});
         navigate("/game", {state:{gameID:1}})
       }

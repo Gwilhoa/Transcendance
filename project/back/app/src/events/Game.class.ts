@@ -151,13 +151,13 @@ export class Game {
     userWin.emit('finish_game', {
       score1: this._score1,
       score2: this._score2,
-      status: 'lose',
+      status: 'lost',
       adversary: winname,
     });
     userDefeat.emit('finish_game', {
       score1: this._score1,
       score2: this._score2,
-      status: 'win',
+      status: 'won',
       adversary: losename,
     });
     this.clear();
@@ -259,11 +259,12 @@ export class Game {
     this._finishCallback.push(callback);
   }
 
-  public remake() {
+  public async remake() {
     this._io.to(this._id).emit('finish_game', {
       score1: 0,
       score2: 0,
       status: 'remake',
+      username: 'none',
     });
     this._user2.leave(this._id);
     this._user1.leave(this._id);

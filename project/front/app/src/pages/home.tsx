@@ -3,13 +3,22 @@ import React, { useCallback, useEffect, useState } from 'react';
 import '../components/notification/notification.css'
 import ErrorToken, { setErrorLocalStorage } from '../components/IfError';
 import { useNavigate } from 'react-router-dom';
-import axios, { socket } from '../components/utils/API';
 import { cookies } from '../App';
 import { IUser } from '../components/utils/interface';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from "../redux/store";
 import { openModal } from "../redux/modal/modalSlice";
 import { Search } from '../components/search/userSearch';
+import axios from 'axios';
+import SocketSingleton from "../socket";
+
+const socketInstance = SocketSingleton.getInstance();
+const socket = socketInstance.getSocket();
+socket.on('message_code', (data: any) => {
+    console.log(data);
+});
+
+
 
 const Add = () => {
     const [listUser, setListUser] = useState<Array<IUser> | null >([]);

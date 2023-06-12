@@ -4,12 +4,15 @@ import { useNavigate } from 'react-router-dom';
 import { ButtonInputToggle } from '../utils/inputButton';
 import LogoutButton from './logout';
 import { setErrorLocalStorage } from "../IfError"
-import axios, { socket } from '../utils/API';
 import Cookies from 'universal-cookie';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { closeModal } from '../../redux/modal/modalSlice';
+import axios from 'axios';
+import SocketSingleton from "../../socket";
 const cookies = new Cookies();
+const socketInstance = SocketSingleton.getInstance();
+const socket = socketInstance.getSocket();
 
 
 export default function Profil() {

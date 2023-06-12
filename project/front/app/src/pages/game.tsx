@@ -1,7 +1,6 @@
 import './css/game.css'
 import React, { useState, useEffect, useRef } from "react";
 import { useSpring, animated } from 'react-spring';
-import { socket } from '../components/utils/API';
 import Cookies from 'universal-cookie';
 import { useNavigate } from 'react-router-dom';
 import ErrorToken from '../components/IfError';
@@ -9,6 +8,7 @@ import { openModal } from '../redux/modal/modalSlice';
 import {useDispatch, useSelector} from 'react-redux';
 import {setFinalStatus} from "../redux/game/gameSlice";
 import {RootState} from "../redux/store";
+import SocketSingleton from "../socket";
 const cookies = new Cookies();
 
 let isCall = true;
@@ -34,6 +34,8 @@ const Game: React.FC<GameProps> = ({ gameId }) => {
   const finalStatus = useSelector((state: RootState) => state.finalGame.finalStatus);
 
 
+  const socketInstance = SocketSingleton.getInstance();
+  const socket = socketInstance.getSocket();
 
 
 
@@ -65,6 +67,7 @@ const Game: React.FC<GameProps> = ({ gameId }) => {
   });
 
   useEffect(() => {
+    const socket = socketInstance.getSocket();
     window.addEventListener("keydown", handleKeyPress);
 
     socket.emit('join_matchmaking', {token : cookies.get('jwtAuthorization')});
