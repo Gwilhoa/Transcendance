@@ -11,6 +11,7 @@ import { closeModal } from '../../redux/modal/modalSlice';
 import { ProfilImage } from "./ProfilImage";
 import axios from 'axios';
 import SocketSingleton from "../../socket";
+import {ProfilName} from "./ProfilName";
 const cookies = new Cookies();
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
@@ -273,7 +274,7 @@ export default function Profil() {
         <div className="profil-modal">
 			<div className='profil-title'>
 				<button className="close-profil" onClick={() => dispatch(closeModal())}></button>
-				<h2> {name} </h2>
+				<h2> <ProfilName  id={id}/> </h2>
 			</div>
             <div> 
 				{initialElement}
