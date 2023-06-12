@@ -11,13 +11,23 @@ import Messages from "./message";
 function Conversation() {
 	const conversationId = useSelector((state: RootState) => state.conversation.id);
 	const [listMessage, setListMessage] = useState<Array<Message>>([]);
+	const [message, setMessage] = useState<Message>();
 	const socketInstance = SocketSingleton.getInstance();
 	const socket = socketInstance.getSocket();
+
 	useEffect(() => {	
 
 		socket.on('message_code', (data: any) => {
-			console.log(data);
+			console.log("send message code : " + data.code);
 		});
+
+		socket.on('message', (data: Message) => {
+			console.log('receive message');
+			console.log(data);
+			const newList = [...listMessage, data];
+			setListMessage(newList);
+		});
+
 	}, [socket])
 
 	useEffect(() =>{
