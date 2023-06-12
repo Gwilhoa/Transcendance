@@ -23,6 +23,7 @@ const initialState: Channel= {
 const CreateChannel = () => {
 	const dispatch = useDispatch();
 	const [channelParams, setChannelParams] = useState<Channel>(initialState);
+	const [id, setId] = useState<string>('');
 
 	const onSubmitChannelName = (str: string) => {
 		setChannelParams((prevChannelParams) => ({
@@ -47,7 +48,6 @@ const CreateChannel = () => {
 
 	const handleNewChannel = () => {
 		console.log('send');
-		let id;
 		console.log(channelParams);
 		axios.post(process.env.REACT_APP_IP + ':3000/channel/create',
 			{
@@ -61,7 +61,7 @@ const CreateChannel = () => {
 			})
 			.then((response) => {
 				console.log(response);
-				id = response.data.id;
+				setId(response.data.id);
 			})
 			.catch((error) => {
 				console.error(error)

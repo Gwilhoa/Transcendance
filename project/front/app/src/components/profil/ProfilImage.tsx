@@ -7,6 +7,8 @@ const cookies = new Cookies();
 import SocketSingleton from "../../socket";
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
+import { useDispatch } from 'react-redux';
+import { openModal } from "../../redux/modal/modalSlice";
 
 enum UserStatus {
     CONNECTED = 0,
@@ -16,10 +18,11 @@ enum UserStatus {
     DISCONNECTED = 4,
 }
 
-export const ProfilImage = ({ id, diameter}: { id: string, diameter: string }) =>{
+export const ProfilImage = ({ id, OnClickOpenProfil, diameter}: { id: string, OnClickOpenProfil: boolean, diameter: string }) =>{
     const [userStatus, setUserStatus] = useState("");
-    const navigate = useNavigate();
     const [image, setImage] = useState<string>("");
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const changeImage = () => {
         axios.get(process.env.REACT_APP_IP + ":3000/user/image/" + id, {
@@ -77,7 +80,7 @@ export const ProfilImage = ({ id, diameter}: { id: string, diameter: string }) =
     },[navigate, socket])
 
     return (
-        <div key={"image"} className='profil-image'>
+        <div key={"image"} className='profil-image' onClick={OnClickOpenProfil  === true ? () => dispatch(openModal(id)) : undefined}>
             <img className='circle-image' src={image} alt="selected" />
 			<div className={'profil-status' + ' ' + userStatus}></div>
         </div>
