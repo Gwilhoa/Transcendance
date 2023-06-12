@@ -169,6 +169,18 @@ export class ChannelService {
   }
 
   public async getMessage(channel_id, user_id) {
+    if (user_id == null) {
+      const chan = await this.channelRepository
+        .createQueryBuilder('channel')
+        .leftJoinAndSelect('channel.messages', 'messages')
+        .leftJoinAndSelect('messages.user', 'user')
+        .leftJoinAndSelect('channel.users', 'users')
+        .where('channel.id = :id', { id: channel_id })
+        .getOne();
+      if (chan == null) throw new Error('Channel not found');
+      if (chan.messages == null || chan.messages.length == 0) return null;
+      return chan.messages;
+    }
     const user = await this.userService.getUserById(user_id);
     if (user == null) throw new Error('User not found');
     const chan = await this.channelRepository
@@ -344,8 +356,15 @@ export class ChannelService {
   }
 
   async deletechannel(id) {
+    console.log('delete channel id : ', id);
     const channel = await this.channelRepository.findOneBy({ id: id });
     if (channel == null) throw new Error('Channel not found');
+    const messages = await this.getMessage(channel.id, null);
+    if (messages != null && messages.length > 0) {
+      for (const message of messages) {
+        await this.messageRepository.delete(message);
+      }
+    }
     return await this.channelRepository.delete(id);
   }
 
