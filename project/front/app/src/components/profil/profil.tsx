@@ -8,6 +8,7 @@ import Cookies from 'universal-cookie';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { closeModal } from '../../redux/modal/modalSlice';
+import { ProfilImage } from "./ProfilImage";
 import axios from 'axios';
 import SocketSingleton from "../../socket";
 const cookies = new Cookies();
@@ -21,43 +22,17 @@ export default function Profil() {
 	const [isMe, setIsMe] =  useState<boolean>(false);
 	const [isFriend, setIsFriend] =  useState<boolean>(false);
     const [name, setName] = useState<string>("");
-    const [image, setImage] = useState<string>("");
     const [checked, setChecked] = useState(false);
 	const [errorName, setErrorName] = useState<boolean>(false);
 	const [victories, setVictory] = useState<number>(0);
 	const [defeats, setDefeat] = useState<number>(0);
 	const [experience, setExperience] = useState<number>(0);
 	const [hasFriendRequest, setHasFriendRequest] = useState<number>(0);
-	const [userStatus, setUserStatus] = useState("");
 	const id = useSelector((state: RootState) => state.modal.id);
 	const dispatch = useDispatch();
-	
-	enum UserStatus {
-		CONNECTED = 0,
-		IN_CONNECTION = 1,
-		IN_GAME = 2,
-		OFFLINE = 3,
-		DISCONNECTED = 4,
-	}
 
 	console.log(id);
 	const refresh = useCallback(( id: string | null ) => {
-		setUserStatus('profil-status-disconnected');
-		axios.get(process.env.REACT_APP_IP + ":3000/user/image/" + id, {
-			headers: {
-				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
-			},
-		})
-			.then((response) => {
-				const data = response.data;
-				setImage(data);
-			})
-			.catch((error) => {
-				setErrorLocalStorage("Error " + error.response.status);
-				console.error(error);
-				navigate('/Error');
-				dispatch(closeModal());
-			});
 
 		axios.get(process.env.REACT_APP_IP + ":3000/user/id/" + id, {
 			headers: {
@@ -70,15 +45,6 @@ export default function Profil() {
 				setVictory(response.data.victories);
 				setDefeat(response.data.defeats);
 				setExperience(response.data.experience);
-
-				if (response.data.status === UserStatus.CONNECTED)
-				{
-					setUserStatus("profil-status-connected");
-				}
-				if (response.data.status === UserStatus.IN_GAME)
-				{
-					setUserStatus("profil-status-in-game");
-				}
 			})
 			.catch((error) => {
 				setErrorLocalStorage("Error " + error.response.status);
@@ -239,23 +205,6 @@ export default function Profil() {
 				},
 				data: formData,
 			})
-				.then(() => {
-					axios.get(process.env.REACT_APP_IP + ":3000/user/image/" + id, {
-						headers: {
-							Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
-						},
-					})
-						.then((response) => {
-							const data = response.data;
-							setImage(data);
-						})
-						.catch((error) => {
-							setErrorLocalStorage("Error " + error.response.status);
-							console.error(error);
-							navigate('/Error');
-							dispatch(closeModal());
-						});
-				})
 				.catch((error) => {
 					setErrorLocalStorage("Error " + error.response.status);
 					console.error(error);
@@ -279,29 +228,8 @@ export default function Profil() {
 		socket.emit('challenge', { rival_id: id });
 	}
 
-	useEffect(() => {
-		// setUserStatus('profil-status-disconnected');
-		socket.on('connection_server', (data: any) => {
-			console.log('status')
-			if (data.connected.includes() != null){
-				console.log("satus connected");
-				setUserStatus('profil-status-connected');
-			}
-			if (data.connected.includes() != null){
-				console.log("satus in game");
-				setUserStatus('profil-status-in-game');
-			}
-			console.log(data.connected);
-			console.log(data.in_game);
-		})
-	},[socket] )
-
 	initialElement.push(
-        <div key={"image"} className='profil-image'>
-            <img className='circle-image' src={image} alt="selected" />
-			<div className={'profil-status' + ' ' + userStatus}></div>
-            <br/> <br/>
-        </div>
+        <ProfilImage id = {'' + id} diameter = '50'/>
     )
     
     if (isMe) {
