@@ -15,23 +15,24 @@ const BeginGame = () => {
     let paddle1;
     const navigate = useNavigate();
     useEffect(() => {
-        
-    
+
+        socket.on('game_found', (data) => {
+            console.log('found game');
+            console.log(data);
+        });
+
         socket.emit('join_matchmaking', {token : cookies.get('jwtAuthorization')});
     
         socket.on('matchmaking_code', (data:any) => {
           if (data["code"] === 0) {
             console.log('enter matchmaking successfull');
-            socket.on('found_game', (data) => {
-                console.log(data);
-            });
           }
           else {
             navigate("/home");
             alert("Error, you are already in game");
           }
         });
-      }, []);
+      }, [socket]);
 
 
     const spinnerAnimation = useSpring({
