@@ -86,16 +86,13 @@ export default function Profil() {
 		axios.get(process.env.REACT_APP_IP + ":3000/user/friend/request", {
 			headers: { Authorization: `Bearer ${cookies.get('jwtAuthorization')}`, },
 		}).then((Response) => {
-			console.log('friend request');
-			console.log(Response.data);
 			for (const request of Response.data) {
 				console.log(request);
 				if (request.sender.id === id) {
-					console.log('has friend request');
 					setHasFriendRequest(1);
 					return;
 				}
-				if (request.sender.id === id && request.receiver.id === id) { //TODO: check if sender is me and receiver is him (waiting...)
+				if (request.sender.id === localStorage.getItem('id') && request.receiver.id === id) {
 					console.log('has friend request');
 					setHasFriendRequest(2);
 					return;

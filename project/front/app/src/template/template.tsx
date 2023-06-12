@@ -43,7 +43,6 @@ const Template = () => {
     }) 
     socket.on('friend_request', (data: any) => {
       if (data.code == 4) {
-        console.log(data);
         friendId = data.id;
         setNotif(<Notification message={"New friend"} onConfirm={confirmFriend} onCancel={rejectFriend} hasButton={true} setVisible={setNotifVisible}/>);
         setNotifVisible(true)

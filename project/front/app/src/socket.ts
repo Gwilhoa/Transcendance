@@ -16,6 +16,7 @@ class SocketSingleton {
 				jwtAuthorization = cookies.get('jwtAuthorization');
 			}
 			this.socket.emit('connection', { token: jwtAuthorization });
+			console.log('connected');
 		});
 
 
