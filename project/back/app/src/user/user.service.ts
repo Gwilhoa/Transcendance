@@ -379,7 +379,7 @@ export class UserService {
       fs.writeFileSync(imagePath, buffer);
       const send = {
         id: id,
-        type: 'name',
+        type: 'image',
       };
       this.server.emit('update_profil', send);
       return imagePath;
