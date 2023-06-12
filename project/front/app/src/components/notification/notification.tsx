@@ -5,17 +5,18 @@ import { Link } from "react-router-dom";
 
 interface NotificationProps {
   message: string;
-  channel: string;
-  isInChannel: boolean;
+  onConfirm: () => void;
+  onCancel:  () => void;
+  hasButton:boolean
+  setVisible: (arg: boolean) => void;
 }
 
-export default function Notification({ message, isInChannel, channel }: NotificationProps) {
-  const [visible, setVisible] = useState(true);
-
+export default function Notification({ message, onConfirm, onCancel, hasButton, setVisible }: NotificationProps) {
+ 
   useEffect(() => {
     const timer = setTimeout(() => {
       setVisible(false);
-    }, 6000);
+    }, 3000);
 
     return () => clearTimeout(timer);
     }, []);
@@ -24,15 +25,29 @@ export default function Notification({ message, isInChannel, channel }: Notifica
       setVisible(false);
     };
 
-  if (visible) {
+  
       return (
-        <div className="not">
+        <div className="notific" onClick={handleClose}>
           <h2>
+            {message}
           </h2>
+          
+          {hasButton &&
+            <>
+            <button onClick={onConfirm}>
+              <h2>
+                <span role="img" aria-label="Valider">&#10004;</span>
+              </h2>
+            </button>
+            <button onClick={onCancel}>
+              <h2>
+                <span role="img" aria-label="Refuser">&#10060;</span>
+              </h2>
+            </button>
+            </>
+          }  
+          
         </div>
       );
-  }
-    else
-        return null;
 }
 

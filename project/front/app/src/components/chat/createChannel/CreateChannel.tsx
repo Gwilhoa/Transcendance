@@ -6,8 +6,11 @@ import { Channel } from "../../../pages/chat";
 import { ButtonInputToggle } from "../../utils/inputButton";
 import { cookies } from "../../../App";
 import axios from "axios";
-import { socket } from "../../utils/API";
 import { setConversation } from "../../../redux/chat/conversationIdSlice";
+import SocketSingleton from "../../../socket";
+const socketInstance = SocketSingleton.getInstance();
+const socket = socketInstance.getSocket();
+
 
 const initialState: Channel= {
 	id: '',

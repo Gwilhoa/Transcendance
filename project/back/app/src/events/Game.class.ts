@@ -9,13 +9,14 @@ export class Game {
   static default_positionBy = this.default_sizeMaxY / 2;
   static default_update = 16;
   static default_racklenght = 15;
-  static default_positionR = 50 - this.default_racklenght / 2;
+  static default_positionR = (this.default_sizeMaxX / 2) - this.default_racklenght / 2;
   static default_rackwidth = 2;
   static default_radiusball = 1;
   static default_speedBall = 0.5;
   static default_sizeMinX = 0;
   static default_sizeMinY = 0;
-  static default_victorygoal = 1;
+  static default_victorygoal = 3;
+  static default_rackspeed = 2;
 
   private _io: Server;
   private _loopid: NodeJS.Timeout;
@@ -86,19 +87,23 @@ export class Game {
       if (y == 1) {
         if (this._rack1y >= this._maxY - Game.default_racklenght)
           this._rack1y = this._maxY - Game.default_racklenght;
-        else this._rack1y += 2;
-      } else if (y == 0) {
-        if (this._rack1y - 2 <= 0) this._rack1y = 0;
-        else this._rack1y -= 2;
+        else this._rack1y += Game.default_rackspeed;
+      } 
+      else if (y == 0) {
+        if (this._rack1y - Game.default_rackspeed <= 0) this._rack1y = 0;
+
+        else this._rack1y -= Game.default_rackspeed;
       }
-    } else if (player.id == this._user2.id) {
+    } 
+    else if (player.id == this._user2.id) {
       if (y == 1) {
         if (this._rack2y >= this._maxY - Game.default_racklenght)
           this._rack2y = this._maxY - Game.default_racklenght;
-        else this._rack2y += 2;
+        else this._rack2y += Game.default_rackspeed;
       } else if (y == 0) {
-        if (this._rack2y <= 0) this._rack2y = 0;
-        else this._rack2y -= 2;
+        if (this._rack2y <= 0)
+          this._rack2y = 0;
+        else this._rack2y -= Game.default_rackspeed;
       }
     }
   }
@@ -151,13 +156,13 @@ export class Game {
     userWin.emit('finish_game', {
       score1: this._score1,
       score2: this._score2,
-      status: 'lose',
+      status: 'lost',
       adversary: winname,
     });
     userDefeat.emit('finish_game', {
       score1: this._score1,
       score2: this._score2,
-      status: 'win',
+      status: 'won',
       adversary: losename,
     });
     this.clear();
@@ -166,7 +171,7 @@ export class Game {
 
   private endBattle = (scoreWin: number): number => {
     scoreWin++;
-    if (scoreWin != Game.default_victorygoal) {
+    if (scoreWin < Game.default_victorygoal) {
       this._rack1y = Game.default_positionR;
       this._rack2y = Game.default_positionR;
       this._ballx = Game.default_positionBx;
@@ -259,11 +264,12 @@ export class Game {
     this._finishCallback.push(callback);
   }
 
-  public remake() {
+  public async remake() {
     this._io.to(this._id).emit('finish_game', {
       score1: 0,
       score2: 0,
       status: 'remake',
+      username: 'none',
     });
     this._user2.leave(this._id);
     this._user1.leave(this._id);
