@@ -30,11 +30,11 @@ const AppInsideBrowser = () => {
 				<Route path="/Error" Component={TryToReconnect} />
 				<Route element={<Template/>}>
 					<Route path="/home" element={<Home></Home>} />
-					<Route path="/game" element={<Game></Game>} />
+					<Route path="/game" element={<Game gameId={0} />} />
 					<Route path="/chat/*" element={<Chat></Chat>} />
 					<Route path="/CreateTwoFa" element={<CreateTwoFaPage></CreateTwoFaPage>}/>
 					<Route path="/history" element={<History></History>} />
-					<Route path="/endgame/*" element={<EndGame result="dj"></EndGame>} />
+					<Route path="/endgame/*" element={<EndGame></EndGame>} />
 				</Route>
 			</Routes>
 		</>

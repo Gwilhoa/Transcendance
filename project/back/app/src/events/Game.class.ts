@@ -9,14 +9,14 @@ export class Game {
   static default_positionBy = this.default_sizeMaxY / 2;
   static default_update = 16;
   static default_racklenght = 15;
-  static default_positionR = 50 - this.default_racklenght / 2;
+  static default_positionR = (this.default_sizeMaxX / 2) - this.default_racklenght / 2;
   static default_rackwidth = 2;
-  static default_steprack = 1;
   static default_radiusball = 1;
   static default_speedBall = 0.5;
   static default_sizeMinX = 0;
   static default_sizeMinY = 0;
-  static default_victorygoal = 1;
+  static default_victorygoal = 3;
+  static default_rackspeed = 2;
 
   private _io: Server;
   private _loopid: NodeJS.Timeout;
@@ -51,6 +51,7 @@ export class Game {
     this._id = id;
     this._user1 = user1;
     this._user2 = user2;
+    this._finishCallback = finishCallback;
     this._rack1y = Game.default_positionR;
     this._rack2y = Game.default_positionR;
     this._score1 = 0;
@@ -81,48 +82,28 @@ export class Game {
     return this._user2;
   }
 
-  public getRack1y() {
-    return this._rack1y;
-  }
-
-  public getRack2y() {
-    return this._rack2y;
-  }
-
-  public getScore1() {
-    return this._score1;
-  }
-
-  public getScore2() {
-    return this._score2;
-  }
-
-  public getBallx() {
-    return this._ballx;
-  }
-
-  public getBally() {
-    return this._bally;
-  }
-
   public updateRacket(player: Socket, y: number) {
     if (player.id == this._user1.id) {
       if (y == 1) {
         if (this._rack1y >= this._maxY - Game.default_racklenght)
           this._rack1y = this._maxY - Game.default_racklenght;
-        else this._rack1y += 2;
-      } else if (y == 0) {
-        if (this._rack1y - 2 <= 0) this._rack1y = 0;
-        else this._rack1y -= 2;
+        else this._rack1y += Game.default_rackspeed;
+      } 
+      else if (y == 0) {
+        if (this._rack1y - Game.default_rackspeed <= 0) this._rack1y = 0;
+
+        else this._rack1y -= Game.default_rackspeed;
       }
-    } else if (player.id == this._user2.id) {
+    } 
+    else if (player.id == this._user2.id) {
       if (y == 1) {
         if (this._rack2y >= this._maxY - Game.default_racklenght)
           this._rack2y = this._maxY - Game.default_racklenght;
-        else this._rack2y += 2;
+        else this._rack2y += Game.default_rackspeed;
       } else if (y == 0) {
-        if (this._rack2y <= 0) this._rack2y = 0;
-        else this._rack2y -= 2;
+        if (this._rack2y <= 0)
+          this._rack2y = 0;
+        else this._rack2y -= Game.default_rackspeed;
       }
     }
   }
@@ -151,28 +132,46 @@ export class Game {
     this._loopid = setInterval(this.gameLoop, Game.default_update);
   }
 
-  private endWar = async (userWin: Socket, userDefeat: Socket) => {
+  private endWar = async (userWin: Socket, userDefeat: Socket, winuser) => {
     console.log('game finish ' + this._id);
     this._user1.leave(this._id);
     this._user2.leave(this._id);
+    const g = await this._gameService.finishGame(
+      this._id,
+      this._score1,
+      this._score2,
+    );
+    let winname: string;
+    let losename: string;
+    if (winuser == 1) {
+      losename = g.user1.username;
+      winname = g.user2.username;
+    } else {
+      losename = g.user2.username;
+      winname = g.user1.username;
+    }
+    console.log('game finish ' + winname + ' ' + losename);
+    this._user2.leave(this._id);
+    this._user1.leave(this._id);
     userWin.emit('finish_game', {
       score1: this._score1,
       score2: this._score2,
-      status: 'lose',
+      status: 'lost',
+      adversary: winname,
     });
     userDefeat.emit('finish_game', {
       score1: this._score1,
       score2: this._score2,
-      status: 'win',
+      status: 'won',
+      adversary: losename,
     });
-    await this._gameService.finishGame(this._id, this._score1, this._score2);
-    clearInterval(this._loopid);
+    this.clear();
     this.executeFinishCallbacks();
   };
 
   private endBattle = (scoreWin: number): number => {
     scoreWin++;
-    if (scoreWin != Game.default_victorygoal) {
+    if (scoreWin < Game.default_victorygoal) {
       this._rack1y = Game.default_positionR;
       this._rack2y = Game.default_positionR;
       this._ballx = Game.default_positionBx;
@@ -194,7 +193,6 @@ export class Game {
       this._maxY - Game.default_rackwidth - Game.default_radiusball;
 
     if (this._bally <= minposition) {
-      console.log(this._angle);
       if (
         this._futurballx >= this._rack1y &&
         this._futurballx <= this._rack1y + Game.default_racklenght
@@ -203,13 +201,13 @@ export class Game {
         this._angle = Math.PI - this._angle;
         const distbar = this._futurbally - minposition;
         this._futurbally -= 2 * distbar;
-      } else if (this._ballx) {
+      } else {
         this._score1 = this.endBattle(this._score1);
         if (this._score1 >= Game.default_victorygoal) {
-          await this.endWar(this._user1, this._user2);
+          await this.endWar(this._user1, this._user2, 1);
           return;
         } else {
-          clearInterval(this._loopid);
+          this.clear();
           this.start();
           return;
         }
@@ -228,10 +226,10 @@ export class Game {
       } else {
         this._score2 = this.endBattle(this._score2);
         if (this._score2 >= Game.default_victorygoal) {
-          await this.endWar(this._user2, this._user1);
+          await this.endWar(this._user2, this._user1, 2);
           return;
         } else {
-          clearInterval(this._loopid);
+          this.clear();
           this.start();
           return;
         }
@@ -266,19 +264,21 @@ export class Game {
     this._finishCallback.push(callback);
   }
 
-  public remake() {
+  public async remake() {
     this._io.to(this._id).emit('finish_game', {
       score1: 0,
       score2: 0,
       status: 'remake',
+      username: 'none',
     });
     this._user2.leave(this._id);
     this._user1.leave(this._id);
-    clearInterval(this._loopid);
+    this.clear();
     this.executeFinishCallbacks();
   }
 
   public clear() {
-    clearInterval(this._loopid);
+    if (this._loopid != null) clearInterval(this._loopid);
+    this._loopid = null;
   }
 }

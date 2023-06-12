@@ -17,7 +17,7 @@ function ErrorToken() {
 		navigate('/Error');
 	}
 
-		axios.get(process.env.REACT_APP_IP + ":3000/auth/2fa/is2FA", {
+		axios.get(process.env.REACT_APP_IP + ":3000/user/id", {
 			headers: {
 				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
 			},
@@ -25,6 +25,8 @@ function ErrorToken() {
 			.catch((error) => {
 				setErrorLocalStorage("Error " + error.response.status);
 				console.error(error);
+				if (cookies.get('jwtAuthorization') != null)
+					cookies.remove('jwtAuthorization');
 				navigate('/Error');
 			});
 	}, [navigate]);

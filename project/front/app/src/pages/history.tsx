@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useCallback }from "react";
 import './css/history.css'
 import ErrorToken, { setErrorLocalStorage } from '../components/IfError';
-import axios from '../components/utils/API'
 import { useNavigate } from 'react-router-dom';
 import { cookies } from '../App'
 import { useDispatch } from "react-redux";
 import { openModal } from "../redux/modal/modalSlice";
+import axios from "axios";
 
 
 interface ShowScore {
@@ -40,6 +40,7 @@ const OneScoreBlock = ({status, myScore, opponentScore, opponentId, myUsername, 
 				setErrorLocalStorage("Error " + error.response.status);
 				console.error(error);
 				navigate('/Error');
+                return;
 			});
         axios.get(process.env.REACT_APP_IP + ":3000/user/image/" + opponentId, {
             headers: {
@@ -54,8 +55,9 @@ const OneScoreBlock = ({status, myScore, opponentScore, opponentId, myUsername, 
                 setErrorLocalStorage("Error " + error.response.status);
                 console.error(error);
                 navigate('/Error');
+                return;
             });
-        }, [navigate]);
+        }, [id, navigate, opponentId]);
 
     return (
       <div className="score-block">

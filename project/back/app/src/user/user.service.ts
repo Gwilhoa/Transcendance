@@ -133,8 +133,9 @@ export class UserService {
     if ((await this.userRepository.findOneBy({ id: user.id })) != null) {
       return user;
     }
-    await this.userRepository.save(user);
-    return user;
+    const ret = await this.userRepository.save(user);
+    this.server.emit('new_user', ret);
+    return ret;
   }
 
   public async getUsers() {
@@ -270,7 +271,9 @@ export class UserService {
   public async getFriendRequests(id: string) {
     const user = await this.userRepository
       .createQueryBuilder('user')
-      .leftJoinAndSelect('user.friendRequests', 'friendRequests')
+      .leftJoinAndSelect('user.requestsReceived', 'requestsReceived')
+      .leftJoinAndSelect('requestsReceived.sender', 'sender')
+      .leftJoinAndSelect('requestsReceived.receiver', 'receiver')
       .where('user.id = :id', { id })
       .getOne();
     if (!user) {
@@ -440,12 +443,13 @@ export class UserService {
     const myuser = await this.userRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.blockedUsers', 'blockedUsers')
-        .where('user.id = :id', { id: myuser_id })
-        .getOne();
-    const user = await this.userRepository.createQueryBuilder('user')
-        .leftJoinAndSelect('user.blockedUsers', 'blockedUsers')
-        .where('user.id = :id', { id: user_id })
-        .getOne();
+      .where('user.id = :id', { id: myuser_id })
+      .getOne();
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.blockedUsers', 'blockedUsers')
+      .where('user.id = :id', { id: user_id })
+      .getOne();
     if (user == null || myuser == null) {
       return false;
     }
@@ -496,11 +500,25 @@ export class UserService {
     return user.games;
   }
 
-  public async getUserBySimilarNames(names: string) {
+  public async getUserBySimilarNames(names: string, id: string) {
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.blockedUsers', 'blockedUsers')
+      .where('user.id = :id', { id: id })
+      .getOne();
     const users = await this.userRepository
       .createQueryBuilder('user')
       .where('user.username LIKE :name', { name: `%${names}%` })
       .getMany();
+    if (user.blockedUsers != null && user.blockedUsers.length > 0) {
+      for (const u of users) {
+        for (const blockedUser of user.blockedUsers) {
+          if (blockedUser.id == id) {
+            users.splice(users.indexOf(u), 1);
+          }
+        }
+      }
+    }
     if (users == null) {
       return null;
     }
@@ -608,5 +626,20 @@ export class UserService {
       return null;
     }
     return user.secret2FA;
+  }
+
+  async endgame(user_id, iswin) {
+    const user = await this.getUserById(user_id);
+    if (user == null) {
+      throw new Error('User not found');
+    }
+    if (iswin) {
+      user.victories += 1;
+      user.experience += 500;
+    } else {
+      user.defeats += 1;
+      user.experience += 100;
+    }
+    await this.userRepository.save(user);
   }
 }
