@@ -9,92 +9,49 @@ import "../css/sidebar.css"
 import SocketSingleton from "../../../socket";
 import { setErrorLocalStorage } from "../../IfError";
 import { useNavigate } from "react-router-dom";
+import { ProfilImage } from "../../profil/ProfilImage";
 
 function Timer({ dateString }: {dateString: string}) {
-	const [timeElipsed, setTimeElipsed] = useState<number>(0);
+	const [timeElipsed, setTimeElipsed] = useState<string>();
 
 	useEffect(() => {
-		const interval = setInterval(() => {
-			const now = new Date();
 			const date = new Date(dateString);
-			const secondsAgo = Math.floor((now.getTime() - date.getTime()) / 1000);
-			setTimeElipsed(secondsAgo);
-		}, 1000);
-
-		return () =>{
-				clearInterval(interval);
-		}
+			const formattedDate = `${date.getFullYear()}-${(date.getMonth() + 1)
+				.toString()
+				.padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")} ${date
+				.getHours()
+				.toString()
+				.padStart(2, "0")}h${date.getMinutes().toString().padStart(2, "0")}`;
+			setTimeElipsed(formattedDate);
 	});
 
-	
-	if (timeElipsed < 60)
 		return (
 			<>
-				Il y a {timeElipsed} s
+				post on {timeElipsed}.
 			</>
 		);
-
-	if (timeElipsed < 3600)
-		return (
-			<>
-				Il y a {(timeElipsed / 60).toFixed(0)} min
-			</>
-		);
-	if (timeElipsed < 86400)
-		return (
-			<>
-				Il y a {(timeElipsed / 3600).toFixed(0)} h
-			</>
-		);
-	else {
-		return (
-			<>
-				Il y a {(timeElipsed / 86400).toFixed(0)} d
-			</>
-		);
-	}
 }
 
 function Messages({ message }: { message: Message}) {
 	const isMe: boolean = (message.user.id === localStorage.getItem('id'));
-	const [image, setImage] = useState<string>('');
-	const navigate = useNavigate(); 
-
-	useEffect(() => {
-		axios.get(process.env.REACT_APP_IP + ":3000/user/image/" + message.user.id, {
-			headers: {
-				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
-			},
-		})
-			.then((response) => {
-				const data = response.data;
-				setImage(data);
-			})
-			.catch((error) => {
-				setErrorLocalStorage("Error " + error.response.status);
-				console.error(error);
-				navigate('/Error');
-			});
-	})
 
 	return (
 		<div key={message.id} className={isMe ? 'MyMessage' : 'OtherMessage'}>
+			<div className="photoProfilMessage">
+				<ProfilImage id={message.user.id} diameter='' />
+			</div>
 			<div className="headerMessage">
-				<div className="photoProfilMessage">
-				</div>
 				<div className="nameMessage">
 					{message.user.username}
 				</div>
+				<div className="dateMessage">
+					<Timer dateString={message.date} />
+				</div>
 			</div>
-
 			<div className="textMessage">
 				{message.content}		
 			</div>
 			
-			<div className="dateMessage">
-				<Timer dateString={message.date} />
-
-			</div>
 		</div>
 	);
 }
