@@ -22,7 +22,6 @@ function Conversation() {
 	useEffect(() =>{
 		if (conversationId) {
 			console.log(conversationId);
-			socket.emit('send_message', {token: cookies.get("jwtAuthorization"), channel_id: conversationId, content: "test"});
 			axios.get(process.env.REACT_APP_IP + ':3000/channel/message/' + conversationId,
 					{
 						headers: {

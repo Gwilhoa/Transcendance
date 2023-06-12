@@ -8,7 +8,11 @@ import { Message } from "../../../pages/chat"
 import "../css/sidebar.css"
 import SocketSingleton from "../../../socket";
 
-function Conversation() {
+function Conversation(message: Message) {
+	const [isMe, setIsMe] = useState<boolean>(message.user.id == localStorage.getItem('id'));
+	
+	
+
 	return (
 		<>
 

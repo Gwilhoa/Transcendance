@@ -33,6 +33,7 @@ export interface Message {
 	id: string;
 	user: User;
 }
+
 function Chat() {
 	const isOpenSideBar = useSelector((state: RootState) => state.modalChat.isOpenSideBar);
 	const isOpenCreateChannel = useSelector((state: RootState) => state.modalChat.isOpenCreateChannel);
@@ -44,7 +45,7 @@ function Chat() {
 			{isOpenCreateChannel && ( <CreateChannel /> )}
 			<OptionBar/>
 			<div className="rightPart">
-			<Conversation />
+				<Conversation />
 				<SendMessage />
 			</div>
 		</div>
