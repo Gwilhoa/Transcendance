@@ -9,3 +9,8 @@
 	position: relative;
 	flex: 70%;
 }
+
+.profil-image{
+	height: 3rem;
+	width: 3rem;
+}
