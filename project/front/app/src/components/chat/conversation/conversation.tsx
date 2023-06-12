@@ -6,6 +6,7 @@ import { RootState } from "../../../redux/store";
 import { Message } from "../../../pages/chat"
 import "../css/sidebar.css"
 import SocketSingleton from "../../../socket";
+import Messages from "./message";
 
 function Conversation() {
 	const conversationId = useSelector((state: RootState) => state.conversation.id);
@@ -41,7 +42,7 @@ function Conversation() {
 	return (
 		<div className="chatConversation">
 			{listMessage.map((message) => (
-			<p key={message.id}>{message.content}</p>
+				<Messages key={message.id} message={message} />
 			))}
 
 		</div>
