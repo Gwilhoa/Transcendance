@@ -41,7 +41,7 @@ function Messages({ message }: { message: Message}) {
 	return (
 		<div key={message.id} className={isMe ? 'MyMessage' : 'OtherMessage'}>
 			<div onClick={() => dispatch(openModal(message.user.id))} className="photoProfilMessage">
-				<ProfilImage id={message.user.id} diameter='' />
+				<ProfilImage id = {'' + message.user.id} OnClickOpenProfil={false} diameter = ''/>
 			</div>
 			<div className="headerMessage">
 				<div className="nameMessage">
