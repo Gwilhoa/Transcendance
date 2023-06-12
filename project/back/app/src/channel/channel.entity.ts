@@ -43,7 +43,9 @@ export class Channel {
   })
   bannedUsers: User[];
 
-  @OneToMany((type) => Message, (message) => message.channel)
+  @OneToMany((type) => Message, (message) => message.channel, {
+    onDelete: 'CASCADE',
+  })
   messages: Message[];
 
   @Column()
