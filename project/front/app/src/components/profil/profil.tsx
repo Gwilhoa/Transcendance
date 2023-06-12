@@ -8,6 +8,7 @@ import Cookies from 'universal-cookie';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { closeModal } from '../../redux/modal/modalSlice';
+import { ProfilImage } from "./ProfilImage";
 import axios from 'axios';
 import SocketSingleton from "../../socket";
 const cookies = new Cookies();
@@ -21,7 +22,6 @@ export default function Profil() {
 	const [isMe, setIsMe] =  useState<boolean>(false);
 	const [isFriend, setIsFriend] =  useState<boolean>(false);
     const [name, setName] = useState<string>("");
-    const [image, setImage] = useState<string>("");
     const [checked, setChecked] = useState(false);
 	const [errorName, setErrorName] = useState<boolean>(false);
 	const [victories, setVictory] = useState<number>(0);
@@ -33,21 +33,6 @@ export default function Profil() {
 
 	console.log(id);
 	const refresh = useCallback(( id: string | null ) => {
-		axios.get(process.env.REACT_APP_IP + ":3000/user/image/" + id, {
-			headers: {
-				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
-			},
-		})
-			.then((response) => {
-				const data = response.data;
-				setImage(data);
-			})
-			.catch((error) => {
-				setErrorLocalStorage("Error " + error.response.status);
-				console.error(error);
-				navigate('/Error');
-				dispatch(closeModal());
-			});
 
 		axios.get(process.env.REACT_APP_IP + ":3000/user/id/" + id, {
 			headers: {
@@ -219,23 +204,6 @@ export default function Profil() {
 				},
 				data: formData,
 			})
-				.then(() => {
-					axios.get(process.env.REACT_APP_IP + ":3000/user/image/" + id, {
-						headers: {
-							Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
-						},
-					})
-						.then((response) => {
-							const data = response.data;
-							setImage(data);
-						})
-						.catch((error) => {
-							setErrorLocalStorage("Error " + error.response.status);
-							console.error(error);
-							navigate('/Error');
-							dispatch(closeModal());
-						});
-				})
 				.catch((error) => {
 					setErrorLocalStorage("Error " + error.response.status);
 					console.error(error);
@@ -260,10 +228,7 @@ export default function Profil() {
 	}
 
 	initialElement.push(
-        <div key={"image"}>
-            <img className='circle-image' src={image} alt="selected" />
-            <br/> <br/>
-        </div>
+        <ProfilImage id = {'' + id} diameter = '50'/>
     )
     
     if (isMe) {
@@ -312,13 +277,13 @@ export default function Profil() {
 			</div>
             <div> 
 				{initialElement}
+				<div className='result-profil'>
+					<h3>Result</h3>
+					<p>Win: {victories}  - Loose: {defeats}</p>
+					<p>experiences : {experience}</p>
+				</div>
 				{ !isMe ? (
 					<>
-						<div className='result-profil'>
-							<h3>Result</h3>
-							<p>Win: {victories}  - Loose: {defeats}</p>
-							<p>experiences : {experience}</p>
-						</div>
 						{ !isFriend ? (
 							<div className='other-user-profil'>
 								<button onClick={() => handleAddFriend(id)}>
