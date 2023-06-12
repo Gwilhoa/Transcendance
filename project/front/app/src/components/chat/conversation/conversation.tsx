@@ -41,9 +41,12 @@ function Conversation() {
 
 	return (
 		<div className="chatConversation">
-			{listMessage.map((message) => (
+			{ (listMessage != null && listMessage.length > 0) ?
+
+				(listMessage.map((message) => (
 				<Messages key={message.id} message={message} />
-			))}
+			))) : (<></>)
+			}
 
 		</div>
 	);

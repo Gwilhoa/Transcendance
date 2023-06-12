@@ -49,7 +49,7 @@ const CreateChannel = () => {
 		console.log('send');
 		let id;
 		console.log(channelParams);
-		axios.post('/channel/create', 
+		axios.post(process.env.REACT_APP_IP + ':3000/channel/create',
 			{
 				name: channelParams.name,
 				creator_id: localStorage.getItem('id'), 
