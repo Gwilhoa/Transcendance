@@ -229,7 +229,7 @@ export default function Profil() {
 	}
 
 	initialElement.push(
-        <ProfilImage id = {'' + id} diameter = '50'/>
+        <ProfilImage id = {'' + id} OnClickOpenProfil={false} diameter = '50'/>
     )
 
 	initialElement.push(
