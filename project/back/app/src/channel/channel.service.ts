@@ -391,4 +391,26 @@ export class ChannelService {
     channel.users.push(user);
     return await this.channelRepository.save(channel);
   }
+
+  async updateChannel(channel_id: any, user_id: any, body: any) {
+    const channel = await this.channelRepository
+      .createQueryBuilder('channel')
+      .leftJoinAndSelect('channel.creator', 'creator')
+      .where('channel.id = :id', { id: channel_id })
+      .getOne();
+    if (channel == null) throw new Error('Channel not found');
+    if (channel.creator.id != user_id)
+      throw new Error('User is not creator of this channel');
+    if (channel.pwd == null && body.password != null) {
+      channel.type = ChannelType.PROTECTED_CHANNEL;
+    }
+    if (body.password != null) {
+      if ((await bcrypt.compare(body.old_password, channel.pwd)) == false)
+        throw new Error('Wrong password');
+      channel.pwd = await bcrypt.hash(body.password, 10);
+    }
+    if (body.name != null) channel.name = body.name;
+    const ret = await this.channelRepository.save(channel);
+    return { channel_id: ret.id, name: ret.name };
+  }
 }
