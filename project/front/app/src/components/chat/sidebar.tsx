@@ -5,14 +5,16 @@ import { cookies } from "../../App";
 import { Channel } from "../../pages/chat";
 import { setConversation } from "../../redux/chat/conversationIdSlice";
 import { RootState } from "../../redux/store";
-import { socket } from "../utils/API";
 import "./css/sidebar.css"
+import SocketSingleton from "../../socket";
 
 function SideBarChat() {
 	const [listChannel, setListChannel] = useState<Array<Channel>>([]);
 	const dispatch = useDispatch();
 	const conversationId = useSelector((state: RootState) => state.conversation.id);
 
+	const socketInstance = SocketSingleton.getInstance();
+	const socket = socketInstance.getSocket();
 	useEffect(() =>{
 		socket.on('join_code', (data: any) => {
 			console.log(data);

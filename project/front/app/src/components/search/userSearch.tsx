@@ -1,10 +1,12 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { socket } from '../utils/API';
 import { IUser } from '../utils/interface';
 import { useDispatch } from 'react-redux';
 import { setUsers, addUser, setUsersNull } from '../../redux/search/searchSlice';
 
+import SocketSingleton from "../../socket";
+const socketInstance = SocketSingleton.getInstance();
+const socket = socketInstance.getSocket();
 export const Search = ({ defaultAllUsers }: { defaultAllUsers: boolean }) => {
     const navigate = useNavigate();
     const dispatch = useDispatch();

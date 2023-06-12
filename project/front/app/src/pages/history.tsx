@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useCallback }from "react";
 import './css/history.css'
 import ErrorToken, { setErrorLocalStorage } from '../components/IfError';
-import axios from '../components/utils/API'
 import { useNavigate } from 'react-router-dom';
 import { cookies } from '../App'
 import { useDispatch } from "react-redux";
 import { openModal } from "../redux/modal/modalSlice";
+import axios from "axios";
 
 
 interface ShowScore {
