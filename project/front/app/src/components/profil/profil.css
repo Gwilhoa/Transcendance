@@ -8,7 +8,7 @@
   top: 50%;
   transform: translate(-50%, -50%) ;
   width: 500px;
-  height: 650px;
+  height: 810px;
   overflow: auto;
   background-color: var(--box-color);
   color: var(--light-color);
@@ -53,7 +53,7 @@
 .profil-image{
   height: 16rem;
   width: 16rem;
-  margin-bottom: 3rem;
+  /* margin-bottom: 3rem; */
   display: inline-block;
   position: relative;
 }
@@ -88,6 +88,40 @@
 .profil-status-disconnected{
   background-color: rgb(96, 96, 96);
 }
+
+/* Score Profil */
+
+.profil-game-info {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
+.profil-game-info p {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding-left: 2rem;
+  padding-right: 2rem;
+}
+
+.profil-score-middlle-one{
+  border-left: 1px solid #ccc;
+  border-right: 1px solid #ccc;
+}
+
+.profil-game-info-title{
+  margin-bottom: 0.5rem;
+}
+
+.profil-experience{
+  padding-top: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+/* end Score Profil */
 
 .profil-button {
   display: inline-block;

@@ -231,6 +231,26 @@ export default function Profil() {
 	initialElement.push(
         <ProfilImage id = {'' + id} diameter = '50'/>
     )
+
+	initialElement.push(
+		<div className='score-profil'>
+			<div className='profil-game-info'>
+				<p>
+					<span className='profil-game-info-title'>Win</span>
+					<span>{victories}</span>
+				</p>
+				<p className='profil-score-middlle-one'>
+				<span className='profil-game-info-title'>Loose</span>
+				<span>{defeats}</span>
+				</p>
+				<p>
+				<span className='profil-game-info-title'>Ratio</span>
+				<span>{defeats === 0 ? (victories === 0 ? 0 : 1) : victories/defeats}</span>
+				</p>
+			</div>
+			<p className='profil-experience'>{experience} XP</p>
+		</div>
+    )
     
     if (isMe) {
         initialElement.push(
@@ -278,11 +298,6 @@ export default function Profil() {
 			</div>
             <div> 
 				{initialElement}
-				<div className='result-profil'>
-					<h3>Result</h3>
-					<p>Win: {victories}  - Loose: {defeats}</p>
-					<p>experiences : {experience}</p>
-				</div>
 				{ !isMe ? (
 					<>
 						{ !isFriend ? (
