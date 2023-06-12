@@ -38,7 +38,6 @@ function Messages({ message }: { message: Message}) {
 	const isMe: boolean = (message.user.id === localStorage.getItem('id'));
 	const dispatch = useDispatch();
 
-
 	return (
 		<div key={message.id} className={isMe ? 'MyMessage' : 'OtherMessage'}>
 			<div onClick={() => dispatch(openModal(message.user.id))} className="photoProfilMessage">
@@ -55,7 +54,6 @@ function Messages({ message }: { message: Message}) {
 			<div className="textMessage">
 				{message.content}		
 			</div>
-			
 		</div>
 	);
 }
