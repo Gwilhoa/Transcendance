@@ -4,12 +4,15 @@ import { useNavigate } from 'react-router-dom';
 import { ButtonInputToggle } from '../utils/inputButton';
 import LogoutButton from './logout';
 import { setErrorLocalStorage } from "../IfError"
-import axios, { socket } from '../utils/API';
 import Cookies from 'universal-cookie';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { closeModal } from '../../redux/modal/modalSlice';
+import axios from 'axios';
+import SocketSingleton from "../../socket";
 const cookies = new Cookies();
+const socketInstance = SocketSingleton.getInstance();
+const socket = socketInstance.getSocket();
 
 
 export default function Profil() {
@@ -102,16 +105,13 @@ export default function Profil() {
 		axios.get(process.env.REACT_APP_IP + ":3000/user/friend/request", {
 			headers: { Authorization: `Bearer ${cookies.get('jwtAuthorization')}`, },
 		}).then((Response) => {
-			console.log('friend request');
-			console.log(Response.data);
 			for (const request of Response.data) {
 				console.log(request);
 				if (request.sender.id === id) {
-					console.log('has friend request');
 					setHasFriendRequest(1);
 					return;
 				}
-				if (request.receiver.id === id && request.sender.id === localStorage.getItem('id')) {
+				if (request.sender.id === localStorage.getItem('id') && request.receiver.id === id) {
 					console.log('has friend request');
 					setHasFriendRequest(2);
 					return;
