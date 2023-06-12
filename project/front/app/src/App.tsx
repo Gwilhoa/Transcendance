@@ -14,11 +14,13 @@ import NotTwoFa from "./components/authenticate/AuthenticateComponentsNotTwoFa"
 import TwoFa from "./components/authenticate/AuthenticateComponentsTwoFa"
 import React from "react";
 import Cookies from 'universal-cookie';
+import BeginGame from "./pages/begingame";
 
 export const cookies = new Cookies();
 
 
 const AppInsideBrowser = () => {
+
 	return (
 		<>
 			<Routes>
@@ -28,10 +30,11 @@ const AppInsideBrowser = () => {
 				<Route path="/authenticate/NotTwoFa" Component={NotTwoFa} />
 				<Route path="/authenticate/TwoFa" Component={TwoFa} />
 				<Route path="/Error" Component={TryToReconnect} />
+				<Route path="/game" element={<Game gameId={0} />} />
 				<Route element={<Template/>}>
 					<Route path="/home" element={<Home></Home>} />
-					<Route path="/game" element={<Game gameId={0} />} />
 					<Route path="/chat/*" element={<Chat></Chat>} />
+					<Route path="/begingame/*" element={<BeginGame></BeginGame> }/>
 					<Route path="/CreateTwoFa" element={<CreateTwoFaPage></CreateTwoFaPage>}/>
 					<Route path="/history" element={<History></History>} />
 					<Route path="/endgame/*" element={<EndGame></EndGame>} />

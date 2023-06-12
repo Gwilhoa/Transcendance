@@ -1,5 +1,3 @@
-
-
 :root {
   --widthCanvas: "1";
   --heightCanvas: "1";
@@ -60,10 +58,4 @@
   background: rgb(63,94,251);
   background: radial-gradient(circle, rgba(63,94,251,1) 15%, rgba(70,252,189,1) 58%);
   border-radius: 50%;
-}
-
-.gameimg {
-  width: 150px;
-  height: 150px;
-  filter: invert(1);
 }

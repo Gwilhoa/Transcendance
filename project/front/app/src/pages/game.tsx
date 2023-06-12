@@ -1,10 +1,8 @@
 import './css/game.css'
 import React, { useState, useEffect, useRef } from "react";
-import { useSpring, animated } from 'react-spring';
 import Cookies from 'universal-cookie';
 import { useNavigate } from 'react-router-dom';
 import ErrorToken from '../components/IfError';
-import { openModal } from '../redux/modal/modalSlice';
 import {useDispatch, useSelector} from 'react-redux';
 import {setFinalStatus} from "../redux/game/gameSlice";
 import {RootState} from "../redux/store";
@@ -59,12 +57,7 @@ const Game: React.FC<GameProps> = ({ gameId }) => {
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const spinnerAnimation = useSpring({
-    from: { transform: 'rotate(0deg)' },
-    to: { transform: 'rotate(360deg)' },
-    loop: true,
-    config: { duration: 4000 },
-  });
+
 
   useEffect(() => {
     const socket = socketInstance.getSocket();
@@ -95,18 +88,7 @@ const Game: React.FC<GameProps> = ({ gameId }) => {
       isCall = !isCall;
     }
   });
-  socket.on('game_found', (data) => {
-    if (data.game_id == null) {
-      console.log('error while game creating');
-    }
-    if (data.user == 1) {
-      setColor1('blue');
-      setColor2('red');
-    } else {
-      setColor2('blue');
-      setColor1('red');
-    }
-  });
+  
 
   socket.on('create_game', (any) => {
     console.log("WESH")
@@ -133,35 +115,24 @@ const Game: React.FC<GameProps> = ({ gameId }) => {
   }, [onGame]);
 
   return (
-      <>
-        <ErrorToken />
-        {onGame == 0 &&
-            <div className='center-page'>
-              <h2 style={{color: 'white'}}> Searching players... </h2>
-              <animated.img src={"https://pic.onlinewebfonts.com/svg/img_155544.png"} className={"gameimg"} style={spinnerAnimation}></animated.img>
-            </div>
-        }
+  <>
+    <ErrorToken />
+    <canvas
+        ref={canvasRef}
+        className="game-canvas"
+    > </canvas>
+    <div className="parentscore">
+      <div className="score">
+        <h1>
 
-        {onGame == 1 &&
-            <>
-              <canvas
-                  ref={canvasRef}
-                  className="game-canvas"
-              > </canvas>
-              <div className="parentscore">
-                <div className="score">
-                  <h1>
-
-                    {score1 + " | " + score2}
-                  </h1>
-                </div>
-              </div>
-              <div className="paddle1" style={{ top: paddle1 + '%', background: color1 }} />
-              <div className="paddle2" style={{ top: paddle2 + '%', background: color2 }} />
-              <div className="ball" style={{ top: ball.x + '%', left: ball.y - 1 + '%'}} />
-            </>
-        }
-      </>
+          {score1 + " | " + score2}
+        </h1>
+      </div>
+    </div>
+    <div className="paddle1" style={{ top: paddle1 + '%', background: color1 }} />
+    <div className="paddle2" style={{ top: paddle2 + '%', background: color2 }} />
+    <div className="ball" style={{ top: ball.x + '%', left: ball.y - 1 + '%'}} />
+  </>
 
   );
 }
