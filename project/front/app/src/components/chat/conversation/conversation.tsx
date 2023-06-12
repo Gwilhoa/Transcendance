@@ -11,7 +11,6 @@ import Messages from "./message";
 function Conversation() {
 	const conversationId = useSelector((state: RootState) => state.conversation.id);
 	const [listMessage, setListMessage] = useState<Array<Message>>([]);
-	const [message, setMessage] = useState<Message>();
 	const socketInstance = SocketSingleton.getInstance();
 	const socket = socketInstance.getSocket();
 
@@ -21,11 +20,19 @@ function Conversation() {
 			console.log("send message code : " + data.code);
 		});
 
-		socket.on('message', (data: Message) => {
+		socket.on('message', (data: any) => {
 			console.log('receive message');
 			console.log(data);
-			const newList = [...listMessage, data];
-			setListMessage(newList);
+			if (data.channel === conversationId) {
+				const newItemMessage: Message = {
+					content: data.content,
+					id: data.id,
+					user: data.user,
+					date: data.date,
+				}
+				console.log(newItemMessage);
+				setListMessage(prevListMessage => [...prevListMessage, newItemMessage]);
+			}
 		});
 
 	}, [socket])
@@ -47,7 +54,7 @@ function Conversation() {
 						console.error(error);
 					});
 		}
-	},[conversationId, socket])
+	},[conversationId])
 
 	return (
 		<div className="chatConversation">
