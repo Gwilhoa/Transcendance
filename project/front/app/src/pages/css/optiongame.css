@@ -1,6 +1,4 @@
 
-  
-  /* Styles for the title */
   .title-choice {
     text-align: center;
     color: #fff;
@@ -8,14 +6,12 @@
     font-size: 2rem;
   }
   
-  /* Styles for the button group */
   .button-group {
     display: flex;
     justify-content: center;
     margin-top: 1rem;
   }
   
-  /* Styles for the buttons */
   .button {
     padding: 1rem 2rem;
     margin: 0 1rem;
@@ -26,13 +22,17 @@
     font-size: 1.5rem;
   }
   
-  /* Styles for the selected button */
   .selected {
     background-color: #bd4e4e;
     color: #fff;
   }
+
+  .img {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+  }
   
-  /* Styles for the confirm button */
   .enter {
     display: block;
     margin: 2rem auto;
@@ -44,7 +44,6 @@
     font-size: 2rem;
   }
   
-  /* Responsive styles */
   @media screen and (max-width: 600px) {
     h1 {
       font-size: 1.2rem;

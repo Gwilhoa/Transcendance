@@ -7,6 +7,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {setFinalStatus} from "../redux/game/gameSlice";
 import {RootState} from "../redux/store";
 import SocketSingleton from "../socket";
+import { animated, useSpring } from 'react-spring';
 const cookies = new Cookies();
 
 let isCall = true;
@@ -16,6 +17,14 @@ interface GameProps {
 }
 
 const Game: React.FC<GameProps> = () => {
+
+  const animatedBall = useSpring({
+    from: { transform: 'rotate(0deg)' },
+    to: { transform: 'rotate(360deg)' },
+    loop: true,
+    config: { duration: 4000 },
+  });
+
   isCall = true;
   const navigate = useNavigate();
   const gameId = useSelector((state: RootState) => state.beginToOption.gameid);
@@ -23,7 +32,7 @@ const Game: React.FC<GameProps> = () => {
   console.log(onGame);
   const [score1, setScore1] = useState(0);
   const [score2, setScore2] = useState(0);
-
+  
   const [ball, setBall] = useState({ x: 50, y: 50});
   const [paddle1, setPaddle1] = useState(42.5 );
   const [paddle2, setPaddle2] = useState(42.5 );
@@ -31,7 +40,7 @@ const Game: React.FC<GameProps> = () => {
   const [color2, setColor2] = useState("white");
   
   const playerstats = useSelector((state: RootState) => state.beginToOption.playerstate);
-
+  
   
   const [nbBall, setNbBall] = useState('button1');
   const [nbMap, setNbMap] = useState('map1');
@@ -40,12 +49,16 @@ const Game: React.FC<GameProps> = () => {
   
   const dispatch = useDispatch();
   const finalStatus = useSelector((state: RootState) => state.finalGame.finalStatus);
-
+  
   
   const socketInstance = SocketSingleton.getInstance();
   const socket = socketInstance.getSocket();
   
   
+  const ballStyles = {
+    top: `${ball.x - 2}%`,
+    left: `${ball.y - 1}%`,
+  };
   
   const handleKeyPress = (event: KeyboardEvent) => {
     switch (event.code) {
@@ -122,10 +135,7 @@ const Game: React.FC<GameProps> = () => {
   return (
   <>
     <ErrorToken />
-    <canvas
-        ref={canvasRef}
-        className="game-canvas"
-    > </canvas>
+    <img src={nbMap} width={"100vh"} height={"100vh"}/>
     <div className="parentscore">
       <div className="score">
         <h1>
@@ -136,8 +146,13 @@ const Game: React.FC<GameProps> = () => {
     </div>
     <div className="paddle1" style={{ top: paddle1 + '%', background: color1 }} />
     <div className="paddle2" style={{ top: paddle2 + '%', background: color2 }} />
-    <div className="ball" style={{ top: ball.x - 2 + '%', left: ball.y - 1 + '%'}} />
+    <animated.img
+      src={nbBall}
+      className="ball"
+      style={{ ...animatedBall, ...ballStyles }}
+    />
   </>
+
 
   );
 }
