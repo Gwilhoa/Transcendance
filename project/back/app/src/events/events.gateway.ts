@@ -520,15 +520,15 @@ export class EventsGateway
     if (game == null) {
       return;
     } else {
-      this.server.to(game_id).emit('option_receive', payload);
-      await sleep(1000);
       this.server.to(game_id).emit('will_started', { time: 3 });
       await sleep(1000);
+      this.server.to(game_id).emit('option_receive', payload);
       this.server.to(game_id).emit('will_started', { time: 2 });
       await sleep(1000);
       this.server.to(game_id).emit('will_started', { time: 1 });
       await sleep(1000);
       this.server.to(game_id).emit('will_started', { time: 0 });
+      await sleep(1000);
       game.start();
     }
   }
