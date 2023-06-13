@@ -7,7 +7,6 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setBeginStatus } from '../redux/game/beginToOption';
 
-
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
 const cookies = new Cookies();
@@ -17,25 +16,26 @@ const BeginGame = () => {
     let paddle1;
     const navigate = useNavigate();
     const dispatch = useDispatch();
+
     useEffect(() => {
       
-        socket.emit('join_matchmaking', {token : cookies.get('jwtAuthorization')});
-    
-        socket.on('matchmaking_code', (data:any) => {
-          if (data["code"] === 0) {
-            console.log('enter matchmaking successfull');
-            socket.on('game_found', (data) => {
-                console.log(data);
-                dispatch(setBeginStatus({decide: data.decide, playerstate: data.user, gameid: data.game_id}));
-                navigate("/optiongame")            
-            });
-          }
-          else {
-            navigate("/home");
-            alert("Error, you are already in game");
-          }
-        });
-      }, [socket]);
+      socket.emit('join_matchmaking', {token : cookies.get('jwtAuthorization')});
+  
+      socket.on('matchmaking_code', (data:any) => {
+        if (data["code"] === 0) {
+          console.log('enter matchmaking successfull');
+          socket.on('game_found', (data) => {
+              console.log(data);
+              dispatch(setBeginStatus({decide: data.decide, playerstate: data.user, gameid: data.game_id}));
+              navigate("/optiongame")            
+          });
+        }
+        else {
+          navigate("/home");
+          alert("Error, you are already in game");
+        }
+      });
+    }, [socket]);
 
 
     const spinnerAnimation = useSpring({
