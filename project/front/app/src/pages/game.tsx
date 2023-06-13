@@ -133,9 +133,15 @@ const Game: React.FC<GameProps> = () => {
   }, [onGame]);
 
   return (
-  <>
+    <div
+    style={{
+      backgroundImage: nbMap,
+      backgroundSize: 'cover',
+      backgroundRepeat: 'no-repeat',
+    }}>
+
     <ErrorToken />
-    <img src={nbMap} width={"100vh"} height={"100vh"}/>
+    
     <div className="parentscore">
       <div className="score">
         <h1>
@@ -150,8 +156,8 @@ const Game: React.FC<GameProps> = () => {
       src={nbBall}
       className="ball"
       style={{ ...animatedBall, ...ballStyles }}
-    />
-  </>
+      />
+    </div>
 
 
   );
