@@ -36,7 +36,7 @@ const BeginGame = () => {
             alert("Error, you are already in game");
           }
         });
-      }, []);
+      }, [socket]);
 
 
     const spinnerAnimation = useSpring({

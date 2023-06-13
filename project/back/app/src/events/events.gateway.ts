@@ -482,13 +482,13 @@ export class EventsGateway
     player.emit('game_found', {
       game_id: create_game.id,
       user: 1,
-      rival: rival.id,
+      rival: create_gameDTO.user2_id,
       decide: FirstDecide,
     });
     rival.emit('game_found', {
       game_id: create_game.id,
       user: 2,
-      rival: player.id,
+      rival: create_gameDTO.user1_id,
       decide: !FirstDecide,
     });
     player.join(create_game.id);
@@ -509,11 +509,7 @@ export class EventsGateway
     }
     this.matchmaking = tempmatchmaking;
     this.server.to(game.getId()).emit('game_created', game.getId());
-    this.logger.log(
-      'game ' + game.getId() + ' created ' + FirstDecide
-        ? 'player 1'
-        : 'player 2' + ' will decide',
-    );
+    this.logger.log('game ' + game.getId() + ' created ');
   }
 
   @SubscribeMessage('option_send')
