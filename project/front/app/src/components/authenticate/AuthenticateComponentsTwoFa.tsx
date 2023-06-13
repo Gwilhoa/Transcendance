@@ -1,22 +1,22 @@
-import "../../pages/css/CreateTwoFa.css";
-import React, { useState, useRef, useEffect } from "react";
-import Cookies from "universal-cookie";
+import '../../pages/css/CreateTwoFa.css';
+import React, { useState, useRef, useEffect } from 'react';
+import Cookies from 'universal-cookie';
 const cookies = new Cookies();
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import AuthCode, { AuthCodeRef } from "react-auth-code-input";
-import { setErrorLocalStorage } from "../IfError";
-import { ErrorInput } from "../../pages/CreateTwoFa";
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import AuthCode, { AuthCodeRef } from 'react-auth-code-input';
+import { setErrorLocalStorage } from '../IfError';
+import { ErrorInput } from '../../pages/CreateTwoFa';
 
 function AuthenticateComponentsTwoFa() {
-	const [, setResult] = useState<string>("");
+	const [, setResult] = useState<string>('');
 	const [Error, setError] = useState<boolean>(false);
 	const navigate = useNavigate();
 	const AuthInputRef = useRef<AuthCodeRef>(null);
 
 	useEffect(() => {
 		if (cookies.get('jwtAuthorization') != null) {
-			axios.get(process.env.REACT_APP_IP + ":3000/auth/2fa/is2FA", {
+			axios.get(process.env.REACT_APP_IP + ':3000/auth/2fa/is2FA', {
 				headers: {
 					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
 				},
@@ -27,7 +27,7 @@ function AuthenticateComponentsTwoFa() {
 				})
 				.catch((error) => {
 					cookies.remove('tenMinToken');
-					setErrorLocalStorage("Error " + error.response.status);
+					setErrorLocalStorage('Error ' + error.response.status);
 					console.error(error);
 					navigate('/Error');
 				});
@@ -41,8 +41,8 @@ function AuthenticateComponentsTwoFa() {
 	const handleOnChange = (res: string) => {
 		setResult(res);
 		if (res.length === 6) {
-			console.log("result of input create 2fa " + res);
-			axios.post(process.env.REACT_APP_IP + ":3000/auth/authenticate",
+			console.log('result of input create 2fa ' + res);
+			axios.post(process.env.REACT_APP_IP + ':3000/auth/authenticate',
 			{
 				code: res
 			},
@@ -59,7 +59,7 @@ function AuthenticateComponentsTwoFa() {
 				})
 				.catch((error) => {
 					if (error.response.status === 401) {
-						setErrorLocalStorage("unauthorized");
+						setErrorLocalStorage('unauthorized');
 						navigate('/Error');
 					}
 					else {

@@ -1,14 +1,14 @@
 import './css/game.css'
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from 'react';
 import { useSpring, animated } from 'react-spring';
 import Cookies from 'universal-cookie';
 import { useNavigate } from 'react-router-dom';
 import ErrorToken from '../components/IfError';
 import { openModal } from '../redux/modal/modalSlice';
 import {useDispatch, useSelector} from 'react-redux';
-import {setFinalStatus} from "../redux/game/gameSlice";
-import {RootState} from "../redux/store";
-import SocketSingleton from "../socket";
+import {setFinalStatus} from '../redux/game/gameSlice';
+import {RootState} from '../redux/store';
+import SocketSingleton from '../socket';
 const cookies = new Cookies();
 
 let isCall = true;
@@ -28,8 +28,8 @@ const Game: React.FC<GameProps> = ({ gameId }) => {
   const [ball, setBall] = useState({ x: 50, y: 50});
   const [paddle1, setPaddle1] = useState(42.5 );
   const [paddle2, setPaddle2] = useState(42.5 );
-  const [color1, setColor1] = useState("white");
-  const [color2, setColor2] = useState("white");
+  const [color1, setColor1] = useState('white');
+  const [color2, setColor2] = useState('white');
   const dispatch = useDispatch();
   const finalStatus = useSelector((state: RootState) => state.finalGame.finalStatus);
 
@@ -42,17 +42,17 @@ const Game: React.FC<GameProps> = ({ gameId }) => {
 
   const handleKeyPress = (event: KeyboardEvent) => {
     switch (event.code) {
-      case "KeyW":
-        socket.emit("input_game", {game_id: gameId, type: 0})
+      case 'KeyW':
+        socket.emit('input_game', {game_id: gameId, type: 0})
         break;
-      case "KeyS":
-        socket.emit("input_game", {game_id: gameId, type: 1})
+      case 'KeyS':
+        socket.emit('input_game', {game_id: gameId, type: 1})
         break;
-      case "ArrowUp":
-        socket.emit("input_game", {game_id: gameId, type: 0})
+      case 'ArrowUp':
+        socket.emit('input_game', {game_id: gameId, type: 0})
         break;
-      case "ArrowDown":
-        socket.emit("input_game", {game_id: gameId, type: 1})
+      case 'ArrowDown':
+        socket.emit('input_game', {game_id: gameId, type: 1})
     }
   };
 
@@ -68,12 +68,12 @@ const Game: React.FC<GameProps> = ({ gameId }) => {
 
   useEffect(() => {
     const socket = socketInstance.getSocket();
-    window.addEventListener("keydown", handleKeyPress);
+    window.addEventListener('keydown', handleKeyPress);
 
     socket.emit('join_matchmaking', {token : cookies.get('jwtAuthorization')});
 
     socket.on('matchmaking_code', (data:any) => {
-      if (data["code"] === 0) {
+      if (data['code'] === 0) {
         console.log('enter matchmaking successfull');
         socket.on('game_start', (code:any) => {
           gameId = (code)
@@ -81,8 +81,8 @@ const Game: React.FC<GameProps> = ({ gameId }) => {
         });
       }
       else {
-        navigate("/home");
-        alert("Error, you are already in game");
+        navigate('/home');
+        alert('Error, you are already in game');
       }
     });
   }, []);
@@ -109,7 +109,7 @@ const Game: React.FC<GameProps> = ({ gameId }) => {
   });
 
   socket.on('create_game', (any) => {
-    console.log("WESH")
+    console.log('WESH')
     console.log(any);
   })
 
@@ -138,7 +138,7 @@ const Game: React.FC<GameProps> = ({ gameId }) => {
         {onGame == 0 &&
             <div className='center-page'>
               <h2 style={{color: 'white'}}> Searching players... </h2>
-              <animated.img src={"https://pic.onlinewebfonts.com/svg/img_155544.png"} className={"gameimg"} style={spinnerAnimation}></animated.img>
+              <animated.img src={'https://pic.onlinewebfonts.com/svg/img_155544.png'} className={'gameimg'} style={spinnerAnimation}></animated.img>
             </div>
         }
 
@@ -146,19 +146,19 @@ const Game: React.FC<GameProps> = ({ gameId }) => {
             <>
               <canvas
                   ref={canvasRef}
-                  className="game-canvas"
+                  className='game-canvas'
               > </canvas>
-              <div className="parentscore">
-                <div className="score">
+              <div className='parentscore'>
+                <div className='score'>
                   <h1>
 
-                    {score1 + " | " + score2}
+                    {score1 + ' | ' + score2}
                   </h1>
                 </div>
               </div>
-              <div className="paddle1" style={{ top: paddle1 + '%', background: color1 }} />
-              <div className="paddle2" style={{ top: paddle2 + '%', background: color2 }} />
-              <div className="ball" style={{ top: ball.x + '%', left: ball.y - 1 + '%'}} />
+              <div className='paddle1' style={{ top: paddle1 + '%', background: color1 }} />
+              <div className='paddle2' style={{ top: paddle2 + '%', background: color2 }} />
+              <div className='ball' style={{ top: ball.x + '%', left: ball.y - 1 + '%'}} />
             </>
         }
       </>

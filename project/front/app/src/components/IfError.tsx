@@ -1,7 +1,7 @@
-import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import { cookies } from "../App";
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { cookies } from '../App';
 
 export function setErrorLocalStorage(ErrorMessage:string) {
 	localStorage.setItem('Error', ErrorMessage);
@@ -18,7 +18,7 @@ function ErrorToken() {
 				navigate('/Error');
 			}
 
-				axios.get(process.env.REACT_APP_IP + ":3000/user/id", {
+				axios.get(process.env.REACT_APP_IP + ':3000/user/id', {
 					headers: {
 						Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
 					},
@@ -29,7 +29,7 @@ function ErrorToken() {
 							navigate('/Error');
 						}
 						else {
-							setErrorLocalStorage("Error " + error.response.status);
+							setErrorLocalStorage('Error ' + error.response.status);
 							console.error(error);
 							if (cookies.get('jwtAuthorization') != null)
 								cookies.remove('jwtAuthorization');

@@ -1,4 +1,4 @@
-import "./css/CreateTwoFa.css";
+import './css/CreateTwoFa.css';
 import axios from 'axios';
 import React, { useEffect, useRef, useState } from 'react';
 import AuthCode, { AuthCodeRef } from 'react-auth-code-input';
@@ -18,17 +18,17 @@ const IsTwoFA = () => {
 	const navigate = useNavigate();
 
 	useEffect(() => { 
-		axios.get(process.env.REACT_APP_IP + ":3000/auth/2fa/is2FA", {
+		axios.get(process.env.REACT_APP_IP + ':3000/auth/2fa/is2FA', {
 			headers: {
 				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
 			},
 		})
 			.then((response) => {
 				if (response.data == true)
-					navigate("/home");
+					navigate('/home');
 			})
 			.catch((error) => {
-				setErrorLocalStorage("Error " + error.response.status);
+				setErrorLocalStorage('Error ' + error.response.status);
 				console.error(error);
 				navigate('/Error');
 			});
@@ -42,8 +42,8 @@ const IsTwoFA = () => {
 
 
 const CreateTwoFaPage = () => {
-	const [, setResult] = useState<string>("");
-	const [dataImage, setDataImage] = useState<string>("");
+	const [, setResult] = useState<string>('');
+	const [dataImage, setDataImage] = useState<string>('');
 	const [Error, setError] = useState<boolean>(false);
 	const navigate = useNavigate();
 	const AuthInputRef = useRef<AuthCodeRef>(null);
@@ -51,8 +51,8 @@ const CreateTwoFaPage = () => {
 	const handleOnChange = (res: string) => {
 		setResult(res);
 		if (res.length === 6) {
-			console.log("result of input create 2fa " + res);
-			axios.post(process.env.REACT_APP_IP + ":3000/auth/2fa/enable",
+			console.log('result of input create 2fa ' + res);
+			axios.post(process.env.REACT_APP_IP + ':3000/auth/2fa/enable',
 			{
 				code: res
 			},
@@ -67,7 +67,7 @@ const CreateTwoFaPage = () => {
 				})
 				.catch((error) => {
 					if (error.response.status === 401) {
-						setErrorLocalStorage("unauthorized");
+						setErrorLocalStorage('unauthorized');
 						navigate('/Error');
 					}
 					else {
@@ -83,7 +83,7 @@ const CreateTwoFaPage = () => {
 	};
 
 	useEffect(() => {
-			axios.get(process.env.REACT_APP_IP + ":3000/auth/2fa/create", {
+			axios.get(process.env.REACT_APP_IP + ':3000/auth/2fa/create', {
 				headers: {
 				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
 				},
@@ -94,7 +94,7 @@ const CreateTwoFaPage = () => {
 				})
 				.catch((error) => {
 					console.error(error);
-					setErrorLocalStorage("Error " + error.response.status);
+					setErrorLocalStorage('Error ' + error.response.status);
 					navigate('/Error');
 				});
 	}, [navigate]);
@@ -106,7 +106,7 @@ const CreateTwoFaPage = () => {
 				<h1 className='create-2FA-title'>
 					Scan the qrCode and enter your Code
 				</h1>
-				<img src={dataImage} className="qrCode"/>
+				<img src={dataImage} className='qrCode'/>
 			<div className='input-2fa'>
 				<AuthCode 
 					allowedCharacters='numeric' 

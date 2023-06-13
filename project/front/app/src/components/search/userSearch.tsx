@@ -4,7 +4,7 @@ import { IUser } from '../utils/interface';
 import { useDispatch } from 'react-redux';
 import { setUsers, addUser, setUsersNull } from '../../redux/search/searchSlice';
 
-import SocketSingleton from "../../socket";
+import SocketSingleton from '../../socket';
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
 export const Search = ({ defaultAllUsers }: { defaultAllUsers: boolean }) => {

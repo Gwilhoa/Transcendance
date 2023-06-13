@@ -1,11 +1,11 @@
 import './css/history.css'
-import React, { useEffect, useState, useCallback }from "react";
+import React, { useEffect, useState, useCallback }from 'react';
 import ErrorToken, { setErrorLocalStorage } from '../components/IfError';
 import { useNavigate } from 'react-router-dom';
 import { cookies } from '../App'
-import { useDispatch } from "react-redux";
-import { openModal } from "../redux/modal/modalSlice";
-import axios from "axios";
+import { useDispatch } from 'react-redux';
+import { openModal } from '../redux/modal/modalSlice';
+import axios from 'axios';
 
 
 interface ShowScore {
@@ -21,13 +21,13 @@ const vistoryScore = 3;
 
 const OneScoreBlock = ({status, myScore, opponentScore, opponentId, myUsername, opponentUsername }: ShowScore) => {
     const navigate = useNavigate();
-    const [image, setImage] = useState<string>("");
-    const [user1Image, setUser1Image] = useState<string>("");
-    const [user2Image, setUser2Image] = useState<string>("");
+    const [image, setImage] = useState<string>('');
+    const [user1Image, setUser1Image] = useState<string>('');
+    const [user2Image, setUser2Image] = useState<string>('');
     const id = localStorage.getItem('id');
     const dispatch = useDispatch();
 	useEffect(() =>{
-		axios.get(process.env.REACT_APP_IP + ":3000/user/image/" + id, {
+		axios.get(process.env.REACT_APP_IP + ':3000/user/image/' + id, {
 			headers: {
 				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
 			},
@@ -37,12 +37,12 @@ const OneScoreBlock = ({status, myScore, opponentScore, opponentId, myUsername, 
 				setUser1Image(data);
 			})
 			.catch((error) => {
-				setErrorLocalStorage("Error " + error.response.status);
+				setErrorLocalStorage('Error ' + error.response.status);
 				console.error(error);
 				navigate('/Error');
                 return;
 			});
-        axios.get(process.env.REACT_APP_IP + ":3000/user/image/" + opponentId, {
+        axios.get(process.env.REACT_APP_IP + ':3000/user/image/' + opponentId, {
             headers: {
                 Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
             },
@@ -52,7 +52,7 @@ const OneScoreBlock = ({status, myScore, opponentScore, opponentId, myUsername, 
                 setUser2Image(data);
             })
             .catch((error) => {
-                setErrorLocalStorage("Error " + error.response.status);
+                setErrorLocalStorage('Error ' + error.response.status);
                 console.error(error);
                 navigate('/Error');
                 return;
@@ -60,16 +60,16 @@ const OneScoreBlock = ({status, myScore, opponentScore, opponentId, myUsername, 
         }, [id, navigate, opponentId]);
 
     return (
-      <div className="score-block">
-        <h3 className="status">{status}</h3>
-            <div className="history-score">
-            <div className="player">
-                <img className="image" src={user1Image} onClick={() => dispatch(openModal(id))} title={myUsername}></img>
+      <div className='score-block'>
+        <h3 className='status'>{status}</h3>
+            <div className='history-score'>
+            <div className='player'>
+                <img className='image' src={user1Image} onClick={() => dispatch(openModal(id))} title={myUsername}></img>
                 <p>{myScore}</p>
             </div>
             <p>against</p>
-            <div className="player">
-                <img className="image" src={user2Image} onClick={() => dispatch(openModal(opponentId))} title={opponentUsername}></img>
+            <div className='player'>
+                <img className='image' src={user2Image} onClick={() => dispatch(openModal(opponentId))} title={opponentUsername}></img>
                 <p>{opponentScore}</p> 
             </div>
         </div>
@@ -93,7 +93,7 @@ const Add = () => {
 
     const navigate = useNavigate();
     useEffect(() =>{
-        axios.get(process.env.REACT_APP_IP + ":3000/game",{
+        axios.get(process.env.REACT_APP_IP + ':3000/game',{
             headers: {
                 Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
             },
@@ -108,12 +108,12 @@ const Add = () => {
             navigate('/Error');
         })
     }, [navigate]);
-    console.log("toto");
+    console.log('toto');
     
     if (response == null || response.length == 0)
     {
-        // console.log("toto");
-        return (<p className="no-game-played">{"You don't have played a game yet!"}</p>);
+        // console.log('toto');
+        return (<p className='no-game-played'>{"You don't have played a game yet!"}</p>);
     }
     console.log(response)
     let i = 0;
@@ -158,20 +158,20 @@ const Add = () => {
         )
         i++;
     }
-    return <div className="score-board">{blocks}</div>;
+    return <div className='score-board'>{blocks}</div>;
 }
 
 const History = () => {
     console.log('aaa');
     return (
-        <div className="page-history">
+        <div className='page-history'>
 			<ErrorToken />
-             <header className="history-title">
+             <header className='history-title'>
                 <div>
-                    {"Historique"}
+                    {'Historique'}
                 </div>
             </header>
-            <div className="scrollBlock">
+            <div className='scrollBlock'>
                 <Add />
             </div>
         </div>

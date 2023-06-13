@@ -1,8 +1,7 @@
 .page-history {
   width: 100%;
   top: var(--header-size);
-  bottom: var(--footer-size);
-  height: calc(100vh - (var(--header-size) + var(--footer-size)));
+  height: calc(100vh - (var(--header-size)));
 }
 
 .history-title {

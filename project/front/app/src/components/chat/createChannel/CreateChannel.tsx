@@ -1,13 +1,13 @@
-import "../css/CreateChannel.css"
-import React, { useState } from "react"
-import { useDispatch } from "react-redux";
-import { switchChatModalCreateChannel } from "../../../redux/chat/modalChatSlice";
-import { Channel } from "../../../pages/chat";
-import { ButtonInputToggle } from "../../utils/inputButton";
-import { cookies } from "../../../App";
-import axios from "axios";
-import { setConversation } from "../../../redux/chat/conversationIdSlice";
-import SocketSingleton from "../../../socket";
+import '../css/CreateChannel.css'
+import React, { useState } from 'react'
+import { useDispatch } from 'react-redux';
+import { switchChatModalCreateChannel } from '../../../redux/chat/modalChatSlice';
+import { Channel } from '../../../pages/chat';
+import { ButtonInputToggle } from '../../utils/inputButton';
+import { cookies } from '../../../App';
+import axios from 'axios';
+import { setConversation } from '../../../redux/chat/conversationIdSlice';
+import SocketSingleton from '../../../socket';
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
 
@@ -67,7 +67,7 @@ const CreateChannel = () => {
 				console.error(error)
 			});
 		if (channelParams.type == 0 ) {
-			console.log("hey need an other call")
+			console.log('hey need an other call')
 		}
 		socket.emit('join_channel', {id: id});
 		dispatch(setConversation(channelParams.id));
@@ -78,24 +78,24 @@ const CreateChannel = () => {
 	const getTypeLabel = (type: number) => {
 		switch (type) {
 			case 0:
-				return "Private";
+				return 'Private';
 			case 1:
-				return "Public";
+				return 'Public';
 			case 2:
-				return "Protected";
+				return 'Protected';
 			default:
-				return "";
+				return '';
 		}
 	};
 
 	return (
-	<div className="PageShadow">
-		<div className="create-channel">
+	<div className='page-shadow'>
+		<div className='create-channel'>
 			<h2>Create Channel</h2>
 			<h3>Channel Name</h3>
-			<button className="close-create-channel" onClick={() => dispatch(switchChatModalCreateChannel())} />
-			<input className='channel-name-input' type='text' placeholder="Channel Name" value={channelParams.name} onChange={(e) => onSubmitChannelName(e.target.value)}/>
-			<div className="ButtonChangeTypeChannel">
+			<button className='close-create-channel' onClick={() => dispatch(switchChatModalCreateChannel())} />
+			<input className='channel-name-input' type='text' placeholder='Channel Name' value={channelParams.name} onChange={(e) => onSubmitChannelName(e.target.value)}/>
+			<div className='ButtonChangeTypeChannel'>
 				<h3>Channel Type</h3>
 				<button className='channel-type-button' onClick={() => handleChannelTypeChange(0)}>Private</button>
 				<button className='channel-type-button' onClick={() => handleChannelTypeChange(1)}>Public</button>
@@ -103,13 +103,13 @@ const CreateChannel = () => {
 			</div>
 			{channelParams.type === 2 ? (
 			<>
-				<div className="divInputPassword">
+				<div className='divInputPassword'>
 					<h3>Password</h3>
 					<input
-						className="channel-password-input"
-						placeholder="Password"
-						type="password"
-						id="password"
+						className='channel-password-input'
+						placeholder='Password'
+						type='password'
+						id='password'
 						onChange={() => handlePasswordChange}
 					/>
 				</div>
@@ -117,13 +117,13 @@ const CreateChannel = () => {
 			) : (<></>)}
 			{channelParams.type === 0 ? (
 			<>
-				<div className="divFindUser">
+				<div className='divFindUser'>
 					<h3>Invite some friend:</h3>
 				</div>
 			</>
 			) : (<></>)}
 
-			<button className="channel-create-channel-button" onClick={() => handleNewChannel()}>New Channel</button>
+			<button className='channel-create-channel-button' onClick={() => handleNewChannel()}>New Channel</button>
 		</div>
 	</div>
 	);
