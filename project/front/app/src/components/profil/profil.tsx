@@ -3,15 +3,15 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ButtonInputToggle } from '../utils/inputButton';
 import LogoutButton from './logout';
-import { setErrorLocalStorage } from "../IfError"
+import { setErrorLocalStorage } from '../IfError'
 import Cookies from 'universal-cookie';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { closeModal } from '../../redux/modal/modalSlice';
-import { ProfilImage } from "./ProfilImage";
+import { ProfilImage } from './ProfilImage';
 import axios from 'axios';
-import SocketSingleton from "../../socket";
-import {ProfilName} from "./ProfilName";
+import SocketSingleton from '../../socket';
+import {ProfilName} from './ProfilName';
 const cookies = new Cookies();
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
@@ -34,7 +34,7 @@ export default function Profil() {
 	console.log(id);
 	const refresh = useCallback(( id: string | null ) => {
 
-		axios.get(process.env.REACT_APP_IP + ":3000/user/id/" + id, {
+		axios.get(process.env.REACT_APP_IP + ':3000/user/id/' + id, {
 			headers: {
 				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
 			},
@@ -46,12 +46,12 @@ export default function Profil() {
 				setExperience(response.data.experience);
 			})
 			.catch((error) => {
-				setErrorLocalStorage("Error " + error.response.status);
+				setErrorLocalStorage('Error ' + error.response.status);
 				console.error(error);
 				navigate('/Error');
 				dispatch(closeModal());
 			});
-		axios.post(process.env.REACT_APP_IP + ":3000/user/isfriend",
+		axios.post(process.env.REACT_APP_IP + ':3000/user/isfriend',
 			{friend_id: id},
 			{
 				headers: {Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,},
@@ -62,12 +62,12 @@ export default function Profil() {
 			.catch((error) => {
 				console.error(error);
 				if (error.response.status === 401 || error.response.status === 500) {
-					setErrorLocalStorage("Error " + error.response.status);
+					setErrorLocalStorage('Error ' + error.response.status);
 					navigate('/Error');
 					dispatch(closeModal());
 				}
 			})
-		axios.get(process.env.REACT_APP_IP + ":3000/user/friend/request", {
+		axios.get(process.env.REACT_APP_IP + ':3000/user/friend/request', {
 			headers: { Authorization: `Bearer ${cookies.get('jwtAuthorization')}`, },
 		}).then((Response) => {
 			for (const request of Response.data) {
@@ -105,7 +105,7 @@ export default function Profil() {
 					})
 					.catch((error) => {
 						console.error(error);
-						setErrorLocalStorage("Error " + error.response.status);
+						setErrorLocalStorage('Error ' + error.response.status);
 						navigate('/Error');
 					});
 				setIsFriend(!isFriend);
@@ -133,7 +133,7 @@ export default function Profil() {
 		}
 		refresh(id);
 		
-		axios.get(process.env.REACT_APP_IP + ":3000/auth/2fa/is2FA", {
+		axios.get(process.env.REACT_APP_IP + ':3000/auth/2fa/is2FA', {
 			headers: {
 				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
 			},
@@ -145,7 +145,7 @@ export default function Profil() {
 					setChecked(true);
 			})
 			.catch((error) => {
-				setErrorLocalStorage("Error " + error.response.status);
+				setErrorLocalStorage('Error ' + error.response.status);
 				console.error(error);
 				navigate('/Error');
 				dispatch(closeModal());
@@ -153,7 +153,7 @@ export default function Profil() {
 	}, [navigate, id, refresh, dispatch]);
 
 	const changeName = (str: string) => {
-			axios.post(process.env.REACT_APP_IP + ":3000/user/name",
+			axios.post(process.env.REACT_APP_IP + ':3000/user/name',
 				{ name: str }, 
 				{ headers: {
 					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`, 
@@ -173,13 +173,13 @@ export default function Profil() {
 			dispatch(closeModal());
 		}
 		else {
-			axios.get(process.env.REACT_APP_IP + ":3000/auth/2fa/disable", {
+			axios.get(process.env.REACT_APP_IP + ':3000/auth/2fa/disable', {
 				headers: {
 					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
 				},
 			})
 				.catch((error) => {
-					setErrorLocalStorage("Error " + error.response.status);
+					setErrorLocalStorage('Error ' + error.response.status);
 					console.error(error);
 					navigate('/Error');
 				});
@@ -203,7 +203,7 @@ export default function Profil() {
 				data: formData,
 			})
 				.catch((error) => {
-					setErrorLocalStorage("Error " + error.response.status);
+					setErrorLocalStorage('Error ' + error.response.status);
 					console.error(error);
 					navigate('/Error');
 				});
@@ -211,28 +211,28 @@ export default function Profil() {
 	};
 
 	const handleAddFriend = (id: string | null) => {
-		console.log("add friend " + id);
+		console.log('add friend ' + id);
 		socket.emit('friend_request', { friend_id: id });
 	};
 
 	const handleUnFriend = (id: string | null) => {
-		console.log("add friend " + id);
+		console.log('add friend ' + id);
 		socket.emit('unfriend_request', { friend_id: id });
 	};
 
 	const handlechallenge = (id: string | null) => {
-		console.log("challenge " + id);
+		console.log('challenge ' + id);
 		socket.emit('challenge', { rival_id: id });
 	}
 
 	initialElement.push(
-		<div key="ProfilImage">
+		<div key='ProfilImage'>
         <ProfilImage id = {'' + id} OnClickOpenProfil={false} diameter = '50'/>
 		</div>
     )
 
 	initialElement.push(
-		<div className='score-profil' key="score-profil">
+		<div className='score-profil' key='score-profil'>
 			<div className='profil-game-info'>
 				<p>
 					<span className='profil-game-info-title'>Win</span>
@@ -253,15 +253,15 @@ export default function Profil() {
     
     if (isMe) {
         initialElement.push(
-			<div className="browse-file" key="changeImage">
-				<input type="file" onChange={handleImageChange} id="files"/>
-				<label htmlFor="files" className='profil-button'>Change image</label>
+			<div className='browse-file' key='changeImage'>
+				<input type='file' onChange={handleImageChange} id='files'/>
+				<label htmlFor='files' className='profil-button'>Change image</label>
 			</div>
 
         )
         
         initialElement.push(
-            <div key="changeName" className="ChangeNameDiv">
+            <div key='changeName' className='ChangeNameDiv'>
 					<ButtonInputToggle
 					onInputSubmit={changeName}
 					textInButton='Change name'
@@ -269,13 +269,13 @@ export default function Profil() {
 					classInput='profil-button'
 					classButton='profil-button'
 					/>
-				{errorName ? <p className="Error-msg">*Name already Exist</p> : <></>}
+				{errorName ? <p className='Error-msg'>*Name already Exist</p> : <></>}
             </div>
             )
             
         initialElement.push(
-			<div className='change2FA' key="2FA">
-				<label className="switch">
+			<div className='change2FA' key='2FA'>
+				<label className='switch'>
 					<input type='checkbox' name='2FA' checked={checked} onChange={clicked} />
 					<span className='slider'></span>
 				</label>
@@ -283,16 +283,16 @@ export default function Profil() {
 			</div>
             )
 		initialElement.push(
-			<div key="logout" className="logout">
+			<div key='logout' className='logout'>
 				<LogoutButton/>
 			</div>	
 		)
 	}
 
     return (
-        <div className="profil-modal">
+        <div className='profil-modal'>
 			<div className='profil-title'>
-				<button className="close-profil" onClick={() => dispatch(closeModal())}></button>
+				<button className='close-profil' onClick={() => dispatch(closeModal())}></button>
 				<h2> <ProfilName  id={id}/> </h2>
 			</div>
             <div> 
@@ -302,7 +302,7 @@ export default function Profil() {
 						{ !isFriend ? (
 							<div className='other-user-profil'>
 								<button onClick={() => handleAddFriend(id)}>
-									{ hasFriendRequest == 1 ? "accept request" : hasFriendRequest == 2 ? "waiting" : "add friend" }
+									{ hasFriendRequest == 1 ? 'accept request' : hasFriendRequest == 2 ? 'waiting' : 'add friend' }
 								</button>
 								<br/>
 								<button onClick={() => handlechallenge(id)}>

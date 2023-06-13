@@ -1,12 +1,12 @@
-import axios from "axios";
-import React, { useEffect, useState } from "react"
-import { useDispatch, useSelector } from "react-redux";
-import { cookies } from "../../App";
-import { Channel } from "../../pages/chat";
-import { setConversation } from "../../redux/chat/conversationIdSlice";
-import { RootState } from "../../redux/store";
-import "./css/sidebar.css"
-import SocketSingleton from "../../socket";
+import './css/sidebar.css'
+import axios from 'axios';
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux';
+import { cookies } from '../../App';
+import { Channel } from '../../pages/chat';
+import { setConversation } from '../../redux/chat/conversationIdSlice';
+import { RootState } from '../../redux/store';
+import SocketSingleton from '../../socket';
 
 function SideBarChat() {
 	const [listChannel, setListChannel] = useState<Array<Channel>>([]);
@@ -48,7 +48,7 @@ function SideBarChat() {
 	}
 
 	return (
-		<div className="chatSideBar">
+		<div className='chatSideBar'>
 			{listChannel.map((channel) => (
 				<button onClick={() => handleSwitchChannel(channel.id)} key={channel.id}>
 					{channel.name}

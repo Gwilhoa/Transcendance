@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
 export function ButtonInputToggle({ onInputSubmit, textInButton, placeHolder, classInput, classButton }: {onInputSubmit: (value: string) => void, textInButton:string, placeHolder:string, classInput:string, classButton:string }) {
   const [showInput, setShowInput] = useState(false);

@@ -1,11 +1,11 @@
 import './css/endgame.css'
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from 'react';
 import Cookies from 'universal-cookie';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-import {useSelector} from "react-redux";
-import {RootState} from "../redux/store";
-import SocketSingleton from "../socket";
+import {useSelector} from 'react-redux';
+import {RootState} from '../redux/store';
+import SocketSingleton from '../socket';
 
 const cookies = new Cookies();
 
@@ -30,13 +30,13 @@ const EndGame = () => {
 
   const homebutton = () => {
     socket.emit('game_finished', {rematch : false});
-    navigate("/home");
+    navigate('/home');
   }
 
   const replaybutton = () => {
     socket.emit('game_finished', {rematch : true})
     if (revenge) {
-      navigate("/game", {state:{gameID:1}})
+      navigate('/game', {state:{gameID:1}})
     }
     else
       setMyrevenge(true);
@@ -47,7 +47,7 @@ const EndGame = () => {
     if (rematch) {
       if (myrevenge) {
         socket.emit('game_finished', {rematch : true});
-        navigate("/game", {state:{gameID:1}})
+        navigate('/game', {state:{gameID:1}})
       }
       else
         setRevenge(true);
@@ -59,7 +59,7 @@ const EndGame = () => {
 
   useEffect(() => {
     if (finalStatus == null) {
-      navigate("/home");
+      navigate('/home');
     }
   } , [finalStatus, navigate]);
 
@@ -67,9 +67,9 @@ const EndGame = () => {
 
   return (
     <>  
-    <div className="end_game">
-        <h1 className="end_game_title">{"you " + finalStatus?.status + " against " + finalStatus?.adversary}</h1>
-        <div className="end_game_buttons">
+    <div className='end_game'>
+        <h1 className='end_game_title'>{'you ' + finalStatus?.status + ' against ' + finalStatus?.adversary}</h1>
+        <div className='end_game_buttons'>
             {revenge &&
             <p>ton adversaire veut une revenche</p>}
 
@@ -77,7 +77,7 @@ const EndGame = () => {
             <p>demande prise en compte</p>}
 
             {replay && !myrevenge &&
-            <button className="end_game_button" onClick={replaybutton}>Replay</button>}
+            <button className='end_game_button' onClick={replaybutton}>Replay</button>}
             <button className='end_game_button' onClick={homebutton}> Home</button>
         </div>
         </div>

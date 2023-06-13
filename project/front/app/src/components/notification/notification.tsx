@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import { useEffect } from "react";
 import './notification.css';
-import { Link } from "react-router-dom";
+import React, { useState } from 'react';
+import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 interface NotificationProps {
   message: string;
@@ -27,7 +27,7 @@ export default function Notification({ message, onConfirm, onCancel, hasButton, 
 
   
       return (
-        <div className="notific" onClick={handleClose}>
+        <div className='notific' onClick={handleClose}>
           <h2>
             {message}
           </h2>
@@ -36,12 +36,12 @@ export default function Notification({ message, onConfirm, onCancel, hasButton, 
             <>
             <button onClick={onConfirm}>
               <h2>
-                <span role="img" aria-label="Valider">&#10004;</span>
+                <span role='img' aria-label='Valider'>&#10004;</span>
               </h2>
             </button>
             <button onClick={onCancel}>
               <h2>
-                <span role="img" aria-label="Refuser">&#10060;</span>
+                <span role='img' aria-label='Refuser'>&#10060;</span>
               </h2>
             </button>
             </>

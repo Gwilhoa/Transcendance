@@ -1,13 +1,48 @@
-.chatPage .chatOptionBar {
-	position: relative;
-	flex: 0 0 5%;
-	background: #363a4f;
+.chat-option-bar {
+	background-color: var(--background-color);
 	display: flex;
+	width: 6rem;
 	flex-direction: column;
-	justify-content: flex-start;
 	align-items: center;
+	border-right: 0.2rem solid var(--primary-color);
 }
 
-.chatPage .chatOptionBar button {
-	margin-top: 10px;
+/* hamburger button */
+
+.chat-hamburger-buttton {
+	background: var(--box-color);
+	justify-content: center;
+	align-items: center;
+	display: flex;
+	flex-direction: column;
+	border-radius: 50%;
+	width: 5rem;
+	height:  5rem;
+	cursor: pointer;
+	margin: 0.5rem 0 0.5rem;
+}
+
+.chat-hamburger-buttton-bar{
+	background-color: var(--primary-color);
+	border-radius: 10px;
+	margin: 5%;
+	height: 10%;
+	width: 60%;
+
+}
+
+/* add channel button */
+
+.chat-add-channel-button{
+	background-color: var(--box-color);
+	border-radius: 50%;
+	width: 5rem;
+	height:  5rem;
+	display: flex;
+	font-size: 3rem;
+	justify-content: center;
+	align-items: center;
+	color : var(--primary-color);
+	cursor: pointer;
+	font-weight: 300;
 }

@@ -5,7 +5,11 @@
 	flex: relative;
 }
 
-.chatPage .rightPart {
-	position: relative;
-	flex: 70%;
+.rightPart {
+	width: 100%;
+}
+
+.profil-image{
+	height: 3rem;
+	width: 3rem;
 }

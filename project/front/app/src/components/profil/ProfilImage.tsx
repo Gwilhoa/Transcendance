@@ -1,14 +1,14 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios  from 'axios';
-import { setErrorLocalStorage } from "../IfError";
+import { setErrorLocalStorage } from '../IfError';
 import Cookies from 'universal-cookie';
 const cookies = new Cookies();
-import SocketSingleton from "../../socket";
+import SocketSingleton from '../../socket';
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
 import { useDispatch } from 'react-redux';
-import { openModal } from "../../redux/modal/modalSlice";
+import { openModal } from '../../redux/modal/modalSlice';
 
 enum UserStatus {
     CONNECTED = 0,
@@ -19,13 +19,13 @@ enum UserStatus {
 }
 
 export const ProfilImage = ({ id, OnClickOpenProfil, diameter}: { id: string, OnClickOpenProfil: boolean, diameter: string }) =>{
-    const [userStatus, setUserStatus] = useState("");
-    const [image, setImage] = useState<string>("");
+    const [userStatus, setUserStatus] = useState('');
+    const [image, setImage] = useState<string>('');
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
     const changeImage = () => {
-        axios.get(process.env.REACT_APP_IP + ":3000/user/image/" + id, {
+        axios.get(process.env.REACT_APP_IP + ':3000/user/image/' + id, {
             headers: {
                 Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
             },
@@ -35,7 +35,7 @@ export const ProfilImage = ({ id, OnClickOpenProfil, diameter}: { id: string, On
                 setImage(data);
             })
             .catch((error) => {
-                setErrorLocalStorage("Error " + error.response.status);
+                setErrorLocalStorage('Error ' + error.response.status);
                 console.error(error);
                 navigate('/Error');
             });
@@ -44,7 +44,7 @@ export const ProfilImage = ({ id, OnClickOpenProfil, diameter}: { id: string, On
     useEffect(() => {
         setUserStatus('profil-status-disconnected');
         changeImage();
-        axios.get(process.env.REACT_APP_IP + ":3000/user/id/" + id, {
+        axios.get(process.env.REACT_APP_IP + ':3000/user/id/' + id, {
 			headers: {
 				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
 			},
@@ -52,15 +52,15 @@ export const ProfilImage = ({ id, OnClickOpenProfil, diameter}: { id: string, On
         .then((response) => {
             if (response.data.status === UserStatus.CONNECTED)
             {
-                setUserStatus("profil-status-connected");
+                setUserStatus('profil-status-connected');
             }
             if (response.data.status === UserStatus.IN_GAME)
             {
-                setUserStatus("profil-status-in-game");
+                setUserStatus('profil-status-in-game');
             }
         })
         .catch((error) => {
-            setErrorLocalStorage("Error " + error.response.status);
+            setErrorLocalStorage('Error ' + error.response.status);
             console.error(error);
             navigate('/Error');
         });
@@ -80,8 +80,8 @@ export const ProfilImage = ({ id, OnClickOpenProfil, diameter}: { id: string, On
     },[navigate, socket])
 
     return (
-        <div key={"image"} className='profil-image' onClick={OnClickOpenProfil  === true ? () => dispatch(openModal(id)) : undefined}>
-            <img className='circle-image' src={image} alt="selected" />
+        <div key={'image'} className='profil-image' onClick={OnClickOpenProfil  === true ? () => dispatch(openModal(id)) : undefined}>
+            <img className='circle-image' src={image} alt='selected' />
 			<div className={'profil-status' + ' ' + userStatus}></div>
         </div>
     );

@@ -1,8 +1,8 @@
-import React from "react";
-import { useSelector } from "react-redux";
-import { RootState } from "../../redux/store";
-import Profil from "./profil";
 import './profil.css'
+import React from 'react';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../redux/store';
+import Profil from './profil';
 
 export default function ProfilModal() {
 	const isOpen = useSelector((state: RootState) => state.modal.isOpen);
@@ -10,7 +10,7 @@ export default function ProfilModal() {
     return (
         <>
             {isOpen && 
-            <div className="page-shadow">
+            <div className='page-shadow'>
                     <Profil/>
             </div>}
         </>
