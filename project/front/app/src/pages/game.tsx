@@ -15,9 +15,10 @@ interface GameProps {
   gameId: number;
 }
 
-const Game: React.FC<GameProps> = ({ gameId }) => {
+const Game: React.FC<GameProps> = () => {
   isCall = true;
   const navigate = useNavigate();
+  const gameId = useSelector((state: RootState) => state.beginToOption.gameid);
   const [onGame, findGame] = useState(gameId);
   console.log(onGame);
   const [score1, setScore1] = useState(0);
@@ -39,7 +40,7 @@ const Game: React.FC<GameProps> = ({ gameId }) => {
   
   const dispatch = useDispatch();
   const finalStatus = useSelector((state: RootState) => state.finalGame.finalStatus);
-  
+
   
   const socketInstance = SocketSingleton.getInstance();
   const socket = socketInstance.getSocket();
@@ -80,8 +81,7 @@ const Game: React.FC<GameProps> = ({ gameId }) => {
       setIsPowerup(data.powerup);
       console.log(data)
     })
-    socket.on('game_start', (code:any) => {
-      gameId = (code)
+    socket.on('game_start', () => {
       socket.emit('input_game', { game_id: gameId, position: paddle1, token: cookies.get('jwtAuthorization')});
     });
   }, [])
@@ -111,9 +111,6 @@ const Game: React.FC<GameProps> = ({ gameId }) => {
       setBall({x: (data.ballx), y: (data.bally)});
       setPaddle2(data.rack2y)
       setPaddle1(data.rack1y);
-      if (!onGame) {
-        findGame(1);
-      }
     });
 
     return () => {
