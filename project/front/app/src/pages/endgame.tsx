@@ -60,8 +60,12 @@ const EndGame = () => {
       setMyrevenge(true);
   }
 
+<<<<<<< HEAD
 
     socket.on('rematch', (any) => {
+=======
+    socket.on('rematch', (any: { rematch: any; }) => {
+>>>>>>> origin/main
     const rematch = any.rematch;
     if (rematch) {
       if (myrevenge) {

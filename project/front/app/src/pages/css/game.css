@@ -41,6 +41,7 @@
 }
 
 .parentscore {
+  z-index: 2;
   height: 100%;
   display: flex;
   justify-content: center;
@@ -48,7 +49,6 @@
 }
 
 .score { 
-  z-index: 1;
   color: rgb(115, 121, 69);
   font-size: calc(5vw + 5vh);
   white-space: nowrap;
@@ -56,7 +56,7 @@
 
 
 .ball {
-  z-index: 2;
+  z-index: 3;
   position: absolute;
   width: 30px;
   height: 30px;

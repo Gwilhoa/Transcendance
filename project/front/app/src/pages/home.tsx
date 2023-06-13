@@ -80,13 +80,6 @@ const Add = () => {
         }
     }, [listUser, refresh, socket]);
     
-
-
-
-
-
-
-
     if (listUser == null || listUser.length == 0)
     {
         return (<p className="no-friend">Knowing how to enjoy your own company is an art. <span>Natasha Adamo</span></p>);
