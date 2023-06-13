@@ -1,5 +1,5 @@
 import './css/chat.css'
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Conversation from '../components/chat/conversation/conversation';
 import CreateChannel from '../components/chat/createChannel/CreateChannel';
@@ -9,6 +9,9 @@ import ErrorToken from '../components/IfError';
 import { RootState } from '../redux/store';
 import SendMessage from '../components/chat/input/sendmessage';
 import { setConversation } from '../redux/chat/conversationIdSlice';
+import SocketSingleton from '../socket';
+const socketInstance = SocketSingleton.getInstance();
+const socket = socketInstance.getSocket();
 
 export interface User {
 	id: string;

@@ -1,7 +1,7 @@
 import '../css/sidebar.css'
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { cookies } from '../../../App';
 import { RootState } from '../../../redux/store';
 import { Message } from '../../../pages/chat'
@@ -18,11 +18,45 @@ function Conversation() {
 	const socket = socketInstance.getSocket();
 	const navigate = useNavigate();
 
+	const fetchMessage = (id: string) => {
+		setErrorGetMessage(false);
+		axios.get(process.env.REACT_APP_IP + ':3000/channel/message/' + id,
+				{
+					headers: {
+						Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+					},
+				})
+				.then((response) => {
+					console.log(response);
+					if (response.status === 204) {
+						setListMessage([]);
+					}
+					else {
+						setListMessage(response.data);
+					}
+				})
+				.catch((error) => {
+					console.error(error);
+					if (error.response.status === 401) {
+						setErrorLocalStorage('unauthorized');
+						navigate('/Error');
+					}
+					else {
+						setListMessage([]);
+						setErrorGetMessage(true);
+					}
+				});
+		}
+
 	useEffect(() => {	
+
 		const id = conversationId;
 
 		socket.on('message_code', (data: any) => {
 			console.log('send message code : ' + data.code);
+			if (listMessage.length === 0) {
+				fetchMessage(id);
+			}
 			return ;
 		});
 
@@ -36,57 +70,56 @@ function Conversation() {
 					date: data.date,
 				}
 				console.log(newItemMessage);
-				if (!listMessage.includes(newItemMessage)) {
-					setListMessage(prevListMessage => [...prevListMessage, newItemMessage]);
+				setListMessage((prevListMessage) => {
+					if (prevListMessage.length === 0) {
+						console.log("here lenght 0");
+						return [newItemMessage];
+					} 
+					else if (!prevListMessage.some((message) => message.id === newItemMessage.id)) {
+						console.log("here new message");
+						return [...prevListMessage, newItemMessage];
+					}
+					else {
+						console.log("here prevlist");
+						return prevListMessage;
+					}
+				});
 				}
-			}
 			return ;
 		});
 	}, [socket]);
 
+
+
 	useEffect(() =>{
 		if (conversationId) {
 			console.log(conversationId);
-			setErrorGetMessage(false);
-			setErrorGetMessage(false);
-			axios.get(process.env.REACT_APP_IP + ':3000/channel/message/' + conversationId,
-					{
-						headers: {
-							Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
-						},
-					})
-					.then((response) => {
-						console.log(response);
-						setListMessage(response.data);
-					})
-					.catch((error) => {
-						console.error(error);
-						if (error.response.status === 401) {
-							setErrorLocalStorage('unauthorized');
-							navigate('/Error');
-						}
-						else {
-							setListMessage([]);
-							setErrorGetMessage(true);
-						}
-					});
+			fetchMessage(conversationId);
 		}
 	},[conversationId]);
 
 	return (
 		<div className='chatConversation'>
 			{ errorGetMessage ? 
-				<p className="errorGetMessage" >{"you can't access this channel"}</p> 
+				<p className="errorGetMessage" >
+					{"you can't access this channel"}
+				</p> 
 			: 
 				<></> 
 			}
 			{ (listMessage != null && listMessage.length > 0) ?
 				(listMessage.map((message) => (
 				<Messages key={message.id} message={message} />
-			))) : (
-				<p className="writeTheFirstMessage">
-					no message on the channel, wirte the first one
-				</p>
+			))) : ( 
+				conversationId == '' ? (
+					<p className="NeverJoinChannel">
+						{"you don't have access to any channel"}
+					</p>
+				) : ( 
+					<p className="writeTheFirstMessage">
+						no message on the channel, wirte the first one
+					</p>
+				)
 			)}
 		</div>
 	);

@@ -13,8 +13,10 @@ export default function SendMessage(){
 	const [message, setMessage] = useState('');
 	const conversation = useSelector((state: RootState) => state.conversation.id);
 
-	function handleSendMessage()
+	const handleSendMessage = () =>
 	{
+		console.log('send message pls :')
+		console.log(conversation);
 		socket.emit('send_message', {token: cookies.get('jwtAuthorization'), channel_id: conversation , content: message});
 	}
 

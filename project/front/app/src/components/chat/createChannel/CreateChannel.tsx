@@ -1,5 +1,5 @@
 import '../css/CreateChannel.css'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux';
 import { switchChatModalCreateChannel } from '../../../redux/chat/modalChatSlice';
 import { Channel } from '../../../pages/chat';
@@ -62,6 +62,9 @@ const CreateChannel = () => {
 			.then((response) => {
 				console.log(response);
 				setId(response.data.id);
+				socket.emit('join_channel', {id: response.data.id});
+				// dispatch(setConversation(response.data.id));
+				dispatch(switchChatModalCreateChannel());
 			})
 			.catch((error) => {
 				console.error(error)
@@ -69,23 +72,8 @@ const CreateChannel = () => {
 		if (channelParams.type == 0 ) {
 			console.log('hey need an other call')
 		}
-		socket.emit('join_channel', {id: id});
-		dispatch(setConversation(channelParams.id));
-		dispatch(switchChatModalCreateChannel());
+		// socket.emit('join_channel', {id: id});
 		return;
-	};
-
-	const getTypeLabel = (type: number) => {
-		switch (type) {
-			case 0:
-				return 'Private';
-			case 1:
-				return 'Public';
-			case 2:
-				return 'Protected';
-			default:
-				return '';
-		}
 	};
 
 	return (
