@@ -45,8 +45,6 @@ const BeginGame = () => {
         config: { duration: 4000 },
     });
 
-
-
   return (
     <div className='center-page'>
         <h2 style={{color: 'white'}}> Searching players... </h2>
