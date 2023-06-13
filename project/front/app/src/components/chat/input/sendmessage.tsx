@@ -1,3 +1,5 @@
+
+import '../css/sendMessageBar.css'
 import React from 'react'
 import {useEffect, useState} from 'react';
 import SocketSingleton from '../../../socket';
@@ -18,9 +20,9 @@ export default function SendMessage(){
 
 
 	return (
-		<>
-			<input type='text' placeholder='Message' onChange={(e) => setMessage(e.target.value)}/>
-			<button onClick={handleSendMessage}>Send</button>
-		</>
+		<div className='chat-input-send-bar'>
+			<input className='chat-input-message' type='text' placeholder='Message' onChange={(e) => setMessage(e.target.value)}/>
+			<button className='chat-button-send-message' onClick={handleSendMessage}>{'>'}</button>
+		</div>
 	)
 }
