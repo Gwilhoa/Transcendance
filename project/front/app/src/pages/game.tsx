@@ -103,7 +103,7 @@ const Game: React.FC<GameProps> = () => {
     
     socket.on('finish_game', (any) => {
       if (isCall) {
-      const content = {status: any.status, adversary: any.adversary, score1: any.score1, score2: any.score2};
+      const content = {status: any.status, adversary: any.adversary, score1: any.score1, score2: any.score2, gameid: gameId};
       dispatch(setFinalStatus(content));
       navigate('/endGame');
       isCall = !isCall;

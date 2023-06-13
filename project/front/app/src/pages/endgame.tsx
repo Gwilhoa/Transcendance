@@ -12,6 +12,7 @@ const cookies = new Cookies();
 
 
 const EndGame = () => {
+  const myrevengeRef = useRef(false);
   const [revenge, setRevenge] = useState(false);
   const [myrevenge, setMyrevenge] = useState(false);
   const [replay, setMyReplay] = useState(true);
@@ -27,7 +28,10 @@ const EndGame = () => {
 
   useEffect(() => {
     return () => {
-      socket.emit('game_finished', { rematch: false });
+      console.log("unmount revenge : " + myrevenge);
+
+      if (!myrevengeRef.current)
+        socket.emit('game_finished', { rematch: false });
     };
   }, [socket]);
 
@@ -38,15 +42,16 @@ const EndGame = () => {
 
   const launchReplay = () => {
     socket.emit('game_finished', {rematch : true});
-    socket.on('game_found', (data) => {
-      console.log(data);
-      dispatch(setBeginStatus({decide: data.decide, playerstate: data.user}));
-      navigate("/optiongame")            
-  });
-    navigate("/optiongame")
   }
 
+  socket.on('game_found', (data) => {
+    console.log(data);
+    dispatch(setBeginStatus({decide: data.decide, playerstate: data.user, gameid: data.game_id}));
+    navigate("/optiongame")
+  });
+
   const replaybutton = () => {
+    myrevengeRef.current = true;
     socket.emit('game_finished', {rematch : true})
     if (revenge) {
       launchReplay();
@@ -79,7 +84,7 @@ const EndGame = () => {
 
 
   return (
-    <>  
+    <>
     <div className="end_game">
         <h1 className="end_game_title">{"you " + finalStatus?.status + " against " + finalStatus?.adversary}</h1>
         <div className="end_game_buttons">
