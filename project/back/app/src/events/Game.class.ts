@@ -18,6 +18,8 @@ export class Game {
   static default_sizeMinY = 0;
   static default_victorygoal = 3;
   static default_rackspeed = 2;
+  static default_maxpowerupreverse = 2;
+  static default_maxpowerupstop = 2;
 
   private _io: Server;
   private _loopid: NodeJS.Timeout;
@@ -41,6 +43,14 @@ export class Game {
   private _gameService: GameService;
   private _finishCallback: Array<() => void> = [];
   private _package: number;
+  private _isPowerUp: boolean;
+  private _player1_reversey: number;
+  private _player2_reversey: number;
+  private _player1_reversex: number;
+  private _player2_reversex: number;
+  private _wait_ball: number;
+  private _player1_stop: number;
+  private _player2_stop: number;
 
   public constructor(
     id: string,
@@ -71,6 +81,7 @@ export class Game {
     this._angle = 180;
     this._gameService = gameService;
     this._package = 0;
+    this._wait_ball = 0;
   }
 
   public getId() {
@@ -105,6 +116,53 @@ export class Game {
         else this._rack2y -= Game.default_rackspeed;
       }
     }
+
+    if (!this._isPowerUp)
+      return
+
+    if (y == 3) {
+      if (player.id == this._user2.id && this._player2_reversey > 0) {
+        this._angle = Math.PI - this._angle;
+        this._player2_reversey -= 1;
+      }
+      if (player.id == this._user1.id && this._player1_reversey > 0) {
+        this._angle = Math.PI - this._angle;
+        this._player1_reversey -= 1;
+      }
+    }
+    if (y == 4) {
+      if (player.id == this._user2.id && this._player2_reversex > 0) {
+        this._player2_reversex -= 1;
+        this._angle = -this._angle;
+      }
+      if (player.id == this._user1.id && this._player1_reversex > 0) {
+        this._player1_reversex -= 1;
+        this._angle = -this._angle;
+      }
+    }
+
+    if (y == 5)  {
+      if (player.id == this._user1.id && this._player1_stop > 0) {
+        this._player1_stop -= 1;
+        this._wait_ball = 100;
+      }
+      if (player.id == this._user2.id && this._player2_stop > 0) {
+        this._player2_stop -= 1;
+        this._wait_ball = 100;
+      }
+    }
+
+  }
+
+  public definePowerUp(powerup:boolean) {
+    this._isPowerUp = powerup;
+    this._player1_reversey = Game.default_maxpowerupreverse;
+    this._player2_reversey = Game.default_maxpowerupreverse;
+    this._player1_reversex = Game.default_maxpowerupreverse;
+    this._player2_reversex = Game.default_maxpowerupreverse;
+    this._player1_stop = Game.default_maxpowerupstop;
+    this._player2_stop = Game.default_maxpowerupstop;
+
   }
 
   public getGameInfo() {
@@ -121,6 +179,7 @@ export class Game {
     };
   }
   public async start() {
+    console.log('power up ' + this._isPowerUp);
     await sleep(3000);
     while (
       Math.cos(this._angle) < 0.5 &&
@@ -186,6 +245,10 @@ export class Game {
   };
 
   public gameLoop = async () => {
+    if (this._wait_ball > 0) {
+      this._wait_ball -= 1;
+      return;
+    }
     this._futurballx = this._ballx + Math.sin(this._angle) * this._speedball;
     this._futurbally = this._bally + Math.cos(this._angle) * this._speedball;
     const minposition =
@@ -198,20 +261,15 @@ export class Game {
         this._futurballx >= this._rack1y &&
         this._futurballx <= this._rack1y + Game.default_racklenght
       ) {
-        this._speedball *= 1.15;
+        if (this._isPowerUp)
+          this._speedball *= 1.05;
+        else
+          this._speedball *= 1.15;
         this._angle = Math.PI - this._angle;
         const distbar = this._futurbally - minposition;
         this._futurbally -= 2 * distbar;
       } else {
-        this._score1 = this.endBattle(this._score1);
-        if (this._score1 >= Game.default_victorygoal) {
-          await this.endWar(this._user1, this._user2, 1);
-          return;
-        } else {
-          this.clear();
-          this.start();
-          return;
-        }
+        
       }
     }
 
@@ -220,24 +278,42 @@ export class Game {
         this._futurballx >= this._rack2y &&
         this._futurballx <= this._rack2y + Game.default_racklenght
       ) {
-        this._speedball *= 1.15;
+        if (this._isPowerUp)
+          this._speedball *= 1.05;
+        else
+          this._speedball *= 1.15;
         this._angle = Math.PI - this._angle;
         const distbar = this._futurbally - maxposition;
         this._futurbally -= 2 * distbar;
       } else {
-        this._score2 = this.endBattle(this._score2);
-        if (this._score2 >= Game.default_victorygoal) {
-          await this.endWar(this._user2, this._user1, 2);
-          return;
-        } else {
-          this.clear();
-          this.start();
-          return;
-        }
       }
     }
+  
+  if (this._futurbally < (Game.default_sizeMinY - Game.default_radiusball)) {
+    this._score1 = this.endBattle(this._score1);
+    if (this._score1 >= Game.default_victorygoal) {
+      await this.endWar(this._user1, this._user2, 1);
+      return;
+    } else {
+      this.clear();
+      this.start();
+      return;
+    }
+  }
 
-    if (
+  if (this._futurbally > (Game.default_sizeMaxY + Game.default_radiusball)) {
+    this._score2 = this.endBattle(this._score2);
+    if (this._score2 >= Game.default_victorygoal) {
+      await this.endWar(this._user2, this._user1, 2);
+    return;
+  } else {
+    this.clear();
+    this.start();
+    return;
+    }
+  } 
+    
+  if (
       this._futurballx < this._minX + Game.default_radiusball ||
       this._futurballx > this._maxX - Game.default_radiusball
     ) {

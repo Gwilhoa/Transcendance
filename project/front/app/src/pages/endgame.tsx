@@ -7,6 +7,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../redux/store";
 import SocketSingleton from "../socket";
 import { setBeginStatus } from '../redux/game/beginToOption';
+import ErrorToken from '../components/IfError';
 
 const cookies = new Cookies();
 
@@ -60,12 +61,7 @@ const EndGame = () => {
       setMyrevenge(true);
   }
 
-<<<<<<< HEAD
-
-    socket.on('rematch', (any) => {
-=======
     socket.on('rematch', (any: { rematch: any; }) => {
->>>>>>> origin/main
     const rematch = any.rematch;
     if (rematch) {
       if (myrevenge) {
@@ -89,6 +85,8 @@ const EndGame = () => {
 
   return (
     <>
+    
+    <ErrorToken />
     <div className="end_game">
         <h1 className="end_game_title">{"you " + finalStatus?.status + " against " + finalStatus?.adversary}</h1>
         <div className="end_game_buttons">

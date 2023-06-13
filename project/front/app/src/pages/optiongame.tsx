@@ -29,6 +29,11 @@ const OptionGame = () => {
     const navigate = useNavigate();
     const decide = useSelector((state: RootState) => state.beginToOption.decide);
     const playerstats = useSelector((state: RootState) => state.beginToOption.playerstate);
+    const couille = useSelector((state: RootState) => state.beginToOption.gameid);
+    useEffect(() => {
+        if (couille == null)
+            navigate('/home');
+    }, [])
     console.log('playerstats ' + playerstats + '\ndecide ' + decide);
 
     const Ball1 = "https://s2.qwant.com/thumbr/0x380/6/6/6f4c8d9426e69610d320350bc3fabc62de2332249a7491f1b39bdac0998bd0/soccer-ball-drawing-easy-39.png?u=http%3A%2F%2Fgetdrawings.com%2Fimages%2Fsoccer-ball-drawing-easy-39.png&q=0&b=1&p=0&a=0";
@@ -68,9 +73,9 @@ const OptionGame = () => {
     <>
         { !decide &&
             <>
-            <div className='title-choice'>
-            Waiting your adversaire
-            </div>
+                <div className='title-choice'>
+                Waiting your adversaire
+                </div>
             </>
         }
 

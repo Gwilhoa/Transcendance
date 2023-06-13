@@ -73,6 +73,19 @@ const Game: React.FC<GameProps> = () => {
         break;
       case "ArrowDown":
         socket.emit("input_game", {game_id: gameId, type: 1})
+        break;
+      case "KeyA":
+        socket.emit("input_game", {game_id: gameId, type: 3})
+        break;
+      case "KeyE":
+        socket.emit("input_game", {game_id: gameId, type: 3})
+        break;
+      case "KeyQ":
+        socket.emit("input_game", {game_id: gameId, type: 4})
+        break;
+      case "KeyF":
+        socket.emit("input_game", {game_id: gameId, type: 5})
+        break;
     }
   };
           
@@ -130,13 +143,13 @@ const Game: React.FC<GameProps> = () => {
       socket.off('update_game');
       socket.emit('');
     };
-  }, [onGame]);
+  }, []);
 
   return (
     <>
 
     <ErrorToken />
-    <img src={nbMap} width={'100%'} height={'100%'}/>
+    <img className="fill" src={nbMap}/>
     <div className="parentscore">
       <div className="score">
         <h1>
@@ -149,8 +162,7 @@ const Game: React.FC<GameProps> = () => {
     <animated.img
       src={nbBall}
       className="ball"
-      style={{ ...animatedBall, ...ballStyles }}
-      />
+      style={{ ...animatedBall, ...ballStyles }}/>
     </>
 
 

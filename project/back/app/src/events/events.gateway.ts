@@ -516,6 +516,7 @@ export class EventsGateway
     const user_id = getIdFromSocket(client, this.clients);
     const game_id = this.ingame.get(user_id);
     const game: Game = this.games[game_id];
+    game.definePowerUp(payload.powerup)
     if (game == null) {
       return;
     } else {
