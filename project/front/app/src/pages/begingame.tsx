@@ -19,23 +19,23 @@ const BeginGame = () => {
     const dispatch = useDispatch();
     useEffect(() => {
       
-      socket.emit('join_matchmaking', {token : cookies.get('jwtAuthorization')});
-  
-      socket.on('matchmaking_code', (data:any) => {
-        if (data["code"] === 0) {
-          console.log('enter matchmaking successfull');
-          socket.on('game_found', (data) => {
-              console.log(data);
-              dispatch(setBeginStatus({decide: data.decide, playerstate: data.user}));
-              navigate("/optiongame")            
-          });
-        }
-        else {
-          navigate("/home");
-          alert("Error, you are already in game");
-        }
-      });
-    }, [socket]);
+        socket.emit('join_matchmaking', {token : cookies.get('jwtAuthorization')});
+    
+        socket.on('matchmaking_code', (data:any) => {
+          if (data["code"] === 0) {
+            console.log('enter matchmaking successfull');
+            socket.on('game_found', (data) => {
+                console.log(data);
+                dispatch(setBeginStatus({decide: data.decide, playerstate: data.user, gameid: data.game_id}));
+                navigate("/optiongame")            
+            });
+          }
+          else {
+            navigate("/home");
+            alert("Error, you are already in game");
+          }
+        });
+      }, [socket]);
 
 
     const spinnerAnimation = useSpring({
