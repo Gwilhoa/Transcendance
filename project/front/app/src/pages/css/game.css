@@ -5,19 +5,23 @@
 
 
 .game-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   position: absolute;
   margin: 0 auto;
   width: 100%;
-  object-fit: contain;
   height: 100%;
+  object-fit: contain;
 }
 
 .game-canvas {
   position: absolute;
   top: 0;
-  height: calc(100vh - (var(--header-size) + var(--footer-size)));
-  background-color: black;
+  height: 100%;
   width: 100%;
+  background-color: black;
 }
 
 .paddle1,
@@ -36,14 +40,6 @@
   right: 1%;
 }
 
-.score {
-  color: rgb(115, 121, 69);
-  font-size: calc(5vw + 5vh);
-  white-space: nowrap;
-  position: absolute;
-  text-align: center;
-}
-
 .parentscore {
   height: 100%;
   display: flex;
@@ -51,7 +47,16 @@
   align-items: center;
 }
 
+.score { 
+  z-index: 1;
+  color: rgb(115, 121, 69);
+  font-size: calc(5vw + 5vh);
+  white-space: nowrap;
+}
+
+
 .ball {
+  z-index: 2;
   position: absolute;
   width: 20px;
   height: 20px;

@@ -18,6 +18,7 @@ const Head = () => {
 	socket.on('message_code', (data: any) => {
 		console.log(data);
 	});
+	
 	useEffect(() => {
 		if (localStorage.getItem('id') === null) {
 			axios.get(process.env.REACT_APP_IP + ":3000/user/id", {

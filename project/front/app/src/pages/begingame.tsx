@@ -4,6 +4,8 @@ import { animated, useSpring } from 'react-spring';
 import React, { useEffect } from 'react';
 import SocketSingleton from '../socket';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { setBeginStatus } from '../redux/game/beginToOption';
 
 
 const socketInstance = SocketSingleton.getInstance();
@@ -14,16 +16,19 @@ const BeginGame = () => {
     let gameId;
     let paddle1;
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     useEffect(() => {
-        
-    
+      
         socket.emit('join_matchmaking', {token : cookies.get('jwtAuthorization')});
     
         socket.on('matchmaking_code', (data:any) => {
           if (data["code"] === 0) {
             console.log('enter matchmaking successfull');
-            socket.on('found_game', (data) => {
+            socket.on('game_found', (data) => {
                 console.log(data);
+                const argu = { arg1: 'value1', arg2: 'value2' };
+                dispatch(setBeginStatus(argu));
+                navigate("/optiongame")            
             });
           }
           else {
