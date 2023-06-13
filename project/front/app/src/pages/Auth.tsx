@@ -1,9 +1,9 @@
+import './css/auth.css'
 import axios from 'axios';
 import React, { useEffect } from 'react';
 import { Link, useNavigate } from "react-router-dom";
 import Cookies from 'universal-cookie';
 const cookies = new Cookies();
-import './css/auth.css'
 import logo from '../images/pegi18.png'
 
 function Auth() {

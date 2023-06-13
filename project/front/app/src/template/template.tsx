@@ -1,6 +1,6 @@
+import  '../App.css'
 import React, { useEffect, useState } from "react";
 import Head from "./header";
-import  '../App.css'
 import Notification from "../components/notification/notification";
 import { Outlet, useLocation } from "react-router-dom";
 import SocketSingleton from "../socket";

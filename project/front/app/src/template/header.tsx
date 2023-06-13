@@ -1,5 +1,5 @@
-import { Link, useNavigate } from "react-router-dom";
 import './template.css'
+import { Link, useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import { setErrorLocalStorage } from "../components/IfError";
 import Cookies from 'universal-cookie';

@@ -1,7 +1,7 @@
+import "../css/CreateChannel.css"
 import React, { useState } from "react"
 import { useDispatch } from "react-redux";
 import { switchChatModalCreateChannel } from "../../../redux/chat/modalChatSlice";
-import "../css/CreateChannel.css"
 import { Channel } from "../../../pages/chat";
 import { ButtonInputToggle } from "../../utils/inputButton";
 import { cookies } from "../../../App";
@@ -14,7 +14,7 @@ const socket = socketInstance.getSocket();
 
 const initialState: Channel= {
 	id: '',
-	name: 'New Name',
+	name: 'New Channel',
 	topic: null,
 	type: 0,
 	pwd: null,
@@ -90,32 +90,24 @@ const CreateChannel = () => {
 
 	return (
 	<div className="PageShadow">
-		<div className="CreateChannel">
+		<div className="create-channel">
 			<h2>Create Channel</h2>
-			<br />
-			{channelParams.name}
-			<br />
-			<button className="CloseCreateChannel" onClick={() => dispatch(switchChatModalCreateChannel())} />
-			<ButtonInputToggle
-					onInputSubmit={onSubmitChannelName}
-					textInButton='Channel name'
-					placeHolder='Channel name'
-					classInput=''
-					classButton=''
-			/>
-			<br />
+			<h3>Channel Name</h3>
+			<button className="close-create-channel" onClick={() => dispatch(switchChatModalCreateChannel())} />
+			<input className='channel-name-input' type='text' placeholder="Channel Name" value={channelParams.name} onChange={(e) => onSubmitChannelName(e.target.value)}/>
 			<div className="ButtonChangeTypeChannel">
-				<h3>Channel Type: {getTypeLabel(channelParams.type)}</h3>
-				<button onClick={() => handleChannelTypeChange(0)}>Private</button>
-				<button onClick={() => handleChannelTypeChange(1)}>Public</button>
-				<button onClick={() => handleChannelTypeChange(2)}>Protected</button>
+				<h3>Channel Type</h3>
+				<button className='channel-type-button' onClick={() => handleChannelTypeChange(0)}>Private</button>
+				<button className='channel-type-button' onClick={() => handleChannelTypeChange(1)}>Public</button>
+				<button className='channel-type-button' onClick={() => handleChannelTypeChange(2)}>Protected</button>
 			</div>
 			{channelParams.type === 2 ? (
 			<>
-				<br />
 				<div className="divInputPassword">
 					<h3>Password</h3>
 					<input
+						className="channel-password-input"
+						placeholder="Password"
 						type="password"
 						id="password"
 						onChange={() => handlePasswordChange}
@@ -125,15 +117,13 @@ const CreateChannel = () => {
 			) : (<></>)}
 			{channelParams.type === 0 ? (
 			<>
-				<br />
 				<div className="divFindUser">
 					<h3>Invite some friend:</h3>
 				</div>
 			</>
 			) : (<></>)}
 
-			<br />
-			<button onClick={() => handleNewChannel()}>New Channel</button>
+			<button className="channel-create-channel-button" onClick={() => handleNewChannel()}>New Channel</button>
 		</div>
 	</div>
 	);

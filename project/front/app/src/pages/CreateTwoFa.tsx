@@ -1,7 +1,7 @@
+import "./css/CreateTwoFa.css";
 import axios from 'axios';
 import React, { useEffect, useRef, useState } from 'react';
 import AuthCode, { AuthCodeRef } from 'react-auth-code-input';
-import "./css/CreateTwoFa.css";
 import Cookies from 'universal-cookie';
 import ErrorToken, { setErrorLocalStorage } from '../components/IfError';
 import { useNavigate } from 'react-router-dom';

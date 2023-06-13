@@ -1,6 +1,6 @@
+import './notification.css';
 import React, { useState } from "react";
 import { useEffect } from "react";
-import './notification.css';
 import { Link } from "react-router-dom";
 
 interface NotificationProps {

@@ -1,3 +1,4 @@
+import "./css/chat.css"
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Conversation from '../components/chat/conversation/conversation';
@@ -6,7 +7,6 @@ import OptionBar from '../components/chat/optionBar/optionBar';
 import SideBarChat from '../components/chat/sidebar';
 import ErrorToken from '../components/IfError';
 import { RootState } from '../redux/store';
-import "./css/chat.css"
 import SendMessage from "../components/chat/input/sendmessage";
 import { setConversation } from '../redux/chat/conversationIdSlice';
 

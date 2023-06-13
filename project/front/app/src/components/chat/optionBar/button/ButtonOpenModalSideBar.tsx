@@ -1,8 +1,8 @@
+import "../../css/optionBar.css"
 import React from "react"
 import { useDispatch } from "react-redux";
 import { switchChatModalSideBar } from "../../../../redux/chat/modalChatSlice";
 import { MdViewList } from "react-icons/md/index"
-import "../../css/optionBar.css"
 
 const ButtonOpenModalSideBar = () => {
 	const dispatch = useDispatch();

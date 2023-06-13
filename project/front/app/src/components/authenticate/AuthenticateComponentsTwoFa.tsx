@@ -1,3 +1,4 @@
+import "../../pages/css/CreateTwoFa.css";
 import React, { useState, useRef, useEffect } from "react";
 import Cookies from "universal-cookie";
 const cookies = new Cookies();
@@ -6,7 +7,6 @@ import { useNavigate } from "react-router-dom";
 import AuthCode, { AuthCodeRef } from "react-auth-code-input";
 import { setErrorLocalStorage } from "../IfError";
 import { ErrorInput } from "../../pages/CreateTwoFa";
-import "../../pages/css/CreateTwoFa.css";
 
 function AuthenticateComponentsTwoFa() {
 	const [, setResult] = useState<string>("");

@@ -1,6 +1,6 @@
 import './css/home.css'
-import React, { useCallback, useEffect, useState } from 'react';
 import '../components/notification/notification.css'
+import React, { useCallback, useEffect, useState } from 'react';
 import ErrorToken, { setErrorLocalStorage } from '../components/IfError';
 import { useNavigate } from 'react-router-dom';
 import { cookies } from '../App';

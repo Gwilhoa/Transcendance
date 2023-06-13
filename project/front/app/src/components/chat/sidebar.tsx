@@ -1,3 +1,4 @@
+import "./css/sidebar.css"
 import axios from "axios";
 import React, { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux";
@@ -5,7 +6,6 @@ import { cookies } from "../../App";
 import { Channel } from "../../pages/chat";
 import { setConversation } from "../../redux/chat/conversationIdSlice";
 import { RootState } from "../../redux/store";
-import "./css/sidebar.css"
 import SocketSingleton from "../../socket";
 
 function SideBarChat() {
