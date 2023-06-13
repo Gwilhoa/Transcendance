@@ -3,7 +3,6 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 interface GameState {
 	decide:boolean;
     playerstate:number;
-
 }
 
 const initialState: GameState = {
@@ -16,7 +15,7 @@ const beginGameSlice = createSlice({
 	initialState,
 	reducers: {
 		setBeginStatus: (state, action: PayloadAction<any>) => {
-			state.decide = action.payload.playerstate;
+			state.decide = action.payload.decide;
             state.playerstate = action.payload.playerstate; 
 		},
 	},

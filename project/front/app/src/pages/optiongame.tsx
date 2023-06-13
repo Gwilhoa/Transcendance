@@ -16,15 +16,12 @@ const cookies = new Cookies();
 interface OptionGameProps {
     gameId: any;
     decide: boolean;
-
-
 }
 
 const OptionGame = () => {
-    const decide = true;
-    const beginGameStatus = useSelector((state: RootState) => state.beginGame.beginGameStatus);
-
-  console.log(beginGameStatus);
+    const decide = useSelector((state: RootState) => state.beginToOption.decide);
+    const playerstats = useSelector((state: RootState) => state.beginToOption.playerstate);
+    console.log('playerstats ' + playerstats + '\ndecide ' + decide);
   return (
     <>
         { !decide &&

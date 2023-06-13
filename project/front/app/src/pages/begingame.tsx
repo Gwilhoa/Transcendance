@@ -26,8 +26,7 @@ const BeginGame = () => {
             console.log('enter matchmaking successfull');
             socket.on('game_found', (data) => {
                 console.log(data);
-                const argu = { arg1: 'value1', arg2: 'value2' };
-                dispatch(setBeginStatus(argu));
+                dispatch(setBeginStatus({decide: data.decide, playerstate: data.user}));
                 navigate("/optiongame")            
             });
           }
