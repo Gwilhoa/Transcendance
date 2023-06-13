@@ -9,7 +9,8 @@ export class Game {
   static default_positionBy = this.default_sizeMaxY / 2;
   static default_update = 16;
   static default_racklenght = 15;
-  static default_positionR = (this.default_sizeMaxX / 2) - this.default_racklenght / 2;
+  static default_positionR =
+    this.default_sizeMaxX / 2 - this.default_racklenght / 2;
   static default_rackwidth = 2;
   static default_radiusball = 1;
   static default_speedBall = 0.5;
@@ -39,6 +40,7 @@ export class Game {
   private _futurbally;
   private _gameService: GameService;
   private _finishCallback: Array<() => void> = [];
+  private _package: number;
 
   public constructor(
     id: string,
@@ -68,6 +70,7 @@ export class Game {
     this._io = io;
     this._angle = 180;
     this._gameService = gameService;
+    this._package = 0;
   }
 
   public getId() {
@@ -88,27 +91,24 @@ export class Game {
         if (this._rack1y >= this._maxY - Game.default_racklenght)
           this._rack1y = this._maxY - Game.default_racklenght;
         else this._rack1y += Game.default_rackspeed;
-      } 
-      else if (y == 0) {
+      } else if (y == 0) {
         if (this._rack1y - Game.default_rackspeed <= 0) this._rack1y = 0;
-
         else this._rack1y -= Game.default_rackspeed;
       }
-    } 
-    else if (player.id == this._user2.id) {
+    } else if (player.id == this._user2.id) {
       if (y == 1) {
         if (this._rack2y >= this._maxY - Game.default_racklenght)
           this._rack2y = this._maxY - Game.default_racklenght;
         else this._rack2y += Game.default_rackspeed;
       } else if (y == 0) {
-        if (this._rack2y <= 0)
-          this._rack2y = 0;
+        if (this._rack2y <= 0) this._rack2y = 0;
         else this._rack2y -= Game.default_rackspeed;
       }
     }
   }
 
   public getGameInfo() {
+    this._package++;
     return {
       id: this._id,
       rack1y: this._rack1y,
@@ -117,6 +117,7 @@ export class Game {
       score2: this._score2,
       ballx: this._ballx,
       bally: this._bally,
+      package: this._package,
     };
   }
   public async start() {
