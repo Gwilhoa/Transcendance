@@ -28,13 +28,22 @@ const Game: React.FC<GameProps> = ({ gameId }) => {
   const [paddle2, setPaddle2] = useState(42.5 );
   const [color1, setColor1] = useState("white");
   const [color2, setColor2] = useState("white");
+  
+  const playerstats = useSelector((state: RootState) => state.beginToOption.playerstate);
+
+  
+  const [nbBall, setNbBall] = useState('button1');
+  const [nbMap, setNbMap] = useState('map1');
+  const [isPowerup, setIsPowerup] = useState(false);
+  
+  
   const dispatch = useDispatch();
   const finalStatus = useSelector((state: RootState) => state.finalGame.finalStatus);
-
-
+  
+  
   const socketInstance = SocketSingleton.getInstance();
   const socket = socketInstance.getSocket();
-
+  
   
   
   const handleKeyPress = (event: KeyboardEvent) => {
@@ -42,26 +51,40 @@ const Game: React.FC<GameProps> = ({ gameId }) => {
       case "KeyW":
         socket.emit("input_game", {game_id: gameId, type: 0})
         break;
-        case "KeyS":
-          socket.emit("input_game", {game_id: gameId, type: 1})
-          break;
-          case "ArrowUp":
+      case "KeyS":
+        socket.emit("input_game", {game_id: gameId, type: 1})
+        break;
+      case "ArrowUp":
         socket.emit("input_game", {game_id: gameId, type: 0})
         break;
       case "ArrowDown":
         socket.emit("input_game", {game_id: gameId, type: 1})
-      }
-    };
-    
-    
-    const canvasRef = useRef<HTMLCanvasElement>(null);
-    useEffect(() => {
-      window.addEventListener("keydown", handleKeyPress);
-      socket.on('game_start', (code:any) => {
-        gameId = (code)
-        socket.emit('input_game', { game_id: gameId, position: paddle1, token: cookies.get('jwtAuthorization')});
-      });
-    }, [])
+    }
+  };
+          
+          
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeyPress);
+    if (playerstats == 2) {
+      setColor1("red")
+      setColor2("blue")
+    }
+    else {
+      setColor1("blue");
+      setColor2("red")
+    }
+    socket.on('option_receive', (data) => {
+      setNbBall(data.ball);
+      setNbMap(data.map);
+      setIsPowerup(data.powerup);
+      console.log(data)
+    })
+    socket.on('game_start', (code:any) => {
+      gameId = (code)
+      socket.emit('input_game', { game_id: gameId, position: paddle1, token: cookies.get('jwtAuthorization')});
+    });
+  }, [])
     
     
     

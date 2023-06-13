@@ -36,7 +36,7 @@ const EndGame = () => {
   const replaybutton = () => {
     socket.emit('game_finished', {rematch : true})
     if (revenge) {
-      navigate("/game", {state:{gameID:1}})
+      navigate("/optiongame", {state:{gameID:1}})
     }
     else
       setMyrevenge(true);

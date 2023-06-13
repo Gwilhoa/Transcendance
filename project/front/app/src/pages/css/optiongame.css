@@ -1,0 +1,69 @@
+
+  
+  /* Styles for the title */
+  .title-choice {
+    text-align: center;
+    color: #fff;
+    margin-top: 3rem;
+    font-size: 2rem;
+  }
+  
+  /* Styles for the button group */
+  .button-group {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+  }
+  
+  /* Styles for the buttons */
+  .button {
+    padding: 1rem 2rem;
+    margin: 0 1rem;
+    background-color: #ccc;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.5rem;
+  }
+  
+  /* Styles for the selected button */
+  .selected {
+    background-color: #bd4e4e;
+    color: #fff;
+  }
+  
+  /* Styles for the confirm button */
+  .enter {
+    display: block;
+    margin: 2rem auto;
+    padding: 1rem 2rem;
+    background-color: #ccc;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 2rem;
+  }
+  
+  /* Responsive styles */
+  @media screen and (max-width: 600px) {
+    h1 {
+      font-size: 1.2rem;
+    }
+  
+    .title-choice {
+      font-size: 1.2rem;
+    }
+  
+    .button {
+      padding: 0.8rem 1.6rem;
+      margin: 0.5rem 1rem;
+      font-size: 0.8rem;
+    }
+  
+    .enter {
+      margin: 1.5rem auto;
+      padding: 0.8rem 1.6rem;
+      font-size: 1.5rem;
+    }
+  }
+  
