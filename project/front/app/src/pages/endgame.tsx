@@ -3,9 +3,10 @@ import React, { useState, useEffect, useRef } from "react";
 import Cookies from 'universal-cookie';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../redux/store";
 import SocketSingleton from "../socket";
+import { setBeginStatus } from '../redux/game/beginToOption';
 
 const cookies = new Cookies();
 
@@ -18,6 +19,8 @@ const EndGame = () => {
   const finalStatus = useSelector((state: RootState) => state.finalGame.finalStatus);
   const socketInstance = SocketSingleton.getInstance();
   const socket = socketInstance.getSocket();
+  const dispatch = useDispatch();
+
   socket.on('message_code', (data: any) => {
     console.log(data);
   });
@@ -33,21 +36,31 @@ const EndGame = () => {
     navigate("/home");
   }
 
+  const launchReplay = () => {
+    socket.emit('game_finished', {rematch : true});
+    socket.on('game_found', (data) => {
+      console.log(data);
+      dispatch(setBeginStatus({decide: data.decide, playerstate: data.user}));
+      navigate("/optiongame")            
+  });
+    navigate("/optiongame")
+  }
+
   const replaybutton = () => {
     socket.emit('game_finished', {rematch : true})
     if (revenge) {
-      navigate("/optiongame", {state:{gameID:1}})
+      launchReplay();
     }
     else
       setMyrevenge(true);
   }
 
+
     socket.on('rematch', (any) => {
     const rematch = any.rematch;
     if (rematch) {
       if (myrevenge) {
-        socket.emit('game_finished', {rematch : true});
-        navigate("/game", {state:{gameID:1}})
+        launchReplay();
       }
       else
         setRevenge(true);

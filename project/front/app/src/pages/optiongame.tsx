@@ -6,7 +6,8 @@ import SocketSingleton from '../socket';
 import { useNavigate } from 'react-router-dom';
 import { SocketAddress } from 'net';
 import { RootState } from '../redux/store';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { setBeginStatus } from '../redux/game/beginToOption';
 
 
 const socketInstance = SocketSingleton.getInstance();
@@ -19,6 +20,7 @@ interface OptionGameProps {
 }
 
 const OptionGame = () => {
+    
     const navigate = useNavigate();
     const decide = useSelector((state: RootState) => state.beginToOption.decide);
     const playerstats = useSelector((state: RootState) => state.beginToOption.playerstate);

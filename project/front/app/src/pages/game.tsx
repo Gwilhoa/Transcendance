@@ -130,13 +130,13 @@ const Game: React.FC<GameProps> = () => {
       <div className="score">
         <h1>
 
-          {score1 + " | " + score2}
+          {score2 + " | " + score1}
         </h1>
       </div>
     </div>
     <div className="paddle1" style={{ top: paddle1 + '%', background: color1 }} />
     <div className="paddle2" style={{ top: paddle2 + '%', background: color2 }} />
-    <div className="ball" style={{ top: ball.x + '%', left: ball.y - 1 + '%'}} />
+    <div className="ball" style={{ top: ball.x - 2 + '%', left: ball.y - 1 + '%'}} />
   </>
 
   );
