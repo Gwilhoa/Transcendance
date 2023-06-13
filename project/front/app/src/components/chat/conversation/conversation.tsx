@@ -83,9 +83,11 @@ function Conversation() {
 			{ (listMessage != null && listMessage.length > 0) ?
 				(listMessage.map((message) => (
 				<Messages key={message.id} message={message} />
-			))) : (<></>)
-			}
-
+			))) : (
+				<p className="writeTheFirstMessage">
+					no message on the channel, wirte the first one
+				</p>
+			)}
 		</div>
 	);
 }
