@@ -1,5 +1,5 @@
 .chatSideBar {
-	width: 30rem;
+	width: var(--left-side-bar-width);
 	background-color: var(--box-color);
 	color: var(--light-color);
 }

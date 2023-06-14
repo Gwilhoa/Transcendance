@@ -40,17 +40,19 @@ function Messages({ message }: { message: Message}) {
 
 	return (
 		<div key={message.id} className={isMe ? 'chat-my-message' : 'chat-other-message'}>
-			<div className='chat-header-message'>
 			<ProfilImage id = {'' + message.user.id} OnClickOpenProfil={true} OverwriteClassName = 'chat-message-image-profil'/>
-				<div className='nameMessage'>
-					<ProfilName id={message.user.id} />
+			<div className='chat-message-header-and-content'>
+				<div className='chat-header-of-message'>
+					<div className='chat-header-username'>
+						<ProfilName id={message.user.id} />
+					</div>
+					<div className='chat-header-date'>
+						<Timer dateString={message.date} />
+					</div>
 				</div>
-				<div className='chat-date-message'>
-					<Timer dateString={message.date} />
+				<div className='chat-content-message'>
+					{message.content}		
 				</div>
-			</div>
-			<div className='textMessage'>
-				{message.content}		
 			</div>
 		</div>
 	);

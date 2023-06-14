@@ -65,7 +65,7 @@ function Chat() {
 			<OptionBar/>
 			{isOpenSideBar && ( <SideBarChat /> )}
 			{isOpenCreateChannel && ( <CreateChannel /> )}
-			<div className='rightPart'>
+			<div className='chat-right-page'>
 				<Conversation />
 				<SendMessage />
 			</div>

@@ -1,7 +1,7 @@
 .chat-option-bar {
 	background-color: var(--background-color);
 	display: flex;
-	width: 6rem;
+	width: var(--option-bar-width);
 	flex-direction: column;
 	align-items: center;
 	border-right: 0.2rem solid var(--primary-color);

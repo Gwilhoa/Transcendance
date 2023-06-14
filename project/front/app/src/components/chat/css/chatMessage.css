@@ -1,6 +1,6 @@
 .chat-scroll-converation{
     overflow: auto;
-    max-height: calc(100vh - var(--header-size) - var(--search-bar-size));
+    max-height: calc(100vh - var(--header-size) - var(--search-bar-height));
     display: flex;
     flex-direction: column-reverse;
 }
@@ -18,12 +18,27 @@
     color: var(--light-color);
     margin: 2em;
     display: flex;
-    /* flex-direction: column; */
 }
 
-.chat-header-message{
+.chat-message-header-and-content{
+    margin-left: 0.5rem;
+}
+
+.chat-header-of-message{
     display: flex;
-    /* flex-direction: row; */
-    /* justify-content: space-between; */
-    /* align-items: center; */
+}
+
+.chat-header-username{
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin-right: 0.5rem;
+}
+
+.chat-header-date{
+    opacity: 0.5;
+}
+
+.chat-content-message{
+    font-size: 1.125rem;
+    opacity: 0.8;
 }
