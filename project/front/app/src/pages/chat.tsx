@@ -43,9 +43,21 @@ function Chat() {
 	const isOpenSideBar = useSelector((state: RootState) => state.modalChat.isOpenSideBar);
 	const isOpenCreateChannel = useSelector((state: RootState) => state.modalChat.isOpenCreateChannel);
 	const conversationId = useSelector((state: RootState) => state.conversation.id);
-	if (conversationId === '' && localStorage.getItem('conversationId') != '') {
-		dispatch(setConversation('' + localStorage.getItem('conversationId')));
-	}
+	
+	useEffect(() => {
+		if (conversationId === '' && localStorage.getItem('conversationId') != '') {
+			dispatch(setConversation('' + localStorage.getItem('conversationId')));
+		}
+	}, []);
+
+	useEffect(() =>{
+		socket.on('join_code', (data: any) => {
+			console.log('join_code ' + data.code)
+			console.log(data);
+			dispatch(setConversation(data.channel_id));
+			return ;
+		});
+	}, [socket])
 
 	return (
 		<div className='chatPage'>

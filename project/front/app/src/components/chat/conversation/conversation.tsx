@@ -1,7 +1,7 @@
 import '../css/sidebar.css'
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { cookies } from '../../../App';
 import { RootState } from '../../../redux/store';
 import { Message } from '../../../pages/chat'
@@ -9,6 +9,7 @@ import SocketSingleton from '../../../socket';
 import Messages from './message';
 import { useNavigate } from 'react-router-dom';
 import { setErrorLocalStorage } from '../../IfError';
+import { setConversation } from '../../../redux/chat/conversationIdSlice';
 
 function Conversation() {
 	const [errorGetMessage, setErrorGetMessage] = useState<boolean>(false);
@@ -17,6 +18,7 @@ function Conversation() {
 	const socketInstance = SocketSingleton.getInstance();
 	const socket = socketInstance.getSocket();
 	const navigate = useNavigate();
+	const dispatch = useDispatch();
 
 	const fetchMessage = (id: string) => {
 		setErrorGetMessage(false);
@@ -49,7 +51,15 @@ function Conversation() {
 		}
 
 	useEffect(() => {	
-		const id = conversationId;
+		let id = conversationId;
+
+		socket.on('join_code', (data: any) => {
+			console.log('join_code ' + data.code)
+			console.log(data);
+			id = data.channel_id
+			dispatch(setConversation(data.channel_id));
+			return ;
+		});
 
 		socket.on('message_code', (data: any) => {
 			console.log('message_code' + data.code);

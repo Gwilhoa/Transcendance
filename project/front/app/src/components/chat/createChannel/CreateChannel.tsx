@@ -99,10 +99,14 @@ const AddUserId = ({ usersId, setUserId }: AddUserIdProps) => {
     return (
         <div className='users-list'>
             {listUser.map((user) => (
-                <div className='user' key={user.id} onClick={() => dispatch(openModal(user.id))}>
-                    <img className='image' src='https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/42_Logo.svg/1200px-42_Logo.svg.png'></img>
-                    <p className='name'>{user.username}</p>
-                </div>
+				!usersId.includes(user.id) ? (
+					<div className='user' key={user.id} onClick={() => dispatch(openModal(user.id))}>
+						<img className='image' src='https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/42_Logo.svg/1200px-42_Logo.svg.png'></img>
+						<p className='name'>{user.username}</p>
+					</div>
+				) : (
+					<></>
+				)
             ))}
         </div>
     );
@@ -112,6 +116,7 @@ const AddUserId = ({ usersId, setUserId }: AddUserIdProps) => {
 const CreateChannel = () => {
 	const dispatch = useDispatch();
 	const [channelParams, setChannelParams] = useState<Channel>(initialState);
+	const [usersId, setUserId] = useState<Array<string>>([]);
 
 	const onSubmitChannelName = (str: string) => {
 		setChannelParams((prevChannelParams) => ({
@@ -150,7 +155,6 @@ const CreateChannel = () => {
 			.then((response) => {
 				console.log(response);
 				socket.emit('join_channel', {channel_id: response.data.id});
-				dispatch(setConversation(response.data.id));
 				dispatch(switchChatModalCreateChannel());
 			})
 			.catch((error) => {
@@ -194,7 +198,7 @@ const CreateChannel = () => {
 				<div className='divFindUser'>
 					<h6>Invite some people:</h6>
 					<Search defaultAllUsers={true}/>
-					<AddUserId />
+					<AddUserId usersId={usersId} setUserId={setUserId}/>
 				</div>
 			</>
 			) : (<></>)}
