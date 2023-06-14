@@ -1,0 +1,8 @@
+.profil-image.chat-message-image-profil{
+    width: 4rem;
+    height: 4rem;
+}
+
+.profil-image.chat-message-image-profil > .profil-status{
+    border: 0.25rem solid var(--background-color);
+}

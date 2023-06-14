@@ -1,5 +1,5 @@
 
-import '../css/sidebar.css'
+import '../css/chatMessage.css'
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
@@ -40,9 +40,7 @@ function Messages({ message }: { message: Message}) {
 
 	return (
 		<div key={message.id} className={isMe ? 'MyMessage' : 'OtherMessage'}>
-			<div onClick={() => dispatch(openModal(message.user.id))} className='photoProfilMessage'>
-				<ProfilImage id = {'' + message.user.id} OnClickOpenProfil={false} diameter = ''/>
-			</div>
+				<ProfilImage id = {'' + message.user.id} OnClickOpenProfil={true} OverwriteClassName = 'chat-message-image-profil'/>
 			<div className='headerMessage'>
 				<div className='nameMessage'>
 					<ProfilName id={message.user.id} />

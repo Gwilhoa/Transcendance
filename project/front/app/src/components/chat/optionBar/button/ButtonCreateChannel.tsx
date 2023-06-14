@@ -9,14 +9,7 @@ const ButtonCreateChannel = () => {
 
 	return (
 		<div className='chat-add-channel-button' onClick={() => dispatch(switchChatModalCreateChannel())}>
-			ⵜ
 		</div>
-		// <button 
-		// 	onClick={() => dispatch(switchChatModalCreateChannel())} 
-		// 	className='buttonShowModal'
-		// >
-		// 	<MdPlaylistAdd />
-		// </button>
 	);
 }
 

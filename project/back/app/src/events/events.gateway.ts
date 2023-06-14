@@ -671,6 +671,8 @@ export class EventsGateway
 
   @SubscribeMessage('invite_channel')
   async invite_channel(client: Socket, payload: any) {
+    this.logger.debug('invite_channel');
+    this.logger.debug(payload);
     const channel_id = payload.channel_id;
     const receiver_id = payload.receiver_id;
     const sender_id = getIdFromSocket(client, this.clients);
@@ -688,8 +690,10 @@ export class EventsGateway
       client.emit('invite_request', {
         code: ChannelCode.UNEXISTING_CHANNEL,
       });
+    } else {
       let ch = null;
       try {
+        this.logger.debug('invite_channel');
         ch = await this.channelService.inviteChannel(
           sender_id,
           receiver_id,
@@ -702,9 +706,13 @@ export class EventsGateway
         return;
       }
       if (ch != null) {
-        client.emit('invite_request', {
-          code: ChannelCode.INVITE_SUCCESS,
-        });
+        const socket = getSocketFromId(receiver_id, this.clients);
+        const send = {
+          user_id: receiver_id,
+          channel_id: channel_id,
+        };
+        socket.join(channel_id);
+        socket.emit('join_code', send);
       }
       return;
     }

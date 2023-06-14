@@ -44,6 +44,7 @@ function SideBarChat() {
 
 	const handleSwitchChannel = (id: string) => {
 		dispatch(setConversation(id));
+		console.log('set conversation sidebar = ' + id);
 	}
 
 	const parseChannelName = (channel: Channel) => {
@@ -59,9 +60,9 @@ function SideBarChat() {
 	return (
 		<div className='chatSideBar'>
 			{listChannel.map((channel) => (
-				<button onClick={() => handleSwitchChannel(channel.id)} key={channel.id}>
+				<div className='chat-side-bar-channel' onClick={() => handleSwitchChannel(channel.id)} key={channel.id}>
 					{parseChannelName(channel)}
-				</button>
+				</div>
 			))}
 		</div>
 	);

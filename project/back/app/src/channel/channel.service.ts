@@ -375,6 +375,8 @@ export class ChannelService {
       .leftJoinAndSelect('channel.admins', 'admins')
       .where('channel.id = :id', { id: channel_id })
       .getOne();
+    if (channel.type == ChannelType.MP_CHANNEL)
+      throw new Error('Channel is private');
 
     let f = false;
     for (const user of channel.admins) {
@@ -396,21 +398,31 @@ export class ChannelService {
     const channel = await this.channelRepository
       .createQueryBuilder('channel')
       .leftJoinAndSelect('channel.creator', 'creator')
+      .leftJoinAndSelect('channel.admins', 'admins')
       .where('channel.id = :id', { id: channel_id })
       .getOne();
     if (channel == null) throw new Error('Channel not found');
-    if (channel.creator.id != user_id)
-      throw new Error('User is not creator of this channel');
-    if (channel.pwd == null && body.password != null) {
-      channel.type = ChannelType.PROTECTED_CHANNEL;
+    if (channel.creator.id == user_id) {
+      if (channel.pwd == null && body.password != null) {
+        channel.type = ChannelType.PROTECTED_CHANNEL;
+      }
+      if (body.password != null) {
+        if ((await bcrypt.compare(body.old_password, channel.pwd)) == false)
+          throw new Error('Wrong password');
+        channel.pwd = await bcrypt.hash(body.password, 10);
+      }
+      if (body.name != null) channel.name = body.name;
+      const ret = await this.channelRepository.save(channel);
+      return { channel_id: ret.id, name: ret.name };
+    } else {
+      for (const admin of channel.admins) {
+        if (admin.id == user_id) {
+          if (body.name != null) channel.name = body.name;
+          const ret = await this.channelRepository.save(channel);
+          return { channel_id: ret.id, name: ret.name };
+        }
+      }
     }
-    if (body.password != null) {
-      if ((await bcrypt.compare(body.old_password, channel.pwd)) == false)
-        throw new Error('Wrong password');
-      channel.pwd = await bcrypt.hash(body.password, 10);
-    }
-    if (body.name != null) channel.name = body.name;
-    const ret = await this.channelRepository.save(channel);
-    return { channel_id: ret.id, name: ret.name };
+    throw new Error('User is not admin of this channel');
   }
 }
