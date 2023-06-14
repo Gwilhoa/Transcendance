@@ -29,6 +29,7 @@ export class ChannelService {
     chan.type = body.type;
     const user = await this.userService.getUserById(body.creator_id);
     if (user == null) throw new Error('User not found');
+    chan.creator = user;
     chan.users.push(user);
     chan.admins.push(user);
     if (body.type == ChannelType.PROTECTED_CHANNEL) {
@@ -75,6 +76,7 @@ export class ChannelService {
       .createQueryBuilder('channel')
       .leftJoinAndSelect('channel.admins', 'admins')
       .leftJoinAndSelect('channel.bannedUsers', 'bannedUsers')
+        .leftJoinAndSelect('channel.creator', 'creator')
       .where('channel.id = :id', { id: id })
       .getOne();
   }
@@ -402,21 +404,21 @@ export class ChannelService {
   async updateChannel(channel_id: any, user_id: any, body: any) {
     const channel = await this.channelRepository
       .createQueryBuilder('channel')
-      .leftJoinAndSelect('channel.creator', 'creator')
       .leftJoinAndSelect('channel.admins', 'admins')
+        .leftJoinAndSelect('channel.creator', 'creator')
       .where('channel.id = :id', { id: channel_id })
       .getOne();
     if (channel == null) throw new Error('Channel not found');
     if (channel.creator.id == user_id) {
-      if (channel.pwd == null && body.password != null) {
+      if (channel.pwd == null && body.password != '') {
         channel.type = ChannelType.PROTECTED_CHANNEL;
       }
-      if (body.password != null) {
+      if (body.password != '') {
         if ((await bcrypt.compare(body.old_password, channel.pwd)) == false)
           throw new Error('Wrong password');
         channel.pwd = await bcrypt.hash(body.password, 10);
       }
-      if (body.name != null) channel.name = body.name;
+      if (body.name != '') channel.name = body.name;
       const ret = await this.channelRepository.save(channel);
       return { channel_id: ret.id, name: ret.name };
     } else {
