@@ -53,7 +53,7 @@ function SideBarChat() {
 	return (
 		<div className='chatSideBar'>
 			{listChannel.map((channel) => (
-				<div className='chat-side-bar-channel' onClick={() => handleSwitchChannel(channel.id)} key={channel.id}>
+				<div onClick={() => handleSwitchChannel(channel.id)} key={channel.id}>
 					<ChannelSideBar channelId={channel.id} />
 				</div>
 			))}

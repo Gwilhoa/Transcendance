@@ -84,6 +84,6 @@ p {
 
 .scrollBlock {
   overflow: auto;
-  max-height: 94%;
+  max-height: calc(100vh - var(--header-size));
 }
 
