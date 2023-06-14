@@ -40,15 +40,11 @@ const AddUserId = ({ usersId, setUserId }: AddUserIdProps) => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     
-    console.log('Add');
     const searchUser = (useSelector((state: RootState) => state.searchUser.users));
     useEffect(() => {
         setListUser(searchUser);
     },[searchUser]);
 
-    console.log(listUser?.length);
-    if (listUser == null)
-        console.log('listUser null');
     const refresh = useCallback(() => {
         axios.get(process.env.REACT_APP_IP + ':3000/user/friend', {
             headers: {
