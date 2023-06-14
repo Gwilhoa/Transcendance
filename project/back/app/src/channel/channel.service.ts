@@ -412,6 +412,8 @@ export class ChannelService {
     if (channel.creator.id == user_id) {
       if (channel.pwd == null && body.password != '') {
         channel.type = ChannelType.PROTECTED_CHANNEL;
+        channel.pwd = await bcrypt.hash(body.password, 10);
+        return await this.channelRepository.save(channel);
       }
       if (body.password != '') {
         if ((await bcrypt.compare(body.old_password, channel.pwd)) == false)
