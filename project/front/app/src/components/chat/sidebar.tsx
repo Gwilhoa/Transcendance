@@ -30,7 +30,7 @@ function SideBarChat() {
 
 	useEffect(() =>{
 		socket.on('join_code', (data: any) => {
-			console.log(data);
+			console.log('join_code ' + data.code)
 			fetchChannel();
 			return ;
 		});
@@ -44,6 +44,17 @@ function SideBarChat() {
 	const handleSwitchChannel = (id: string) => {
 		dispatch(setConversation(id));
 	}
+
+	// const parseChannelName = (channel: Channel) => {
+	// 	if (channel.type !== 3) {
+	// 		return (channel.name);
+	// 	}
+	// 	if (channel.users[0].id != localStorage.getItem('id')) {
+	// 		return (channel.users[0].username);
+	// 	}
+	// 	return (channel.users[1].username)
+	// }
+					// {parseChannelName(channel)}
 
 	return (
 		<div className='chatSideBar'>

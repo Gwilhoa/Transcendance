@@ -49,19 +49,16 @@ function Conversation() {
 		}
 
 	useEffect(() => {	
-
 		const id = conversationId;
 
 		socket.on('message_code', (data: any) => {
-			console.log('send message code : ' + data.code);
-			if (listMessage.length === 0) {
-				fetchMessage(id);
-			}
+			console.log('message_code' + data.code);
 			return ;
 		});
 
 		socket.on('message', (data: any) => {
 			console.log('receive message ' + id + ' ' + data.channel);
+			console.log(data)
 			if (data.channel === id) {
 				const newItemMessage: Message = {
 					content: data.content,
@@ -84,7 +81,7 @@ function Conversation() {
 						return prevListMessage;
 					}
 				});
-				}
+			}
 			return ;
 		});
 	}, [socket]);

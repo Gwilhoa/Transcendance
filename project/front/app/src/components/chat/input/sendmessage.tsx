@@ -15,8 +15,7 @@ export default function SendMessage(){
 
 	const handleSendMessage = () =>
 	{
-		console.log('send message pls :')
-		console.log(conversation);
+		console.log('send message pls : ' + conversation);
 		socket.emit('send_message', {token: cookies.get('jwtAuthorization'), channel_id: conversation , content: message});
 	}
 

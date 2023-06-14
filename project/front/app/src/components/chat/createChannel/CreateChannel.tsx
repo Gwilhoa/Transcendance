@@ -1,6 +1,6 @@
 import '../css/CreateChannel.css'
-import React, { useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux';
+import React, { useCallback, useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux';
 import { switchChatModalCreateChannel } from '../../../redux/chat/modalChatSlice';
 import { Channel } from '../../../pages/chat';
 import { ButtonInputToggle } from '../../utils/inputButton';
@@ -8,6 +8,12 @@ import { cookies } from '../../../App';
 import axios from 'axios';
 import { setConversation } from '../../../redux/chat/conversationIdSlice';
 import SocketSingleton from '../../../socket';
+import { Search } from '../../search/userSearch';
+import { IUser } from '../../utils/interface';
+import { useNavigate } from 'react-router-dom';
+import { openModal } from '../../../redux/modal/modalSlice';
+import { setErrorLocalStorage } from '../../IfError';
+import { RootState } from '../../../redux/store';
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
 
@@ -20,10 +26,92 @@ const initialState: Channel= {
 	pwd: null,
 	users: [],
 }
+
+type AddUserIdProps = {
+  usersId: Array<string>;
+  setUserId: React.Dispatch<React.SetStateAction<Array<string>>>;
+};
+
+const AddUserId = ({ usersId, setUserId }: AddUserIdProps) => {
+    const [listUser, setListUser] = useState<Array<IUser> | null >([]);
+
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+    
+    console.log('Add');
+    const searchUser = (useSelector((state: RootState) => state.searchUser.users));
+    useEffect(() => {
+        setListUser(searchUser);
+    },[searchUser]);
+
+    console.log(listUser?.length);
+    if (listUser == null)
+        console.log('listUser null');
+    const refresh = useCallback(() => {
+        axios.get(process.env.REACT_APP_IP + ':3000/user/friend', {
+            headers: {
+                Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+            },
+        })
+        .then((res) => {
+            console.log(res);
+            setListUser(res.data);
+        })
+        .catch((error) => {
+            console.error(error);
+            setErrorLocalStorage(error.response.status);
+            navigate('/Error');
+        })
+    }, [navigate]);
+
+    useEffect(() => {
+        if (listUser == null)
+        {
+            refresh();
+            socket.on('friend_code', (data: any) => {
+                if (data.code == 2) {
+                    refresh()
+                    return;
+                }
+                else if (data.code === 5 || data.code === 7) {
+                    refresh();
+                }
+                return;
+            })
+            
+            socket.on('friend_request', (data: any) => {
+                console.log('before code');
+                if (data.code == 2 || data.code == 7) {
+                    console.log('refresh friend request');
+                    refresh();
+                    return;
+                }
+                return;
+            })
+        }
+    }, [listUser, refresh, socket]);
+    
+    if (listUser == null || listUser.length == 0)
+    {
+        return (<></>);
+    }
+    console.log(listUser);
+    return (
+        <div className='users-list'>
+            {listUser.map((user) => (
+                <div className='user' key={user.id} onClick={() => dispatch(openModal(user.id))}>
+                    <img className='image' src='https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/42_Logo.svg/1200px-42_Logo.svg.png'></img>
+                    <p className='name'>{user.username}</p>
+                </div>
+            ))}
+        </div>
+    );
+}
+
+
 const CreateChannel = () => {
 	const dispatch = useDispatch();
 	const [channelParams, setChannelParams] = useState<Channel>(initialState);
-	const [id, setId] = useState<string>('');
 
 	const onSubmitChannelName = (str: string) => {
 		setChannelParams((prevChannelParams) => ({
@@ -61,9 +149,8 @@ const CreateChannel = () => {
 			})
 			.then((response) => {
 				console.log(response);
-				setId(response.data.id);
-				socket.emit('join_channel', {id: response.data.id});
-				// dispatch(setConversation(response.data.id));
+				socket.emit('join_channel', {channel_id: response.data.id});
+				dispatch(setConversation(response.data.id));
 				dispatch(switchChatModalCreateChannel());
 			})
 			.catch((error) => {
@@ -72,7 +159,6 @@ const CreateChannel = () => {
 		if (channelParams.type == 0 ) {
 			console.log('hey need an other call')
 		}
-		// socket.emit('join_channel', {id: id});
 		return;
 	};
 
@@ -106,7 +192,9 @@ const CreateChannel = () => {
 			{channelParams.type === 0 ? (
 			<>
 				<div className='divFindUser'>
-					<h3>Invite some friend:</h3>
+					<h6>Invite some people:</h6>
+					<Search defaultAllUsers={true}/>
+					<AddUserId />
 				</div>
 			</>
 			) : (<></>)}
