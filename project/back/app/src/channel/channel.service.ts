@@ -375,6 +375,8 @@ export class ChannelService {
       .leftJoinAndSelect('channel.admins', 'admins')
       .where('channel.id = :id', { id: channel_id })
       .getOne();
+    if (channel.type == ChannelType.MP_CHANNEL)
+      throw new Error('Channel is private');
 
     let f = false;
     for (const user of channel.admins) {
