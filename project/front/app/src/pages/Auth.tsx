@@ -11,6 +11,7 @@ function Auth() {
 
 	localStorage.removeItem('Error');
 	localStorage.removeItem('id');
+	localStorage.removeItem('conversationId');
 	useEffect(() => {
 		if (cookies.get('jwtAuthorization') != null) {
 			axios.get(process.env.REACT_APP_IP + ':3000/auth/2fa/is2FA', {
