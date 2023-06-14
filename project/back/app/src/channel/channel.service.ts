@@ -22,6 +22,8 @@ export class ChannelService {
 
   public async createChannel(body: CreateChannelDto) {
     let chan = new Channel();
+    if (body.name.length > 12)
+      throw new Error('Channel name must be less than 12 characters');
     chan.name = body.name;
     chan.admins = [];
     chan.bannedUsers = [];
