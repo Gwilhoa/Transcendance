@@ -1,3 +1,8 @@
+
+:root{
+    --search-bar-size: 3rem;
+}
+
 .chat-input-send-bar{
     background-color: var(--box-color);
     border-radius: 50px;
@@ -7,7 +12,7 @@
     position: absolute;
     bottom: 1rem;
     display: flex;
-    height: 3rem;
+    height: var(--search-bar-size);
     color: var(--light-color);
     padding-left: 2rem;
 }

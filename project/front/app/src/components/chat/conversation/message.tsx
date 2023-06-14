@@ -39,13 +39,13 @@ function Messages({ message }: { message: Message}) {
 	const dispatch = useDispatch();
 
 	return (
-		<div key={message.id} className={isMe ? 'MyMessage' : 'OtherMessage'}>
-				<ProfilImage id = {'' + message.user.id} OnClickOpenProfil={true} OverwriteClassName = 'chat-message-image-profil'/>
-			<div className='headerMessage'>
+		<div key={message.id} className={isMe ? 'chat-my-message' : 'chat-other-message'}>
+			<div className='chat-header-message'>
+			<ProfilImage id = {'' + message.user.id} OnClickOpenProfil={true} OverwriteClassName = 'chat-message-image-profil'/>
 				<div className='nameMessage'>
 					<ProfilName id={message.user.id} />
 				</div>
-				<div className='dateMessage'>
+				<div className='chat-date-message'>
 					<Timer dateString={message.date} />
 				</div>
 			</div>
