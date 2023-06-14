@@ -2,16 +2,13 @@ import '../css/CreateChannel.css'
 import React, { useCallback, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { switchChatModalCreateChannel } from '../../../redux/chat/modalChatSlice';
-import { Channel } from '../../../pages/chat';
-import { ButtonInputToggle } from '../../utils/inputButton';
+import { Channel, User } from '../../../pages/chat';
 import { cookies } from '../../../App';
 import axios from 'axios';
-import { setConversation } from '../../../redux/chat/conversationIdSlice';
 import SocketSingleton from '../../../socket';
 import { Search } from '../../search/userSearch';
 import { IUser } from '../../utils/interface';
 import { useNavigate } from 'react-router-dom';
-import { openModal } from '../../../redux/modal/modalSlice';
 import { setErrorLocalStorage } from '../../IfError';
 import { RootState } from '../../../redux/store';
 import { ProfilImage } from '../../profil/ProfilImage';
@@ -19,14 +16,26 @@ import { ProfilName } from '../../profil/ProfilName';
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
 
+const initialUserState: User= {
+	id: '',
+	email: '',
+	username: '',
+	enabled2FA: false,
+	experience: 0,
+	status: 0,
+}
 
-const initialState: Channel= {
+const initialChannelState: Channel= {
 	id: '',
 	name: 'New Channel',
 	topic: null,
 	type: 0,
 	pwd: null,
 	users: [],
+	owner: initialUserState,
+	admins: [],
+	bannedUsers: [],
+
 }
 
 type AddUserIdProps = {
@@ -104,7 +113,7 @@ const AddUserId = ({ usersId, setUserId }: AddUserIdProps) => {
 const CreateChannel = () => {
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
-	const [channelParams, setChannelParams] = useState<Channel>(initialState);
+	const [channelParams, setChannelParams] = useState<Channel>(initialChannelState);
 	const [usersId, setUserId] = useState<Array<string>>([]);
 
 	const onSubmitChannelName = (str: string) => {

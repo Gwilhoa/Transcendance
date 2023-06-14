@@ -11,6 +11,7 @@ import { RootState } from '../redux/store';
 import SendMessage from '../components/chat/input/sendmessage';
 import { setConversation } from '../redux/chat/conversationIdSlice';
 import SocketSingleton from '../socket';
+import UpdateChannel from "../components/chat/inviteChannel/UpdateChannel";
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
 
@@ -29,7 +30,10 @@ export interface Channel {
 	topic: string | null;
 	type: number;
 	pwd: string | null;
+	owner: User;
 	users: Array<User>;
+	admins: Array<User>;
+	bannedUsers: Array<User>;
 }
 
 export interface Message {
@@ -44,6 +48,7 @@ function Chat() {
 	const isOpenSideBar = useSelector((state: RootState) => state.modalChat.isOpenSideBar);
 	const isOpenCreateChannel = useSelector((state: RootState) => state.modalChat.isOpenCreateChannel);
 	const isOpenInviteChannel = useSelector((state: RootState) => state.modalChat.isOpenInviteChannel);
+	const isOpenUpdateChannel = useSelector((state: RootState) => state.modalChat.isOpenUpdateChannel);
 	const conversationId = useSelector((state: RootState) => state.conversation.id);
 	
 	useEffect(() => {
@@ -68,6 +73,7 @@ function Chat() {
 			{isOpenSideBar && ( <SideBarChat /> )}
 			{isOpenCreateChannel && ( <CreateChannel /> )}
 			{isOpenInviteChannel && ( <InviteChannel /> )}
+			{isOpenUpdateChannel && ( <UpdateChannel /> )}
 			<div className='chat-right-page'>
 				<Conversation />
 				<SendMessage />

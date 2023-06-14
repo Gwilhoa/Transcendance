@@ -8,8 +8,8 @@ const ButtonInviteChannel = () => {
 	const dispatch = useDispatch();
 
 	return (
-		<div className='chat-invite-channel-button' onClick={() => dispatch(switchChatModalInviteChannel())}>
-		✉
+		<div className='chat-side-bar-channel-invite' onClick={() => dispatch(switchChatModalInviteChannel())}>
+		♛
 		</div>
 	);
 }
