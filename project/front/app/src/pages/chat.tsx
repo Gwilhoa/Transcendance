@@ -30,7 +30,10 @@ export interface Channel {
 	topic: string | null;
 	type: number;
 	pwd: string | null;
+	owner: User;
 	users: Array<User>;
+	admins: Array<User>;
+	bannedUsers: Array<User>;
 }
 
 export interface Message {
