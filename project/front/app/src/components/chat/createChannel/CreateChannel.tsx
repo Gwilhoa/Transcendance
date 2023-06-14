@@ -38,7 +38,6 @@ const AddUserId = ({ usersId, setUserId }: AddUserIdProps) => {
     const [listUser, setListUser] = useState<Array<IUser> | null >([]);
 
     const navigate = useNavigate();
-    const dispatch = useDispatch();
     
     const searchUser = (useSelector((state: RootState) => state.searchUser.users));
     useEffect(() => {
@@ -104,6 +103,7 @@ const AddUserId = ({ usersId, setUserId }: AddUserIdProps) => {
 
 const CreateChannel = () => {
 	const dispatch = useDispatch();
+	const navigate = useNavigate();
 	const [channelParams, setChannelParams] = useState<Channel>(initialState);
 	const [usersId, setUserId] = useState<Array<string>>([]);
 
@@ -150,7 +150,10 @@ const CreateChannel = () => {
 				dispatch(switchChatModalCreateChannel());
 			})
 			.catch((error) => {
-				console.error(error)
+					if (error.response.status === 401 || error.response.status === 500) {
+						setErrorLocalStorage('unauthorized');
+						navigate('/Error');
+					}
 			});
 		return;
 	};
