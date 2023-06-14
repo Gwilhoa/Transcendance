@@ -20,6 +20,7 @@ export class Game {
   static default_rackspeed = 2;
   static default_maxpowerupreverse = 2;
   static default_maxpowerupstop = 2;
+  static default_maxtimestop = 60;
 
   private _io: Server;
   private _loopid: NodeJS.Timeout;
@@ -51,6 +52,12 @@ export class Game {
   private _wait_ball: number;
   private _player1_stop: number;
   private _player2_stop: number;
+  private _stop:boolean;
+  private _playerstop:string;
+  private _time_stop_user1: number;
+  private _time_stop_user2: number;
+  private _loop_stop: NodeJS.Timeout;
+  private _started:boolean;
 
   public constructor(
     id: string,
@@ -82,6 +89,10 @@ export class Game {
     this._gameService = gameService;
     this._package = 0;
     this._wait_ball = 0;
+    this._stop = false;
+    this._time_stop_user1 = Game.default_maxtimestop;
+    this._time_stop_user2 = Game.default_maxtimestop;
+    this._started = false;
   }
 
   public getId() {
@@ -96,7 +107,70 @@ export class Game {
     return this._user2;
   }
 
-  public updateRacket(player: Socket, y: number) {
+  private delayStop = () => {
+    if ((this._playerstop == this._user1.id && this._time_stop_user1 == 0) || (this._playerstop == this._user2.id  && this._time_stop_user2 == 0)) {
+      clearInterval(this._loop_stop);
+      this._stop = false;
+      this._loopid = setInterval(this.gameLoop, Game.default_update);
+      this._user1.emit('is_stop_game', { stop: false, stoper: false });
+      this._user2.emit('is_stop_game', { stop: false, stoper: false });
+      return;
+    }
+
+    if (this._playerstop == this._user1.id ) {
+      this._user1.emit('stop_game', { time: this._time_stop_user1 });
+      this._user2.emit('stop_game', { time: this._time_stop_user1 });
+    }
+    else {
+      this._user1.emit('stop_game', { time: this._time_stop_user2 });
+      this._user2.emit('stop_game', { time: this._time_stop_user2 });
+    }
+
+
+    if (this._playerstop == this._user1.id)
+      this._time_stop_user1 -= 1
+    else
+      this._time_stop_user2 -= 1
+  }
+
+  public updateRacket = (player: Socket, y: number) => {
+
+    if (y == 2 && this._started) {
+      console.log("enter");
+      console.log(this._stop);
+      console.log(player.id);
+      console.log(this._playerstop);
+      if (this._stop && player.id == this._playerstop) {
+        console.log('clearinterval')
+
+        clearInterval(this._loop_stop);
+        this._stop = false;
+        this._loopid = setInterval(this.gameLoop, Game.default_update);
+        this._user1.emit('is_stop_game', { stop: false, stoper: false });
+        this._user2.emit('is_stop_game', { stop: false, stoper: false });
+        return ;
+      }
+      if (!this._stop) {
+        if ((player.id === this._user1.id && this._time_stop_user1 > 0) || (player.id === this._user2.id && this._time_stop_user2 > 0)) {
+          this._stop = true;
+          clearInterval(this._loopid);
+          if (player.id == this._user1.id) {
+            this._user1.emit('is_stop_game', { stop: true, stoper: true });
+            this._user2.emit('is_stop_game', { stop: true, stoper: false });
+          }
+          else {
+            this._user1.emit('is_stop_game', { stop: true, stoper: false });
+            this._user2.emit('is_stop_game', { stop: true, stoper: true });
+          }
+          this._playerstop = player.id;
+          this._loop_stop = setInterval(this.delayStop, 1000);
+        }
+      }
+    }
+
+    if (this._stop) {
+      return;
+    }
     if (player.id == this._user1.id) {
       if (y == 1) {
         if (this._rack1y >= this._maxY - Game.default_racklenght)
@@ -116,6 +190,7 @@ export class Game {
         else this._rack2y -= Game.default_rackspeed;
       }
     }
+
 
     if (!this._isPowerUp)
       return
@@ -190,9 +265,12 @@ export class Game {
       this._angle = Math.random() * 360;
     }
     this._loopid = setInterval(this.gameLoop, Game.default_update);
+    this._started = true;
   }
 
   private endWar = async (userWin: Socket, userDefeat: Socket, winuser) => {
+    this._time_stop_user1 = Game.default_maxtimestop;
+    this._time_stop_user2 = Game.default_maxtimestop;
     console.log('game finish ' + this._id);
     this._user1.leave(this._id);
     this._user2.leave(this._id);

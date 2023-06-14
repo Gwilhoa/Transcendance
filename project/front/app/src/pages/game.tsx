@@ -46,11 +46,12 @@ const Game: React.FC<GameProps> = () => {
   const [nbMap, setNbMap] = useState('map1');
   const [isPowerup, setIsPowerup] = useState(false);
   
-  
+  const [stop, setStop] = useState(false);
+  const [timeStop, setTimeStop] = useState(60);
   const dispatch = useDispatch();
   const finalStatus = useSelector((state: RootState) => state.finalGame.finalStatus);
-  
-  
+  const [IamStoper, setIamStoper] = useState(false);
+
   const socketInstance = SocketSingleton.getInstance();
   const socket = socketInstance.getSocket();
   
@@ -74,10 +75,10 @@ const Game: React.FC<GameProps> = () => {
       case "ArrowDown":
         socket.emit("input_game", {game_id: gameId, type: 1})
         break;
-      case "KeyA":
-        socket.emit("input_game", {game_id: gameId, type: 3})
+      case "Escape":
+        socket.emit("input_game", {game_id: gameId, type: 2})
         break;
-      case "KeyE":
+      case "KeyA":
         socket.emit("input_game", {game_id: gameId, type: 3})
         break;
       case "KeyQ":
@@ -114,6 +115,45 @@ const Game: React.FC<GameProps> = () => {
     
     
     
+  const leaveGame = () => {
+    socket.emit('leave_game');
+    navigate('/home')
+  }
+
+  const resumeGame = () => {
+    socket.emit("input_game", {game_id: gameId, type: 2})
+  }
+  
+  socket.on('create_game', (any) => {
+    console.log("WESH")
+    console.log(any);
+  })
+  
+  
+  useEffect(() => {
+    socket.on('stop_game', (any) => {
+      
+      console.log(any);
+      setTimeStop(any.time);
+    })
+
+    socket.on('is_stop_game', (any) => {
+      console.log(any);
+      setStop(any.stop);
+     
+      setIamStoper(any.stoper);
+      console.log(any.stoper);
+      console.log(IamStoper);
+    })
+
+    socket.on('update_game', (data) => {
+      setScore1(data.score1);
+      setScore2(data.score2);
+      setBall({x: (data.ballx), y: (data.bally)});
+      setPaddle2(data.rack2y)
+      setPaddle1(data.rack1y);
+    });
+    
     socket.on('finish_game', (any) => {
       if (isCall) {
       const content = {status: any.status, adversary: any.adversary, score1: any.score1, score2: any.score2, gameid: gameId};
@@ -123,22 +163,6 @@ const Game: React.FC<GameProps> = () => {
     }
   });
   
-  
-  socket.on('create_game', (any) => {
-    console.log("WESH")
-    console.log(any);
-  })
-
-
-  useEffect(() => {
-    socket.on('update_game', (data) => {
-      setScore1(data.score1);
-      setScore2(data.score2);
-      setBall({x: (data.ballx), y: (data.bally)});
-      setPaddle2(data.rack2y)
-      setPaddle1(data.rack1y);
-    });
-
     return () => {
       socket.off('update_game');
       socket.emit('');
@@ -163,8 +187,28 @@ const Game: React.FC<GameProps> = () => {
       src={nbBall}
       className="ball"
       style={{ ...animatedBall, ...ballStyles }}/>
-    </>
+    {stop &&
+    <div className="backgroundimg">
+      {IamStoper &&
+      <button className='buttonResume' onClick={resumeGame}>
+      <h1>
+        resume
+      </h1>
+      </button>
+      }
+      <button className='buttonLeave' onClick={leaveGame}>
+        <h1>
+        Leave
+        </h1>
+      </button>
+      <div className='textTime'>
 
+      <h1>
+        {timeStop}
+      </h1>
+      </div>
+    </div> }
+    </>
 
   );
 }
