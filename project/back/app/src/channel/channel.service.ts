@@ -76,7 +76,8 @@ export class ChannelService {
       .createQueryBuilder('channel')
       .leftJoinAndSelect('channel.admins', 'admins')
       .leftJoinAndSelect('channel.bannedUsers', 'bannedUsers')
-        .leftJoinAndSelect('channel.creator', 'creator')
+      .leftJoinAndSelect('channel.creator', 'creator')
+      .leftJoinAndSelect('channel.users', 'users')
       .where('channel.id = :id', { id: id })
       .getOne();
   }
@@ -405,7 +406,7 @@ export class ChannelService {
     const channel = await this.channelRepository
       .createQueryBuilder('channel')
       .leftJoinAndSelect('channel.admins', 'admins')
-        .leftJoinAndSelect('channel.creator', 'creator')
+      .leftJoinAndSelect('channel.creator', 'creator')
       .where('channel.id = :id', { id: channel_id })
       .getOne();
     if (channel == null) throw new Error('Channel not found');
