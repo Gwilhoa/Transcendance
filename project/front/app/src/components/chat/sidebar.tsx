@@ -30,6 +30,7 @@ function SideBarChat() {
 
 	useEffect(() =>{
 		socket.on('join_code', (data: any) => {
+			console.log('join_code ' + data.code)
 			console.log(data);
 			fetchChannel();
 			return ;
@@ -45,11 +46,21 @@ function SideBarChat() {
 		dispatch(setConversation(id));
 	}
 
+	const parseChannelName = (channel: Channel) => {
+		if (channel.type !== 3) {
+			return (channel.name);
+		}
+		if (channel.users[0].id != localStorage.getItem('id')) {
+			return (channel.users[0].username);
+		}
+		return (channel.users[1].username)
+	}
+
 	return (
 		<div className='chatSideBar'>
 			{listChannel.map((channel) => (
 				<button onClick={() => handleSwitchChannel(channel.id)} key={channel.id}>
-					{channel.name}
+					{parseChannelName(channel)}
 				</button>
 			))}
 		</div>

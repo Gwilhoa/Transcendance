@@ -1,5 +1,5 @@
 import './css/chat.css'
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Conversation from '../components/chat/conversation/conversation';
 import CreateChannel from '../components/chat/createChannel/CreateChannel';
@@ -9,6 +9,9 @@ import ErrorToken from '../components/IfError';
 import { RootState } from '../redux/store';
 import SendMessage from '../components/chat/input/sendmessage';
 import { setConversation } from '../redux/chat/conversationIdSlice';
+import SocketSingleton from '../socket';
+const socketInstance = SocketSingleton.getInstance();
+const socket = socketInstance.getSocket();
 
 export interface User {
 	id: string;
@@ -40,9 +43,21 @@ function Chat() {
 	const isOpenSideBar = useSelector((state: RootState) => state.modalChat.isOpenSideBar);
 	const isOpenCreateChannel = useSelector((state: RootState) => state.modalChat.isOpenCreateChannel);
 	const conversationId = useSelector((state: RootState) => state.conversation.id);
-	if (conversationId === '' && localStorage.getItem('conversationId') != '') {
-		dispatch(setConversation('' + localStorage.getItem('conversationId')));
-	}
+	
+	useEffect(() => {
+		if (conversationId === '' && localStorage.getItem('conversationId') != '') {
+			dispatch(setConversation('' + localStorage.getItem('conversationId')));
+		}
+	}, []);
+
+	useEffect(() =>{
+		socket.on('join_code', (data: any) => {
+			console.log('join_code ' + data.code)
+			console.log(data);
+			dispatch(setConversation(data.channel_id));
+			return ;
+		});
+	}, [socket])
 
 	return (
 		<div className='chatPage'>
