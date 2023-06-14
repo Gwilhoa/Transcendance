@@ -5,6 +5,7 @@ interface ModalState {
 	isOpenCreateChannel: boolean;
 	isOpenInviteChannel: boolean;
 	isOpenUpdateChannel: boolean;
+	isOpenListUser: boolean;
 }
 
 const initialState: ModalState = {
@@ -12,6 +13,7 @@ const initialState: ModalState = {
 	isOpenCreateChannel: false,
 	isOpenUpdateChannel: false,
 	isOpenInviteChannel: false,
+	isOpenListUser: false,
 };
 
 const modalChatSlice = createSlice({
@@ -29,7 +31,10 @@ const modalChatSlice = createSlice({
 		},
 		switchChatModalUpdateChannel: (state) => {
 			state.isOpenUpdateChannel = !state.isOpenUpdateChannel;
-		}
+		},
+		switchChatModalListUser: (state) => {
+			state.isOpenListUser = !state.isOpenListUser;
+		},
 	},
 });
 
@@ -38,7 +43,8 @@ export const
 	switchChatModalSideBar, 
 	switchChatModalCreateChannel, 
 	switchChatModalInviteChannel,
-	switchChatModalUpdateChannel
+	switchChatModalUpdateChannel,
+	switchChatModalListUser,
 } = modalChatSlice.actions;
 
 export default modalChatSlice.reducer;

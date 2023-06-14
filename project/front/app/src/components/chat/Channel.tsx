@@ -2,33 +2,11 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { cookies } from '../../App';
-import { Channel, User } from '../../pages/chat';
+import { Channel, initialChannelState } from '../../pages/chat';
 import { setErrorLocalStorage } from '../IfError';
 import ButtonInviteChannel from './optionBar/button/ButtonInviteChannelModal';
+import ButtonListChannel from './optionBar/button/ButtonListUserModal';
 import ButtonUpdateChannel from './optionBar/button/ButtonUpdateChannel';
-
-
-const initialUserState: User= {
-	id: '',
-	email: '',
-	username: '',
-	enabled2FA: false,
-	experience: 0,
-	status: 0,
-}
-
-const initialChannelState: Channel= {
-	id: '',
-	name: 'New Channel',
-	topic: null,
-	type: 0,
-	pwd: null,
-	users: [],
-	creator: initialUserState,
-	admins: [],
-	bannedUsers: [],
-
-}
 
 const ChannelSideBar = ({ channelId }: {channelId: string}) => {
 	const [channel, setChannel] = useState<Channel>(initialChannelState);
@@ -59,14 +37,29 @@ const ChannelSideBar = ({ channelId }: {channelId: string}) => {
 			return (channel.users[0].username);
 		}
 		return (channel.users[1].username)
-	}
+	};
+			// {parseChannelName(channel)}
+
+	const isAdmin = (channel: Channel) => {
+		if (channel.admins.some((admin) => admin.id === localStorage.getItem('id'))) {
+			return(true);
+		}
+		return (false);
+	};
 
 	return (
 		<div className='chat-side-bar-channel'>
-			{parseChannelName(channel)}
+			{channel.name}
 			<div className='chat-side-bar-channel-modify-button'>
-				<ButtonInviteChannel />
-				<ButtonUpdateChannel />
+			{ isAdmin(channel) ? (
+				<>
+					<ButtonInviteChannel />
+					<ButtonUpdateChannel /> 
+					<ButtonListChannel />
+				</>
+			) : (
+				<ButtonListChannel />
+			)}
 			</div>
 		</div>		
 	);
