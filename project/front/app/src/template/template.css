@@ -1,16 +1,6 @@
 :root {
-  /* 
+
   --header-size: 90px;
-  --footer-size: 60px;
-  --main-width:100%;
-  --light-color:white;
-  --light-color: rgb(209, 209, 209);
-  --header-background-color: #333;
-  --box-color: rgb(48, 62, 121);
-  --box-color:rgb(31, 42, 83);
-  */
-  --header-size: 90px;
-  --footer-size: 60px;
   --main-width:100%;
   --light-color: #FFFFFF;
   --header-background-color: #1F2937;
@@ -55,33 +45,42 @@ code {
   padding: 0 20px;
 }
 
-  .transcendance-link {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: var(--light-color);
-    margin: 0;
-    text-decoration: none;
-  }
+.transcendance-link {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--light-color);
+  margin: 0;
+  text-decoration: none;
+}
+
+.navbar__link {
+  color: var(--light-color);
+  text-decoration: none;
+  background-color: var(--header-background-color);
+  border: none;
+  cursor: pointer;
+  margin-right: 40px;
+  font-size: 1rem;
+}
+
+.main-template {
+  position: absolute; 
+  /* top: var(--header-size); */
+  height: calc(100vh - (var(--header-size)));
+  top:var(--header-size);
+  width: var(--main-width);
+}
+
+.page {
+  overflow: hidden;
+}
   
-  .navbar__link {
-    color: var(--light-color);
-    text-decoration: none;
-    background-color: var(--header-background-color);
-    border: none;
-    cursor: pointer;
-    margin-right: 40px;
-    font-size: 1rem;
+.page-shadow {
+  z-index: 1;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  position: fixed;
+  background-color: rgba(0, 0, 0, 0.4);
   }
-  
-  .main-template {
-    position: absolute; 
-    /* top: var(--header-size); */
-    height: calc(100vh - (var(--footer-size) + var(--header-size)));
-    top:var(--header-size);
-    width: var(--main-width);
-  }
-  
-  .page {
-    overflow: hidden;
-  }
-  

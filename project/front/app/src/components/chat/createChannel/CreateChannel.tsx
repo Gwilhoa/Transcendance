@@ -1,29 +1,122 @@
-import React, { useState } from "react"
-import { useDispatch } from "react-redux";
-import { switchChatModalCreateChannel } from "../../../redux/chat/modalChatSlice";
-import "../css/CreateChannel.css"
-import { Channel } from "../../../pages/chat";
-import { ButtonInputToggle } from "../../utils/inputButton";
-import { cookies } from "../../../App";
-import axios from "axios";
-import { setConversation } from "../../../redux/chat/conversationIdSlice";
-import SocketSingleton from "../../../socket";
+import '../css/CreateChannel.css'
+import React, { useCallback, useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux';
+import { switchChatModalCreateChannel } from '../../../redux/chat/modalChatSlice';
+import { Channel } from '../../../pages/chat';
+import { ButtonInputToggle } from '../../utils/inputButton';
+import { cookies } from '../../../App';
+import axios from 'axios';
+import { setConversation } from '../../../redux/chat/conversationIdSlice';
+import SocketSingleton from '../../../socket';
+import { Search } from '../../search/userSearch';
+import { IUser } from '../../utils/interface';
+import { useNavigate } from 'react-router-dom';
+import { openModal } from '../../../redux/modal/modalSlice';
+import { setErrorLocalStorage } from '../../IfError';
+import { RootState } from '../../../redux/store';
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
 
 
 const initialState: Channel= {
 	id: '',
-	name: 'New Name',
+	name: 'New Channel',
 	topic: null,
 	type: 0,
 	pwd: null,
 	users: [],
 }
+
+type AddUserIdProps = {
+  usersId: Array<string>;
+  setUserId: React.Dispatch<React.SetStateAction<Array<string>>>;
+};
+
+const AddUserId = ({ usersId, setUserId }: AddUserIdProps) => {
+    const [listUser, setListUser] = useState<Array<IUser> | null >([]);
+
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+    
+    console.log('Add');
+    const searchUser = (useSelector((state: RootState) => state.searchUser.users));
+    useEffect(() => {
+        setListUser(searchUser);
+    },[searchUser]);
+
+    console.log(listUser?.length);
+    if (listUser == null)
+        console.log('listUser null');
+    const refresh = useCallback(() => {
+        axios.get(process.env.REACT_APP_IP + ':3000/user/friend', {
+            headers: {
+                Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+            },
+        })
+        .then((res) => {
+            console.log(res);
+            setListUser(res.data);
+        })
+        .catch((error) => {
+            console.error(error);
+            setErrorLocalStorage(error.response.status);
+            navigate('/Error');
+        })
+    }, [navigate]);
+
+    useEffect(() => {
+        if (listUser == null)
+        {
+            refresh();
+            socket.on('friend_code', (data: any) => {
+                if (data.code == 2) {
+                    refresh()
+                    return;
+                }
+                else if (data.code === 5 || data.code === 7) {
+                    refresh();
+                }
+                return;
+            })
+            
+            socket.on('friend_request', (data: any) => {
+                console.log('before code');
+                if (data.code == 2 || data.code == 7) {
+                    console.log('refresh friend request');
+                    refresh();
+                    return;
+                }
+                return;
+            })
+        }
+    }, [listUser, refresh, socket]);
+    
+    if (listUser == null || listUser.length == 0)
+    {
+        return (<></>);
+    }
+    console.log(listUser);
+    return (
+        <div className='users-list'>
+            {listUser.map((user) => (
+				!usersId.includes(user.id) ? (
+					<div className='user' key={user.id} onClick={() => dispatch(openModal(user.id))}>
+						<img className='image' src='https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/42_Logo.svg/1200px-42_Logo.svg.png'></img>
+						<p className='name'>{user.username}</p>
+					</div>
+				) : (
+					<></>
+				)
+            ))}
+        </div>
+    );
+}
+
+
 const CreateChannel = () => {
 	const dispatch = useDispatch();
 	const [channelParams, setChannelParams] = useState<Channel>(initialState);
-	const [id, setId] = useState<string>('');
+	const [usersId, setUserId] = useState<Array<string>>([]);
 
 	const onSubmitChannelName = (str: string) => {
 		setChannelParams((prevChannelParams) => ({
@@ -61,63 +154,40 @@ const CreateChannel = () => {
 			})
 			.then((response) => {
 				console.log(response);
-				setId(response.data.id);
+				socket.emit('join_channel', {channel_id: response.data.id});
+				dispatch(switchChatModalCreateChannel());
 			})
 			.catch((error) => {
 				console.error(error)
 			});
 		if (channelParams.type == 0 ) {
-			console.log("hey need an other call")
+			console.log('hey need an other call')
 		}
-		socket.emit('join_channel', {id: id});
-		dispatch(setConversation(channelParams.id));
-		dispatch(switchChatModalCreateChannel());
 		return;
 	};
 
-	const getTypeLabel = (type: number) => {
-		switch (type) {
-			case 0:
-				return "Private";
-			case 1:
-				return "Public";
-			case 2:
-				return "Protected";
-			default:
-				return "";
-		}
-	};
-
 	return (
-	<div className="PageShadow">
-		<div className="CreateChannel">
+	<div className='page-shadow'>
+		<div className='create-channel'>
 			<h2>Create Channel</h2>
-			<br />
-			{channelParams.name}
-			<br />
-			<button className="CloseCreateChannel" onClick={() => dispatch(switchChatModalCreateChannel())} />
-			<ButtonInputToggle
-					onInputSubmit={onSubmitChannelName}
-					textInButton='Channel name'
-					placeHolder='Channel name'
-					classInput=''
-					classButton=''
-			/>
-			<br />
-			<div className="ButtonChangeTypeChannel">
-				<h3>Channel Type: {getTypeLabel(channelParams.type)}</h3>
-				<button onClick={() => handleChannelTypeChange(0)}>Private</button>
-				<button onClick={() => handleChannelTypeChange(1)}>Public</button>
-				<button onClick={() => handleChannelTypeChange(2)}>Protected</button>
+			<h3>Channel Name</h3>
+			<button className='close-create-channel' onClick={() => dispatch(switchChatModalCreateChannel())} />
+			<input className='channel-name-input' type='text' placeholder='Channel Name' value={channelParams.name} onChange={(e) => onSubmitChannelName(e.target.value)}/>
+			<div className='ButtonChangeTypeChannel'>
+				<h3>Channel Type</h3>
+				<button className='channel-type-button' onClick={() => handleChannelTypeChange(0)}>Private</button>
+				<button className='channel-type-button' onClick={() => handleChannelTypeChange(1)}>Public</button>
+				<button className='channel-type-button' onClick={() => handleChannelTypeChange(2)}>Protected</button>
 			</div>
 			{channelParams.type === 2 ? (
 			<>
-				<br />
-				<div className="divInputPassword">
+				<div className='divInputPassword'>
 					<h3>Password</h3>
 					<input
-						type="password"
-						id="password"
+						className='channel-password-input'
+						placeholder='Password'
+						type='password'
+						id='password'
 						onChange={() => handlePasswordChange}
 					/>
 				</div>
@@ -125,15 +195,15 @@ const CreateChannel = () => {
 			) : (<></>)}
 			{channelParams.type === 0 ? (
 			<>
-				<br />
-				<div className="divFindUser">
-					<h3>Invite some friend:</h3>
+				<div className='divFindUser'>
+					<h6>Invite some people:</h6>
+					<Search defaultAllUsers={true}/>
+					<AddUserId usersId={usersId} setUserId={setUserId}/>
 				</div>
 			</>
 			) : (<></>)}
 
-			<br />
-			<button onClick={() => handleNewChannel()}>New Channel</button>
+			<button className='channel-create-channel-button' onClick={() => handleNewChannel()}>New Channel</button>
 		</div>
 	</div>
 	);

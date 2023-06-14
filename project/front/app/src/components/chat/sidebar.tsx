@@ -1,31 +1,22 @@
-import axios from "axios";
-import React, { useEffect, useState } from "react"
-import { useDispatch, useSelector } from "react-redux";
-import { cookies } from "../../App";
-import { Channel } from "../../pages/chat";
-import { setConversation } from "../../redux/chat/conversationIdSlice";
-import { RootState } from "../../redux/store";
-import "./css/sidebar.css"
-import SocketSingleton from "../../socket";
+import './css/sidebar.css'
+import axios from 'axios';
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux';
+import { cookies } from '../../App';
+import { Channel } from '../../pages/chat';
+import { setConversation } from '../../redux/chat/conversationIdSlice';
+import { RootState } from '../../redux/store';
+import SocketSingleton from '../../socket';
 
 function SideBarChat() {
 	const [listChannel, setListChannel] = useState<Array<Channel>>([]);
 	const dispatch = useDispatch();
-	const conversationId = useSelector((state: RootState) => state.conversation.id);
-
 	const socketInstance = SocketSingleton.getInstance();
 	const socket = socketInstance.getSocket();
-	useEffect(() =>{
-		socket.on('join_code', (data: any) => {
-			console.log(data);
-			fetchChannel();
-			return ;
-		});
-	}, [socket])
-	
+
 	const fetchChannel = async () => {
       try {
-        const response = await axios.get(process.env.REACT_APP_IP + ':3000/channel', {
+        const response = await axios.get(process.env.REACT_APP_IP + ':3000/user/channels', {
           headers: {
             Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
           },
@@ -36,22 +27,40 @@ function SideBarChat() {
         console.error(error);
       }
     };
+
+	useEffect(() =>{
+		socket.on('join_code', (data: any) => {
+			console.log('join_code ' + data.code)
+			console.log(data);
+			fetchChannel();
+			return ;
+		});
+	}, [socket])
+	
 	
 	useEffect(() =>{
 		fetchChannel();
-		console.log(conversationId)
-	},[])
+	}, [])
 
 	const handleSwitchChannel = (id: string) => {
 		dispatch(setConversation(id));
-		console.log(conversationId);
+	}
+
+	const parseChannelName = (channel: Channel) => {
+		if (channel.type !== 3) {
+			return (channel.name);
+		}
+		if (channel.users[0].id != localStorage.getItem('id')) {
+			return (channel.users[0].username);
+		}
+		return (channel.users[1].username)
 	}
 
 	return (
-		<div className="chatSideBar">
+		<div className='chatSideBar'>
 			{listChannel.map((channel) => (
 				<button onClick={() => handleSwitchChannel(channel.id)} key={channel.id}>
-					{channel.name}
+					{parseChannelName(channel)}
 				</button>
 			))}
 		</div>

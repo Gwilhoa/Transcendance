@@ -274,19 +274,23 @@ export class EventsGateway
     const channel = await this.channelService.getChannelById(channel_id);
     send = {
       code: 0,
+      channel_id: channel_id,
     };
     if (channel == null) {
       send = {
         code: 1,
+        channel_id: channel_id,
       };
     } else if (!(await this.channelService.isInChannel(user.id, channel.id))) {
       send = {
         code: 2,
+        channel_id: channel_id,
       };
     } else {
       client.join(channel_id);
       send = {
         code: 0,
+        channel_id: channel_id,
       };
     }
     client.emit('join_code', send);

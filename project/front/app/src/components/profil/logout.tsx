@@ -1,8 +1,8 @@
-import React from "react";
-import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import Cookies from "universal-cookie";
-import { closeModal } from "../../redux/modal/modalSlice";
+import React from 'react';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import Cookies from 'universal-cookie';
+import { closeModal } from '../../redux/modal/modalSlice';
 const cookies = new Cookies();
 
 function LogoutButton() {

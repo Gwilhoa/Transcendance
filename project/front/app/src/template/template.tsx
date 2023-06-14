@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
-import Head from "./header";
 import  '../App.css'
-import Notification from "../components/notification/notification";
-import { Outlet, useLocation } from "react-router-dom";
-import SocketSingleton from "../socket";
+import React, { useEffect, useState } from 'react';
+import Head from './header';
+import Notification from '../components/notification/notification';
+import { Outlet, useLocation } from 'react-router-dom';
+import SocketSingleton from '../socket';
 
 
 
@@ -24,18 +24,18 @@ const Template = () => {
     //if (location.pathname === '/') {
       //  window.location.reload();
       //}
-      //socket = io(process.env.REACT_APP_IP + ":3000", {
+      //socket = io(process.env.REACT_APP_IP + ':3000', {
         //  transports: ['websocket']
         //});
         //}, []);
         
     const confirmFriend = () => {
-      console.log("confirm friend")
+      console.log('confirm friend')
       socket.emit('friend_request', {friend_id: friendId})
     }
         
     const rejectFriend = () => {
-      console.log("reject friend")
+      console.log('reject friend')
     }
 
     socket.on('message', (data:any) => {
@@ -44,7 +44,7 @@ const Template = () => {
     socket.on('friend_request', (data: any) => {
       if (data.code == 4) {
         friendId = data.id;
-        setNotif(<Notification message={"New friend"} onConfirm={confirmFriend} onCancel={rejectFriend} hasButton={true} setVisible={setNotifVisible}/>);
+        setNotif(<Notification message={'New friend'} onConfirm={confirmFriend} onCancel={rejectFriend} hasButton={true} setVisible={setNotifVisible}/>);
         setNotifVisible(true)
 			}
 		})
@@ -55,13 +55,13 @@ const Template = () => {
     
     
     return (
-      <div className="page">
+      <div className='page'>
         {notifVisible &&
         <>
           {notif}
         </>
         }
-        <main className="main-template">
+        <main className='main-template'>
           <Outlet></Outlet>
         </main>
         <header>

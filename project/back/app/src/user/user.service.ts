@@ -260,6 +260,7 @@ export class UserService {
     const user = await this.userRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.joinedChannels', 'channels')
+        .leftJoinAndSelect('channels.users', 'users')
       .where('user.id = :id', { id })
       .getOne();
     if (!user) {

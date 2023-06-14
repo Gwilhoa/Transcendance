@@ -1,13 +1,19 @@
 import './css/endgame.css'
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from 'react';
 import Cookies from 'universal-cookie';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
+<<<<<<< HEAD
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../redux/store";
 import SocketSingleton from "../socket";
 import { setBeginStatus } from '../redux/game/beginToOption';
 import ErrorToken from '../components/IfError';
+=======
+import {useSelector} from 'react-redux';
+import {RootState} from '../redux/store';
+import SocketSingleton from '../socket';
+>>>>>>> origin/main
 
 const cookies = new Cookies();
 
@@ -38,7 +44,7 @@ const EndGame = () => {
 
   const homebutton = () => {
     socket.emit('game_finished', {rematch : false});
-    navigate("/home");
+    navigate('/home');
   }
 
   const launchReplay = () => {
@@ -61,7 +67,7 @@ const EndGame = () => {
       setMyrevenge(true);
   }
 
-    socket.on('rematch', (any: { rematch: any; }) => {
+  socket.on('rematch', (any: { rematch: any; }) => {
     const rematch = any.rematch;
     if (rematch) {
       if (myrevenge) {
@@ -77,7 +83,7 @@ const EndGame = () => {
 
   useEffect(() => {
     if (finalStatus == null) {
-      navigate("/home");
+      navigate('/home');
     }
   } , [finalStatus, navigate]);
 
@@ -97,7 +103,7 @@ const EndGame = () => {
             <p>demande prise en compte</p>}
 
             {replay && !myrevenge &&
-            <button className="end_game_button" onClick={replaybutton}>Replay</button>}
+            <button className='end_game_button' onClick={replaybutton}>Replay</button>}
             <button className='end_game_button' onClick={homebutton}> Home</button>
         </div>
         </div>

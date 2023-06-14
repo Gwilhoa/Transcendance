@@ -1,13 +1,13 @@
-import React from "react"
-import ButtonOpenModalSideBar from "./button/ButtonOpenModalSideBar"
-import ButtonCreateChannel from "./button/ButtonCreateChannel"
-import "../css/optionBar.css"
+import '../css/optionBar.css'
+import React from 'react'
+import ButtonOpenModalSideBar from './button/ButtonOpenModalSideBar'
+import ButtonCreateChannel from './button/ButtonCreateChannel'
 
 const OptionBar = () => {
 
 	
   return (
-		<div className="chatOptionBar">
+		<div className='chat-option-bar'>
 			<ButtonOpenModalSideBar />
 			<ButtonCreateChannel />
 		</div>

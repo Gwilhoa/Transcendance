@@ -1,13 +1,24 @@
 import './css/game.css'
+<<<<<<< HEAD
 import React, { useState, useEffect, useRef } from "react";
+=======
+import React, { useState, useEffect, useRef } from 'react';
+import { useSpring, animated } from 'react-spring';
+>>>>>>> origin/main
 import Cookies from 'universal-cookie';
 import { useNavigate } from 'react-router-dom';
 import ErrorToken from '../components/IfError';
 import {useDispatch, useSelector} from 'react-redux';
+<<<<<<< HEAD
 import {setFinalStatus} from "../redux/game/gameSlice";
 import {RootState} from "../redux/store";
 import SocketSingleton from "../socket";
 import { animated, useSpring } from 'react-spring';
+=======
+import {setFinalStatus} from '../redux/game/gameSlice';
+import {RootState} from '../redux/store';
+import SocketSingleton from '../socket';
+>>>>>>> origin/main
 const cookies = new Cookies();
 
 let isCall = true;
@@ -63,14 +74,14 @@ const Game: React.FC<GameProps> = () => {
   
   const handleKeyPress = (event: KeyboardEvent) => {
     switch (event.code) {
-      case "KeyW":
-        socket.emit("input_game", {game_id: gameId, type: 0})
+      case 'KeyW':
+        socket.emit('input_game', {game_id: gameId, type: 0})
         break;
-      case "KeyS":
-        socket.emit("input_game", {game_id: gameId, type: 1})
+      case 'KeyS':
+        socket.emit('input_game', {game_id: gameId, type: 1})
         break;
-      case "ArrowUp":
-        socket.emit("input_game", {game_id: gameId, type: 0})
+      case 'ArrowUp':
+        socket.emit('input_game', {game_id: gameId, type: 0})
         break;
       case "ArrowDown":
         socket.emit("input_game", {game_id: gameId, type: 1})
@@ -125,7 +136,7 @@ const Game: React.FC<GameProps> = () => {
   }
   
   socket.on('create_game', (any) => {
-    console.log("WESH")
+    console.log('WESH')
     console.log(any);
   })
   

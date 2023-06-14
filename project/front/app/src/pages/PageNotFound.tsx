@@ -1,6 +1,6 @@
+import './css/PageNotFound.css'
 import React from 'react';
 import ErrorToken from '../components/IfError';
-import './css/PageNotFound.css'
 
 function NotFound () {
 	return (
