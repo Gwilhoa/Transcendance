@@ -18,7 +18,7 @@ enum UserStatus {
     DISCONNECTED = 4,
 }
 
-export const ProfilImage = ({ id, OnClickOpenProfil, diameter}: { id: string, OnClickOpenProfil: boolean, diameter: string }) =>{
+export const ProfilImage = ({ id, OnClickOpenProfil, OverwriteClassName}: { id: string, OnClickOpenProfil: boolean, OverwriteClassName: string }) =>{
     const [userStatus, setUserStatus] = useState('');
     const [image, setImage] = useState<string>('');
     const navigate = useNavigate();
@@ -80,7 +80,7 @@ export const ProfilImage = ({ id, OnClickOpenProfil, diameter}: { id: string, On
     },[navigate, socket])
 
     return (
-        <div key={'image'} className='profil-image' onClick={OnClickOpenProfil  === true ? () => dispatch(openModal(id)) : undefined}>
+        <div key={'image'} className={'profil-image' + ' ' + OverwriteClassName} onClick={OnClickOpenProfil  === true ? () => dispatch(openModal(id)) : undefined}>
             <img className='circle-image' src={image} alt='selected' />
 			<div className={'profil-status' + ' ' + userStatus}></div>
         </div>
