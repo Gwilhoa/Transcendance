@@ -14,6 +14,8 @@ import { useNavigate } from 'react-router-dom';
 import { openModal } from '../../../redux/modal/modalSlice';
 import { setErrorLocalStorage } from '../../IfError';
 import { RootState } from '../../../redux/store';
+import { ProfilImage } from '../../profil/ProfilImage';
+import { ProfilName } from '../../profil/ProfilName';
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
 
@@ -68,29 +70,20 @@ const AddUserId = ({ usersId, setUserId }: AddUserIdProps) => {
         if (listUser == null)
         {
             refresh();
-            socket.on('friend_code', (data: any) => {
-                if (data.code == 2) {
-                    refresh()
-                    return;
-                }
-                else if (data.code === 5 || data.code === 7) {
-                    refresh();
-                }
-                return;
-            })
-            
-            socket.on('friend_request', (data: any) => {
-                console.log('before code');
-                if (data.code == 2 || data.code == 7) {
-                    console.log('refresh friend request');
-                    refresh();
-                    return;
-                }
-                return;
-            })
         }
-    }, [listUser, refresh, socket]);
+    }, [listUser, refresh]);
     
+	const handleOnClick = (id: string) => {
+		setUserId((prevListId) => {
+			if(!prevListId.some((idInList) => id === idInList)) {
+				return [...prevListId, id];
+			}
+			return prevListId;
+		});
+		console.log('here');
+		console.log(usersId);
+	};
+
     if (listUser == null || listUser.length == 0)
     {
         return (<></>);
@@ -100,12 +93,12 @@ const AddUserId = ({ usersId, setUserId }: AddUserIdProps) => {
         <div className='users-list'>
             {listUser.map((user) => (
 				!usersId.includes(user.id) ? (
-					<div className='user' key={user.id} onClick={() => dispatch(openModal(user.id))}>
-						<img className='image' src='https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/42_Logo.svg/1200px-42_Logo.svg.png'></img>
-						<p className='name'>{user.username}</p>
+					<div className='user' key={user.id} onClick={() => handleOnClick(user.id)}>
+						<ProfilImage id={user.id} OnClickOpenProfil={false} diameter='' />
+						<ProfilName  id={user.id} />
 					</div>
 				) : (
-					<></>
+					<div key='notUser'></div>
 				)
             ))}
         </div>
@@ -155,14 +148,14 @@ const CreateChannel = () => {
 			.then((response) => {
 				console.log(response);
 				socket.emit('join_channel', {channel_id: response.data.id});
+				usersId.map((userId) =>{
+					socket.emit('invite_channel', {receiver_id: userId, channel_id: response.data.id});
+				});
 				dispatch(switchChatModalCreateChannel());
 			})
 			.catch((error) => {
 				console.error(error)
 			});
-		if (channelParams.type == 0 ) {
-			console.log('hey need an other call')
-		}
 		return;
 	};
 
