@@ -86,7 +86,7 @@ const AddUserId = ({ usersId, setUserId }: AddUserIdProps) => {
     console.log(listUser);
     return (
         <div className='users-list'>
-            {listUser.map((user) => (
+            {listUser.slice(0, 3).map((user) => (
 				!usersId.includes(user.id) ? (
 					<div className='user' key={user.id} onClick={() => handleOnClick(user.id)}>
 						<ProfilImage id={user.id} OnClickOpenProfil={false} OverwriteClassName = 'chat-message-image-profil'/>

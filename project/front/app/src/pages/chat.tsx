@@ -1,8 +1,9 @@
 import './css/chat.css'
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Conversation from '../components/chat/conversation/conversation';
 import CreateChannel from '../components/chat/createChannel/CreateChannel';
+import InviteChannel from '../components/chat/inviteChannel/InviteChannel';
 import OptionBar from '../components/chat/optionBar/optionBar';
 import SideBarChat from '../components/chat/sidebar';
 import ErrorToken from '../components/IfError';
@@ -42,6 +43,7 @@ function Chat() {
 	const dispatch = useDispatch();
 	const isOpenSideBar = useSelector((state: RootState) => state.modalChat.isOpenSideBar);
 	const isOpenCreateChannel = useSelector((state: RootState) => state.modalChat.isOpenCreateChannel);
+	const isOpenInviteChannel = useSelector((state: RootState) => state.modalChat.isOpenInviteChannel);
 	const conversationId = useSelector((state: RootState) => state.conversation.id);
 	
 	useEffect(() => {
@@ -65,6 +67,7 @@ function Chat() {
 			<OptionBar/>
 			{isOpenSideBar && ( <SideBarChat /> )}
 			{isOpenCreateChannel && ( <CreateChannel /> )}
+			{isOpenInviteChannel && ( <InviteChannel /> )}
 			<div className='rightPart'>
 				<Conversation />
 				<SendMessage />
