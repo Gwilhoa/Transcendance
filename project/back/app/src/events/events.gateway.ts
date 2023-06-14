@@ -720,6 +720,8 @@ export class EventsGateway
 
   @SubscribeMessage('update_channel')
   async update_channel(client: Socket, payload: any) {
+    this.logger.debug('update_channel');
+    this.logger.debug(payload);
     const channel_id = payload.channel_id;
     const user_id = getIdFromSocket(client, this.clients);
     let ret = null;
