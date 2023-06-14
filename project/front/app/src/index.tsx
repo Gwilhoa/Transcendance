@@ -1,7 +1,7 @@
 // import './index.css';
-import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { createRoot } from 'react-dom/client';
+import App from './App';
 import ProfilModal from './components/profil/modal';
 import React from 'react';
 import { CookiesProvider } from 'react-cookie';
