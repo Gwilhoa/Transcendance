@@ -20,10 +20,15 @@ export default function SendMessage(){
 		setMessage('');
 	}
 
+	const handleKeyDown = (event:any) => {
+		if (event.key === 'Enter') {
+			handleSendMessage()
+		}
+	};
 
 	return (
 		<div className='chat-input-send-bar'>
-			<input className='chat-input-message' type='text' placeholder='Message' value={message} onChange={(e) => setMessage(e.target.value)}/>
+			<input className='chat-input-message' type='text' placeholder='Message' value={message}  onKeyDown={handleKeyDown} onChange={(e) => setMessage(e.target.value)}/>
 			<button className='chat-button-send-message' onClick={handleSendMessage}>{'>'}</button>
 		</div>
 	)
