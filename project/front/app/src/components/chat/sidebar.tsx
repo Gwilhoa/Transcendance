@@ -44,6 +44,7 @@ function SideBarChat() {
 
 	const handleSwitchChannel = (id: string) => {
 		dispatch(setConversation(id));
+		console.log('set conversation sidebar = ' + id);
 	}
 
 	const parseChannelName = (channel: Channel) => {
