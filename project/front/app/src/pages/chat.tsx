@@ -74,7 +74,7 @@ function Chat() {
 			{isOpenCreateChannel && ( <CreateChannel /> )}
 			{isOpenInviteChannel && ( <InviteChannel /> )}
 			{isOpenUpdateChannel && ( <UpdateChannel /> )}
-			<div className='rightPart'>
+			<div className='chat-right-page'>
 				<Conversation />
 				<SendMessage />
 			</div>

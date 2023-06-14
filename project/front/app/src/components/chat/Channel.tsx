@@ -62,11 +62,13 @@ const ChannelSideBar = ({ channelId }: {channelId: string}) => {
 	}
 
 	return (
-		<>
+		<div className='chat-side-bar-channel'>
 			{parseChannelName(channel)}
-			<ButtonInviteChannel />
-			<ButtonUpdateChannel />
-		</>		
+			<div className='chat-side-bar-channel-modify-button'>
+				<ButtonInviteChannel />
+				<ButtonUpdateChannel />
+			</div>
+		</div>		
 	);
 };
 

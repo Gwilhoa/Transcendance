@@ -20,7 +20,7 @@ function Timer({ dateString }: {dateString: string}) {
 			const date = new Date(dateString);
 			const formattedDate = `${date.getFullYear()}-${(date.getMonth() + 1)
 				.toString()
-				.padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date
+				.padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} at ${date
 				.getHours()
 				.toString()
 				.padStart(2, '0')}h${date.getMinutes().toString().padStart(2, '0')}`;
@@ -29,7 +29,7 @@ function Timer({ dateString }: {dateString: string}) {
 
 		return (
 			<>
-				post on {timeElipsed}.
+				post on {timeElipsed}
 			</>
 		);
 }
@@ -39,18 +39,20 @@ function Messages({ message }: { message: Message}) {
 	const dispatch = useDispatch();
 
 	return (
-		<div key={message.id} className={isMe ? 'MyMessage' : 'OtherMessage'}>
-				<ProfilImage id = {'' + message.user.id} OnClickOpenProfil={true} OverwriteClassName = 'chat-message-image-profil'/>
-			<div className='headerMessage'>
-				<div className='nameMessage'>
-					<ProfilName id={message.user.id} />
+		<div key={message.id} className={isMe ? 'chat-my-message' : 'chat-other-message'}>
+			<ProfilImage id = {'' + message.user.id} OnClickOpenProfil={true} OverwriteClassName = 'chat-message-image-profil'/>
+			<div className='chat-message-header-and-content'>
+				<div className='chat-header-of-message'>
+					<div className='chat-header-username' onClick={() => dispatch(openModal(message.user.id))}>
+						<ProfilName id={message.user.id} />
+					</div>
+					<div className='chat-header-date'>
+						<Timer dateString={message.date} />
+					</div>
 				</div>
-				<div className='dateMessage'>
-					<Timer dateString={message.date} />
+				<div className='chat-content-message'>
+					{message.content}		
 				</div>
-			</div>
-			<div className='textMessage'>
-				{message.content}		
 			</div>
 		</div>
 	);

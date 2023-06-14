@@ -1,3 +1,9 @@
+:root{
+    --search-bar-height: 3rem;
+	--option-bar-width: 6rem;
+	--left-side-bar-width: 30rem;
+}
+
 .chatPage {
 	width: 100%;
 	height: 100%;
@@ -5,8 +11,10 @@
 	flex: relative;
 }
 
-.rightPart {
+.chat-right-page {
+	height: 100%;
 	width: 100%;
+	margin: 0;
 }
 
 .profil-image{

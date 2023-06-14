@@ -1,13 +1,40 @@
-.notific 
+/* background-color: red;
+color: var(--light-color);
+padding: 1em;
+top:100;
+left:50%;
+transform: translate(-50%);
+position: absolute;
+border-bottom-left-radius: 20px;
+border-bottom-right-radius: 20px; */
+.popup-notification
 {
-    background-color: red;
-    color: var(--light-color);
-    padding: 1em;
-    top:100;
-    z-index: 120;
-    left:50%;
-    transform: translate(-50%);
-    position: absolute;
-    border-bottom-left-radius: 20px;
-    border-bottom-right-radius: 20px;
+	background-color: rgb(255, 84, 84);
+	display: flex;
+	z-index: 1;
+	justify-content: center;
+	position: absolute;
+	width : 45%;
+	border-radius: 100vw;
+	/* border: 3px solid rgba(189, 39,); */
+	border: 0.25rem solid rgb(150, 0, 0);
+	top: var(--header-size);
+
+}
+
+
+.notification-button-validate{
+	height: 2rem;
+	width: 2rem;
+	background-color: green;
+	border-radius: 100vw;
+	cursor: pointer;
+}
+
+.notification-button-cancel{
+	height: 2rem;
+	width: 2rem;
+	background-color: red;
+	border-radius: 100vw;
+	cursor: pointer;
 }

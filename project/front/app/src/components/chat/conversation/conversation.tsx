@@ -1,4 +1,4 @@
-import '../css/sidebar.css'
+import '../css/chatMessage.css'
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
@@ -113,11 +113,13 @@ function Conversation() {
 				</p> 
 			: 
 				<></> 
-			}
-			{ (listMessage != null && listMessage.length > 0) ?
-				(listMessage.map((message) => (
-				<Messages key={message.id} message={message} />
-			))) : ( 
+			}	
+			{ (listMessage != null && listMessage.length > 0) ? 
+				<div className='chat-scroll-converation'>
+					{(listMessage.map((message) => (		
+						<Messages key={message.id} message={message} />
+					)))}
+				</div> : ( 
 				conversationId == '' ? (
 					<p className="NeverJoinChannel">
 						{"you don't have access to any channel"}
