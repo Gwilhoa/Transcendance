@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { cookies } from '../../App';
 import { Channel, User } from '../../pages/chat';
 import { setErrorLocalStorage } from '../IfError';
+import ButtonInviteChannel from './optionBar/button/ButtonInviteChannelModal';
+import ButtonUpdateChannel from './optionBar/button/ButtonUpdateChannel';
 
 
 const initialUserState: User= {
@@ -62,6 +64,8 @@ const ChannelSideBar = ({ channelId }: {channelId: string}) => {
 	return (
 		<>
 			{parseChannelName(channel)}
+			<ButtonInviteChannel />
+			<ButtonUpdateChannel />
 		</>		
 	);
 };

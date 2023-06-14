@@ -8,7 +8,8 @@ const ButtonUpdateChannel = () => {
 	const dispatch = useDispatch();
 
 	return (
-		<div className='chat-add-channel-button' onClick={() => dispatch(switchChatModalUpdateChannel())}>
+		<div className='' onClick={() => dispatch(switchChatModalUpdateChannel())}>
+			u
 		</div>
 	);
 }
