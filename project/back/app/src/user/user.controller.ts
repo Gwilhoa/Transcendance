@@ -295,5 +295,6 @@ export class UserController {
     if (ret == null) {
       return response.status(204).send('No Channels');
     }
+    return response.status(200).send(ret);
   }
 }
