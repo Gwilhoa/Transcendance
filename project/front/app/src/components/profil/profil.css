@@ -27,7 +27,7 @@
   position: absolute;
   right: 17px;
   top: 17px;
-  background-color: rgb(189, 39, 39);
+  background-color: var(--close-button-color);
   color: var(--light-color);
   border: none;
   padding: 0.75rem;
