@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { cookies } from '../../App';
-import { Channel, initialChannelState } from '../../pages/chat';
+import { Channel, initialChannelState, User } from '../../pages/chat';
 import { openModal } from '../../redux/modal/modalSlice';
 import { RootState } from '../../redux/store';
 import { setErrorLocalStorage } from '../IfError';
@@ -18,9 +18,9 @@ const ListAdmin = ( {channel, setChannel }: listUserPros ) => {
 
 	return (
 		<>
-			{ channel.admins.map((user) => (
-				user.id === channel.creator.email ? (
-					<></>
+			{ channel.admins.map((user: User) => (
+				user.id === channel.creator.id ? (
+					null
 				) : (
 					<div 
 						className="chat-admin-component" 
@@ -30,6 +30,47 @@ const ListAdmin = ( {channel, setChannel }: listUserPros ) => {
 						{user.username}
 					</div>
 				)
+				))}
+		</>
+	);
+};
+
+const ListUser = ( {channel, setChannel }: listUserPros ) => {
+	const dispatch = useDispatch();
+
+	return (
+		<>
+			{ channel.users.map((user : User) => (
+				user.id === channel.creator.id || 
+				channel.admins.some((admin) => admin.id  === user.id) ? (
+					null
+				) : (
+					<div 
+						className="chat-admin-component" 
+						key={user.id} 
+						onClick={() => dispatch(openModal(user.id))}
+					>
+						{user.username}
+					</div>
+				)
+				))}
+		</>
+	);
+};
+
+const ListUserMp = ( { channel }: listUserPros ) => {
+	const dispatch = useDispatch();
+
+	return (
+		<>
+			{ channel.users.map((user : User) => (
+					<div 
+						className="chat-admin-component" 
+						key={user.id} 
+						onClick={() => dispatch(openModal(user.id))}
+					>
+						{user.username}
+					</div>
 				))}
 		</>
 	);
@@ -71,11 +112,13 @@ const ListUserChannel = () => {
 					</div>
 					<div className="users">
 						<h4>Users</h4>
+						<ListUser channel={channel} setChannel={setChannel} />
 					</div>
 				</>
 			) : (
 				<div className="users">
 					<h4>Users</h4>
+					<ListUserMp channel={channel} setChannel={setChannel} />
 				</div>
 			)}
 		</div>
