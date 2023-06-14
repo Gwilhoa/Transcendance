@@ -32,7 +32,7 @@ const initialChannelState: Channel= {
 	type: 0,
 	pwd: null,
 	users: [],
-	owner: initialUserState,
+	creator: initialUserState,
 	admins: [],
 	bannedUsers: [],
 
