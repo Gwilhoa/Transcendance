@@ -71,7 +71,12 @@ export class ChannelService {
   }
 
   public async getChannelById(id) {
-    return await this.channelRepository.findOneBy({ id: id });
+    return await this.channelRepository
+      .createQueryBuilder('channel')
+      .leftJoinAndSelect('channel.admins', 'admins')
+      .leftJoinAndSelect('channel.bannedUsers', 'bannedUsers')
+      .where('channel.id = :id', { id: id })
+      .getOne();
   }
 
   public async isInChannel(user_id: string, channel_id: string) {
