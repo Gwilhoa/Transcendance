@@ -244,7 +244,7 @@ export default function Profil() {
 				</p>
 				<p>
 				<span className='profil-game-info-title'>Ratio</span>
-				<span>{defeats === 0 ? (victories === 0 ? 0 : 1) : victories/defeats}</span>
+				<span>{defeats === 0 ? (victories === 0 ? 0 : 1) : (victories/defeats).toFixed(2)}</span>
 				</p>
 			</div>
 			<p className='profil-experience'>{experience} XP</p>
