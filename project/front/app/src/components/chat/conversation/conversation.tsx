@@ -13,12 +13,12 @@ import { setConversation } from '../../../redux/chat/conversationIdSlice';
 
 function Conversation() {
 	const [errorGetMessage, setErrorGetMessage] = useState<boolean>(false);
-	const conversationId = useSelector((state: RootState) => state.conversation.id);
 	const [listMessage, setListMessage] = useState<Array<Message>>([]);
 	const socketInstance = SocketSingleton.getInstance();
 	const socket = socketInstance.getSocket();
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
+	const conversationId = useSelector((state: RootState) => state.conversation.id);
 
 	const fetchMessage = (id: string) => {
 		setErrorGetMessage(false);
@@ -39,7 +39,7 @@ function Conversation() {
 				})
 				.catch((error) => {
 					console.error(error);
-					if (error.response.status === 401) {
+					if (error.response.status === 401 || error.response.status === 500) {
 						setErrorLocalStorage('unauthorized');
 						navigate('/Error');
 					}
@@ -94,7 +94,7 @@ function Conversation() {
 			}
 			return ;
 		});
-	}, [socket]);
+	}, [socket, conversationId]);
 
 
 

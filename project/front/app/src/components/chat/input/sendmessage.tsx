@@ -17,12 +17,13 @@ export default function SendMessage(){
 	{
 		console.log('send message pls : ' + conversation);
 		socket.emit('send_message', {token: cookies.get('jwtAuthorization'), channel_id: conversation , content: message});
+		setMessage('');
 	}
 
 
 	return (
 		<div className='chat-input-send-bar'>
-			<input className='chat-input-message' type='text' placeholder='Message' onChange={(e) => setMessage(e.target.value)}/>
+			<input className='chat-input-message' type='text' placeholder='Message' value={message} onChange={(e) => setMessage(e.target.value)}/>
 			<button className='chat-button-send-message' onClick={handleSendMessage}>{'>'}</button>
 		</div>
 	)
