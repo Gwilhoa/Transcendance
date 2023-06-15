@@ -143,9 +143,12 @@ export class ChannelService {
     const target = await this.userService.getUserById(body.user_id);
     const user = await this.userService.getUserById(user_id);
     if (user == null || target == null) throw new Error('User not found');
-    let chan = await this.channelRepository.findOneBy({
-      id: body.channel_id,
-    });
+    let chan = await this.channelRepository
+        .createQueryBuilder()
+        .leftJoinAndSelect('channel.admins', 'admins')
+        .leftJoinAndSelect('channel.users', 'users')
+        .where('channel.id = :id', { id: body.channel_id })
+        .getOne();
     if (chan == null) throw new Error('Channel not found');
     let f = false;
     for (const admin of chan.admins) {
