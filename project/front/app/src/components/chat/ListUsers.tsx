@@ -10,13 +10,12 @@ import { setErrorLocalStorage } from '../IfError';
 import { ProfilImage } from '../profil/ProfilImage';
 import { ProfilName } from '../profil/ProfilName';
 
-type listUserPros = {
+type listUserProps = {
   channel: Channel;
   setChannel: React.Dispatch<React.SetStateAction<Channel>>;
 };
 
-const ListAdmin = ( {channel, setChannel }: listUserPros ) => {
-	const dispatch = useDispatch();
+const ListAdmin = ( {channel, setChannel }: listUserProps ) => {
 
 	return (
 		<>
@@ -37,8 +36,7 @@ const ListAdmin = ( {channel, setChannel }: listUserPros ) => {
 	);
 };
 
-const ListUser = ( {channel, setChannel }: listUserPros ) => {
-	const dispatch = useDispatch();
+const ListUser = ( {channel, setChannel }: listUserProps ) => {
 
 	return (
 		<>
@@ -60,8 +58,7 @@ const ListUser = ( {channel, setChannel }: listUserPros ) => {
 	);
 };
 
-const ListUserMp = ( { channel }: listUserPros ) => {
-	const dispatch = useDispatch();
+const ListUserMp = ( { channel }: listUserProps ) => {
 
 	return (
 		<>
@@ -75,6 +72,19 @@ const ListUserMp = ( { channel }: listUserPros ) => {
 					</div>
 				))}
 		</>
+	);
+};
+
+const Creator = ( { channel }: listUserProps ) => {
+
+	return (
+		<div 
+			key={channel.creator.id}
+			className='chat-creator-component'
+		>
+			<ProfilImage OnClickOpenProfil={true} id={channel.creator.id} OverwriteClassName='chat-message-image-profil' />
+			<ProfilName id={channel.creator.id} />
+		</div>
 	);
 };
 
@@ -98,7 +108,7 @@ const ListUserChannel = () => {
 						navigate('/Error');
 					}
 			});
-	}, [channelId]);
+	}, [channelId, setChannel]);
 	
 	return (
 		<div className='chat-list-user'>
@@ -106,12 +116,7 @@ const ListUserChannel = () => {
 				<>
 					<div className='owner'>
 						<h4>Owner</h4>
-						<ProfilImage 
-							OnClickOpenProfil={true} 
-							id={channel.creator.id} 
-							OverwriteClassName='chat-message-image-profil'
-						/>
-						<ProfilName id={channel.creator.id} />
+						<Creator channel={channel} setChannel={setChannel}/>
 					</div>
 					<div className='admin'>
 						<h4>Admin</h4>
