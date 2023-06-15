@@ -27,7 +27,10 @@ function Conversation() {
 	const conversationId = useSelector((state: RootState) => state.conversation.id);
 
 	const addImageProfil = ( id: string) => {
-		if (!listImageProfil.some((img) => img.id === id)) {
+		let add = true;
+
+		listImageProfil.map((img) => img.id === id ? (add = false) : null)
+		if (add) {
 			axios.get(process.env.REACT_APP_IP + ':3000/user/image/' + id, {
 				headers: {
 					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
@@ -46,8 +49,6 @@ function Conversation() {
 					console.error(error);
 					navigate('/Error');
 				});
-			console.log('here list photo');
-			console.log(listImageProfil);
 		}
 	};
 
