@@ -98,11 +98,11 @@ function Chat() {
 			{isOpenCreateChannel && ( <CreateChannel /> )}
 			{isOpenInviteChannel && ( <InviteChannel /> )}
 			{isOpenUpdateChannel && ( <UpdateChannel /> )}
-			{isOpenListUserChannel && ( <ListUserChannel /> )}
 			<div className='chat-right-page'>
 				<Conversation />
 				<SendMessage />
 			</div>
+			{isOpenListUserChannel && ( <ListUserChannel /> )}
 		</div>
 	);
 }

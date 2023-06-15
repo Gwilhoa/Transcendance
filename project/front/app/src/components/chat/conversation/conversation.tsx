@@ -21,6 +21,7 @@ function Conversation() {
 	const [errorGetMessage, setErrorGetMessage] = useState<boolean>(false);
 	const [listMessage, setListMessage] = useState<Array<Message>>([]);
 	const [listImageProfil, setListImageProfil] = useState<Array<imageProfil>>([]);
+	const [channelName, setchannelName] = useState<string>('');
 	const socketInstance = SocketSingleton.getInstance();
 	const socket = socketInstance.getSocket();
 	const navigate = useNavigate();
@@ -139,13 +140,33 @@ function Conversation() {
 		if (conversationId) {
 			console.log(conversationId);
 			fetchMessage(conversationId);
+			axios.get(process.env.REACT_APP_IP + ':3000/channel/id/' + conversationId,
+				{
+					headers: {
+						Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+					},
+				})
+				.then((response) => {
+					console.log(response);
+					setchannelName(response.data.name)
+				})
+				.catch((error) => {
+					console.error(error);
+					if (error.response.status === 401 || error.response.status === 500) {
+						setErrorLocalStorage('unauthorized');
+						navigate('/Error');
+					}
+				});
 		}
 	},[conversationId]);
 
 	return (
-		<div className='chatConversation'>
-			<div className='chat-header'>
-					<ButtonListChannel />
+		<div className='chat-conversation'>
+			<div className='chat-conversation-header'>
+				<p>
+					{channelName}
+				</p>
+				<ButtonListChannel />
 			</div>
 			{ errorGetMessage ? 
 				<p className="errorGetMessage" >

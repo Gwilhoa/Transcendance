@@ -1,7 +1,7 @@
 import './css/listUsers.css';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { cookies } from '../../App';
 import { Channel, initialChannelState, User } from '../../pages/chat';
@@ -9,6 +9,7 @@ import { RootState } from '../../redux/store';
 import { setErrorLocalStorage } from '../IfError';
 import { ProfilImage } from '../profil/ProfilImage';
 import { ProfilName } from '../profil/ProfilName';
+import { openModal } from '../../redux/modal/modalSlice';
 import SocketSingleton from '../../socket';
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
@@ -40,6 +41,7 @@ const MakeAdmin = ( { id, channel, setChannel }: changeChannelProps ) => {
 };
 
 const ListAdmin = ( {channel, setChannel }: listUserProps ) => {
+	const dispatch = useDispatch();
 
 	return (
 		<>
@@ -48,10 +50,12 @@ const ListAdmin = ( {channel, setChannel }: listUserProps ) => {
 					null
 				) : (
 					<div 
-						className='chat-admin-component' 
+						className='chat-list-users-user' 
 						key={user.id} 
 					>
-						<ProfilImage OnClickOpenProfil={true} id={user.id} OverwriteClassName='chat-list-user-image' />
+						<div className='chat-list-users-user-name' onClick={() => dispatch(openModal(user.id))}>
+							<ProfilImage OnClickOpenProfil={true} id={user.id} OverwriteClassName='chat-list-user-image' />
+						</div>
 						<ProfilName id={user.id} />
 					</div>
 				)
@@ -61,6 +65,7 @@ const ListAdmin = ( {channel, setChannel }: listUserProps ) => {
 };
 
 const ListUser = ( {channel, setChannel }: listUserProps ) => {
+	const dispatch = useDispatch();
 
 	return (
 		<>
@@ -70,11 +75,13 @@ const ListUser = ( {channel, setChannel }: listUserProps ) => {
 					null
 				) : (
 					<div 
-						className='chat-admin-component' 
+						className='chat-list-users-user' 
 						key={user.id} 
 					>
 						<ProfilImage OnClickOpenProfil={true} id={user.id} OverwriteClassName='chat-list-user-image' />
-						<ProfilName id={user.id} />
+						<div className='chat-list-users-user-name' onClick={() => dispatch(openModal(user.id))}>
+							<ProfilName id={user.id} />
+						</div>
 						<MakeAdmin id={user.id} channel={channel} setChannel={setChannel} />
 					</div>
 				)
@@ -84,16 +91,19 @@ const ListUser = ( {channel, setChannel }: listUserProps ) => {
 };
 
 const ListBannedUser = ( { channel, setChannel }: listUserProps ) => {
-	
+	const dispatch = useDispatch();
+
 	return (
 		<>
 			{ channel.bannedUsers.map((user : User) => (
 					<div 
-						className='chat-admin-component' 
+						className='chat-list-users-user' 
 						key={user.id} 
 					>
 						<ProfilImage OnClickOpenProfil={true} id={user.id} OverwriteClassName='chat-list-user-image' />
-						<ProfilName id={user.id} />
+							<div className='chat-list-users-user-name' onClick={() => dispatch(openModal(user.id))}>
+								<ProfilName id={user.id} />
+							</div>
 					</div>
 			))}
 		</>		
@@ -101,16 +111,19 @@ const ListBannedUser = ( { channel, setChannel }: listUserProps ) => {
 };
 
 const ListUserMp = ( { channel }: listUserProps ) => {
+	const dispatch = useDispatch();
 
 	return (
 		<>
 			{ channel.users.map((user : User) => (
 					<div 
-						className='chat-admin-component' 
+						className='chat-list-users-user' 
 						key={user.id} 
 					>
 						<ProfilImage OnClickOpenProfil={true} id={user.id} OverwriteClassName='chat-list-user-image' />
-						<ProfilName id={user.id} />
+						<div className='chat-list-users-user-name' onClick={() => dispatch(openModal(user.id))}>
+							<ProfilName id={user.id} />
+						</div>
 					</div>
 				))}
 		</>
@@ -118,14 +131,17 @@ const ListUserMp = ( { channel }: listUserProps ) => {
 };
 
 const Creator = ( { channel }: listUserProps ) => {
+	const dispatch = useDispatch();
 
 	return (
 		<div 
 			key={channel.creator.id}
-			className='chat-creator-component'
+			className='chat-list-users-user'
 		>
 			<ProfilImage OnClickOpenProfil={true} id={channel.creator.id} OverwriteClassName='chat-list-user-image' />
-			<ProfilName id={channel.creator.id} />
+			<div className='chat-list-users-user-name' onClick={() => dispatch(openModal(channel.creator.id))}>
+				<ProfilName id={channel.creator.id} />
+			</div>
 		</div>
 	);
 };
@@ -153,32 +169,34 @@ const ListUserChannel = () => {
 	}, [channelId, setChannel]);
 	
 	return (
-		<div className='chat-list-user'>
-			{ channel.type !== 3 ? ( 
-				<>
-					<div className='owner'>
-						<h4>Owner</h4>
-						<Creator channel={channel} setChannel={setChannel}/>
-					</div>
-					<div className='admin'>
-						<h4>Admin</h4>
-						<ListAdmin channel={channel} setChannel={setChannel} />
-					</div>
+		<div className='chat-right-bar-list-user'>
+			<div>
+				{ channel.type !== 3 ? ( 
+					<>
+						<div className='owner'>
+							<h4>Owner</h4>
+							<Creator channel={channel} setChannel={setChannel}/>
+						</div>
+						<div className='admin'>
+							<h4>Admin</h4>
+							<ListAdmin channel={channel} setChannel={setChannel} />
+						</div>
+						<div className='users'>
+							<h4>Users</h4>
+							<ListUser channel={channel} setChannel={setChannel} />
+						</div>
+						<div className='banned'>
+							<h4>Banned</h4>
+							<ListBannedUser channel={channel} setChannel ={setChannel} />
+						</div>
+					</>
+				) : (
 					<div className='users'>
 						<h4>Users</h4>
-						<ListUser channel={channel} setChannel={setChannel} />
+						<ListUserMp channel={channel} setChannel={setChannel} />
 					</div>
-					<div className='banned'>
-						<h4>Banned</h4>
-						<ListBannedUser channel={channel} setChannel ={setChannel} />
-					</div>
-				</>
-			) : (
-				<div className='users'>
-					<h4>Users</h4>
-					<ListUserMp channel={channel} setChannel={setChannel} />
-				</div>
-			)}
+				)}
+			</div>
 		</div>
 	);
 };
