@@ -11,6 +11,16 @@ import { useNavigate } from 'react-router-dom';
 import { setErrorLocalStorage } from '../../IfError';
 import { setConversation } from '../../../redux/chat/conversationIdSlice';
 
+interface listImage {
+	id: string;
+	image: string;
+}
+
+type initialListImage= {
+	id: '',
+	image: '',
+}
+
 function Conversation() {
 	const [errorGetMessage, setErrorGetMessage] = useState<boolean>(false);
 	const [listMessage, setListMessage] = useState<Array<Message>>([]);
@@ -117,7 +127,10 @@ function Conversation() {
 			{ (listMessage != null && listMessage.length > 0) ? 
 				<div className='chat-scroll-converation'>
 					{(listMessage.map((message) => (		
-						<Messages key={message.id} message={message} />
+						<Messages 
+							key={message.id} 
+							message={message} 
+						/>
 					)))}
 				</div> : ( 
 				conversationId == '' ? (

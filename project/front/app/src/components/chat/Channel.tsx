@@ -38,7 +38,6 @@ const ChannelSideBar = ({ channelId }: {channelId: string}) => {
 		}
 		return (channel.users[1].username)
 	};
-			// {parseChannelName(channel)}
 
 	const isAdmin = (channel: Channel) => {
 		if (channel.admins.some((admin) => admin.id === localStorage.getItem('id'))) {
@@ -49,7 +48,7 @@ const ChannelSideBar = ({ channelId }: {channelId: string}) => {
 
 	return (
 		<div className='chat-side-bar-channel'>
-			{channel.name}
+			{parseChannelName(channel)}
 			<div className='chat-side-bar-channel-modify-button'>
 			{ isAdmin(channel) ? (
 				<>

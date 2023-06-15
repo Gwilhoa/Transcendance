@@ -34,7 +34,7 @@ function Timer({ dateString }: {dateString: string}) {
 		);
 }
 
-function Messages({ message }: { message: Message}) {
+function Messages({ message, image }: { message: Message, image: string}) {
 	const isMe: boolean = (message.user.id === localStorage.getItem('id'));
 	const dispatch = useDispatch();
 
@@ -44,7 +44,7 @@ function Messages({ message }: { message: Message}) {
 			<div className='chat-message-header-and-content'>
 				<div className='chat-header-of-message'>
 					<div className='chat-header-username' onClick={() => dispatch(openModal(message.user.id))}>
-						<ProfilName id={message.user.id} />
+						{message.user.username}
 					</div>
 					<div className='chat-header-date'>
 						<Timer dateString={message.date} />
