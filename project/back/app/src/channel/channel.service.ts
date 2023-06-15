@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { flatten, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { addAdminDto } from 'src/dto/add-admin.dto';
 import { CreateChannelDto } from 'src/dto/create-channel.dto';
@@ -147,12 +147,20 @@ export class ChannelService {
       id: body.channel_id,
     });
     if (chan == null) throw new Error('Channel not found');
-    if (!chan.admins.includes(user))
-      throw new Error('User is not admin of this channel');
-    if (chan.admins.includes(target))
-      throw new Error('User is already admin of this channel');
-    if (!chan.users.includes(target))
-      throw new Error('User is not in this channel');
+    let f = false;
+    for (const admin of chan.admins) {
+      if (admin.id == user.id) f = true;
+    }
+    if (!f) throw new Error('User is not admin of this channel');
+    for (const admin of chan.admins) {
+      if (admin.id == target.id)
+        throw new Error('Target is already admin of this channel');
+    }
+    f = false;
+    for (const user of chan.users) {
+      if (user.id == target.id) f = true;
+    }
+    if (!f) throw new Error('Target is not in this channel');
     chan.admins.push(target);
     chan = await this.channelRepository.save(chan);
     return chan;
