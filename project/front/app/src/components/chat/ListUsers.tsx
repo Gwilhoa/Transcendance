@@ -15,6 +15,14 @@ type listUserProps = {
   setChannel: React.Dispatch<React.SetStateAction<Channel>>;
 };
 
+// const MakeAdmin = () => {
+// 	return (
+// 		<div className='button-making-admin'>
+// 			
+// 		</div>
+// 	);
+// };
+
 const ListAdmin = ( {channel, setChannel }: listUserProps ) => {
 
 	return (
@@ -55,6 +63,23 @@ const ListUser = ( {channel, setChannel }: listUserProps ) => {
 				)
 				))}
 		</>
+	);
+};
+
+const ListBannedUser = ( { channel, setChannel }: listUserProps ) => {
+	
+	return (
+		<>
+			{ channel.bannedUsers.map((user : User) => (
+					<div 
+						className='chat-admin-component' 
+						key={user.id} 
+					>
+						<ProfilImage OnClickOpenProfil={true} id={user.id} OverwriteClassName='chat-message-image-profil' />
+						<ProfilName id={user.id} />
+					</div>
+			))}
+		</>		
 	);
 };
 
@@ -125,6 +150,10 @@ const ListUserChannel = () => {
 					<div className='users'>
 						<h4>Users</h4>
 						<ListUser channel={channel} setChannel={setChannel} />
+					</div>
+					<div className='banned'>
+						<h4>Banned</h4>
+						<ListBannedUser channel={channel} setChannel ={setChannel} />
 					</div>
 				</>
 			) : (
