@@ -7,6 +7,8 @@ import { Channel, initialChannelState, User } from '../../pages/chat';
 import { openModal } from '../../redux/modal/modalSlice';
 import { RootState } from '../../redux/store';
 import { setErrorLocalStorage } from '../IfError';
+import { ProfilImage } from '../profil/ProfilImage';
+import { ProfilName } from '../profil/ProfilName';
 
 type listUserPros = {
   channel: Channel;
@@ -23,11 +25,11 @@ const ListAdmin = ( {channel, setChannel }: listUserPros ) => {
 					null
 				) : (
 					<div 
-						className="chat-admin-component" 
+						className='chat-admin-component' 
 						key={user.id} 
-						onClick={() => dispatch(openModal(user.id))}
 					>
-						{user.username}
+						<ProfilImage OnClickOpenProfil={true} id={user.id} OverwriteClassName='chat-message-image-profil' />
+						<ProfilName id={user.id} />
 					</div>
 				)
 				))}
@@ -46,11 +48,11 @@ const ListUser = ( {channel, setChannel }: listUserPros ) => {
 					null
 				) : (
 					<div 
-						className="chat-admin-component" 
+						className='chat-admin-component' 
 						key={user.id} 
-						onClick={() => dispatch(openModal(user.id))}
 					>
-						{user.username}
+						<ProfilImage OnClickOpenProfil={true} id={user.id} OverwriteClassName='chat-message-image-profil' />
+						<ProfilName id={user.id} />
 					</div>
 				)
 				))}
@@ -65,11 +67,11 @@ const ListUserMp = ( { channel }: listUserPros ) => {
 		<>
 			{ channel.users.map((user : User) => (
 					<div 
-						className="chat-admin-component" 
+						className='chat-admin-component' 
 						key={user.id} 
-						onClick={() => dispatch(openModal(user.id))}
 					>
-						{user.username}
+						<ProfilImage OnClickOpenProfil={true} id={user.id} OverwriteClassName='chat-message-image-profil' />
+						<ProfilName id={user.id} />
 					</div>
 				))}
 		</>
@@ -99,24 +101,29 @@ const ListUserChannel = () => {
 	}, [channelId]);
 	
 	return (
-		<div className="chat-list-user">
+		<div className='chat-list-user'>
 			{ channel.type !== 3 ? ( 
 				<>
-					<div className="owner">
+					<div className='owner'>
 						<h4>Owner</h4>
-						{channel.creator.username}
+						<ProfilImage 
+							OnClickOpenProfil={true} 
+							id={channel.creator.id} 
+							OverwriteClassName='chat-message-image-profil'
+						/>
+						<ProfilName id={channel.creator.id} />
 					</div>
-					<div className="admin">
+					<div className='admin'>
 						<h4>Admin</h4>
 						<ListAdmin channel={channel} setChannel={setChannel} />
 					</div>
-					<div className="users">
+					<div className='users'>
 						<h4>Users</h4>
 						<ListUser channel={channel} setChannel={setChannel} />
 					</div>
 				</>
 			) : (
-				<div className="users">
+				<div className='users'>
 					<h4>Users</h4>
 					<ListUserMp channel={channel} setChannel={setChannel} />
 				</div>

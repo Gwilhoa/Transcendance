@@ -12,6 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { ProfilImage } from '../../profil/ProfilImage';
 import { ProfilName } from '../../profil/ProfilName';
 import { openModal } from '../../../redux/modal/modalSlice';
+import { imageProfil } from './conversation';
 
 function Timer({ dateString }: {dateString: string}) {
 	const [timeElipsed, setTimeElipsed] = useState<string>();
@@ -34,14 +35,20 @@ function Timer({ dateString }: {dateString: string}) {
 		);
 }
 
-function Messages({ message, image }: { message: Message, image: string}) {
+function Messages({ message, listImage }: { message: Message, listImage: Array<imageProfil> }) {
 	const isMe: boolean = (message.user.id === localStorage.getItem('id'));
+	const photo: string = listImage.find((image) => image.id === message.user.id) 
+									?.image || '';
+
 	const dispatch = useDispatch();
 
 	return (
 		<div key={message.id} className={isMe ? 'chat-my-message' : 'chat-other-message'}>
-			<ProfilImage id = {'' + message.user.id} OnClickOpenProfil={true} OverwriteClassName = 'chat-message-image-profil'/>
-			<div className='chat-message-header-and-content'>
+			<img 
+				className='chat-message-image-profil'
+				src={photo}
+			/>
+			<div className='chat-message-header-and-content' >
 				<div className='chat-header-of-message'>
 					<div className='chat-header-username' onClick={() => dispatch(openModal(message.user.id))}>
 						{message.user.username}

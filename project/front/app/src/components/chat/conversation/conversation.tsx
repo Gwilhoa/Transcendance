@@ -11,24 +11,49 @@ import { useNavigate } from 'react-router-dom';
 import { setErrorLocalStorage } from '../../IfError';
 import { setConversation } from '../../../redux/chat/conversationIdSlice';
 
-interface listImage {
+export interface imageProfil {
 	id: string;
 	image: string;
-}
-
-type initialListImage= {
-	id: '',
-	image: '',
 }
 
 function Conversation() {
 	const [errorGetMessage, setErrorGetMessage] = useState<boolean>(false);
 	const [listMessage, setListMessage] = useState<Array<Message>>([]);
+	const [listImageProfil, setListImageProfil] = useState<Array<imageProfil>>([]);
 	const socketInstance = SocketSingleton.getInstance();
 	const socket = socketInstance.getSocket();
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 	const conversationId = useSelector((state: RootState) => state.conversation.id);
+
+	const addImageProfil = ( id: string) => {
+		if (!listImageProfil.some((img) => img.id === id)) {
+			axios.get(process.env.REACT_APP_IP + ':3000/user/image/' + id, {
+				headers: {
+					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+				},
+			})
+				.then((response) => {
+					const data = response.data;
+					const img: imageProfil  = {
+						id: id,
+						image: data,
+					}
+					setListImageProfil((prevList) => [...prevList, img]);
+				})
+				.catch((error) => {
+					setErrorLocalStorage('Error ' + error.response.status);
+					console.error(error);
+					navigate('/Error');
+				});
+			console.log('here list photo');
+			console.log(listImageProfil);
+		}
+	};
+
+	useEffect(() => {
+		listMessage.map((itemMessage) => addImageProfil(itemMessage.user.id));
+	}, [listMessage]);
 
 	const fetchMessage = (id: string) => {
 		setErrorGetMessage(false);
@@ -130,6 +155,7 @@ function Conversation() {
 						<Messages 
 							key={message.id} 
 							message={message} 
+							listImage={listImageProfil}
 						/>
 					)))}
 				</div> : ( 
