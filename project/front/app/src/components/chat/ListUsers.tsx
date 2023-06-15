@@ -1,3 +1,4 @@
+import './css/listUsers.css';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -50,7 +51,7 @@ const ListAdmin = ( {channel, setChannel }: listUserProps ) => {
 						className='chat-admin-component' 
 						key={user.id} 
 					>
-						<ProfilImage OnClickOpenProfil={true} id={user.id} OverwriteClassName='chat-message-image-profil' />
+						<ProfilImage OnClickOpenProfil={true} id={user.id} OverwriteClassName='chat-list-user-image' />
 						<ProfilName id={user.id} />
 					</div>
 				)
@@ -72,7 +73,7 @@ const ListUser = ( {channel, setChannel }: listUserProps ) => {
 						className='chat-admin-component' 
 						key={user.id} 
 					>
-						<ProfilImage OnClickOpenProfil={true} id={user.id} OverwriteClassName='chat-message-image-profil' />
+						<ProfilImage OnClickOpenProfil={true} id={user.id} OverwriteClassName='chat-list-user-image' />
 						<ProfilName id={user.id} />
 						<MakeAdmin id={user.id} channel={channel} setChannel={setChannel} />
 					</div>
@@ -91,7 +92,7 @@ const ListBannedUser = ( { channel, setChannel }: listUserProps ) => {
 						className='chat-admin-component' 
 						key={user.id} 
 					>
-						<ProfilImage OnClickOpenProfil={true} id={user.id} OverwriteClassName='chat-message-image-profil' />
+						<ProfilImage OnClickOpenProfil={true} id={user.id} OverwriteClassName='chat-list-user-image' />
 						<ProfilName id={user.id} />
 					</div>
 			))}
@@ -108,7 +109,7 @@ const ListUserMp = ( { channel }: listUserProps ) => {
 						className='chat-admin-component' 
 						key={user.id} 
 					>
-						<ProfilImage OnClickOpenProfil={true} id={user.id} OverwriteClassName='chat-message-image-profil' />
+						<ProfilImage OnClickOpenProfil={true} id={user.id} OverwriteClassName='chat-list-user-image' />
 						<ProfilName id={user.id} />
 					</div>
 				))}
@@ -123,7 +124,7 @@ const Creator = ( { channel }: listUserProps ) => {
 			key={channel.creator.id}
 			className='chat-creator-component'
 		>
-			<ProfilImage OnClickOpenProfil={true} id={channel.creator.id} OverwriteClassName='chat-message-image-profil' />
+			<ProfilImage OnClickOpenProfil={true} id={channel.creator.id} OverwriteClassName='chat-list-user-image' />
 			<ProfilName id={channel.creator.id} />
 		</div>
 	);

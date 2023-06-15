@@ -1,0 +1,9 @@
+.profil-image.chat-list-user-image{
+    width: 5rem;
+    height: 5rem;
+    cursor: pointer;
+}
+
+.profil-image.chat-list-user-image > .profil-status{
+    border: 0.25rem solid var(--background-color);
+}

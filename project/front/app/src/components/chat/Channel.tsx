@@ -54,10 +54,9 @@ const ChannelSideBar = ({ channelId }: {channelId: string}) => {
 				<>
 					<ButtonInviteChannel />
 					<ButtonUpdateChannel /> 
-					<ButtonListChannel />
 				</>
 			) : (
-				<ButtonListChannel />
+				null
 			)}
 			</div>
 		</div>		

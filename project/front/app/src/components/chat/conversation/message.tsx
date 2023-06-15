@@ -38,7 +38,7 @@ function Messages({ message, listImage }: { message: Message, listImage: Array<i
 		<div key={message.id} className={isMe ? 'chat-my-message' : 'chat-other-message'}>
 			<img 
 				className='chat-message-image-profil'
-				src={photo}
+				src={photo} onClick={() => dispatch(openModal(message.user.id))}
 			/>
 			<div className='chat-message-header-and-content' >
 				<div className='chat-header-of-message'>

@@ -10,6 +10,7 @@ import Messages from './message';
 import { useNavigate } from 'react-router-dom';
 import { setErrorLocalStorage } from '../../IfError';
 import { setConversation } from '../../../redux/chat/conversationIdSlice';
+import ButtonListChannel from '../optionBar/button/ButtonListUserModal';
 
 export interface imageProfil {
 	id: string;
@@ -143,6 +144,9 @@ function Conversation() {
 
 	return (
 		<div className='chatConversation'>
+			<div className='chat-header'>
+					<ButtonListChannel />
+			</div>
 			{ errorGetMessage ? 
 				<p className="errorGetMessage" >
 					{"you can't access this channel"}

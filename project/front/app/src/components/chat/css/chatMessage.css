@@ -4,13 +4,12 @@
     position: relative;
 }
 
-.profil-image.chat-message-image-profil{
+.chat-message-image-profil{
     width: 4rem;
     height: 4rem;
-}
-
-.profil-image.chat-message-image-profil > .profil-status{
-    border: 0.25rem solid var(--background-color);
+    object-fit: cover; 
+    border-radius: 50%;
+    cursor: pointer;
 }
 
 .chat-my-message, .chat-other-message{
@@ -31,6 +30,7 @@
     font-size: 1.25rem;
     font-weight: bold;
     margin-right: 0.5rem;
+    cursor: pointer;
 }
 
 .chat-header-date{
