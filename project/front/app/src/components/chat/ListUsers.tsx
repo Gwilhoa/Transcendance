@@ -1,27 +1,42 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { cookies } from '../../App';
 import { Channel, initialChannelState, User } from '../../pages/chat';
-import { openModal } from '../../redux/modal/modalSlice';
 import { RootState } from '../../redux/store';
 import { setErrorLocalStorage } from '../IfError';
 import { ProfilImage } from '../profil/ProfilImage';
 import { ProfilName } from '../profil/ProfilName';
+import SocketSingleton from '../../socket';
+const socketInstance = SocketSingleton.getInstance();
+const socket = socketInstance.getSocket();
 
 type listUserProps = {
-  channel: Channel;
-  setChannel: React.Dispatch<React.SetStateAction<Channel>>;
+	channel: Channel;
+	setChannel: React.Dispatch<React.SetStateAction<Channel>>;
 };
 
-// const MakeAdmin = () => {
-// 	return (
-// 		<div className='button-making-admin'>
-// 			
-// 		</div>
-// 	);
-// };
+type changeChannelProps = {
+	channel: Channel
+	id: string;
+	setChannel: React.Dispatch<React.SetStateAction<Channel>>;
+};
+
+const MakeAdmin = ( { id, channel, setChannel }: changeChannelProps ) => {
+	
+
+	const handleClickMakeAdmin = () => {
+		socket.emit('add_admin', { channel_id: channel.id, admin_id: id });
+		console.log('ON CLICK add admin');
+	};
+
+	return (
+		<div className='button-making-admin' onClick={handleClickMakeAdmin}>
+		ADD
+		</div>
+	);
+};
 
 const ListAdmin = ( {channel, setChannel }: listUserProps ) => {
 
@@ -59,6 +74,7 @@ const ListUser = ( {channel, setChannel }: listUserProps ) => {
 					>
 						<ProfilImage OnClickOpenProfil={true} id={user.id} OverwriteClassName='chat-message-image-profil' />
 						<ProfilName id={user.id} />
+						<MakeAdmin id={user.id} channel={channel} setChannel={setChannel} />
 					</div>
 				)
 				))}

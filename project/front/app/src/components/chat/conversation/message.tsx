@@ -1,16 +1,8 @@
 
 import '../css/chatMessage.css'
-import axios from 'axios';
 import React, { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux';
-import { cookies } from '../../../App';
-import { RootState } from '../../../redux/store';
+import { useDispatch } from 'react-redux';
 import { Message } from '../../../pages/chat'
-import SocketSingleton from '../../../socket';
-import { setErrorLocalStorage } from '../../IfError';
-import { useNavigate } from 'react-router-dom';
-import { ProfilImage } from '../../profil/ProfilImage';
-import { ProfilName } from '../../profil/ProfilName';
 import { openModal } from '../../../redux/modal/modalSlice';
 import { imageProfil } from './conversation';
 
