@@ -4,14 +4,16 @@ import modalChatReducer from './chat/modalChatSlice';
 import conversationIdReducer from './chat/conversationIdSlice';
 import finalGameStat from './game/gameSlice';
 import searchReducer from './search/searchSlice';
+import beginToOption from "./game/beginToOption";
 
 const store = configureStore({
 	reducer: {
 		modal: modalReducer,
 		modalChat: modalChatReducer,
 		conversation: conversationIdReducer,
-		finalGame: finalGameStat, // Ajoutez votre réducteur finalGameStat ici
+		finalGame: finalGameStat,
 		searchUser: searchReducer,
+		beginToOption: beginToOption,
 	},
 });
 
