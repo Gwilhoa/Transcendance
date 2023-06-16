@@ -7,9 +7,9 @@ const ButtonListChannel = () => {
 	const dispatch = useDispatch();
 
 	return (
-		<div className='chat-side-bar-channel-invite' onClick={() => dispatch(switchChatModalListUser())}>
-		⚙
-		</div>
+		<p className='chat-list-users-button' onClick={() => dispatch(switchChatModalListUser())}>
+		☷
+		</p>
 	);
 }
 

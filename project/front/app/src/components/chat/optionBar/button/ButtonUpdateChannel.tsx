@@ -9,7 +9,7 @@ const ButtonUpdateChannel = () => {
 
 	return (
 		<div className='' onClick={() => dispatch(switchChatModalUpdateChannel())}>
-			⚌
+			⚙
 		</div>
 	);
 }

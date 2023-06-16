@@ -3,9 +3,9 @@
     border-radius: 50px;
     margin-left: 1.5rem;
     margin-right: 1.5rem;
-    right: 0;
+    /* right: 0;
     left: 0;
-    bottom: 1rem;
+    bottom: 1rem; */
     display: flex;
     height: var(--search-bar-size);
     color: var(--light-color);
@@ -28,5 +28,11 @@
     background-color: transparent;
     border: none;
     cursor: pointer;
+    color: var(--light-color);
+}
+
+.chat-conversation-never-join-channel, .chat-conversation-write-the-first-message{
+    margin: 2rem 2rem 2rem;
+    font-weight: 500;
     color: var(--light-color);
 }

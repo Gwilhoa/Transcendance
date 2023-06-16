@@ -1,17 +1,26 @@
 .chat-conversation-header{
-    /* position: absolute; */
-    right: 15px;
     color: var(--light-color);
-    display: flex;
-    /* justify-content: space-between; */
-    justify-content: center;
-
+    display: grid;
+    grid-template-columns: 1fr repeat(1, auto) 1fr;
+  
 }
 
-.chat-conversation-header > p{
+.chat-conversation-channel-name{
+    grid-column-start: 2;
     font-size: 1.35rem;
     font-weight: 525;
+    margin-top: 0 0.5rem;
 }
+
+.chat-list-users-button{
+    margin-left: auto;
+    margin-right: 1rem;
+    cursor: pointer;
+    margin-top: 0 0.5rem;
+}
+
+/* .chat-conversation{
+} */
 
 .chat-scroll-converation{
     overflow: auto;

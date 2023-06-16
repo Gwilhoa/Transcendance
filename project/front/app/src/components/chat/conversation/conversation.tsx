@@ -163,7 +163,7 @@ function Conversation() {
 	return (
 		<div className='chat-conversation'>
 			<div className='chat-conversation-header'>
-				<p>
+				<p className='chat-conversation-channel-name'>
 					{channelName}
 				</p>
 				<ButtonListChannel />
@@ -186,11 +186,11 @@ function Conversation() {
 					)))}
 				</div> : ( 
 				conversationId == '' ? (
-					<p className="NeverJoinChannel">
+					<p className="chat-conversation-never-join-channel">
 						{"you don't have access to any channel"}
 					</p>
 				) : ( 
-					<p className="writeTheFirstMessage">
+					<p className="chat-conversation-write-the-first-message">
 						no message on the channel, wirte the first one
 					</p>
 				)
