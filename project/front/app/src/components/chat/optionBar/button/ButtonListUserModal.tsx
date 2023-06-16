@@ -8,7 +8,7 @@ const ButtonListChannel = () => {
 
 	return (
 		<div className='chat-side-bar-channel-invite' onClick={() => dispatch(switchChatModalListUser())}>
-		l
+		⚙
 		</div>
 	);
 }
