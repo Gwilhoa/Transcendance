@@ -549,13 +549,12 @@ export class EventsGateway
   @SubscribeMessage('leave_matchmaking')
   async leave_matchmaking(client: Socket, payload: any) {
     console.log('leave_matchmaking');
-    const id = getIdFromSocket(client, this.clients);
     const tempmatchmaking = [];
     let send = {
       code: 1,
     };
     for (const t of this.matchmaking) {
-      if (t.id != id) {
+      if (t.id != client.id) {
         tempmatchmaking.push(t);
         send = {
           code: 0,
