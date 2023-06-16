@@ -24,9 +24,14 @@
 }
 
 .chat-scroll-converation{
-    overflow: auto;
+    overflow-y: auto;
     max-height: calc(100% - var(--search-bar-height));
-    position: relative;
+    /* position: relative; */
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    
 }
 
 .chat-message-image-profil{

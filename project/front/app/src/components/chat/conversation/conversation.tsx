@@ -177,13 +177,16 @@ function Conversation() {
 			}	
 			{ (listMessage != null && listMessage.length > 0) ? 
 				<div className='chat-scroll-converation'>
+					<div>
+
 					{(listMessage.map((message) => (		
 						<Messages 
-							key={message.id} 
-							message={message} 
-							listImage={listImageProfil}
+						key={message.id} 
+						message={message} 
+						listImage={listImageProfil}
 						/>
-					)))}
+						)))}
+						</div>
 				</div> : ( 
 				conversationId == '' ? (
 					<p className="chat-conversation-never-join-channel">
