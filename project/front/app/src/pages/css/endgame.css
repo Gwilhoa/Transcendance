@@ -3,7 +3,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100vh;
+    height: calc(100vh - var(--header-size));
   }
   
   .end_game_title {

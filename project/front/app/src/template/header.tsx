@@ -18,6 +18,7 @@ const Head = () => {
 	socket.on('message_code', (data: any) => {
 		console.log(data);
 	});
+	
 	useEffect(() => {
 		if (localStorage.getItem('id') === null) {
 			axios.get(process.env.REACT_APP_IP + ':3000/user/id', {
@@ -58,7 +59,7 @@ const Head = () => {
             <Link to='/chat' className='navbar__link'>
               Chat
             </Link>
-            <Link to='/game' className='navbar__link'>
+            <Link to="/begingame" className="navbar__link">
               Game
             </Link>
             <Link to='/history' className='navbar__link'>

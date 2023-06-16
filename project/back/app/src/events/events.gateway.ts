@@ -30,6 +30,7 @@ import {
   messageCode,
 } from 'src/utils/requestcode.enum';
 import { addAdminDto } from '../dto/add-admin.dto';
+import { sleep } from '../utils/sleep';
 
 @WebSocketGateway({
   cors: {
@@ -465,6 +466,7 @@ export class EventsGateway
         game_id: null,
         user: null,
         rival: null,
+        decided: false,
       });
       return;
     }
@@ -480,15 +482,18 @@ export class EventsGateway
     const create_game = await this.gameService.createGame(create_gameDTO);
     this.ingame.set(create_gameDTO.user1_id, create_game.id);
     this.ingame.set(create_gameDTO.user2_id, create_game.id);
+    const FirstDecide = Math.random() < 0.5;
     player.emit('game_found', {
       game_id: create_game.id,
       user: 1,
-      rival: rival.id,
+      rival: create_gameDTO.user2_id,
+      decide: FirstDecide,
     });
     rival.emit('game_found', {
       game_id: create_game.id,
       user: 2,
-      rival: player.id,
+      rival: create_gameDTO.user1_id,
+      decide: !FirstDecide,
     });
     player.join(create_game.id);
     rival.join(create_game.id);
@@ -507,11 +512,31 @@ export class EventsGateway
       }
     }
     this.matchmaking = tempmatchmaking;
-    this.server.to(game.getId()).emit('game_start', game.getId());
-    this.logger.log('game ' + game.getId() + ' started');
-    game.start();
+    this.server.to(game.getId()).emit('game_created', game.getId());
+    this.logger.log('game ' + game.getId() + ' created ');
   }
 
+  @SubscribeMessage('option_send')
+  async option_send(client: Socket, payload: any) {
+    const user_id = getIdFromSocket(client, this.clients);
+    const game_id = this.ingame.get(user_id);
+    const game: Game = this.games[game_id];
+    game.definePowerUp(payload.powerup)
+    if (game == null) {
+      return;
+    } else {
+      this.server.to(game_id).emit('will_started', { time: 3 });
+      await sleep(1000);
+      this.server.to(game_id).emit('option_receive', payload);
+      this.server.to(game_id).emit('will_started', { time: 2 });
+      await sleep(1000);
+      this.server.to(game_id).emit('will_started', { time: 1 });
+      await sleep(1000);
+      this.server.to(game_id).emit('will_started', { time: 0 });
+      await sleep(1000);
+      game.start();
+    }
+  }
   @SubscribeMessage('input_game')
   async input_game(client: Socket, payload: any) {
     const game_id = payload.game_id;
@@ -524,13 +549,13 @@ export class EventsGateway
 
   @SubscribeMessage('leave_matchmaking')
   async leave_matchmaking(client: Socket, payload: any) {
-    const id = getIdFromSocket(client, this.clients);
+    console.log('leave_matchmaking');
     const tempmatchmaking = [];
     let send = {
       code: 1,
     };
     for (const t of this.matchmaking) {
-      if (t.id != id) {
+      if (t.id != client.id) {
         tempmatchmaking.push(t);
         send = {
           code: 0,
