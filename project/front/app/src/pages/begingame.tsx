@@ -1,7 +1,7 @@
 import './css/begingame.css'
 import Cookies from 'universal-cookie';
 import { animated, useSpring } from 'react-spring';
-import React, { useEffect } from 'react';
+import React, {useEffect, useRef} from 'react';
 import SocketSingleton from '../socket';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
@@ -12,25 +12,21 @@ const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
 const cookies = new Cookies();
 const BeginGame = () => {
+    const gamefound = useRef(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  
+
   useEffect(() => {
-      let gamefound = false;
       socket.emit('join_matchmaking', {token : cookies.get('jwtAuthorization')});
       
       socket.on('matchmaking_code', (data:any) => {
         console.log(data)
+          if (!gamefound.current)
+              return;
         if (data["code"] === 0) {
           console.log('enter matchmaking successfull');
-          socket.on('game_found', (data) => {
-            console.log(data);
-            dispatch(setBeginStatus({decide: data.decide, playerstate: data.user, gameid: data.game_id}));
-            navigate("/optiongame")            
-            gamefound = true;
-          });
-        }
-        else {
+            gamefound.current = true;
+        } else {
           console.log('aie aie aie')
           navigate("/home");
           alert("Error, you are already in game");
@@ -38,14 +34,17 @@ const BeginGame = () => {
       });
       
       return () => {
-        if (!gamefound) {
           console.log("oui")
           socket.emit('leave_matchmaking')
-        }
       };
 
     }, []);
-    
+
+    socket.on('game_found', (data) => {
+        console.log(data);
+        dispatch(setBeginStatus({decide: data.decide, playerstate: data.user, gameid: data.game_id}));
+        navigate("/optiongame")
+    });
     
     const spinnerAnimation = useSpring({
         from: { transform: 'rotate(0deg)' },
