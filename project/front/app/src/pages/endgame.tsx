@@ -78,6 +78,7 @@ const EndGame = () => {
 
   useEffect(() => {
     if (finalStatus == null || finalStatus.adversary == null) {
+      socket.emit('leave_game')
       navigate('/home');
     }
   } , [finalStatus, navigate]);

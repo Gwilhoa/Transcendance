@@ -90,7 +90,6 @@ const Game: React.FC<GameProps> = () => {
           
   const leaveGame = () => {
     socket.emit('leave_game');
-    navigate('/home')
   }
   
   const resumeGame = () => {
