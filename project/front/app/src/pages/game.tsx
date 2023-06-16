@@ -1,24 +1,13 @@
 import './css/game.css'
-<<<<<<< HEAD
 import React, { useState, useEffect, useRef } from "react";
-=======
-import React, { useState, useEffect, useRef } from 'react';
-import { useSpring, animated } from 'react-spring';
->>>>>>> origin/main
 import Cookies from 'universal-cookie';
 import { useNavigate } from 'react-router-dom';
 import ErrorToken from '../components/IfError';
 import {useDispatch, useSelector} from 'react-redux';
-<<<<<<< HEAD
 import {setFinalStatus} from "../redux/game/gameSlice";
 import {RootState} from "../redux/store";
 import SocketSingleton from "../socket";
 import { animated, useSpring } from 'react-spring';
-=======
-import {setFinalStatus} from '../redux/game/gameSlice';
-import {RootState} from '../redux/store';
-import SocketSingleton from '../socket';
->>>>>>> origin/main
 const cookies = new Cookies();
 
 let isCall = true;
@@ -39,8 +28,6 @@ const Game: React.FC<GameProps> = () => {
   isCall = true;
   const navigate = useNavigate();
   const gameId = useSelector((state: RootState) => state.beginToOption.gameid);
-  const [onGame, findGame] = useState(gameId);
-  console.log(onGame);
   const [score1, setScore1] = useState(0);
   const [score2, setScore2] = useState(0);
   
@@ -101,8 +88,21 @@ const Game: React.FC<GameProps> = () => {
     }
   };
           
-          
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const leaveGame = () => {
+    socket.emit('leave_game');
+    navigate('/home')
+  }
+  
+  const resumeGame = () => {
+    socket.emit("input_game", {game_id: gameId, type: 2})
+  }
+  
+  socket.on('create_game', (any) => {
+    console.log('WESH')
+    console.log(any);
+  })
+  
+  
   useEffect(() => {
     window.addEventListener("keydown", handleKeyPress);
     if (playerstats == 2) {
@@ -119,29 +119,11 @@ const Game: React.FC<GameProps> = () => {
       setIsPowerup(data.powerup);
       console.log(data)
     })
-    socket.on('game_start', () => {
-      socket.emit('input_game', { game_id: gameId, position: paddle1, token: cookies.get('jwtAuthorization')});
-    });
-  }, [])
-    
-    
-    
-  const leaveGame = () => {
-    socket.emit('leave_game');
-    navigate('/home')
-  }
 
-  const resumeGame = () => {
-    socket.emit("input_game", {game_id: gameId, type: 2})
-  }
-  
-  socket.on('create_game', (any) => {
-    console.log('WESH')
-    console.log(any);
-  })
-  
-  
-  useEffect(() => {
+    socket.on('game_start', () => {
+      socket.emit('input_game', { game_id: gameId, position: paddle1, token: cookies.get('jwtAuthorization')}); 
+    })
+
     socket.on('stop_game', (any) => {
       
       console.log(any);

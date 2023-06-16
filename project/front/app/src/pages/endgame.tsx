@@ -3,17 +3,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import Cookies from 'universal-cookie';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-<<<<<<< HEAD
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../redux/store";
 import SocketSingleton from "../socket";
 import { setBeginStatus } from '../redux/game/beginToOption';
 import ErrorToken from '../components/IfError';
-=======
-import {useSelector} from 'react-redux';
-import {RootState} from '../redux/store';
-import SocketSingleton from '../socket';
->>>>>>> origin/main
 
 const cookies = new Cookies();
 
@@ -28,6 +22,7 @@ const EndGame = () => {
   const socketInstance = SocketSingleton.getInstance();
   const socket = socketInstance.getSocket();
   const dispatch = useDispatch();
+  const [undefinedPlayer, setUndefinedPlayer] = useState(true);
 
   socket.on('message_code', (data: any) => {
     console.log(data);
@@ -82,7 +77,7 @@ const EndGame = () => {
     });
 
   useEffect(() => {
-    if (finalStatus == null) {
+    if (finalStatus == null || finalStatus.adversary == null) {
       navigate('/home');
     }
   } , [finalStatus, navigate]);

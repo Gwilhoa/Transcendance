@@ -12,33 +12,41 @@ const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
 const cookies = new Cookies();
 const BeginGame = () => {
-
-    let gameId;
-    let paddle1;
-    const navigate = useNavigate();
-    const dispatch = useDispatch();
-
-    useEffect(() => {
-      
-      socket.emit('join_matchmaking', {token : cookies.get('jwtAuthorization')});
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   
+  useEffect(() => {
+      let gamefound = false;
+      socket.emit('join_matchmaking', {token : cookies.get('jwtAuthorization')});
+      
       socket.on('matchmaking_code', (data:any) => {
+        console.log(data)
         if (data["code"] === 0) {
           console.log('enter matchmaking successfull');
           socket.on('game_found', (data) => {
-              console.log(data);
-              dispatch(setBeginStatus({decide: data.decide, playerstate: data.user, gameid: data.game_id}));
-              navigate("/optiongame")            
+            console.log(data);
+            dispatch(setBeginStatus({decide: data.decide, playerstate: data.user, gameid: data.game_id}));
+            navigate("/optiongame")            
+            gamefound = true;
           });
         }
         else {
+          console.log('aie aie aie')
           navigate("/home");
           alert("Error, you are already in game");
         }
       });
-    }, [socket]);
+      
+      return () => {
+        if (!gamefound) {
+          console.log("oui")
+          socket.emit('leave_matchmaking')
+        }
+      };
 
-
+    }, []);
+    
+    
     const spinnerAnimation = useSpring({
         from: { transform: 'rotate(0deg)' },
         to: { transform: 'rotate(360deg)' },
