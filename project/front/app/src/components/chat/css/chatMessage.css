@@ -19,12 +19,13 @@
     margin-top: 0 0.5rem;
 }
 
-/* .chat-conversation{
-} */
+.chat-conversation{
+    height: calc(100% - var(--search-bar-height));
+}
 
 .chat-scroll-converation{
     overflow: auto;
-    max-height: calc(100vh - var(--header-size) - var(--search-bar-height));
+    max-height: calc(100% - var(--search-bar-height));
     position: relative;
 }
 
