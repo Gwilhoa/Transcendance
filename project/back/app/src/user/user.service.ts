@@ -269,6 +269,9 @@ export class UserService {
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.joinedChannels', 'channels')
       .leftJoinAndSelect('channels.users', 'users')
+      .leftJoinAndSelect('channels.admins', 'admins')
+      .leftJoinAndSelect('channels.creator', 'creator')
+      .leftJoinAndSelect('channels.bannedUsers', 'bannedUsers')
       .where('user.id = :id', { id })
       .getOne();
     if (!user) {
