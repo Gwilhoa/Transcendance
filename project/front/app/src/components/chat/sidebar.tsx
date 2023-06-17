@@ -36,6 +36,14 @@ function SideBarChat() {
 			fetchChannel();
 			return ;
 		});
+
+		socket.on('update_channel', (data: any) => {
+			console.log('update_channel :');
+			console.log(data);
+			listChannel.map((item) => item.id === data.channel_id 
+				
+				);
+		});
 	}, [socket])
 	
 	

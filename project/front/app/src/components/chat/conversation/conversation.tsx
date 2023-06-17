@@ -105,8 +105,6 @@ function Conversation() {
 		});
 
 		socket.on('message', (data: any) => {
-			console.log('receive message ' + id + ' ' + data.channel);
-			console.log(data)
 			if (data.channel === id) {
 				const newItemMessage: Message = {
 					content: data.content,
@@ -117,20 +115,24 @@ function Conversation() {
 				console.log(newItemMessage);
 				setListMessage((prevListMessage) => {
 					if (prevListMessage.length === 0) {
-						console.log("here lenght 0");
 						return [newItemMessage];
 					} 
 					else if (!prevListMessage.some((message) => message.id === newItemMessage.id)) {
-						console.log("here new message");
 						return [...prevListMessage, newItemMessage];
 					}
 					else {
-						console.log("here prevlist");
 						return prevListMessage;
 					}
 				});
 			}
 			return ;
+		});
+
+		socket.on('update_channel', (data: any) => {
+			console.log('update_channel :');
+			console.log(data);
+			if (conversationId === data?.channel_id)
+				setchannelName(data?.name);
 		});
 	}, [socket, conversationId]);
 

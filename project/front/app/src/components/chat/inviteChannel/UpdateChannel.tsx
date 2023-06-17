@@ -45,6 +45,7 @@ const UpdateChannel = () => {
 			password: newPassword,
 			old_password: password
 		});
+		dispatch(switchChatModalUpdateChannel());
 	}
 
 	return (
@@ -57,7 +58,7 @@ const UpdateChannel = () => {
 
 				{channel?.type == 2 ?
 					<input type='text' placeholder='old password' onChange={(e) => setPassword(e.target.value)}/> : <></>}
-				`<button className='create-channel-button' onClick={updateChannel}>Update</button>
+				<button className='create-channel-button' onClick={updateChannel}>Update</button>
 				<button className='close-create-channel' onClick={() => dispatch(switchChatModalUpdateChannel())} />
 			</div>
 		</div>

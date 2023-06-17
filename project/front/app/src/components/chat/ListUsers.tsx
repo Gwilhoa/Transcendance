@@ -40,6 +40,36 @@ const MakeAdmin = ( { id, channel, setChannel }: changeChannelProps ) => {
 	);
 };
 
+const BanHammer = ( { id, channel, setChannel }: changeChannelProps ) => {
+	
+
+	const handleClickMakeAdmin = () => {
+		socket.emit('add_admin', { channel_id: channel.id, admin_id: id });
+		console.log('ON CLICK add admin');
+	};
+
+	return (
+		<div className='button-making-admin' onClick={handleClickMakeAdmin}>
+		Ban
+		</div>
+	);
+};
+
+const UnBanHammer = ( { id, channel, setChannel }: changeChannelProps ) => {
+	
+
+	const handleClickMakeAdmin = () => {
+		socket.emit('add_admin', { channel_id: channel.id, admin_id: id });
+		console.log('ON CLICK add admin');
+	};
+
+	return (
+		<div className='button-making-admin' onClick={handleClickMakeAdmin}>
+		UnBan
+		</div>
+	);
+};
+
 const DeleteAdmin = ( { id, channel, setChannel }: changeChannelProps ) => {
 	
 
@@ -99,6 +129,7 @@ const ListUser = ( {channel, setChannel }: listUserProps ) => {
 							<ProfilName id={user.id} />
 						</div>
 						<MakeAdmin id={user.id} channel={channel} setChannel={setChannel} />
+						<BanHammer id={user.id} channel={channel} setChannel={setChannel} />
 					</div>
 				)
 				))}
@@ -120,6 +151,7 @@ const ListBannedUser = ( { channel, setChannel }: listUserProps ) => {
 							<div className='chat-list-users-user-name' onClick={() => dispatch(openModal(user.id))}>
 								<ProfilName id={user.id} />
 							</div>
+						<UnBanHammer id={user.id} channel={channel} setChannel={setChannel} />
 					</div>
 			))}
 		</>		
