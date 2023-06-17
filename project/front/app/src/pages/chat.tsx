@@ -16,6 +16,7 @@ import ListUserChannel from '../components/chat/ListUsers';
 import axios from 'axios';
 import { cookies } from '../App';
 import { useNavigate } from 'react-router-dom';
+import { error } from 'console';
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
 
@@ -93,6 +94,7 @@ function Chat() {
 	const [conversationId, setConversationId] = useState<string>('');
 
 	const [messages, setMessages] = useState<Array<Message>>([]);
+	const [errorGetMessage, setErrorGetMessage] = useState<boolean>(false);
 	
 ////////////////////////// FETCH DATA /////////////////////////////////////////
 	const fetchListChannel = async () => {
@@ -123,12 +125,14 @@ function Chat() {
 			else {
 				setMessages(response.data);
 			}
+			setErrorGetMessage(false);
 		} catch (error: any) {
 			console.error(error);
 			if (error.response.status === 401 || error.response.status === 500) {
 						setErrorLocalStorage('unauthorized');
 						navigate('/Error');
 			}
+			setErrorGetMessage(true);
 		}
 	};
 
@@ -237,7 +241,11 @@ function Chat() {
 			{isOpenInviteChannel && ( <InviteChannel channel={channel}/> )}
 			{isOpenUpdateChannel && ( <UpdateChannel channel={channel}/> )}
 			<div className='chat-right-page'>
-				<Conversation listMessages={messages} channel={channel}/>
+				<Conversation 
+					listMessages={messages} 
+					channel={channel} 
+					errorGetMessage={errorGetMessage}
+				/>
 				<SendMessage conversation={conversationId}/>
 			</div>
 			{isOpenListUserChannel && ( <ListUserChannel channel={channel} /> )}

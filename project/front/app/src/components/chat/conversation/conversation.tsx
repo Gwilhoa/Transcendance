@@ -1,15 +1,12 @@
 import '../css/chatMessage.css'
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux';
 import { cookies } from '../../../App';
-import { RootState } from '../../../redux/store';
 import { Channel, Message } from '../../../pages/chat'
 import SocketSingleton from '../../../socket';
 import Messages from './message';
 import { useNavigate } from 'react-router-dom';
 import { setErrorLocalStorage } from '../../IfError';
-import { setConversation } from '../../../redux/chat/conversationIdSlice';
 import ButtonListChannel from '../optionBar/button/ButtonListUserModal';
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
@@ -22,13 +19,11 @@ export interface imageProfil {
 
 
 function Conversation(
-						{ listMessages, channel }: 
-						{ listMessages: Array<Message>, channel: Channel }) 
+						{ listMessages, channel, errorGetMessage }: 
+						{ listMessages: Array<Message>, channel: Channel, errorGetMessage: boolean }) 
 {
-	const [errorGetMessage, setErrorGetMessage] = useState<boolean>(false);
 	const [listImageProfil, setListImageProfil] = useState<Array<imageProfil>>([]);
 	const navigate = useNavigate();
-	const conversationId = useSelector((state: RootState) => state.conversation.id);
 
 	useEffect(() => {
 		listMessages.map((itemMessage) => addImageProfil(itemMessage.user.id));
@@ -88,13 +83,13 @@ function Conversation(
 						)))}
 						</div>
 				</div> : ( 
-				conversationId == '' ? (
+				channel.id == '' && !errorGetMessage ? (
 					<p className="chat-conversation-never-join-channel">
 						{"you don't have access to any channel"}
 					</p>
 				) : ( 
 					<p className="chat-conversation-write-the-first-message">
-						no message on the channel, wirte the first one
+						no message on the channel, write the first one
 					</p>
 				)
 			)}
