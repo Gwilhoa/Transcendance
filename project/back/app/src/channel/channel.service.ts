@@ -322,6 +322,8 @@ export class ChannelService {
     for (const admin of channel.admins) {
       if (admin.id == target.id) f = true;
     }
+    if (target.id == channel.creator.id)
+      throw new Error('Cannot remove creator');
     if (!f) throw new Error('Target is not admin of this channel');
     const admins = [];
     for (const admin of channel.admins) {
@@ -355,16 +357,22 @@ export class ChannelService {
     const channel = await this.channelRepository
       .createQueryBuilder('channel')
       .leftJoinAndSelect('channel.bannedUsers', 'bannedUsers')
+        .leftJoinAndSelect('channel.users', 'users')
+        .leftJoinAndSelect('channel.admins', 'admins')
       .where('channel.id = :id', { id: body.channel_id })
       .getOne();
     if (channel == null) throw new Error('Channel not found');
-    if (!channel.users.includes(self_user))
+    if (!includeUser(self_user, channel.users))
       throw new Error('User is not in this channel');
-    if (!channel.admins.includes(self_user))
+    if (!includeUser(self_user, channel.admins))
       throw new Error('User is not admin of this channel');
-    if (!channel.bannedUsers.includes(target))
+    if (!includeUser(target, channel.bannedUsers))
       throw new Error('User is not banned of this channel');
-    channel.bannedUsers.filter((u) => u.id != target.id);
+    const bannedUsers = [];
+    for (const bannedUser of channel.bannedUsers) {
+      if (bannedUser.id != target.id) bannedUsers.push(bannedUser);
+    }
+    channel.bannedUsers = bannedUsers;
     return await this.channelRepository.save(channel);
   }
 

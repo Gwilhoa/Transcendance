@@ -843,4 +843,28 @@ export class EventsGateway
       return;
     }
   }
+
+  @SubscribeMessage('unban_user')
+  async unban_user(client: Socket, payload: any) {
+    const user_id = getIdFromSocket(client, this.clients);
+    const channel_id = payload.channel_id;
+    const ban_id = payload.unban_id;
+    const addBan = new BanUserDto();
+    addBan.channel_id = channel_id;
+    addBan.user_id = ban_id;
+    try {
+      const chan = await this.channelService.deleteBanUser(addBan, user_id);
+      if (chan != null) {
+        this.server.to(chan.id).emit('ban_code', {
+          channel_id: chan.id,
+          bans: chan.bannedUsers,
+        });
+      }
+    } catch (e) {
+      client.emit('ban_code', {
+        message: e.message,
+      });
+      return;
+    }
+  }
 }

@@ -59,8 +59,8 @@ const UnBanHammer = ( { id, channel, setChannel }: changeChannelProps ) => {
 	
 
 	const handleClickMakeAdmin = () => {
-		socket.emit('add_admin', { channel_id: channel.id, admin_id: id });
-		console.log('ON CLICK add admin');
+		socket.emit('unban_user', { channel_id: channel.id, unban_id: id });
+		console.log('unban user');
 	};
 
 	return (
