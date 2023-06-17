@@ -92,6 +92,7 @@ function Conversation() {
 		let id = conversationId;
 
 		socket.on('join_code', (data: any) => {
+			console.log(data);
 			console.log('join_code ' + data.code)
 			console.log(data);
 			id = data.channel_id
