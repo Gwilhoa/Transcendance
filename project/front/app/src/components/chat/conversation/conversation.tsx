@@ -129,14 +129,12 @@ function Conversation() {
 		});
 
 		socket.on('update_channel', (data: any) => {
-			console.log('update_channel :');
+			console.log('update_channel in conversation :');
 			console.log(data);
 			if (conversationId === data?.channel_id)
 				setchannelName(data?.name);
 		});
 	}, [socket, conversationId]);
-
-
 
 	useEffect(() =>{
 		if (conversationId) {

@@ -19,6 +19,16 @@ const BeginGame = () => {
   useEffect(() => {
       socket.emit('join_matchmaking', {token : cookies.get('jwtAuthorization')});
       
+
+      return () => {
+          console.log("oui")
+          socket.emit('leave_matchmaking')
+      };
+
+    }, []);
+
+	useEffect(() => {
+
       socket.on('matchmaking_code', (data:any) => {
         console.log(data)
           if (!gamefound.current)
@@ -32,20 +42,15 @@ const BeginGame = () => {
           alert("Error, you are already in game");
         }
       });
-      
-      return () => {
-          console.log("oui")
-          socket.emit('leave_matchmaking')
-      };
 
-    }, []);
+		socket.on('game_found', (data) => {
+			console.log(data);
+			dispatch(setBeginStatus({decide: data.decide, playerstate: data.user, gameid: data.game_id}));
+            socket.emit('leave_matchmaking')
+			navigate("/optiongame")
+		});
+    }, [socket]);
 
-    socket.on('game_found', (data) => {
-        console.log(data);
-        dispatch(setBeginStatus({decide: data.decide, playerstate: data.user, gameid: data.game_id}));
-        navigate("/optiongame")
-    });
-    
     const spinnerAnimation = useSpring({
         from: { transform: 'rotate(0deg)' },
         to: { transform: 'rotate(360deg)' },

@@ -79,7 +79,7 @@ const AddUserId = ({ usersId, setUserId, channelId }: AddUserIdProps) => {
 						<ProfilName  id={user.id} />
 					</div>
 				) : (
-					<div key='notUser'></div>
+					null
 				)
             ))}
         </div>
