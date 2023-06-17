@@ -224,8 +224,16 @@ export class UserService {
   }
 
   public async addBlocked(id: string, blocked_id: string) {
-    const user = await this.userRepository.findOneBy({ id: id });
-    const blocked = await this.userRepository.findOneBy({ id: blocked_id });
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.blockedUsers', 'blockedUsers')
+      .where('user.id = :id', { id })
+      .getOne();
+    const blocked = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.blockedUsers', 'blockedUsers')
+      .where('user.id = :id', { id: blocked_id })
+      .getOne();
     if (user == null || blocked == null) {
       throw new Error('User not found');
     }
@@ -260,7 +268,7 @@ export class UserService {
     const user = await this.userRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.joinedChannels', 'channels')
-        .leftJoinAndSelect('channels.users', 'users')
+      .leftJoinAndSelect('channels.users', 'users')
       .where('user.id = :id', { id })
       .getOne();
     if (!user) {
