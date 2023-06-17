@@ -44,8 +44,8 @@ const BanHammer = ( { id, channel, setChannel }: changeChannelProps ) => {
 	
 
 	const handleClickMakeAdmin = () => {
-		socket.emit('add_admin', { channel_id: channel.id, admin_id: id });
-		console.log('ON CLICK add admin');
+		socket.emit('ban_user', { channel_id: channel.id, ban_id: id });
+		console.log('ON CLICK ban user');
 	};
 
 	return (
@@ -74,7 +74,7 @@ const DeleteAdmin = ( { id, channel, setChannel }: changeChannelProps ) => {
 	
 
 	const handleClickDeleteAdmin = () => {
-		socket.emit('delete_admin', { channel_id: channel.id, admin_id: id });
+		socket.emit('remove_admin', { channel_id: channel.id, admin_id: id });
 		console.log('ON CLICK Delete admin');
 	};
 

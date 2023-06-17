@@ -31,6 +31,7 @@ import {
 } from 'src/utils/requestcode.enum';
 import { addAdminDto } from '../dto/add-admin.dto';
 import { sleep } from '../utils/sleep';
+import { BanUserDto } from '../dto/ban-user.dto';
 
 @WebSocketGateway({
   cors: {
@@ -521,7 +522,7 @@ export class EventsGateway
     const user_id = getIdFromSocket(client, this.clients);
     const game_id = this.ingame.get(user_id);
     const game: Game = this.games[game_id];
-    game.definePowerUp(payload.powerup)
+    game.definePowerUp(payload.powerup);
     if (game == null) {
       return;
     } else {
@@ -765,33 +766,6 @@ export class EventsGateway
     client.emit('update_channel', ret);
   }
 
-  @SubscribeMessage('delete_admin')
-  async delete_admin(client: Socket, payload: any) {
-    const user_id = getIdFromSocket(client, this.clients);
-    const channel_id = payload.channel_id;
-    const admin_id = payload.admin_id;
-    const addAdmin = new addAdminDto();
-    addAdmin.channel_id = channel_id;
-    addAdmin.user_id = admin_id;
-    try {
-      const chan = await this.channelService.deleteAdmin(addAdmin, user_id);
-      if (chan != null) {
-        this.server.to(chan.id).emit('admin_code', {
-          channel_id: chan.id,
-          admins: chan.admins,
-        });
-      }
-      client.emit('admin_code', {
-        message: 'ok',
-      });
-    } catch (e) {
-      client.emit('add_admin', {
-        message: e.message,
-      });
-      return;
-    }
-  }
-
   @SubscribeMessage('add_admin')
   async add_admin(client: Socket, payload: any) {
     const user_id = getIdFromSocket(client, this.clients);
@@ -840,6 +814,30 @@ export class EventsGateway
       });
     } catch (e) {
       client.emit('admin_code', {
+        message: e.message,
+      });
+      return;
+    }
+  }
+
+  @SubscribeMessage('ban_user')
+  async ban_user(client: Socket, payload: any) {
+    const user_id = getIdFromSocket(client, this.clients);
+    const channel_id = payload.channel_id;
+    const ban_id = payload.ban_id;
+    const addBan = new BanUserDto();
+    addBan.channel_id = channel_id;
+    addBan.user_id = ban_id;
+    try {
+      const chan = await this.channelService.banUser(addBan, user_id);
+      if (chan != null) {
+        this.server.to(chan.id).emit('ban_code', {
+          channel_id: chan.id,
+          bans: chan.bannedUsers,
+        });
+      }
+    } catch (e) {
+      client.emit('ban_code', {
         message: e.message,
       });
       return;

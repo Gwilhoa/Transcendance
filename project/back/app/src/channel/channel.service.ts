@@ -11,6 +11,8 @@ import { Message } from './message.entity';
 import { ChannelType } from 'src/utils/channel.enum';
 import { BanUserDto } from '../dto/ban-user.dto';
 import * as bcrypt from 'bcrypt';
+import { includeUser } from '../utils/socket.function';
+import { User } from '../user/user.entity';
 
 @Injectable()
 export class ChannelService {
@@ -169,18 +171,27 @@ export class ChannelService {
     const user = await this.userService.getUserById(user_id);
 
     if (user == null || target == null) throw new Error('User not found');
-    const chan = await this.channelRepository.findOneBy({
-      id: body.channel_id,
-    });
+    const chan = await this.channelRepository
+      .createQueryBuilder('channel')
+      .leftJoinAndSelect('channel.admins', 'admins')
+      .leftJoinAndSelect('channel.bannedUsers', 'bannedUsers')
+      .leftJoinAndSelect('channel.creator', 'creator')
+      .leftJoinAndSelect('channel.users', 'users')
+      .where('channel.id = :id', { id: body.channel_id })
+      .getOne();
     if (chan == null) throw new Error('Channel not found');
-    if (!chan.admins.includes(user))
+    if (!includeUser(user, chan.admins))
       throw new Error('User is not admin of this channel');
-    if (!chan.users.includes(target))
+    if (!includeUser(target, chan.users))
       throw new Error('User is not in this channel');
-    if (chan.admins.includes(target))
+    if (includeUser(target, chan.admins))
       throw new Error('User is admin of this channel');
-    chan.bannedUsers.push(user);
-    chan.users.filter((u) => u.id != user.id);
+    chan.bannedUsers.push(target);
+    const ret = [];
+    for (const u of chan.users) {
+      if (u.id != target.id) ret.push(u);
+    }
+    chan.users = ret;
     return await this.channelRepository.save(chan);
   }
 
@@ -298,24 +309,23 @@ export class ChannelService {
     const channel = await this.channelRepository
       .createQueryBuilder('channel')
       .leftJoinAndSelect('channel.admins', 'admins')
-        .leftJoinAndSelect('channel.users', 'users')
+      .leftJoinAndSelect('channel.users', 'users')
       .where('channel.id = :id', { id: body.channel_id })
       .getOne();
     if (channel == null) throw new Error('Channel not found');
     let f = false;
     for (const admin of channel.admins) {
-      if (admin.id == channel.id) f = true;
+      if (admin.id == self_user.id) f = true;
     }
     if (!f) throw new Error('User is not admin of this channel');
     f = false;
     for (const admin of channel.admins) {
-      if (admin.id == target.id)
-        f = true;
+      if (admin.id == target.id) f = true;
     }
     if (!f) throw new Error('Target is not admin of this channel');
     const admins = [];
     for (const admin of channel.admins) {
-        if (admin.id != target.id) admins.push(admin);
+      if (admin.id != target.id) admins.push(admin);
     }
     channel.admins = admins;
     return await this.channelRepository.save(channel);
