@@ -417,6 +417,8 @@ export class ChannelService {
       .createQueryBuilder('channel')
       .leftJoinAndSelect('channel.users', 'users')
       .leftJoinAndSelect('channel.admins', 'admins')
+        .leftJoinAndSelect('channel.creator', 'creator')
+        .leftJoinAndSelect('channel.bannedUsers', 'bannedUsers')
       .where('channel.id = :id', { id: channel_id })
       .getOne();
     if (channel.type == ChannelType.MP_CHANNEL)
