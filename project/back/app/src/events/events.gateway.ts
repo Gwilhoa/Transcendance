@@ -737,6 +737,7 @@ export class EventsGateway
         const send = {
           user_id: receiver_id,
           channel_id: channel_id,
+          channel: ch,
         };
         socket.join(channel_id);
         socket.emit('join_code', send);
