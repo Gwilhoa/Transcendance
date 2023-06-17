@@ -867,4 +867,21 @@ export class EventsGateway
       return;
     }
   }
+
+  @SubscribeMessage('block_user')
+  async block_user(client: Socket, payload: any) {
+    const user_id = getIdFromSocket(client, this.clients);
+    const block_id = payload.block_id;
+    try {
+      const user = await this.userService.addBlocked(user_id, block_id);
+      client.emit('block_code', {
+        message: 'ok',
+      });
+    } catch (e) {
+      client.emit('block_code', {
+        message: e.message,
+      });
+      return;
+    }
+  }
 }
