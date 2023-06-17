@@ -298,16 +298,26 @@ export class ChannelService {
     const channel = await this.channelRepository
       .createQueryBuilder('channel')
       .leftJoinAndSelect('channel.admins', 'admins')
+        .leftJoinAndSelect('channel.users', 'users')
       .where('channel.id = :id', { id: body.channel_id })
       .getOne();
     if (channel == null) throw new Error('Channel not found');
-    if (!channel.users.includes(self_user))
-      throw new Error('User is not in this channel');
-    if (!channel.admins.includes(self_user))
-      throw new Error('User is not admin of this channel');
-    if (!channel.admins.includes(target))
-      throw new Error('User is not admin of this channel');
-    channel.admins.filter((u) => u.id != target.id);
+    let f = false;
+    for (const admin of channel.admins) {
+      if (admin.id == channel.id) f = true;
+    }
+    if (!f) throw new Error('User is not admin of this channel');
+    f = false;
+    for (const admin of channel.admins) {
+      if (admin.id == target.id)
+        f = true;
+    }
+    if (!f) throw new Error('Target is not admin of this channel');
+    const admins = [];
+    for (const admin of channel.admins) {
+        if (admin.id != target.id) admins.push(admin);
+    }
+    channel.admins = admins;
     return await this.channelRepository.save(channel);
   }
 
