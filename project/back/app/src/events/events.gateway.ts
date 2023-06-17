@@ -820,5 +820,29 @@ export class EventsGateway
   }
 
   @SubscribeMessage('remove_admin')
-  async remove_admin(client: Socket, payload: any) {}
+  async remove_admin(client: Socket, payload: any) {
+    const user_id = getIdFromSocket(client, this.clients);
+    const channel_id = payload.channel_id;
+    const admin_id = payload.admin_id;
+    const addAdmin = new addAdminDto();
+    addAdmin.channel_id = channel_id;
+    addAdmin.user_id = admin_id;
+    try {
+      const chan = await this.channelService.deleteAdmin(addAdmin, user_id);
+      if (chan != null) {
+        this.server.to(chan.id).emit('admin_code', {
+          channel_id: chan.id,
+          admins: chan.admins,
+        });
+      }
+      client.emit('admin_code', {
+        message: 'ok',
+      });
+    } catch (e) {
+      client.emit('admin_code', {
+        message: e.message,
+      });
+      return;
+    }
+  }
 }
