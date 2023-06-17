@@ -40,6 +40,21 @@ const MakeAdmin = ( { id, channel, setChannel }: changeChannelProps ) => {
 	);
 };
 
+const DeleteAdmin = ( { id, channel, setChannel }: changeChannelProps ) => {
+	
+
+	const handleClickDeleteAdmin = () => {
+		socket.emit('delete_admin', { channel_id: channel.id, admin_id: id });
+		console.log('ON CLICK Delete admin');
+	};
+
+	return (
+		<div className='button-deleting-admin' onClick={handleClickDeleteAdmin}>
+		Del
+		</div>
+	);
+}
+
 const ListAdmin = ( {channel, setChannel }: listUserProps ) => {
 	const dispatch = useDispatch();
 
@@ -57,6 +72,7 @@ const ListAdmin = ( {channel, setChannel }: listUserProps ) => {
 							<ProfilImage OnClickOpenProfil={true} id={user.id} OverwriteClassName='chat-list-user-image' />
 						</div>
 						<ProfilName id={user.id} />
+						<DeleteAdmin id={user.id} channel={channel} setChannel={setChannel} />
 					</div>
 				)
 				))}
