@@ -6,7 +6,7 @@ import CreateChannel from '../components/chat/createChannel/CreateChannel';
 import InviteChannel from '../components/chat/inviteChannel/InviteChannel';
 import OptionBar from '../components/chat/optionBar/optionBar';
 import SideBarChat from '../components/chat/sidebar';
-import ErrorToken from '../components/IfError';
+import ErrorToken, { setErrorLocalStorage } from '../components/IfError';
 import { RootState } from '../redux/store';
 import SendMessage from '../components/chat/input/sendmessage';
 import { setConversation } from '../redux/chat/conversationIdSlice';
@@ -15,6 +15,7 @@ import UpdateChannel from "../components/chat/inviteChannel/UpdateChannel";
 import ListUserChannel from '../components/chat/ListUsers';
 import axios from 'axios';
 import { cookies } from '../App';
+import { useNavigate } from 'react-router-dom';
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
 
@@ -46,7 +47,12 @@ export interface Message {
 	user: User;
 }
 
-export const initialUserState: User= {
+export interface ChanMessage {
+	channelId: string;
+	ListMessages: Array<Message>;
+}
+
+export const initialUserState: User = {
 	id: '',
 	email: '',
 	username: '',
@@ -55,9 +61,9 @@ export const initialUserState: User= {
 	status: 0,
 }
 
-export const initialChannelState: Channel= {
+export const initialChannelState: Channel = {
 	id: '',
-	name: 'New Channel',
+	name: '',
 	topic: null,
 	type: 0,
 	pwd: null,
@@ -79,14 +85,17 @@ function Chat() {
 	const isOpenListUserChannel = useSelector((state: RootState) => state.modalChat.isOpenListUser);
 
 	const dispatch = useDispatch();
+	const navigate = useNavigate();
 
 	const [channel, setChannel] = useState<Channel>(initialChannelState);
 	const [listChannel, setListChannel] = useState<Array<Channel>>([]);
 
 	const [conversationId, setConversationId] = useState<string>('');
+
+	const [messages, setMessages] = useState<Array<Message>>([]);
 	
 ////////////////////////// FETCH DATA /////////////////////////////////////////
-	const fetchListChannel = async ( { setListChannel }: {setListChannel: React.Dispatch<React.SetStateAction<Array<Channel>>>} ) => {
+	const fetchListChannel = async () => {
 		try {
 			const response = await axios.get(process.env.REACT_APP_IP + ':3000/user/channels', {
 				headers: {
@@ -100,21 +109,122 @@ function Chat() {
 		}
 	};
 
+	const fetchListMessage = async () => {
+		try {
+			const response = await axios.get(process.env.REACT_APP_IP + ':3000/channel/message/' + conversationId, {
+				headers: {
+				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+				},
+			});
+			console.log(response);
+			if (response.status === 204) {
+				setMessages([]);
+			}
+			else {
+				setMessages(response.data);
+			}
+		} catch (error: any) {
+			console.error(error);
+			if (error.response.status === 401 || error.response.status === 500) {
+						setErrorLocalStorage('unauthorized');
+						navigate('/Error');
+			}
+		}
+	};
+
+	const fetchChannel= async () => {
+		try {
+			const response = await axios.get(process.env.REACT_APP_IP + ':3000/channel/id/' + conversationId, {
+				headers: {
+				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+				},
+			});
+			console.log(response);
+			setChannel(response.data);
+		} catch (error: any) {
+			console.error(error);
+			if (error.response.status === 401 || error.response.status === 500) {
+						setErrorLocalStorage('unauthorized');
+						navigate('/Error');
+			}
+		}
+	};
+
 ////////////////////////// SOCKET /////////////////////////////////////////////
 	useEffect(() =>{
 		socket.on('join_code', handleJoinCode);
-	}, [socket])
+		socket.on('message', handleMessage);
+		socket.on('message_code', handleMessageCode);
+		socket.on('update_channel', handleUpdateChannel);
+
+	}, [socket]);
 
 	useEffect(() => {
-		fetchListChannel({setListChannel});
+		fetchListChannel();
+
+		return () => {
+			console.log('socket.off chat.');
+			socket.off('join_code');
+			socket.off('message');
+			socket.off('message_code');
+			socket.off('update_channel');
+		};
 	}, []);
 
 ////////////////////////// HANDLE SOCKET //////////////////////////////////////
-const handleJoinCode = (data: any) => {
-	console.log('handleJoinCode');
-	console.log(data);
-	fetchListChannel({setListChannel});
-};
+	const handleJoinCode = (data: any) => { // TODO OPTI THAT SHIT PLS
+		console.log('handleJoinCode');
+		console.log(data);
+		if (data.code == 0) {
+			console.log('pls switch id');
+			setConversationId(data.channel_id);
+		}
+		fetchListChannel();
+	};
+
+	const handleMessage = (data: any) => {
+		const newItemMessage: Message = {
+			content: data.content,
+			id: data.id,
+			user: data.user,
+			date: data.date,
+		}
+		console.log(newItemMessage);
+		setMessages((prevListMessage) => {
+			if (prevListMessage.length === 0) {
+				return [newItemMessage];
+			} 
+			else if (!prevListMessage.some((message) => message.id === newItemMessage.id)) {
+				return [...prevListMessage, newItemMessage];
+			}
+			else {
+				return prevListMessage;
+			}
+		});
+		
+		return ;
+	};
+
+	const handleMessageCode = (data: any) => {
+		console.log(data);
+	};
+
+	const handleUpdateChannel = (data: any) => {
+		console.log('HEY I CHANGE NAME : ' + data?.id);
+		if (conversationId === data?.channel_id) {
+			const updatedChannel = {...channel, name: data.name};
+			setChannel(updatedChannel);
+		}
+		fetchListChannel();
+	};
+
+	useEffect(()=>{
+		console.log('channel id : ' + conversationId);
+		fetchListMessage();
+		fetchChannel();
+
+	},[conversationId]);
+
 	return (
 		<div className='chatPage'>
 			<ErrorToken />
@@ -124,13 +234,13 @@ const handleJoinCode = (data: any) => {
 									setConversationId={setConversationId} 
 								/> )}
 			{isOpenCreateChannel && ( <CreateChannel /> )}
-			{isOpenInviteChannel && ( <InviteChannel /> )}
-			{isOpenUpdateChannel && ( <UpdateChannel /> )}
+			{isOpenInviteChannel && ( <InviteChannel channel={channel}/> )}
+			{isOpenUpdateChannel && ( <UpdateChannel channel={channel}/> )}
 			<div className='chat-right-page'>
-				<Conversation />
-				<SendMessage />
+				<Conversation listMessages={messages} channel={channel}/>
+				<SendMessage conversation={conversationId}/>
 			</div>
-			{isOpenListUserChannel && ( <ListUserChannel /> )}
+			{isOpenListUserChannel && ( <ListUserChannel channel={channel} /> )}
 		</div>
 	);
 }

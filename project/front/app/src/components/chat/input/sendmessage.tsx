@@ -9,9 +9,8 @@ import {RootState} from '../../../redux/store';
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
 
-export default function SendMessage(){
+const SendMessage = ({ conversation }: {conversation: string}) => {
 	const [message, setMessage] = useState('');
-	const conversation = useSelector((state: RootState) => state.conversation.id);
 
 	const handleSendMessage = () =>
 	{
@@ -33,3 +32,5 @@ export default function SendMessage(){
 		</div>
 	)
 }
+
+export default SendMessage;

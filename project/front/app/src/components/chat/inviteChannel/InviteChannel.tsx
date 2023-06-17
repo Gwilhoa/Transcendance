@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { cookies } from '../../../App';
+import { Channel } from '../../../pages/chat';
 import { switchChatModalInviteChannel } from '../../../redux/chat/modalChatSlice';
 import { RootState } from '../../../redux/store';
 import SocketSingleton from '../../../socket';
@@ -67,7 +68,7 @@ const AddUserId = ({ usersId, setUserId, channelId }: AddUserIdProps) => {
 
     if (listUser == null || listUser.length == 0)
     {
-        return (<></>);
+        return (null);
     }
     console.log(listUser);
     return (
@@ -87,54 +88,40 @@ const AddUserId = ({ usersId, setUserId, channelId }: AddUserIdProps) => {
 }
 
 
-const InviteChannel = () => {
+const InviteChannel = ({ channel }: { channel: Channel }) => {
 	const dispatch = useDispatch();
-	const navigate = useNavigate();
-	const channelId = useSelector((state: RootState) => state.conversation.id);
 	const [usersId, setUserId] = useState<Array<string>>([]);
-	const [type, setType] = useState<number>(0);
 
 	useEffect(() => {
-		axios.get(process.env.REACT_APP_IP + ':3000/channel/id/' + channelId,
-			{
-				headers: {Authorization: `bearer ${cookies.get('jwtAuthorization')}`,}
-			})
-			.then((response) => {
-				console.log(response);
-				setType(response.data.type);
-				response.data.users.map((element: IUser) => {
+				channel.users.map((element: IUser) => {
 					setUserId((prevList) => [...prevList, element.id]);	
 				});
-			})
-			.catch((error) => {
-					if (error.response?.status === 401 || error.response?.status === 500) {
-						setErrorLocalStorage('unauthorized');
-						navigate('/Error');
-					}
-			});
 	},[]);
 	
 	return (
 		<div className='page-shadow'>
 			<div className='create-channel'>
-				{ type !== 3 ? (<>
-				<h2>Invite some people</h2>
-				<button 
-					className='close-create-channel' 
-					onClick={() => dispatch(switchChatModalInviteChannel())} />
-				<div className='invite-channel-main'>
-					<Search defaultAllUsers={true}/>
-					<AddUserId 
-						usersId={usersId} 
-						setUserId={setUserId} 
-						channelId={channelId}
-					/>
-				</div>
-				</>) : 
-				(<div>
-					{"You can't acces to this conctionnality"}
-					<button className='close-create-channel' onClick={() => dispatch(switchChatModalInviteChannel())} />
-				</div>
+				{ channel.type !== 3 ? (
+					<>
+						<h2>Invite some people</h2>
+						<button 
+							className='close-create-channel' 
+							onClick={() => dispatch(switchChatModalInviteChannel())} 
+						/>
+						<div className='invite-channel-main'>
+							<Search defaultAllUsers={true}/>
+							<AddUserId 
+								usersId={usersId} 
+								setUserId={setUserId} 
+								channelId={channel.id}
+							/>
+						</div>
+					</>
+				) : (
+					<div>
+						{"You can't acces to this fonctionnality"}
+						<button className='close-create-channel' onClick={() => dispatch(switchChatModalInviteChannel())} />
+					</div>
 				)}
 			</div>
 		</div>

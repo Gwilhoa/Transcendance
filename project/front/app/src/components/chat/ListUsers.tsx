@@ -1,12 +1,7 @@
 import './css/listUsers.css';
-import axios from 'axios';
-import React, { useEffect, useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { cookies } from '../../App';
-import { Channel, initialChannelState, User } from '../../pages/chat';
-import { RootState } from '../../redux/store';
-import { setErrorLocalStorage } from '../IfError';
+import React from 'react';
+import { useDispatch } from 'react-redux';
+import { Channel, User } from '../../pages/chat';
 import { ProfilImage } from '../profil/ProfilImage';
 import { ProfilName } from '../profil/ProfilName';
 import { openModal } from '../../redux/modal/modalSlice';
@@ -16,16 +11,14 @@ const socket = socketInstance.getSocket();
 
 type listUserProps = {
 	channel: Channel;
-	setChannel: React.Dispatch<React.SetStateAction<Channel>>;
 };
 
 type changeChannelProps = {
 	channel: Channel
 	id: string;
-	setChannel: React.Dispatch<React.SetStateAction<Channel>>;
 };
 
-const MakeAdmin = ( { id, channel, setChannel }: changeChannelProps ) => {
+const MakeAdmin = ( { id, channel }: changeChannelProps ) => {
 	
 
 	const handleClickMakeAdmin = () => {
@@ -40,7 +33,7 @@ const MakeAdmin = ( { id, channel, setChannel }: changeChannelProps ) => {
 	);
 };
 
-const BanHammer = ( { id, channel, setChannel }: changeChannelProps ) => {
+const BanHammer = ( { id, channel }: changeChannelProps ) => {
 	
 
 	const handleClickMakeAdmin = () => {
@@ -55,7 +48,7 @@ const BanHammer = ( { id, channel, setChannel }: changeChannelProps ) => {
 	);
 };
 
-const UnBanHammer = ( { id, channel, setChannel }: changeChannelProps ) => {
+const UnBanHammer = ( { id, channel }: changeChannelProps ) => {
 	
 
 	const handleClickMakeAdmin = () => {
@@ -70,7 +63,7 @@ const UnBanHammer = ( { id, channel, setChannel }: changeChannelProps ) => {
 	);
 };
 
-const DeleteAdmin = ( { id, channel, setChannel }: changeChannelProps ) => {
+const DeleteAdmin = ( { id, channel }: changeChannelProps ) => {
 	
 
 	const handleClickDeleteAdmin = () => {
@@ -85,7 +78,7 @@ const DeleteAdmin = ( { id, channel, setChannel }: changeChannelProps ) => {
 	);
 }
 
-const ListAdmin = ( {channel, setChannel }: listUserProps ) => {
+const ListAdmin = ( { channel }: listUserProps ) => {
 	const dispatch = useDispatch();
 
 	return (
@@ -102,7 +95,7 @@ const ListAdmin = ( {channel, setChannel }: listUserProps ) => {
 							<ProfilImage OnClickOpenProfil={true} id={user.id} OverwriteClassName='chat-list-user-image' />
 						</div>
 						<ProfilName id={user.id} />
-						<DeleteAdmin id={user.id} channel={channel} setChannel={setChannel} />
+						<DeleteAdmin id={user.id} channel={channel} />
 					</div>
 				)
 				))}
@@ -110,7 +103,7 @@ const ListAdmin = ( {channel, setChannel }: listUserProps ) => {
 	);
 };
 
-const ListUser = ( {channel, setChannel }: listUserProps ) => {
+const ListUser = ( { channel }: listUserProps ) => {
 	const dispatch = useDispatch();
 
 	return (
@@ -128,8 +121,8 @@ const ListUser = ( {channel, setChannel }: listUserProps ) => {
 						<div className='chat-list-users-user-name' onClick={() => dispatch(openModal(user.id))}>
 							<ProfilName id={user.id} />
 						</div>
-						<MakeAdmin id={user.id} channel={channel} setChannel={setChannel} />
-						<BanHammer id={user.id} channel={channel} setChannel={setChannel} />
+						<MakeAdmin id={user.id} channel={channel} />
+						<BanHammer id={user.id} channel={channel} />
 					</div>
 				)
 				))}
@@ -137,7 +130,7 @@ const ListUser = ( {channel, setChannel }: listUserProps ) => {
 	);
 };
 
-const ListBannedUser = ( { channel, setChannel }: listUserProps ) => {
+const ListBannedUser = ( { channel }: listUserProps ) => {
 	const dispatch = useDispatch();
 
 	return (
@@ -151,7 +144,7 @@ const ListBannedUser = ( { channel, setChannel }: listUserProps ) => {
 							<div className='chat-list-users-user-name' onClick={() => dispatch(openModal(user.id))}>
 								<ProfilName id={user.id} />
 							</div>
-						<UnBanHammer id={user.id} channel={channel} setChannel={setChannel} />
+						<UnBanHammer id={user.id} channel={channel} />
 					</div>
 			))}
 		</>		
@@ -194,28 +187,8 @@ const Creator = ( { channel }: listUserProps ) => {
 	);
 };
 
-const ListUserChannel = () => {
-	const navigate = useNavigate();
-	const channelId = useSelector((state: RootState) => state.conversation.id);
-	const [channel, setChannel] = useState<Channel>(initialChannelState); 
+const ListUserChannel = ({ channel }: { channel: Channel }) => {
 
-	useEffect(() => {
-		axios.get(process.env.REACT_APP_IP + ':3000/channel/id/' + channelId,
-			{
-				headers: {Authorization: `bearer ${cookies.get('jwtAuthorization')}`,}
-			})
-			.then((response) => {
-				console.log(response);
-				setChannel(response.data);
-			})
-			.catch((error) => {
-					if (error.response.status === 401 || error.response.status === 500) {
-						setErrorLocalStorage('unauthorized');
-						navigate('/Error');
-					}
-			});
-	}, [channelId, setChannel]);
-	
 	return (
 		<div className='chat-right-bar-list-user'>
 			<div>
@@ -223,25 +196,25 @@ const ListUserChannel = () => {
 					<>
 						<div className='owner'>
 							<h4>Owner</h4>
-							<Creator channel={channel} setChannel={setChannel}/>
+							<Creator channel={channel} />
 						</div>
 						<div className='admin'>
 							<h4>Admin</h4>
-							<ListAdmin channel={channel} setChannel={setChannel} />
+							<ListAdmin channel={channel} />
 						</div>
 						<div className='users'>
 							<h4>Users</h4>
-							<ListUser channel={channel} setChannel={setChannel} />
+							<ListUser channel={channel} />
 						</div>
 						<div className='banned'>
 							<h4>Banned</h4>
-							<ListBannedUser channel={channel} setChannel ={setChannel} />
+							<ListBannedUser channel={channel} />
 						</div>
 					</>
 				) : (
 					<div className='users'>
 						<h4>Users</h4>
-						<ListUserMp channel={channel} setChannel={setChannel} />
+						<ListUserMp channel={channel} />
 					</div>
 				)}
 			</div>
