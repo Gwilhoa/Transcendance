@@ -1,5 +1,5 @@
 import './css/chat.css'
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Conversation from '../components/chat/conversation/conversation';
 import CreateChannel from '../components/chat/createChannel/CreateChannel';
@@ -13,6 +13,8 @@ import { setConversation } from '../redux/chat/conversationIdSlice';
 import SocketSingleton from '../socket';
 import UpdateChannel from "../components/chat/inviteChannel/UpdateChannel";
 import ListUserChannel from '../components/chat/ListUsers';
+import axios from 'axios';
+import { cookies } from '../App';
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
 
@@ -63,38 +65,64 @@ export const initialChannelState: Channel= {
 	creator: initialUserState,
 	admins: [],
 	bannedUsers: [],
-
 }
 
+
+
+
+////////////////////////// CHAT ///////////////////////////////////////////////
 function Chat() {
-	const dispatch = useDispatch();
 	const isOpenSideBar = useSelector((state: RootState) => state.modalChat.isOpenSideBar);
 	const isOpenCreateChannel = useSelector((state: RootState) => state.modalChat.isOpenCreateChannel);
 	const isOpenInviteChannel = useSelector((state: RootState) => state.modalChat.isOpenInviteChannel);
 	const isOpenUpdateChannel = useSelector((state: RootState) => state.modalChat.isOpenUpdateChannel);
 	const isOpenListUserChannel = useSelector((state: RootState) => state.modalChat.isOpenListUser);
-	const conversationId = useSelector((state: RootState) => state.conversation.id);
-	
-	useEffect(() => {
-		if (conversationId === '' && localStorage.getItem('conversationId') != '') {
-			dispatch(setConversation('' + localStorage.getItem('conversationId')));
-		}
-	}, []);
 
+	const dispatch = useDispatch();
+
+	const [channel, setChannel] = useState<Channel>(initialChannelState);
+	const [listChannel, setListChannel] = useState<Array<Channel>>([]);
+
+	const [conversationId, setConversationId] = useState<string>('');
+	
+////////////////////////// FETCH DATA /////////////////////////////////////////
+	const fetchListChannel = async ( { setListChannel }: {setListChannel: React.Dispatch<React.SetStateAction<Array<Channel>>>} ) => {
+		try {
+			const response = await axios.get(process.env.REACT_APP_IP + ':3000/user/channels', {
+				headers: {
+				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+				},
+			});
+			console.log(response);
+			setListChannel(response.data);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+////////////////////////// SOCKET /////////////////////////////////////////////
 	useEffect(() =>{
-		socket.on('join_code', (data: any) => {
-			console.log('join_code ' + data.code)
-			console.log(data);
-			dispatch(setConversation(data.channel_id));
-			return ;
-		});
+		socket.on('join_code', handleJoinCode);
 	}, [socket])
 
+	useEffect(() => {
+		fetchListChannel({setListChannel});
+	}, []);
+
+////////////////////////// HANDLE SOCKET //////////////////////////////////////
+const handleJoinCode = (data: any) => {
+	console.log('handleJoinCode');
+	console.log(data);
+	fetchListChannel({setListChannel});
+};
 	return (
 		<div className='chatPage'>
 			<ErrorToken />
 			<OptionBar/>
-			{isOpenSideBar && ( <SideBarChat /> )}
+			{isOpenSideBar && ( <SideBarChat 
+									listChannel={listChannel} 
+									setConversationId={setConversationId} 
+								/> )}
 			{isOpenCreateChannel && ( <CreateChannel /> )}
 			{isOpenInviteChannel && ( <InviteChannel /> )}
 			{isOpenUpdateChannel && ( <UpdateChannel /> )}
