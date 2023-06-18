@@ -101,8 +101,8 @@ export class UserGateway implements OnGatewayInit {
     if (await this.userService.isfriend(user_id, friend_id)) {
       await this.userService.removeFriends(user_id, friend_id);
       const mpchannel = await this.channelService.getmpchannel(
-        user_id,
-        friend_id,
+          user_id,
+          friend_id,
       );
       await this.channelService.deletechannel(mpchannel.id);
       client.emit('friend_code', {
@@ -118,60 +118,6 @@ export class UserGateway implements OnGatewayInit {
       client.emit('friend_code', {
         code: FriendCode.UNEXISTING_FRIEND,
       });
-    }
-  }
-
-  @SubscribeMessage('add_admin')
-  async add_admin(client: Socket, payload: any) {
-    const user_id = client.data.id;
-    const channel_id = payload.channel_id;
-    const admin_id = payload.admin_id;
-    const addAdmin = new addAdminDto();
-    addAdmin.channel_id = channel_id;
-    addAdmin.user_id = admin_id;
-    try {
-      const chan = await this.channelService.addAdmin(addAdmin, user_id);
-      if (chan != null) {
-        this.server.to(chan.id).emit('admin_code', {
-          channel_id: chan.id,
-          admins: chan.admins,
-        });
-      }
-      client.emit('admin_code', {
-        message: 'ok',
-      });
-    } catch (e) {
-      client.emit('add_admin', {
-        message: e.message,
-      });
-      return;
-    }
-  }
-
-  @SubscribeMessage('remove_admin')
-  async remove_admin(client: Socket, payload: any) {
-    const user_id = client.data.id;
-    const channel_id = payload.channel_id;
-    const admin_id = payload.admin_id;
-    const addAdmin = new addAdminDto();
-    addAdmin.channel_id = channel_id;
-    addAdmin.user_id = admin_id;
-    try {
-      const chan = await this.channelService.deleteAdmin(addAdmin, user_id);
-      if (chan != null) {
-        this.server.to(chan.id).emit('admin_code', {
-          channel_id: chan.id,
-          admins: chan.admins,
-        });
-      }
-      client.emit('admin_code', {
-        message: 'ok',
-      });
-    } catch (e) {
-      client.emit('admin_code', {
-        message: e.message,
-      });
-      return;
     }
   }
 

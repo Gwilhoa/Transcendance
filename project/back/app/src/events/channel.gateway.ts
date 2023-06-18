@@ -20,6 +20,7 @@ import { AuthService } from '../auth/auth.service';
 import { JoinChannelDto } from '../dto/join-channel.dto';
 import { BanUserDto } from '../dto/ban-user.dto';
 import { use } from 'passport';
+import { addAdminDto } from '../dto/add-admin.dto';
 
 @WebSocketGateway()
 export class ChannelGateway implements OnGatewayInit {
@@ -383,6 +384,84 @@ export class ChannelGateway implements OnGatewayInit {
         sender_id: user_id,
         code: 1,
         message: e.message,
+      });
+    }
+  }
+
+  @SubscribeMessage('add_admin')
+  async add_admin(client: Socket, payload: any) {
+    const user_id = client.data.id;
+    const channel_id = payload.channel_id;
+    const channel = await this.channelService.getChannelById(channel_id);
+    const admin_id = payload.admin_id;
+    const addAdmin = new addAdminDto();
+    addAdmin.channel_id = channel_id;
+    addAdmin.user_id = admin_id;
+    try {
+      const chan = await this.channelService.addAdmin(addAdmin, user_id);
+      if (chan != null) {
+        this.server.to(chan.id).emit('update_user_channel', {
+          channel: chan,
+          code: 0,
+          sender_id: user_id,
+        });
+        client.emit('update_user_channel', {
+          channel: chan,
+          code: 0,
+          sender_id: user_id,
+          message: 'ok',
+        });
+      }
+    } catch (e) {
+      this.server.to(channel.id).emit('update_user_channel', {
+        channel: channel,
+        code: 1,
+        sender_id: user_id,
+      });
+      client.emit('update_user_channel', {
+        channel: channel,
+        code: 1,
+        sender_id: user_id,
+        message: e.message,
+      });
+    }
+  }
+
+  @SubscribeMessage('remove_admin')
+  async remove_admin(client: Socket, payload: any) {
+    const user_id = client.data.id;
+    const channel_id = payload.channel_id;
+    const channel = await this.channelService.getChannelById(channel_id);
+    const admin_id = payload.admin_id;
+    const addAdmin = new addAdminDto();
+    addAdmin.channel_id = channel_id;
+    addAdmin.user_id = admin_id;
+    try {
+      const chan = await this.channelService.deleteAdmin(addAdmin, user_id);
+      if (chan != null) {
+        this.server.to(chan.id).emit('update_user_channel', {
+          channel: chan,
+          code: 0,
+          sender_id: user_id,
+        });
+        client.emit('update_user_channel', {
+          channel: chan,
+          code: 0,
+          sender_id: user_id,
+          message: 'ok',
+        });
+      }
+    } catch (e) {
+      this.server.to(channel.id).emit('update_user_channel', {
+        channel: channel,
+        code: 1,
+        sender_id: user_id,
+      });
+      client.emit('update_user_channel', {
+        channel: channel,
+        code: 1,
+        sender_id: user_id,
+        message: 'ok',
       });
     }
   }
