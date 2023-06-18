@@ -31,7 +31,7 @@ const initialChannelState: Channel = {
 	name: 'New Channel',
 	topic: null,
 	type: 0,
-	pwd: null,
+	pwd: '',
 	users: [],
 	creator: initialUserState,
 	admins: [],
@@ -113,6 +113,7 @@ const CreateChannel = () => {
 	const navigate = useNavigate();
 	const [channelParams, setChannelParams] = useState<Channel>(initialChannelState);
 	const [usersId, setUserId] = useState<Array<string>>([]);
+	const [errorPwd, setErrorPwd] = useState<boolean>(false);
 
 	const onSubmitChannelName = (str: string) => {
 		setChannelParams((prevChannelParams) => ({
@@ -122,6 +123,7 @@ const CreateChannel = () => {
 	};
 
 	const handlePasswordChange = (str: string) => {
+		setErrorPwd(false);
 		setChannelParams((prevChannelParams) => ({
 			...prevChannelParams,
 			pwd: str,
@@ -138,30 +140,38 @@ const CreateChannel = () => {
 	const handleNewChannel = () => {
 		console.log('send');
 		console.log(channelParams);
-		axios.post(process.env.REACT_APP_IP + ':3000/channel/create',
-			{
-				name: channelParams.name,
-				creator_id: localStorage.getItem('id'),
-				type: channelParams.type,
-				password: channelParams.pwd,
-			},
-			{
-				headers: {Authorization: `bearer ${cookies.get('jwtAuthorization')}`,}
-			})
-			.then((response) => {
-				console.log(response);
-				socket.emit('join_channel', {channel_id: response.data.id});
-				usersId.map((userId) => {
-					socket.emit('invite_channel', {receiver_id: userId, channel_id: response.data.id});
+		if (channelParams.type === 2) {
+			const pwd = '' + channelParams.pwd;
+			if (pwd.length === 0) {
+				setErrorPwd(true);
+			}
+		}
+		else {
+			axios.post(process.env.REACT_APP_IP + ':3000/channel/create',
+				{
+					name: channelParams.name,
+					creator_id: localStorage.getItem('id'),
+					type: channelParams.type,
+					password: channelParams.pwd,
+				},
+				{
+					headers: {Authorization: `bearer ${cookies.get('jwtAuthorization')}`,}
+				})
+				.then((response) => {
+					console.log(response);
+					socket.emit('join_channel', {channel_id: response.data.id});
+					usersId.map((userId) => {
+						socket.emit('invite_channel', {receiver_id: userId, channel_id: response.data.id});
+					});
+					dispatch(switchChatModalCreateChannel());
+				})
+				.catch((error) => {
+					if (error.response.status === 401 || error.response.status === 500) {
+						setErrorLocalStorage('unauthorized');
+						navigate('/Error');
+					}
 				});
-				dispatch(switchChatModalCreateChannel());
-			})
-			.catch((error) => {
-				if (error.response.status === 401 || error.response.status === 500) {
-					setErrorLocalStorage('unauthorized');
-					navigate('/Error');
-				}
-			});
+		}
 		return;
 	};
 
@@ -191,6 +201,13 @@ const CreateChannel = () => {
 								id='password'
 								onChange={(e) => handlePasswordChange(e.target.value)}
 							/>
+							{ errorPwd ? 
+								<p>
+									{"password length can't be null"}
+								</p>
+							:
+								null
+							}
 						</div>
 					</>
 				) : (<></>)}
