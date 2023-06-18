@@ -20,7 +20,6 @@ type changeChannelProps = {
 
 const MakeAdmin = ( { id, channel }: changeChannelProps ) => {
 	
-
 	const handleClickMakeAdmin = () => {
 		socket.emit('add_admin', { channel_id: channel.id, admin_id: id });
 		console.log('ON CLICK add admin');
@@ -35,7 +34,6 @@ const MakeAdmin = ( { id, channel }: changeChannelProps ) => {
 
 const BanHammer = ( { id, channel }: changeChannelProps ) => {
 	
-
 	const handleClickMakeAdmin = () => {
 		socket.emit('ban_user', { channel_id: channel.id, ban_id: id });
 		console.log('ON CLICK ban user');
@@ -50,7 +48,6 @@ const BanHammer = ( { id, channel }: changeChannelProps ) => {
 
 const UnBanHammer = ( { id, channel }: changeChannelProps ) => {
 	
-
 	const handleClickMakeAdmin = () => {
 		socket.emit('unban_user', { channel_id: channel.id, unban_id: id });
 		console.log('unban user');
@@ -65,7 +62,6 @@ const UnBanHammer = ( { id, channel }: changeChannelProps ) => {
 
 const DeleteAdmin = ( { id, channel }: changeChannelProps ) => {
 	
-
 	const handleClickDeleteAdmin = () => {
 		socket.emit('remove_admin', { channel_id: channel.id, admin_id: id });
 		console.log('ON CLICK Delete admin');

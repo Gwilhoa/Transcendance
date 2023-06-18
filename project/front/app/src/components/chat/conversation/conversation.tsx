@@ -3,13 +3,10 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { cookies } from '../../../App';
 import { Channel, Message } from '../../../pages/chat'
-import SocketSingleton from '../../../socket';
 import Messages from './message';
 import { useNavigate } from 'react-router-dom';
 import { setErrorLocalStorage } from '../../IfError';
 import ButtonListChannel from '../optionBar/button/ButtonListUserModal';
-const socketInstance = SocketSingleton.getInstance();
-const socket = socketInstance.getSocket();
 
 export interface imageProfil {
 	id: string;

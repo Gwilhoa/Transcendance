@@ -1,36 +1,9 @@
-import axios from 'axios';
-import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom';
-import { cookies } from '../../App';
-import { Channel, initialChannelState } from '../../pages/chat';
-import { setErrorLocalStorage } from '../IfError';
+import React from 'react'
+import { Channel } from '../../pages/chat';
 import ButtonInviteChannel from './optionBar/button/ButtonInviteChannelModal';
 import ButtonUpdateChannel from './optionBar/button/ButtonUpdateChannel';
 
-const ChannelSideBar = ({ channelId }: {channelId: string}) => {
-	const [channel, setChannel] = useState<Channel>(initialChannelState);
-	const navigate = useNavigate();
-
-	const fetchDataChannel = () => {
-		axios.get(process.env.REACT_APP_IP + ':3000/channel/id/' + channelId,
-			{
-				headers: {Authorization: `bearer ${cookies.get('jwtAuthorization')}`,}
-			})
-			.then((response) => {
-				console.log(response);
-				setChannel(response.data);
-			})
-			.catch((error) => {
-					if (error.response.status === 401 || error.response.status === 500) {
-						setErrorLocalStorage('unauthorized');
-						navigate('/Error');
-					}
-			});
-	};
-
-	useEffect(() => {
-		fetchDataChannel();
-	}, []);
+const ChannelSideBar = ({ channel }: {channel: Channel}) => {
 
 	const parseChannelName = (channel: Channel) => {
 		if (channel.type !== 3) {

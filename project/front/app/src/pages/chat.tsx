@@ -1,6 +1,6 @@
 import './css/chat.css'
 import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import Conversation from '../components/chat/conversation/conversation';
 import CreateChannel from '../components/chat/createChannel/CreateChannel';
 import InviteChannel from '../components/chat/inviteChannel/InviteChannel';
@@ -9,14 +9,12 @@ import SideBarChat from '../components/chat/sidebar';
 import ErrorToken, { setErrorLocalStorage } from '../components/IfError';
 import { RootState } from '../redux/store';
 import SendMessage from '../components/chat/input/sendmessage';
-import { setConversation } from '../redux/chat/conversationIdSlice';
 import SocketSingleton from '../socket';
 import UpdateChannel from "../components/chat/inviteChannel/UpdateChannel";
 import ListUserChannel from '../components/chat/ListUsers';
 import axios from 'axios';
 import { cookies } from '../App';
 import { useNavigate } from 'react-router-dom';
-import { error } from 'console';
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
 
@@ -74,9 +72,6 @@ export const initialChannelState: Channel = {
 	bannedUsers: [],
 }
 
-
-
-
 ////////////////////////// CHAT ///////////////////////////////////////////////
 function Chat() {
 	const isOpenSideBar = useSelector((state: RootState) => state.modalChat.isOpenSideBar);
@@ -85,7 +80,6 @@ function Chat() {
 	const isOpenUpdateChannel = useSelector((state: RootState) => state.modalChat.isOpenUpdateChannel);
 	const isOpenListUserChannel = useSelector((state: RootState) => state.modalChat.isOpenListUser);
 
-	const dispatch = useDispatch();
 	const navigate = useNavigate();
 
 	const [channel, setChannel] = useState<Channel>(initialChannelState);
@@ -95,6 +89,8 @@ function Chat() {
 
 	const [messages, setMessages] = useState<Array<Message>>([]);
 	const [errorGetMessage, setErrorGetMessage] = useState<boolean>(false);
+	const [errorPostMessage, setErrorPostMessage] = useState<string>('');
+	const [sendMessage, setSendMessage] = useState<boolean>(false);
 	
 ////////////////////////// FETCH DATA /////////////////////////////////////////
 	const fetchListChannel = async () => {
@@ -136,96 +132,101 @@ function Chat() {
 		}
 	};
 
-	const fetchChannel= async () => {
-		try {
-			const response = await axios.get(process.env.REACT_APP_IP + ':3000/channel/id/' + conversationId, {
-				headers: {
-				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
-				},
-			});
-			console.log(response);
-			setChannel(response.data);
-		} catch (error: any) {
-			console.error(error);
-			if (error.response.status === 401 || error.response.status === 500) {
-						setErrorLocalStorage('unauthorized');
-						navigate('/Error');
+	const findChannel = () => {
+		listChannel.map((itemChannel) => { 
+			if (itemChannel.id == conversationId) {
+				setChannel({...itemChannel});
 			}
-		}
+		});
 	};
 
 ////////////////////////// SOCKET /////////////////////////////////////////////
-	useEffect(() =>{
-		socket.on('join_code', handleJoinCode);
-		socket.on('message', handleMessage);
-		socket.on('message_code', handleMessageCode);
-		socket.on('update_channel', handleUpdateChannel);
-
-	}, [socket]);
 
 	useEffect(() => {
 		fetchListChannel();
 
+		socket.on('join_code', handleJoinCode);
+
 		return () => {
-			console.log('socket.off chat.');
-			socket.off('join_code');
-			socket.off('message');
-			socket.off('message_code');
-			socket.off('update_channel');
-		};
+			socket.off('join_code');		
+		}
 	}, []);
 
 ////////////////////////// HANDLE SOCKET //////////////////////////////////////
-	const handleJoinCode = (data: any) => { // TODO OPTI THAT SHIT PLS
-		console.log('handleJoinCode');
+	const handleJoinCode = (data: any) => {
 		console.log(data);
 		if (data.code == 0) {
-			console.log('pls switch id');
 			setConversationId(data.channel_id);
+			setListChannel((prevListChannel) => [...prevListChannel, data.channel]);
 		}
-		fetchListChannel();
 	};
 
 	const handleMessage = (data: any) => {
-		const newItemMessage: Message = {
-			content: data.content,
-			id: data.id,
-			user: data.user,
-			date: data.date,
+		if (data.channel == conversationId) {
+			const newItemMessage: Message = {
+				content: data.content,
+				id: data.id,
+				user: data.user,
+				date: data.date,
+			}
+			console.log(newItemMessage);
+			setMessages((prevListMessage) => {
+				if (prevListMessage.length === 0) {
+					return [newItemMessage];
+				} 
+				else if (!prevListMessage.some((message) => message.id === newItemMessage.id)) {
+					return [...prevListMessage, newItemMessage];
+				}
+				else {
+					return prevListMessage;
+				}
+			});
 		}
-		console.log(newItemMessage);
-		setMessages((prevListMessage) => {
-			if (prevListMessage.length === 0) {
-				return [newItemMessage];
-			} 
-			else if (!prevListMessage.some((message) => message.id === newItemMessage.id)) {
-				return [...prevListMessage, newItemMessage];
-			}
-			else {
-				return prevListMessage;
-			}
-		});
-		
 		return ;
 	};
 
 	const handleMessageCode = (data: any) => {
 		console.log(data);
+		setSendMessage(false);
+		if (data.code == 3) {
+			setErrorPostMessage('Invalid Format');
+		}
+		if (data.code == 0) {
+			setErrorPostMessage('');
+		}
 	};
 
 	const handleUpdateChannel = (data: any) => {
-		console.log('HEY I CHANGE NAME : ' + data?.id);
-		if (conversationId === data?.channel_id) {
-			const updatedChannel = {...channel, name: data.name};
-			setChannel(updatedChannel);
+		console.log('HEY I CHANGE NAME : ' + data?.channel_id + " :" + conversationId);
+		setListChannel((prevListChannel) => 
+			prevListChannel.map((itemChannel) => {
+				if (itemChannel.id === data.channel_id) {
+					return { ...itemChannel, name: data.name };
+				}
+				return itemChannel;
+			})
+		)
+		if (data.channel_id === conversationId) {
+			setChannel((prevChannel) => ({...prevChannel, name: data.name}));
 		}
-		fetchListChannel();
 	};
 
 	useEffect(()=>{
 		console.log('channel id : ' + conversationId);
 		fetchListMessage();
-		fetchChannel();
+		findChannel();
+
+		socket.on('message', handleMessage);
+		socket.on('message_code', handleMessageCode);
+		socket.on('update_channel', handleUpdateChannel);
+
+		return () => {
+			console.log('socket.off chat.');
+			socket.off('message');
+			socket.off('message_code');
+			setErrorPostMessage('');
+			socket.off('update_channel');
+		};
 
 	},[conversationId]);
 
@@ -246,7 +247,12 @@ function Chat() {
 					channel={channel} 
 					errorGetMessage={errorGetMessage}
 				/>
-				<SendMessage conversation={conversationId}/>
+				<SendMessage 
+					conversation={conversationId} 
+					errorPostMessage={errorPostMessage}
+					setPostMessage={setSendMessage}
+					postMessage={sendMessage}
+				/>
 			</div>
 			{isOpenListUserChannel && ( <ListUserChannel channel={channel} /> )}
 		</div>
