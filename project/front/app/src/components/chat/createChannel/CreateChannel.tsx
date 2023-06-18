@@ -91,12 +91,12 @@ const AddUserId = ({usersId, setUserId}: AddUserIdProps) => {
 	}
 	console.log(listUser);
 	return (
-		<div className='users-list'>
+		<div className='chat-users-list-add-user-by-id'>
 			{listUser.slice(0, 3).map((user) => (
 				!usersId.includes(user.id) ? (
-					<div className='user' key={user.id} onClick={() => handleOnClick(user.id)}>
+					<div className='chat-add-user-by-id' key={user.id} onClick={() => handleOnClick(user.id)}>
 						<ProfilImage id={user.id} OnClickOpenProfil={false}
-									 OverwriteClassName='chat-message-image-profil'/>
+							OverwriteClassName='chat-small-user-image'/>
 						<ProfilName id={user.id}/>
 					</div>
 				) : (
@@ -172,7 +172,7 @@ const CreateChannel = () => {
 				<h3>Channel Name</h3>
 				<button className='close-create-channel' onClick={() => dispatch(switchChatModalCreateChannel())}/>
 				<input className='channel-name-input' type='text' placeholder='Channel Name' value={channelParams.name}
-					   onChange={(e) => onSubmitChannelName(e.target.value)}/>
+					onChange={(e) => onSubmitChannelName(e.target.value)}/>
 				<div className='ButtonChangeTypeChannel'>
 					<h3>Channel Type</h3>
 					<button className='channel-type-button' onClick={() => handleChannelTypeChange(0)}>Private</button>
@@ -196,9 +196,9 @@ const CreateChannel = () => {
 				) : (<></>)}
 				{channelParams.type === 0 ? (
 					<>
-						<div className='divFindUser'>
-							<h6>Invite some people:</h6>
-							<Search defaultAllUsers={true} OverwriteClassName={''}/>
+						<div className='chat-create-channel-find-user'>
+							<h3>Invite some people:</h3>
+							<Search defaultAllUsers={true} OverwriteClassName={'create-channel-invite-input'}/>
 							<AddUserId usersId={usersId} setUserId={setUserId}/>
 						</div>
 					</>

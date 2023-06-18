@@ -73,9 +73,9 @@ const AddUserId = ({usersId, setUserId, channelId}: AddUserIdProps) => {
 		<div className='users-list'>
 			{listUser.slice(0, 6).map((user) => (
 				!usersId.includes(user.id) ? (
-					<div className='user' key={user.id} onClick={() => handleOnClick(user.id)}>
+					<div key={user.id} onClick={() => handleOnClick(user.id)}>
 						<ProfilImage id={user.id} OnClickOpenProfil={false}
-									 OverwriteClassName='chat-message-image-profil'/>
+							OverwriteClassName='chat-side-bar-invite-channel-user-image'/>
 						<ProfilName id={user.id}/>
 					</div>
 				) : null

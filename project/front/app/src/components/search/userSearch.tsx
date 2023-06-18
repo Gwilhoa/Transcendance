@@ -45,6 +45,6 @@ export const Search = ({defaultAllUsers, OverwriteClassName}: {
 
 	return (
 		<input type='search' placeholder='Search' className={'search-bar' + ' ' + OverwriteClassName}
-			   onChange={handleOnChange}></input>
+			onChange={handleOnChange}></input>
 	);
 }

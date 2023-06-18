@@ -73,6 +73,13 @@ export const initialChannelState: Channel = {
 	bannedUsers: [],
 }
 
+export const isAdmin = (channel: Channel) => {
+		if (channel.admins.some((admin) => admin.id === localStorage.getItem('id'))) {
+			return (true);
+		}
+		return (false);
+};
+
 ////////////////////////// CHAT ///////////////////////////////////////////////
 function Chat() {
 	const isOpenSideBar = useSelector((state: RootState) => state.modalChat.isOpenSideBar);
@@ -164,7 +171,7 @@ function Chat() {
 				let channelExists = false;
 
 				const updatedListChannel = prevListChannel.map((itemChannel) => {
-					if (itemChannel.id === data.channel_id) {
+					if (itemChannel.id === data.channel.id) {
 						channelExists = true;
 						console.log('updated channel');
 						console.log(data.channel);
@@ -178,7 +185,7 @@ function Chat() {
 					return updatedListChannel;
 				} 
 				else {
-					setConversationId(data.channel_id);
+					setConversationId(data.channel.id);
 					return [...updatedListChannel, data.channel];
 				}
 			});		

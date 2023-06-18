@@ -75,6 +75,18 @@
     border: 0.2rem solid var(--primary-color);
 }
 
+.create-channel-invite-input{
+    background-color: var(--background-color);
+    margin-top: 0;
+    width: 75%;
+}
+
+.chat-create-channel-find-user{
+    /* display: flex; */
+
+    margin: 1rem;
+}
+
 .channel-create-channel-button {
     border: 0;
     font-size: 1.75rem;
