@@ -1,28 +1,29 @@
-.chat-right-bar-list-user{
+.chat-right-bar-list-user {
     color: var(--light-color);
     background-color: var(--box-color);
     width: 30rem;
+    overflow-y: auto;
 }
 
 .chat-right-bar-list-user > div {
     padding: 0 1rem;
 }
 
-.profil-image.chat-list-user-image{
+.profil-image.chat-list-user-image {
     width: 4rem;
     height: 4rem;
     cursor: pointer;
 }
 
-.profil-image.chat-list-user-image > .profil-status{
+.profil-image.chat-list-user-image > .profil-status {
     border: 0.25rem solid var(--background-color);
 }
 
-.chat-list-users-user{
+.chat-list-users-user {
     display: flex;
 }
 
-.chat-list-users-user-name{
+.chat-list-users-user-name {
     font-weight: bold;
     font-size: 1.25rem;
     /* text-decoration: underline; */

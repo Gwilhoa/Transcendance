@@ -17,8 +17,9 @@ import {
 import { UserService } from '../user/user.service';
 import { sendMessageDTO } from '../dto/sendmessage.dto';
 import { AuthService } from '../auth/auth.service';
-import { Channel } from '../channel/channel.entity';
 import { JoinChannelDto } from '../dto/join-channel.dto';
+import { BanUserDto } from '../dto/ban-user.dto';
+import {use} from "passport";
 
 @WebSocketGateway()
 export class ChannelGateway implements OnGatewayInit {
@@ -37,50 +38,74 @@ export class ChannelGateway implements OnGatewayInit {
 
   @SubscribeMessage('invite_channel')
   async invite_channel(client: Socket, payload: any) {
-    this.logger.debug('invite_channel');
-    this.logger.debug(payload);
     const channel_id = payload.channel_id;
     const receiver_id = payload.receiver_id;
     const sender_id = client.data.id;
-
     const receiver = await this.userService.getUserById(receiver_id);
     const sender = await this.userService.getUserById(sender_id);
+    const channel = await this.channelService.getChannelById(channel_id);
     if (receiver == null || sender == null) {
-      client.emit('invite_request', {
-        code: ChannelCode.UNEXISTING_USER,
+      client.emit('update_user_channel', {
+        code: 1,
+        sender_id: sender_id,
+        message: 'user not found',
+        channel: channel,
+      });
+      this.server.to(channel_id).emit('update_user_channel', {
+        code: 1,
+        sender_id: sender_id,
+        channel: channel,
       });
       return;
     }
-    const channel = await this.channelService.getChannelById(channel_id);
     if (channel == null) {
-      client.emit('invite_request', {
-        code: ChannelCode.UNEXISTING_CHANNEL,
+      client.emit('update_user_channel', {
+        code: 1,
+        sender_id: sender_id,
+        message: 'channel not found',
+        channel: channel,
+      });
+      this.server.to(channel_id).emit('update_user_channel', {
+        code: 1,
+        channel: channel,
+        sender_id: sender_id,
       });
     } else {
       let ch = null;
       try {
-        this.logger.debug('invite_channel');
         ch = await this.channelService.inviteChannel(
           sender_id,
           receiver_id,
           channel_id,
         );
       } catch (e) {
-        client.emit('invite_request', {
+        client.emit('update_user_channel', {
+          code: 1,
+          channel: channel,
+          sender_id: sender_id,
           message: e.message,
+        });
+        this.server.to(channel_id).emit('update_user_channel', {
+          code: 1,
+          channel: channel,
+          sender_id: sender_id,
         });
         return;
       }
       if (ch != null) {
         const socket = getSocketFromId(receiver_id, getSockets(this.server));
-        const send = {
-          user_id: receiver_id,
-          channel_id: channel_id,
-          channel: ch,
-        };
         socket.join(channel_id);
-        socket.emit('join_code', send);
-        this.server.to(channel_id).emit('join_code', send);
+        socket.emit('update_user_channel', {
+          code: 0,
+          channel: ch,
+          sender_id: sender_id,
+          message: 'ok',
+        });
+        this.server.to(channel_id).emit('update_user_channel', {
+          code: 0,
+          channel: ch,
+          sender_id: sender_id,
+        });
       }
       return;
     }
@@ -88,10 +113,9 @@ export class ChannelGateway implements OnGatewayInit {
 
   @SubscribeMessage('update_channel')
   async update_channel(client: Socket, payload: any) {
-    this.logger.debug('update_channel');
-    this.logger.debug(payload);
     const channel_id = payload.channel_id;
     const user_id = client.data.id;
+    const channel = await this.channelService.getChannelById(channel_id);
     let ret = null;
     try {
       ret = await this.channelService.updateChannel(
@@ -100,11 +124,29 @@ export class ChannelGateway implements OnGatewayInit {
         payload,
       );
     } catch (e) {
-      client.emit('update_channel', {
+      client.emit('update_user_channel', {
+        code: 1,
+        channel: channel,
         message: e.message,
+        sender_id: user_id,
+      });
+      this.server.to(channel_id).emit('update_user_channel', {
+        code: 1,
+        channel: channel,
+        sender_id: user_id,
       });
     }
-    client.emit('update_channel', ret);
+    client.emit('update_user_channel', {
+      code: 0,
+      channel: channel,
+      message: 'ok',
+      sender_id: user_id,
+    });
+    this.server.to(channel_id).emit('update_user_channel', {
+      code: 0,
+      channel: channel,
+      sender_id: user_id,
+    });
   }
 
   @SubscribeMessage('send_message')
@@ -175,29 +217,19 @@ export class ChannelGateway implements OnGatewayInit {
 
   @SubscribeMessage('join_channel')
   async handleJoinChannel(client: Socket, payload: any) {
-    let send;
     const channel_id = payload.channel_id;
     const user_id = client.data.id;
-    if (user_id == null) {
-      send = {
-        code: 401,
-      };
-      client.emit('join_code', send);
-      return;
-    }
     const user = await this.userService.getUserById(user_id);
     const channel = await this.channelService.getChannelById(channel_id);
-    send = {
+    const send = {
       code: 0,
-      channel_id: channel_id,
       channel: channel,
+      sender_id: user_id,
+      message: undefined,
     };
     if (channel == null) {
-      send = {
-        code: 1,
-        channel_id: channel_id,
-        channel: channel,
-      };
+      send.code = 1;
+      send.message = 'Channel does not exist';
     } else if (!(await this.channelService.isInChannel(user.id, channel.id))) {
       let ch;
       const ChannelDTO = new JoinChannelDto();
@@ -209,44 +241,29 @@ export class ChannelGateway implements OnGatewayInit {
       try {
         ch = await this.channelService.joinChannel(ChannelDTO);
         client.join(channel_id);
-        send = {
-          code: 2,
-          channel_id: channel_id,
-          channel: ch,
-        };
-        this.server.to(channel_id).emit('user_join', send);
+        send.channel = ch;
+        client.emit('update_user_channel', send);
+        send.message = undefined;
+        this.server.to(channel_id).emit('update_user_channel', send);
+        return;
       } catch (e) {
-        send = {
-          code: 1,
-          channel_id: channel_id,
-          channel: channel,
-          message: e.message,
-        };
-        client.emit('join_code', send);
+        send.code = 1;
+        send.message = e.message;
+        client.emit('update_user_channel', send);
+        send.message = undefined;
+        this.server.to(channel_id).emit('update_user_channel', send);
         return;
       }
     } else {
       client.join(channel_id);
-      send = {
-        code: 0,
-        channel_id: channel_id,
-        channel: channel,
-      };
     }
-    client.emit('join_code', send);
-    send = {
-      user_id: user.id,
-      channel_id: channel_id,
-      channel: channel,
-    };
-    this.server.to(channel_id).emit('user_join', send);
   }
 
   @SubscribeMessage('leave_channel')
   async handleLeaveChannel(client: Socket, payload: any) {
-    let send;
     const token = payload.token;
     const channel_id = payload.channel_id;
+    const channel = await this.channelService.getChannelById(channel_id);
     const user_id = client.data.id;
     try {
       verifyToken(token, this.authService);
@@ -254,38 +271,89 @@ export class ChannelGateway implements OnGatewayInit {
       wrongtoken(client);
       return;
     }
+    const send = {
+      code: 0,
+      channel: channel,
+      sender_id: user_id,
+      message: undefined,
+    };
     if (user_id == null) {
-      send = {
-        code: 401,
-      };
-      client.emit('leave_code', send);
+      send.code = 1;
+      this.server.to(channel_id).emit('update_user_channel', send);
+      send.message = 'User does not exist';
+      client.emit('update_user_channel', send);
       return;
     }
     const user = await this.userService.getUserById(user_id);
-    const channel = await this.channelService.getChannelById(channel_id);
-    send = {
-      code: 0,
-    };
     if (channel == null) {
-      send = {
-        code: 1,
-      };
-    } else if (!(await this.channelService.isInChannel(user.id, channel.id))) {
-      send = {
-        code: 2,
-      };
+      send.code = 1;
+      this.server.to(channel_id).emit('update_user_channel', send);
+      send.message = 'Channel does not exist';
+      client.emit('update_user_channel', send);
+      return;
+    } else if (!(await this.channelService.isInChannel(user_id, channel.id))) {
+      send.code = 1;
+      this.server.to(channel_id).emit('update_user_channel', send);
+      send.message = 'User is not in channel';
+      client.emit('update_user_channel', send);
+      return;
     } else {
       client.leave(channel_id);
-      await this.channelService.leaveChannel(user.id, channel.id);
-      send = {
-        code: 0,
-      };
+      send.channel = await this.channelService.leaveChannel(
+        user_id,
+        channel.id,
+      );
+      this.server.to(channel_id).emit('update_user_channel', send);
+      send.message = 'ok';
+      client.emit('delet_channel', { id: channel_id });
     }
-    client.emit('leave_code', send);
-    send = {
-      user_id: user.id,
-      channel_id: channel_id,
-    };
-    this.server.to(channel_id).emit('user_leave', send);
+  }
+
+  @SubscribeMessage('ban_user')
+  async ban_user(client: Socket, payload: any) {
+    const user_id = client.data.id;
+    const channel_id = payload.channel_id;
+    const ban_id = payload.ban_id;
+    const addBan = new BanUserDto();
+    addBan.channel_id = channel_id;
+    addBan.user_id = ban_id;
+    try {
+      const chan = await this.channelService.banUser(addBan, user_id);
+      if (chan != null) {
+        this.server.to(chan.id).emit('ban_code', {
+          channel_id: chan.id,
+          bans: chan.bannedUsers,
+        });
+      }
+    } catch (e) {
+      client.emit('ban_code', {
+        message: e.message,
+      });
+      return;
+    }
+  }
+
+  @SubscribeMessage('unban_user')
+  async unban_user(client: Socket, payload: any) {
+    const user_id = client.data.id;
+    const channel_id = payload.channel_id;
+    const ban_id = payload.unban_id;
+    const addBan = new BanUserDto();
+    addBan.channel_id = channel_id;
+    addBan.user_id = ban_id;
+    try {
+      const chan = await this.channelService.deleteBanUser(addBan, user_id);
+      if (chan != null) {
+        this.server.to(chan.id).emit('ban_code', {
+          channel_id: chan.id,
+          bans: chan.bannedUsers,
+        });
+      }
+    } catch (e) {
+      client.emit('ban_code', {
+        message: e.message,
+      });
+      return;
+    }
   }
 }

@@ -1,18 +1,22 @@
 
-  .title-choice {
+.game-waiting-settings {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     text-align: center;
     color: #fff;
     margin-top: 3rem;
     font-size: 2rem;
-  }
-  
-  .button-group {
+}
+
+.button-group {
     display: flex;
     justify-content: center;
     margin-top: 1rem;
-  }
-  
-  .button {
+}
+
+.button {
     padding: 1rem 2rem;
     margin: 0 1rem;
     background-color: #ccc;
@@ -20,20 +24,20 @@
     border-radius: 5px;
     cursor: pointer;
     font-size: 1.5rem;
-  }
-  
-  .selected {
+}
+
+.selected {
     background-color: #bd4e4e;
     color: #fff;
-  }
+}
 
-  .img {
+.img {
     display: flex;
     justify-content: center;
     margin-top: 1rem;
-  }
-  
-  .enter {
+}
+
+.enter {
     display: block;
     margin: 2rem auto;
     padding: 1rem 2rem;
@@ -42,27 +46,27 @@
     border-radius: 5px;
     cursor: pointer;
     font-size: 2rem;
-  }
-  
-  @media screen and (max-width: 600px) {
+}
+
+@media screen and (max-width: 600px) {
     h1 {
-      font-size: 1.2rem;
+        font-size: 1.2rem;
     }
-  
+
     .title-choice {
-      font-size: 1.2rem;
+        font-size: 1.2rem;
     }
-  
+
     .button {
-      padding: 0.8rem 1.6rem;
-      margin: 0.5rem 1rem;
-      font-size: 0.8rem;
+        padding: 0.8rem 1.6rem;
+        margin: 0.5rem 1rem;
+        font-size: 0.8rem;
     }
-  
+
     .enter {
-      margin: 1.5rem auto;
-      padding: 0.8rem 1.6rem;
-      font-size: 1.5rem;
+        margin: 1.5rem auto;
+        padding: 0.8rem 1.6rem;
+        font-size: 1.5rem;
     }
-  }
+}
   

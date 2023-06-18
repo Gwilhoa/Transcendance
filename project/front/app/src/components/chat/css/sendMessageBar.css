@@ -1,4 +1,4 @@
-.chat-input-send-bar{
+.chat-input-send-bar {
     background-color: var(--box-color);
     border-radius: 50px;
     margin-left: 1.5rem;
@@ -12,7 +12,7 @@
     padding-left: 2rem;
 }
 
-.chat-input-message{
+.chat-input-message {
     font-size: 1.75rem;
     border: none;
     background-color: var(--box-color);
@@ -22,7 +22,7 @@
 
 }
 
-.chat-button-send-message{
+.chat-button-send-message {
     width: 3rem;
     font-size: 1.75rem;
     background-color: transparent;
@@ -31,7 +31,7 @@
     color: var(--light-color);
 }
 
-.chat-conversation-never-join-channel, .chat-conversation-write-the-first-message{
+.chat-conversation-never-join-channel, .chat-conversation-write-the-first-message {
     margin: 2rem 2rem 2rem;
     font-weight: 500;
     color: var(--light-color);

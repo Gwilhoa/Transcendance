@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 
 interface ModalState {
 	isOpen: boolean;
@@ -24,6 +24,6 @@ const modalSlice = createSlice({
 	},
 });
 
-export const { openModal, closeModal } = modalSlice.actions;
+export const {openModal, closeModal} = modalSlice.actions;
 
 export default modalSlice.reducer;

@@ -5,12 +5,12 @@ import ButtonCreateChannel from './button/ButtonCreateChannel'
 
 const OptionBar = () => {
 
-	
-  return (
+
+	return (
 		<div className='chat-option-bar'>
-			<ButtonOpenModalSideBar />
-			<ButtonCreateChannel />
+			<ButtonOpenModalSideBar/>
+			<ButtonCreateChannel/>
 		</div>
-  );
+	);
 }
 export default OptionBar;

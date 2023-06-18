@@ -1,12 +1,13 @@
 import '../../pages/css/CreateTwoFa.css';
-import React, { useState, useRef, useEffect } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import Cookies from 'universal-cookie';
-const cookies = new Cookies();
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import AuthCode, { AuthCodeRef } from 'react-auth-code-input';
-import { setErrorLocalStorage } from '../IfError';
-import { ErrorInput } from '../../pages/CreateTwoFa';
+import {useNavigate} from 'react-router-dom';
+import AuthCode, {AuthCodeRef} from 'react-auth-code-input';
+import {setErrorLocalStorage} from '../IfError';
+import {ErrorInput} from '../../pages/CreateTwoFa';
+
+const cookies = new Cookies();
 
 function AuthenticateComponentsTwoFa() {
 	const [, setResult] = useState<string>('');
@@ -35,7 +36,7 @@ function AuthenticateComponentsTwoFa() {
 	}, [navigate]);
 
 	const setCookieJwt = (jwtToken: string) => {
-		cookies.set('jwtAuthorization', jwtToken, {sameSite: 'lax', maxAge: 2 * 60 * 60 });
+		cookies.set('jwtAuthorization', jwtToken, {sameSite: 'lax', maxAge: 2 * 60 * 60});
 	};
 
 	const handleOnChange = (res: string) => {
@@ -43,14 +44,14 @@ function AuthenticateComponentsTwoFa() {
 		if (res.length === 6) {
 			console.log('result of input create 2fa ' + res);
 			axios.post(process.env.REACT_APP_IP + ':3000/auth/authenticate',
-			{
-				code: res
-			},
-			{
-				headers: {
-					Authorization: `Bearer ${cookies.get('tenMinToken')}`,
+				{
+					code: res
 				},
-			})
+				{
+					headers: {
+						Authorization: `Bearer ${cookies.get('tenMinToken')}`,
+					},
+				})
 				.then((response) => {
 					console.log(response);
 					setCookieJwt(response.data.access_token);
@@ -61,8 +62,7 @@ function AuthenticateComponentsTwoFa() {
 					if (error.response.status === 401) {
 						setErrorLocalStorage('unauthorized');
 						navigate('/Error');
-					}
-					else {
+					} else {
 						setError(true);
 						console.error(error);
 						AuthInputRef.current?.clear();
@@ -75,20 +75,20 @@ function AuthenticateComponentsTwoFa() {
 	};
 
 
-    return (
-        <div>
+	return (
+		<div>
 			<p>TwoFa enable</p>
 			<div>
-				<AuthCode 
-					allowedCharacters='numeric' 
-					onChange={handleOnChange} 
+				<AuthCode
+					allowedCharacters='numeric'
+					onChange={handleOnChange}
 					inputClassName='input'
 					ref={AuthInputRef}
 				/>
-				{ Error == true ? (<ErrorInput />) : (<></>)}
+				{Error == true ? (<ErrorInput/>) : (<></>)}
 			</div>
-        </div>
-    );
+		</div>
+	);
 }
 
 export default AuthenticateComponentsTwoFa;

@@ -1,29 +1,109 @@
 .chatSideBar {
-	width: var(--left-side-bar-width);
-	background-color: var(--box-color);
-	color: var(--light-color);
-	overflow-y: auto;
+    width: var(--left-side-bar-width);
+    background-color: var(--box-color);
+    color: var(--light-color);
+    overflow-y: auto;
 }
 
-.chat-side-bar-channel{
-	background-color: var(--background-color);
-	border-radius: 50px;
-	height: 2.5rem;
-	margin: 0.5rem;
-	cursor: pointer;
-	display: flex;
-	padding-left: 0.5rem;
-  	align-items: center;
-	font-size: 1.25rem;
-	justify-content: space-between;
+.chat-side-bar-channel {
+    background-color: var(--background-color);
+    border-radius: 50px;
+    height: 2.5rem;
+    margin: 0.5rem;
+    cursor: pointer;
+    display: flex;
+    padding-left: 0.5rem;
+    align-items: center;
+    font-size: 1.25rem;
+    justify-content: space-between;
 }
 
-.chat-side-bar-channel-invite{
-	margin: 0 0.7rem;
+.chat-side-bar-channel-invite {
+    margin: 0 0.7rem;
 }
 
-.chat-side-bar-channel-modify-button{
-	display: flex;
-	margin-right: 1rem;
-	opacity: .7;
+.chat-side-bar-channel-modify-button {
+    display: flex;
+    margin-right: 1rem;
+    opacity: .7;
 }
+
+/* Invite page */
+
+.chat-side-bar-close-add-people-channel {
+    position: absolute;
+    right: 17px;
+    top: 17px;
+    background-color: var(--close-button-color);
+    color: var(--light-color);
+    border: none;
+    padding: 0.75rem;
+    border-radius: 50%;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.chat-side-bar-invite-channel-input {
+    background-color: var(--background-color);
+}
+
+/* end Invite page */
+
+
+/* Modify page */
+
+.chat-side-bar-modify-channel {
+    position: absolute;
+    text-align: center;
+    position: fixed;
+    z-index: 2;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    /* height: 20rem; */
+    width: 30rem;
+    overflow: auto;
+    background-color: var(--box-color);
+    color: var(--light-color);
+    border-radius: 20px;
+}
+
+.chat-side-bar-close-modify-channel {
+    position: absolute;
+    right: 17px;
+    top: 17px;
+    background-color: var(--close-button-color);
+    color: var(--light-color);
+    border: none;
+    padding: 0.75rem;
+    border-radius: 50%;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.chat-side-bar-close-modify-channel-name {
+    border: 0;
+    border-radius: 100vw;
+    background-color: var(--background-color);
+    color: var(--light-color);
+    font-size: 1.125rem;
+    width: 45%;
+    height: 0.5rem;
+    margin: 1.5rem 0 3rem;
+    padding: 1rem;
+    outline: none;
+}
+
+.chat-side-bar-modify-channel-button-update {
+    border: 0;
+    font-size: 1.75rem;
+    border-radius: 1rem;
+    padding: 0.75rem;
+    margin-top: 3rem;
+    margin-bottom: 3rem;
+    background-color: var(--primary-color);
+    color: var(--light-color);
+    cursor: pointer;
+}
+
+/* end Modify page */

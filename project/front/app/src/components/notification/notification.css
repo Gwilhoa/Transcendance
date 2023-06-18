@@ -1,40 +1,44 @@
-/* background-color: red;
-color: var(--light-color);
-padding: 1em;
-top:100;
-left:50%;
-transform: translate(-50%);
-position: absolute;
-border-bottom-left-radius: 20px;
-border-bottom-right-radius: 20px; */
-.popup-notification
-{
-	background-color: rgb(255, 84, 84);
-	display: flex;
-	z-index: 1;
-	justify-content: center;
-	position: absolute;
-	width : 45%;
-	border-radius: 100vw;
-	/* border: 3px solid rgba(189, 39,); */
-	border: 0.25rem solid rgb(150, 0, 0);
-	top: var(--header-size);
+.popup-notification {
+    background-color: var(--box-color);
+    z-index: 1;
+    position: absolute;
+    display: flex;
+    align-items: center;
+    width: 45%;
+    height: 3rem;
+    border-radius: 100vw;
+    border: 0.2rem solid var(--primary-color);
+    top: calc(var(--header-size) + 2rem);
+    color: var(--light-color);
 
+    /* Centering styles */
+    left: 50%;
+    transform: translateX(-50%);
 }
 
-
-.notification-button-validate{
-	height: 2rem;
-	width: 2rem;
-	background-color: green;
-	border-radius: 100vw;
-	cursor: pointer;
+.popup-notification > h2 {
+    margin-left: 1.5rem;
+    font-weight: normal;
 }
 
-.notification-button-cancel{
-	height: 2rem;
-	width: 2rem;
-	background-color: red;
-	border-radius: 100vw;
-	cursor: pointer;
+.notification-buttons {
+    display: flex;
+    position: absolute;
+    right: 1.5rem;
+}
+
+.notification-button {
+    height: 1.5rem;
+    width: 1.5rem;
+    border-radius: 100vw;
+    cursor: pointer;
+    margin: 0 0.25rem;
+}
+
+.notification-button-validate {
+    background-color: var(--accept-button-color);
+}
+
+.notification-button-cancel {
+    background-color: var(--close-button-color);
 }
