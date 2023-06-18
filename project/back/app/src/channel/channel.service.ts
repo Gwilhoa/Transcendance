@@ -128,13 +128,11 @@ export class ChannelService {
   }
 
   public async leaveChannel(user_id, channel_id) {
-    const chan = await this.channelRepository.findOneBy({
-      id: channel_id,
-    });
+    const chan = await this.getChannelById(channel_id);
     if (chan == null) throw new Error('Channel not found');
     const user = await this.userService.getUserById(user_id);
     if (user == null) throw new Error('User not found');
-    if (!chan.users.includes(user)) throw new Error('User not in channel');
+    if (!includeUser(user, chan.users)) throw new Error('User not in channel');
     chan.users = chan.users.filter((u) => u.id != user.id);
     await this.channelRepository.save(chan);
     return user;
@@ -230,6 +228,7 @@ export class ChannelService {
   }
 
   public async sendMessage(body: sendMessageDTO, user_id) {
+    console.log(body.content);
     if (body.content.length > 4242 || body.content.length <= 0)
       throw new Error('Message too long (max 4242) or empty');
     const message = new Message();
@@ -249,6 +248,7 @@ export class ChannelService {
     channel.messages.push(message);
     await this.channelRepository.save(channel);
     const ret: any = await this.messageRepository.save(message);
+    console.log(ret.content);
     ret.channel = channel.id;
     return ret;
   }

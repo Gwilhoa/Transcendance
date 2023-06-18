@@ -228,6 +228,12 @@ export class UserGateway implements OnGatewayInit {
   async block_user(client: Socket, payload: any) {
     const user_id = client.data.id;
     const block_id = payload.block_id;
+    if (block_id == null) {
+      client.emit('block_code', {
+        message: 'block_id is null',
+      });
+      return;
+    }
     try {
       const user = await this.userService.addBlocked(user_id, block_id);
       client.emit('block_code', {

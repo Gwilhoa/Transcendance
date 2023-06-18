@@ -109,6 +109,8 @@ export class ChannelGateway implements OnGatewayInit {
 
   @SubscribeMessage('send_message')
   async handleMessage(client: Socket, payload: any) {
+    this.logger.debug('send_message');
+    this.logger.debug(payload.content);
     if (
       payload.token == null ||
       payload.channel_id == null ||
