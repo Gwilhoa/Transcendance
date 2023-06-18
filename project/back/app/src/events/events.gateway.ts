@@ -17,6 +17,7 @@ import { GameService } from 'src/game/game.service';
 import { CreateGameDTO } from 'src/dto/create-game.dto';
 import { UserStatus } from 'src/utils/user.enum';
 import {
+  disconnect,
   getIdFromSocket,
   getKeys,
   getSocketFromId,
@@ -42,7 +43,8 @@ export class EventsGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
   @WebSocketServer() server: Server;
-  private clients: Map<string, Socket> = new Map<string, Socket>();
+  private clients: string[] = [];
+  private sockets: Socket[] = [];
   private ingame: Map<string, string> = new Map<string, string>();
   private games: Map<string, Game> = new Map<string, Game>();
   private rematch: Map<string, boolean> = new Map<string, boolean>();
@@ -66,7 +68,7 @@ export class EventsGateway
   }
 
   async handleDisconnect(client: Socket) {
-    const id = getIdFromSocket(client, this.clients);
+    const id = client.data.id;
     if (id == null) {
       client.disconnect();
       return;
@@ -74,10 +76,10 @@ export class EventsGateway
     this.logger.log(`Client disconnected: ${id}`);
     if ((await this.userService.changeStatus(id, UserStatus.OFFLINE)) == null) {
       wrongtoken(client);
-      this.clients.delete(id);
+      this.clients = disconnect(id, this.clients);
       this.sendconnected();
     }
-    this.clients.delete(id);
+    this.clients = disconnect(id, this.clients);
     if (getKeys(this.ingame).includes(id)) {
       const game = await this.gameService.remakeGame(this.ingame.get(id));
       if (game == null) {
@@ -85,7 +87,7 @@ export class EventsGateway
         return;
       }
       this.ingame.delete(id);
-      this.games[game.id].remake();
+      await this.games[game.id].remake();
       this.games.delete(game.id);
     }
     if (this.matchmaking.includes(client)) {
@@ -112,7 +114,7 @@ export class EventsGateway
         return;
       }
       this.logger.debug(`Client connected: ${id} for ${client.id}`);
-      this.clients.set(id, client);
+      client.data.id = id;
       this.sendconnected();
       let channels = null;
       try {
@@ -137,11 +139,16 @@ export class EventsGateway
   async handleFriendRequest(client: Socket, payload: any) {
     let send;
     const friend_id = payload.friend_id;
-    const user_id = getIdFromSocket(client, this.clients);
+    const user_id = client.data.id;
+    this.sockets.push(client);
     this.logger.log(`new friend request from ${user_id} to ${friend_id}`);
     const user = await this.userService.getUserById(user_id);
     const friend = await this.userService.getUserById(friend_id);
     let ret;
+    let friend_socket: Socket | null;
+    if (friend != null) {
+      friend_socket = getSocketFromId(friend_id, this.sockets);
+    }
     if (friend == null) {
       ret = {
         code: FriendCode.UNEXISTING_USER,
@@ -153,15 +160,12 @@ export class EventsGateway
     } else if (await this.userService.asfriendrequestby(user_id, friend_id)) {
       await this.userService.removeFriendRequest(user_id, friend_id);
       this.logger.debug('friend id : ' + friend_id);
-      if (getSocketFromId(friend_id, this.clients) != null) {
-        this.logger.debug(
-          'socket friend id : ' + getSocketFromId(friend_id, this.clients).id,
-        );
+      if (friend_socket != null) {
         send = {
           code: FriendCode.NEW_FRIEND,
           id: user_id,
         };
-        getSocketFromId(friend_id, this.clients).emit('friend_request', send);
+        friend_socket.emit('friend_request', send);
       }
       await this.userService.addFriend(user_id, friend_id);
       await this.userService.addFriend(friend_id, user_id);
@@ -178,16 +182,13 @@ export class EventsGateway
       );
       this.logger.debug('friend id : ' + friend_id);
       console.log(this.clients);
-      if (getSocketFromId(friend_id, this.clients) != null) {
-        this.logger.debug(
-          'socket friend id : ' + getSocketFromId(friend_id, this.clients).id,
-        );
+      if (friend_socket != null) {
         send = {
           code: FriendCode.FRIEND_REQUEST,
           id: user.id,
           request: requestFriend.id,
         };
-        getSocketFromId(friend_id, this.clients).emit('friend_request', send);
+        friend_socket.emit('friend_request', send);
       }
     }
     this.logger.debug(`friend request code: ${ret.code}`);
@@ -209,7 +210,7 @@ export class EventsGateway
     const channel_id = payload.channel_id;
     let message = payload.content;
     let send;
-    const user_id = getIdFromSocket(client, this.clients);
+    const user_id = client.data.id;
     try {
       verifyToken(token, this.authService);
     } catch (error) {
@@ -264,7 +265,7 @@ export class EventsGateway
   async handleJoinChannel(client: Socket, payload: any) {
     let send;
     const channel_id = payload.channel_id;
-    const user_id = getIdFromSocket(client, this.clients);
+    const user_id = client.data.id;
     if (user_id == null) {
       send = {
         code: 401,
@@ -313,7 +314,7 @@ export class EventsGateway
     let send;
     const token = payload.token;
     const channel_id = payload.channel_id;
-    const user_id = getIdFromSocket(client, this.clients);
+    const user_id = client.data.id;
     try {
       verifyToken(token, this.authService);
     } catch (error) {
@@ -408,11 +409,8 @@ export class EventsGateway
       let j = 0;
       while (j < this.matchmaking.length) {
         const pretended_player = this.matchmaking[j];
-        const player_id = getIdFromSocket(player, this.clients);
-        const pretended_player_id = getIdFromSocket(
-          pretended_player,
-          this.clients,
-        );
+        const player_id = player.data.id;
+        const pretended_player_id = pretended_player.data.id;
         if (
           pretended_player_id != null &&
           pretended_player_id != player_id &&
@@ -465,8 +463,8 @@ export class EventsGateway
 
   async play_game(player: Socket, rival: Socket) {
     const create_gameDTO = new CreateGameDTO();
-    create_gameDTO.user1_id = getIdFromSocket(player, this.clients);
-    create_gameDTO.user2_id = getIdFromSocket(rival, this.clients);
+    create_gameDTO.user1_id = player.data.id;
+    create_gameDTO.user2_id = player.data.id;
     if (create_gameDTO.user1_id == null || create_gameDTO.user2_id == null) {
       player.emit('game_found', {
         game_id: null,

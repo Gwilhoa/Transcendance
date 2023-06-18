@@ -23,14 +23,13 @@ export function wrongtoken(client: Socket) {
 }
 
 export function send_connection_server(
-  connected: Map<string, Socket>,
+  connected: string[],
   ingame: Map<string, string>,
   server: Server,
 ) {
-  const connectedlist = getKeys(connected);
   const ingamelist = getKeys(ingame);
   const send = {
-    connected: connectedlist,
+    connected: connected,
     ingame: ingamelist,
   };
   server.emit('connection_server', send);
@@ -49,13 +48,13 @@ export function getIdFromSocket(
   return ret;
 }
 
-export function getSocketFromId(id: string, connected: Map<string, Socket>) {
+export function getSocketFromId(id: string, connected: Socket[]): Socket {
   let ret = null;
-  connected.forEach((value, key) => {
-    if (key == id) {
-      ret = value;
+  for (const socket of connected) {
+    if (socket.data.id == id) {
+      ret = socket;
     }
-  });
+  }
   return ret;
 }
 
@@ -66,5 +65,15 @@ export function includeUser(user: User, list: User[]) {
       ret = true;
     }
   });
+  return ret;
+}
+
+export function disconnect(id: any, clients: string[]): string[] {
+  const ret: string[] = [];
+  for (const c_id of clients) {
+    if (c_id != id) {
+      ret.push(c_id);
+    }
+  }
   return ret;
 }
