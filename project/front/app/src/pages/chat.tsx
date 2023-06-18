@@ -189,7 +189,7 @@ function Chat() {
 				}
 			});		
 		}
-		setUpdateChannel(updateChannel+1);
+		setUpdateChannel((prevUpdateChannel) => prevUpdateChannel + 1);
 		if (updateChannel > 10) {
 			setUpdateChannel(0);
 		}
