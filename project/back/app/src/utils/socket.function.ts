@@ -77,3 +77,11 @@ export function disconnect(id: any, clients: string[]): string[] {
   }
   return ret;
 }
+
+export function getSockets(server: Server): Socket[] {
+  const ret: Socket[] = [];
+  server.sockets.sockets.forEach((value) => {
+    ret.push(value);
+  });
+  return ret;
+}

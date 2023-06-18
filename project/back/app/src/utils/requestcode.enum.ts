@@ -19,6 +19,6 @@ export enum messageCode {
 
 export enum ChannelCode {
   INVITE_SUCCESS = 0,
-    UNEXISTING_USER = 1,
-    UNEXISTING_CHANNEL = 2,
+  UNEXISTING_USER = 1,
+  UNEXISTING_CHANNEL = 2,
 }
