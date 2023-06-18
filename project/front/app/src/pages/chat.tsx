@@ -212,7 +212,6 @@ function Chat() {
 	};
 
 	useEffect(()=>{
-		console.log('channel id : ' + conversationId);
 		fetchListMessage();
 		findChannel();
 
