@@ -2,6 +2,7 @@
 	width: var(--left-side-bar-width);
 	background-color: var(--box-color);
 	color: var(--light-color);
+	overflow-y: auto;
 }
 
 .chat-side-bar-channel{
