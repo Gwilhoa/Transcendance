@@ -1,5 +1,6 @@
 import { Server, Socket } from 'socket.io';
 import { AuthService } from '../auth/auth.service';
+import { User } from '../user/user.entity';
 
 export function verifyToken(token: string, authService: AuthService) {
   try {
@@ -53,6 +54,16 @@ export function getSocketFromId(id: string, connected: Map<string, Socket>) {
   connected.forEach((value, key) => {
     if (key == id) {
       ret = value;
+    }
+  });
+  return ret;
+}
+
+export function includeUser(user: User, list: User[]) {
+  let ret = false;
+  list.forEach((value) => {
+    if (value.id == user.id) {
+      ret = true;
     }
   });
   return ret;

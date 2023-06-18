@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { flatten, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { addAdminDto } from 'src/dto/add-admin.dto';
 import { CreateChannelDto } from 'src/dto/create-channel.dto';
@@ -11,6 +11,8 @@ import { Message } from './message.entity';
 import { ChannelType } from 'src/utils/channel.enum';
 import { BanUserDto } from '../dto/ban-user.dto';
 import * as bcrypt from 'bcrypt';
+import { includeUser } from '../utils/socket.function';
+import { User } from '../user/user.entity';
 
 @Injectable()
 export class ChannelService {
@@ -22,6 +24,8 @@ export class ChannelService {
 
   public async createChannel(body: CreateChannelDto) {
     let chan = new Channel();
+    if (body.name.length > 12)
+      throw new Error('Channel name must be less than 12 characters');
     chan.name = body.name;
     chan.admins = [];
     chan.bannedUsers = [];
@@ -29,6 +33,7 @@ export class ChannelService {
     chan.type = body.type;
     const user = await this.userService.getUserById(body.creator_id);
     if (user == null) throw new Error('User not found');
+    chan.creator = user;
     chan.users.push(user);
     chan.admins.push(user);
     if (body.type == ChannelType.PROTECTED_CHANNEL) {
@@ -71,7 +76,14 @@ export class ChannelService {
   }
 
   public async getChannelById(id) {
-    return await this.channelRepository.findOneBy({ id: id });
+    return await this.channelRepository
+      .createQueryBuilder('channel')
+      .leftJoinAndSelect('channel.admins', 'admins')
+      .leftJoinAndSelect('channel.bannedUsers', 'bannedUsers')
+      .leftJoinAndSelect('channel.creator', 'creator')
+      .leftJoinAndSelect('channel.users', 'users')
+      .where('channel.id = :id', { id: id })
+      .getOne();
   }
 
   public async isInChannel(user_id: string, channel_id: string) {
@@ -133,16 +145,22 @@ export class ChannelService {
     const target = await this.userService.getUserById(body.user_id);
     const user = await this.userService.getUserById(user_id);
     if (user == null || target == null) throw new Error('User not found');
-    let chan = await this.channelRepository.findOneBy({
-      id: body.channel_id,
-    });
+    let chan = await this.getChannelById(body.channel_id);
     if (chan == null) throw new Error('Channel not found');
-    if (!chan.admins.includes(user))
-      throw new Error('User is not admin of this channel');
-    if (chan.admins.includes(target))
-      throw new Error('User is already admin of this channel');
-    if (!chan.users.includes(target))
-      throw new Error('User is not in this channel');
+    let f = false;
+    for (const admin of chan.admins) {
+      if (admin.id == user.id) f = true;
+    }
+    if (!f) throw new Error('User is not admin of this channel');
+    for (const admin of chan.admins) {
+      if (admin.id == target.id)
+        throw new Error('Target is already admin of this channel');
+    }
+    f = false;
+    for (const user of chan.users) {
+      if (user.id == target.id) f = true;
+    }
+    if (!f) throw new Error('Target is not in this channel');
     chan.admins.push(target);
     chan = await this.channelRepository.save(chan);
     return chan;
@@ -153,18 +171,27 @@ export class ChannelService {
     const user = await this.userService.getUserById(user_id);
 
     if (user == null || target == null) throw new Error('User not found');
-    const chan = await this.channelRepository.findOneBy({
-      id: body.channel_id,
-    });
+    const chan = await this.channelRepository
+      .createQueryBuilder('channel')
+      .leftJoinAndSelect('channel.admins', 'admins')
+      .leftJoinAndSelect('channel.bannedUsers', 'bannedUsers')
+      .leftJoinAndSelect('channel.creator', 'creator')
+      .leftJoinAndSelect('channel.users', 'users')
+      .where('channel.id = :id', { id: body.channel_id })
+      .getOne();
     if (chan == null) throw new Error('Channel not found');
-    if (!chan.admins.includes(user))
+    if (!includeUser(user, chan.admins))
       throw new Error('User is not admin of this channel');
-    if (!chan.users.includes(target))
+    if (!includeUser(target, chan.users))
       throw new Error('User is not in this channel');
-    if (chan.admins.includes(target))
+    if (includeUser(target, chan.admins))
       throw new Error('User is admin of this channel');
-    chan.bannedUsers.push(user);
-    chan.users.filter((u) => u.id != user.id);
+    chan.bannedUsers.push(target);
+    const ret = [];
+    for (const u of chan.users) {
+      if (u.id != target.id) ret.push(u);
+    }
+    chan.users = ret;
     return await this.channelRepository.save(chan);
   }
 
@@ -282,16 +309,27 @@ export class ChannelService {
     const channel = await this.channelRepository
       .createQueryBuilder('channel')
       .leftJoinAndSelect('channel.admins', 'admins')
+      .leftJoinAndSelect('channel.users', 'users')
       .where('channel.id = :id', { id: body.channel_id })
       .getOne();
     if (channel == null) throw new Error('Channel not found');
-    if (!channel.users.includes(self_user))
-      throw new Error('User is not in this channel');
-    if (!channel.admins.includes(self_user))
-      throw new Error('User is not admin of this channel');
-    if (!channel.admins.includes(target))
-      throw new Error('User is not admin of this channel');
-    channel.admins.filter((u) => u.id != target.id);
+    let f = false;
+    for (const admin of channel.admins) {
+      if (admin.id == self_user.id) f = true;
+    }
+    if (!f) throw new Error('User is not admin of this channel');
+    f = false;
+    for (const admin of channel.admins) {
+      if (admin.id == target.id) f = true;
+    }
+    if (target.id == channel.creator.id)
+      throw new Error('Cannot remove creator');
+    if (!f) throw new Error('Target is not admin of this channel');
+    const admins = [];
+    for (const admin of channel.admins) {
+      if (admin.id != target.id) admins.push(admin);
+    }
+    channel.admins = admins;
     return await this.channelRepository.save(channel);
   }
 
@@ -319,16 +357,22 @@ export class ChannelService {
     const channel = await this.channelRepository
       .createQueryBuilder('channel')
       .leftJoinAndSelect('channel.bannedUsers', 'bannedUsers')
+        .leftJoinAndSelect('channel.users', 'users')
+        .leftJoinAndSelect('channel.admins', 'admins')
       .where('channel.id = :id', { id: body.channel_id })
       .getOne();
     if (channel == null) throw new Error('Channel not found');
-    if (!channel.users.includes(self_user))
+    if (!includeUser(self_user, channel.users))
       throw new Error('User is not in this channel');
-    if (!channel.admins.includes(self_user))
+    if (!includeUser(self_user, channel.admins))
       throw new Error('User is not admin of this channel');
-    if (!channel.bannedUsers.includes(target))
+    if (!includeUser(target, channel.bannedUsers))
       throw new Error('User is not banned of this channel');
-    channel.bannedUsers.filter((u) => u.id != target.id);
+    const bannedUsers = [];
+    for (const bannedUser of channel.bannedUsers) {
+      if (bannedUser.id != target.id) bannedUsers.push(bannedUser);
+    }
+    channel.bannedUsers = bannedUsers;
     return await this.channelRepository.save(channel);
   }
 
@@ -373,8 +417,12 @@ export class ChannelService {
       .createQueryBuilder('channel')
       .leftJoinAndSelect('channel.users', 'users')
       .leftJoinAndSelect('channel.admins', 'admins')
+        .leftJoinAndSelect('channel.creator', 'creator')
+        .leftJoinAndSelect('channel.bannedUsers', 'bannedUsers')
       .where('channel.id = :id', { id: channel_id })
       .getOne();
+    if (channel.type == ChannelType.MP_CHANNEL)
+      throw new Error('Channel is private');
 
     let f = false;
     for (const user of channel.admins) {
@@ -395,22 +443,34 @@ export class ChannelService {
   async updateChannel(channel_id: any, user_id: any, body: any) {
     const channel = await this.channelRepository
       .createQueryBuilder('channel')
+      .leftJoinAndSelect('channel.admins', 'admins')
       .leftJoinAndSelect('channel.creator', 'creator')
       .where('channel.id = :id', { id: channel_id })
       .getOne();
     if (channel == null) throw new Error('Channel not found');
-    if (channel.creator.id != user_id)
-      throw new Error('User is not creator of this channel');
-    if (channel.pwd == null && body.password != null) {
-      channel.type = ChannelType.PROTECTED_CHANNEL;
+    if (channel.creator.id == user_id) {
+      if (channel.pwd == null && body.password != '') {
+        channel.type = ChannelType.PROTECTED_CHANNEL;
+        channel.pwd = await bcrypt.hash(body.password, 10);
+        return await this.channelRepository.save(channel);
+      }
+      if (body.password != '') {
+        if ((await bcrypt.compare(body.old_password, channel.pwd)) == false)
+          throw new Error('Wrong password');
+        channel.pwd = await bcrypt.hash(body.password, 10);
+      }
+      if (body.name != '') channel.name = body.name;
+      const ret = await this.channelRepository.save(channel);
+      return { channel_id: ret.id, name: ret.name };
+    } else {
+      for (const admin of channel.admins) {
+        if (admin.id == user_id) {
+          if (body.name != null) channel.name = body.name;
+          const ret = await this.channelRepository.save(channel);
+          return { channel_id: ret.id, name: ret.name };
+        }
+      }
     }
-    if (body.password != null) {
-      if ((await bcrypt.compare(body.old_password, channel.pwd)) == false)
-        throw new Error('Wrong password');
-      channel.pwd = await bcrypt.hash(body.password, 10);
-    }
-    if (body.name != null) channel.name = body.name;
-    const ret = await this.channelRepository.save(channel);
-    return { channel_id: ret.id, name: ret.name };
+    throw new Error('User is not admin of this channel');
   }
 }

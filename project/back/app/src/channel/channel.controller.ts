@@ -221,6 +221,9 @@ export class ChannelController {
 
   @Get('/id/:id')
   async getChannelById(@Param('id') id: string, @Res() resp) {
+    if (id == "null" || id == null) {
+      return resp.status(400).send('Invalid id');
+    }
     const channel = await this.channelService.getChannelById(id);
     if (channel == null) {
       return resp.status(204).send('No content');

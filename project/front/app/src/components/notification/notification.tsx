@@ -14,11 +14,11 @@ interface NotificationProps {
 export default function Notification({ message, onConfirm, onCancel, hasButton, setVisible }: NotificationProps) {
  
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setVisible(false);
-    }, 3000);
+    // const timer = setTimeout(() => {
+    //   setVisible(false);
+    // }, 3000);
 
-    return () => clearTimeout(timer);
+    // return () => clearTimeout(timer);
     }, []);
 
     const handleClose = () => {
@@ -27,23 +27,15 @@ export default function Notification({ message, onConfirm, onCancel, hasButton, 
 
   
       return (
-        <div className='notific' onClick={handleClose}>
+        <div className='popup-notification' onClick={handleClose}>
           <h2>
             {message}
           </h2>
           
           {hasButton &&
             <>
-            <button onClick={onConfirm}>
-              <h2>
-                <span role='img' aria-label='Valider'>&#10004;</span>
-              </h2>
-            </button>
-            <button onClick={onCancel}>
-              <h2>
-                <span role='img' aria-label='Refuser'>&#10060;</span>
-              </h2>
-            </button>
+            <div className='notification-button-validate' onClick={onConfirm}></div>
+            <div className='notification-button-cancel' onClick={onCancel}></div>
             </>
           }  
           

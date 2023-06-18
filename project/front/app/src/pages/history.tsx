@@ -8,6 +8,7 @@ import { openModal } from '../redux/modal/modalSlice';
 import axios from 'axios';
 
 
+
 interface ShowScore {
     status: string;
     myScore: string;
@@ -112,7 +113,6 @@ const Add = () => {
     
     if (response == null || response.length == 0)
     {
-        // console.log('toto');
         return (<p className='no-game-played'>{"You don't have played a game yet!"}</p>);
     }
     console.log(response)
@@ -120,10 +120,15 @@ const Add = () => {
     for (const game of response)
     {
         let status : string;
-        if( game.score1 == vistoryScore && getUserIndex(game) == 1)
-            status = 'Victory';
+        status = game.finished;
+        if (status != 'REMAKE') {
+            if (game.user1.id == localStorage.getItem('id') && game.score1 > game.score2)
+                status = 'Victory';
+            else
+                status = 'Defeat';
+        }
         else
-            status = 'Defeat';
+            status = 'Remake';
         let myScore : string;
         let opponentScore : string;
         let opponentId : string;
@@ -147,7 +152,7 @@ const Add = () => {
         }
         blocks.push (
             <OneScoreBlock
-            status={status + ':'}
+            status={status}
             myScore={myScore}
             opponentScore={opponentScore}
             opponentId={opponentId}
