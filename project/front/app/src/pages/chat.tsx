@@ -146,20 +146,27 @@ function Chat() {
 		fetchListChannel();
 
 		socket.on('join_code', handleJoinCode);
+		socket.on('user_join', handleUserCode);
 
 		return () => {
 			socket.off('join_code');		
+			socket.off('user_join');		
 		}
 	}, []);
 
 ////////////////////////// HANDLE SOCKET //////////////////////////////////////
 	const handleJoinCode = (data: any) => {
+		console.log('join_code');
 		console.log(data);
-		console.log('Join_Code');
 		if (data.channel_id) {
 			setConversationId(data.channel_id);
 			setListChannel((prevListChannel) => [...prevListChannel, data.channel]);
 		}
+	};
+
+	const handleUserCode = (data: any) => {
+		console.log('user_join');
+		console.log(data);
 	};
 
 	const handleMessage = (data: any) => {
