@@ -19,7 +19,7 @@ enum UserStatus {
 }
 
 export const ProfilName = ({id}: { id: string | null }) => {
-	const [userStatus, setUserStatus] = useState('');
+	const [, setUserStatus] = useState('');
 	const navigate = useNavigate();
 	const [username, setUsername] = useState<string>('');
 
