@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 
 interface GameState {
 	finalStatus: any | null;
@@ -18,6 +18,6 @@ const gameSlice = createSlice({
 	},
 });
 
-export const { setFinalStatus } = gameSlice.actions;
+export const {setFinalStatus} = gameSlice.actions;
 
 export default gameSlice.reducer;

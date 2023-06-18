@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import {createSlice} from '@reduxjs/toolkit';
 
 interface ModalState {
 	isOpenSideBar: boolean;
@@ -39,12 +39,12 @@ const modalChatSlice = createSlice({
 });
 
 export const
-{
-	switchChatModalSideBar, 
-	switchChatModalCreateChannel, 
-	switchChatModalInviteChannel,
-	switchChatModalUpdateChannel,
-	switchChatModalListUser,
-} = modalChatSlice.actions;
+	{
+		switchChatModalSideBar,
+		switchChatModalCreateChannel,
+		switchChatModalInviteChannel,
+		switchChatModalUpdateChannel,
+		switchChatModalListUser,
+	} = modalChatSlice.actions;
 
 export default modalChatSlice.reducer;

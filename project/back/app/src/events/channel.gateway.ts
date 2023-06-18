@@ -17,8 +17,8 @@ import {
 import { UserService } from '../user/user.service';
 import { sendMessageDTO } from '../dto/sendmessage.dto';
 import { AuthService } from '../auth/auth.service';
-import { Channel } from '../channel/channel.entity';
 import { JoinChannelDto } from '../dto/join-channel.dto';
+import { BanUserDto } from '../dto/ban-user.dto';
 
 @WebSocketGateway()
 export class ChannelGateway implements OnGatewayInit {
@@ -37,12 +37,9 @@ export class ChannelGateway implements OnGatewayInit {
 
   @SubscribeMessage('invite_channel')
   async invite_channel(client: Socket, payload: any) {
-    this.logger.debug('invite_channel');
-    this.logger.debug(payload);
     const channel_id = payload.channel_id;
     const receiver_id = payload.receiver_id;
     const sender_id = client.data.id;
-
     const receiver = await this.userService.getUserById(receiver_id);
     const sender = await this.userService.getUserById(sender_id);
     if (receiver == null || sender == null) {
@@ -287,5 +284,53 @@ export class ChannelGateway implements OnGatewayInit {
       channel_id: channel_id,
     };
     this.server.to(channel_id).emit('user_leave', send);
+  }
+
+  @SubscribeMessage('ban_user')
+  async ban_user(client: Socket, payload: any) {
+    const user_id = client.data.id;
+    const channel_id = payload.channel_id;
+    const ban_id = payload.ban_id;
+    const addBan = new BanUserDto();
+    addBan.channel_id = channel_id;
+    addBan.user_id = ban_id;
+    try {
+      const chan = await this.channelService.banUser(addBan, user_id);
+      if (chan != null) {
+        this.server.to(chan.id).emit('ban_code', {
+          channel_id: chan.id,
+          bans: chan.bannedUsers,
+        });
+      }
+    } catch (e) {
+      client.emit('ban_code', {
+        message: e.message,
+      });
+      return;
+    }
+  }
+
+  @SubscribeMessage('unban_user')
+  async unban_user(client: Socket, payload: any) {
+    const user_id = client.data.id;
+    const channel_id = payload.channel_id;
+    const ban_id = payload.unban_id;
+    const addBan = new BanUserDto();
+    addBan.channel_id = channel_id;
+    addBan.user_id = ban_id;
+    try {
+      const chan = await this.channelService.deleteBanUser(addBan, user_id);
+      if (chan != null) {
+        this.server.to(chan.id).emit('ban_code', {
+          channel_id: chan.id,
+          bans: chan.bannedUsers,
+        });
+      }
+    } catch (e) {
+      client.emit('ban_code', {
+        message: e.message,
+      });
+      return;
+    }
   }
 }

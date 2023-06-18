@@ -1,11 +1,11 @@
 import '../css/chatMessage.css'
 import axios from 'axios';
-import React, { useEffect, useState } from 'react'
-import { cookies } from '../../../App';
-import { Channel, Message } from '../../../pages/chat'
+import React, {useEffect, useState} from 'react'
+import {cookies} from '../../../App';
+import {Channel, Message} from '../../../pages/chat'
 import Messages from './message';
-import { useNavigate } from 'react-router-dom';
-import { setErrorLocalStorage } from '../../IfError';
+import {useNavigate} from 'react-router-dom';
+import {setErrorLocalStorage} from '../../IfError';
 import ButtonListChannel from '../optionBar/button/ButtonListUserModal';
 
 export interface imageProfil {
@@ -14,11 +14,9 @@ export interface imageProfil {
 }
 
 
-
 function Conversation(
-						{ listMessages, channel, errorGetMessage }: 
-						{ listMessages: Array<Message>, channel: Channel, errorGetMessage: boolean }) 
-{
+	{listMessages, channel, errorGetMessage}:
+		{ listMessages: Array<Message>, channel: Channel, errorGetMessage: boolean }) {
 	const [listImageProfil, setListImageProfil] = useState<Array<imageProfil>>([]);
 	const navigate = useNavigate();
 
@@ -27,7 +25,7 @@ function Conversation(
 	}, [listMessages]);
 
 
-	const addImageProfil = ( id: string) => {
+	const addImageProfil = (id: string) => {
 		let add = true;
 
 		listImageProfil.map((img) => img.id === id ? (add = false) : null)
@@ -39,7 +37,7 @@ function Conversation(
 			})
 				.then((response) => {
 					const data = response.data;
-					const img: imageProfil  = {
+					const img: imageProfil = {
 						id: id,
 						image: data,
 					}
@@ -59,33 +57,34 @@ function Conversation(
 				<p className='chat-conversation-channel-name'>
 					{channel.name}
 				</p>
-				{ errorGetMessage ? 
-					<p className="errorGetMessage" >
+				{errorGetMessage ?
+					<p className="errorGetMessage">
 						{"you can't access this channel"}
-					</p> 
-				: 
-					<ButtonListChannel />
-				}	
-			</div>
-			{ (listMessages != null && listMessages.length > 0) ? 
-				<div className='chat-scroll-converation'>
-					{(listMessages.map((message) => (		
-						<Messages 
-						key={message.id} 
-						message={message} 
-						listImage={listImageProfil}
-						/>
-						)))}
-				</div> : ( 
-				channel.id != '' && !errorGetMessage ? (
-					<p className="chat-conversation-write-the-first-message">
-						no message on the channel, write the first one
 					</p>
-				) : ( 
-					null
-				)
-			)}
+					:
+					<ButtonListChannel/>
+				}
+			</div>
+			{(listMessages != null && listMessages.length > 0) ?
+				<div className='chat-scroll-converation'>
+					{(listMessages.map((message) => (
+						<Messages
+							key={message.id}
+							message={message}
+							listImage={listImageProfil}
+						/>
+					)))}
+				</div> : (
+					channel.id != '' && !errorGetMessage ? (
+						<p className="chat-conversation-write-the-first-message">
+							no message on the channel, write the first one
+						</p>
+					) : (
+						null
+					)
+				)}
 		</div>
 	);
 }
+
 export default Conversation;

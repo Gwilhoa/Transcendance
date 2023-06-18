@@ -1,20 +1,21 @@
 import './css/chat.css'
-import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import React, {useEffect, useState} from 'react';
+import {useSelector} from 'react-redux';
 import Conversation from '../components/chat/conversation/conversation';
 import CreateChannel from '../components/chat/createChannel/CreateChannel';
 import InviteChannel from '../components/chat/inviteChannel/InviteChannel';
 import OptionBar from '../components/chat/optionBar/optionBar';
 import SideBarChat from '../components/chat/sidebar';
-import ErrorToken, { setErrorLocalStorage } from '../components/IfError';
-import { RootState } from '../redux/store';
+import ErrorToken, {setErrorLocalStorage} from '../components/IfError';
+import {RootState} from '../redux/store';
 import SendMessage from '../components/chat/input/sendmessage';
 import SocketSingleton from '../socket';
 import UpdateChannel from "../components/chat/inviteChannel/UpdateChannel";
 import ListUserChannel from '../components/chat/ListUsers';
 import axios from 'axios';
-import { cookies } from '../App';
-import { useNavigate } from 'react-router-dom';
+import {cookies} from '../App';
+import {useNavigate} from 'react-router-dom';
+
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
 
@@ -91,13 +92,13 @@ function Chat() {
 	const [errorGetMessage, setErrorGetMessage] = useState<boolean>(false);
 	const [errorPostMessage, setErrorPostMessage] = useState<string>('');
 	const [sendMessage, setSendMessage] = useState<boolean>(false);
-	
+
 ////////////////////////// FETCH DATA /////////////////////////////////////////
 	const fetchListChannel = async () => {
 		try {
 			const response = await axios.get(process.env.REACT_APP_IP + ':3000/user/channels', {
 				headers: {
-				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
 				},
 			});
 			console.log(response);
@@ -111,29 +112,28 @@ function Chat() {
 		try {
 			const response = await axios.get(process.env.REACT_APP_IP + ':3000/channel/message/' + conversationId, {
 				headers: {
-				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
 				},
 			});
 			console.log(response);
 			if (response.status === 204) {
 				setMessages([]);
-			}
-			else {
+			} else {
 				setMessages(response.data);
 			}
 			setErrorGetMessage(false);
 		} catch (error: any) {
 			console.error(error);
 			if (error.response.status === 401 || error.response.status === 500) {
-						setErrorLocalStorage('unauthorized');
-						navigate('/Error');
+				setErrorLocalStorage('unauthorized');
+				navigate('/Error');
 			}
 			setErrorGetMessage(true);
 		}
 	};
 
 	const findChannel = () => {
-		listChannel.map((itemChannel) => { 
+		listChannel.map((itemChannel) => {
 			if (itemChannel.id == conversationId) {
 				setChannel({...itemChannel});
 			}
@@ -149,8 +149,8 @@ function Chat() {
 		socket.on('user_join', handleUserCode);
 
 		return () => {
-			socket.off('join_code');		
-			socket.off('user_join');		
+			socket.off('join_code');
+			socket.off('user_join');
 		}
 	}, []);
 
@@ -181,16 +181,14 @@ function Chat() {
 			setMessages((prevListMessage) => {
 				if (prevListMessage.length === 0) {
 					return [newItemMessage];
-				} 
-				else if (!prevListMessage.some((message) => message.id === newItemMessage.id)) {
+				} else if (!prevListMessage.some((message) => message.id === newItemMessage.id)) {
 					return [...prevListMessage, newItemMessage];
-				}
-				else {
+				} else {
 					return prevListMessage;
 				}
 			});
 		}
-		return ;
+		return;
 	};
 
 	const handleMessageCode = (data: any) => {
@@ -206,10 +204,10 @@ function Chat() {
 
 	const handleUpdateChannel = (data: any) => {
 		console.log('HEY I CHANGE NAME : ' + data?.channel_id + " :" + conversationId);
-		setListChannel((prevListChannel) => 
+		setListChannel((prevListChannel) =>
 			prevListChannel.map((itemChannel) => {
 				if (itemChannel.id === data.channel_id) {
-					return { ...itemChannel, name: data.name };
+					return {...itemChannel, name: data.name};
 				}
 				return itemChannel;
 			})
@@ -219,7 +217,7 @@ function Chat() {
 		}
 	};
 
-	useEffect(()=>{
+	useEffect(() => {
 		fetchListMessage();
 		findChannel();
 
@@ -235,34 +233,35 @@ function Chat() {
 			socket.off('update_channel');
 		};
 
-	},[conversationId]);
+	}, [conversationId]);
 
 	return (
 		<div className='chatPage'>
-			<ErrorToken />
+			<ErrorToken/>
 			<OptionBar/>
-			{isOpenSideBar && ( <SideBarChat 
-									listChannel={listChannel} 
-									setConversationId={setConversationId} 
-								/> )}
-			{isOpenCreateChannel && ( <CreateChannel /> )}
-			{isOpenInviteChannel && ( <InviteChannel channel={channel}/> )}
-			{isOpenUpdateChannel && ( <UpdateChannel channel={channel}/> )}
+			{isOpenSideBar && (<SideBarChat
+				listChannel={listChannel}
+				setConversationId={setConversationId}
+			/>)}
+			{isOpenCreateChannel && (<CreateChannel/>)}
+			{isOpenInviteChannel && (<InviteChannel channel={channel}/>)}
+			{isOpenUpdateChannel && (<UpdateChannel channel={channel}/>)}
 			<div className='chat-right-page'>
-				<Conversation 
-					listMessages={messages} 
-					channel={channel} 
+				<Conversation
+					listMessages={messages}
+					channel={channel}
 					errorGetMessage={errorGetMessage}
 				/>
-				<SendMessage 
-					conversation={conversationId} 
+				<SendMessage
+					conversation={conversationId}
 					errorPostMessage={errorPostMessage}
 					setPostMessage={setSendMessage}
 					postMessage={sendMessage}
 				/>
 			</div>
-			{isOpenListUserChannel && ( <ListUserChannel channel={channel} /> )}
+			{isOpenListUserChannel && (<ListUserChannel channel={channel}/>)}
 		</div>
 	);
 }
+
 export default Chat;

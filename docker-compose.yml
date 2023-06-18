@@ -5,7 +5,7 @@ services:
     init: true
     container_name:
       db
-    build: 
+    build:
       context: ./project/sql
     restart: unless-stopped
     environment:
@@ -45,8 +45,8 @@ services:
       APP_ID: ${APP_ID}
       APP_SECRET: ${APP_SECRET}
       APP_REDIRECT_URI: ${APP_REDIRECT_URI}
-      JWT_SECRET : ${JWT_SECRET}
-      IP : ${IP}
+      JWT_SECRET: ${JWT_SECRET}
+      IP: ${IP}
     build:
       context: ./project/back
     networks:
@@ -55,7 +55,7 @@ services:
 
   front:
     environment:
-      REACT_APP_IP : ${IP}
+      REACT_APP_IP: ${IP}
     init: true
     container_name:
       front

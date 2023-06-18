@@ -1,48 +1,48 @@
 .create-channel {
-  position: absolute;
-  text-align: center;
-  position: fixed;
-  z-index: 2;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%) ;
-  width: 500px;
-  overflow: auto;
-  background-color: var(--box-color);
-  color: var(--light-color);
-  border-radius: 20px;
+    position: absolute;
+    text-align: center;
+    position: fixed;
+    z-index: 2;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 500px;
+    overflow: auto;
+    background-color: var(--box-color);
+    color: var(--light-color);
+    border-radius: 20px;
 }
 
 .close-create-channel {
-  position: absolute;
-  right: 17px;
-  top: 17px;
-  background-color: var(--close-button-color);
-  color: var(--light-color);
-  border: none;
-  padding: 0.75rem;
-  border-radius: 50%;
-  cursor: pointer;
-  font-weight: bold;
+    position: absolute;
+    right: 17px;
+    top: 17px;
+    background-color: var(--close-button-color);
+    color: var(--light-color);
+    border: none;
+    padding: 0.75rem;
+    border-radius: 50%;
+    cursor: pointer;
+    font-weight: bold;
 }
 
-.create-channel{
-	font-size: 1.25rem;
+.create-channel {
+    font-size: 1.25rem;
 }
 
 .create-channel > h2 {
-	font-size: 1.75rem;
-  margin-bottom: 2.5rem;
+    font-size: 1.75rem;
+    margin-bottom: 2.5rem;
 }
 
 .create-channel h3 {
-	font-weight: normal;
-  margin: 1.5rem;
-  margin-top: 2.5rem;
+    font-weight: normal;
+    margin: 1.5rem;
+    margin-top: 2.5rem;
 }
 
-.channel-name-input , .channel-password-input{
-	display: inline-block;
+.channel-name-input, .channel-password-input {
+    display: inline-block;
     border: 0;
     border-radius: 3rem;
     background-color: var(--background-color);
@@ -56,33 +56,33 @@
     outline: none;
 }
 
-.channel-type-button{
-	display: inline-block;
-	border-radius: 1rem;
-	background-color: var(--background-color);
-	padding: 0.1rem;
-	color: var(--light-color);
-	font-size: 1.125rem;
-	width: 6.5rem;
-  height: 2rem;
-	margin: 0 0.25rem;
-	outline: none;
-	cursor: pointer;
-	border: none;
+.channel-type-button {
+    display: inline-block;
+    border-radius: 1rem;
+    background-color: var(--background-color);
+    padding: 0.1rem;
+    color: var(--light-color);
+    font-size: 1.125rem;
+    width: 6.5rem;
+    height: 2rem;
+    margin: 0 0.25rem;
+    outline: none;
+    cursor: pointer;
+    border: none;
 }
 
 .channel-type-button:focus {
-	border: 0.2rem solid var(--primary-color);
+    border: 0.2rem solid var(--primary-color);
 }
 
-.channel-create-channel-button{
-  border: 0;
-  font-size: 1.75rem;
-  border-radius: 1rem;
-  padding: 0.75rem;
-  margin-top: 3rem;
-  margin-bottom: 3rem;
-  background-color: var(--primary-color);
-  color : var(--light-color);
-  cursor: pointer;
+.channel-create-channel-button {
+    border: 0;
+    font-size: 1.75rem;
+    border-radius: 1rem;
+    padding: 0.75rem;
+    margin-top: 3rem;
+    margin-bottom: 3rem;
+    background-color: var(--primary-color);
+    color: var(--light-color);
+    cursor: pointer;
 }
