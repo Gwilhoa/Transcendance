@@ -73,6 +73,13 @@ export const initialChannelState: Channel = {
 	bannedUsers: [],
 }
 
+export const isAdmin = (channel: Channel) => {
+		if (channel.admins.some((admin) => admin.id === localStorage.getItem('id'))) {
+			return (true);
+		}
+		return (false);
+};
+
 ////////////////////////// CHAT ///////////////////////////////////////////////
 function Chat() {
 	const isOpenSideBar = useSelector((state: RootState) => state.modalChat.isOpenSideBar);
@@ -87,6 +94,7 @@ function Chat() {
 	const [listChannel, setListChannel] = useState<Array<Channel>>([]);
 
 	const [conversationId, setConversationId] = useState<string>('');
+	const [updateChannel, setUpdateChannel] = useState<boolean>(false);
 
 	const [messages, setMessages] = useState<Array<Message>>([]);
 	const [errorGetMessage, setErrorGetMessage] = useState<boolean>(false);
@@ -145,22 +153,42 @@ function Chat() {
 	useEffect(() => {
 		fetchListChannel();
 
-		socket.on('join_code', handleJoinCode);
+		socket.on('update_user_channel', handleUpdateUserChannel);
 		socket.on('user_join', handleUserCode);
 
 		return () => {
-			socket.off('join_code');
+			socket.off('update_user_channel');
 			socket.off('user_join');
 		}
 	}, []);
 
 ////////////////////////// HANDLE SOCKET //////////////////////////////////////
-	const handleJoinCode = (data: any) => {
-		console.log('join_code');
+	const handleUpdateUserChannel = (data: any) => {
+		console.log('user_update');
 		console.log(data);
-		if (data.channel_id) {
-			setConversationId(data.channel_id);
-			setListChannel((prevListChannel) => [...prevListChannel, data.channel]);
+		if (data.code == 0) {
+			setListChannel((prevListChannel) => {
+				let channelExists = false;
+
+				const updatedListChannel = prevListChannel.map((itemChannel) => {
+					if (itemChannel.id === data.channel.id) {
+						channelExists = true;
+						console.log('updated channel');
+						console.log(data.channel);
+						return data.channel;
+					}
+					return itemChannel;
+				});
+
+				if (channelExists) {
+					setUpdateChannel(!updateChannel);
+					return updatedListChannel;
+				} 
+				else {
+					setConversationId(data.channel.id);
+					return [...updatedListChannel, data.channel];
+				}
+			});		
 		}
 	};
 
@@ -220,20 +248,19 @@ function Chat() {
 	useEffect(() => {
 		fetchListMessage();
 		findChannel();
+		console.log('change channel');
 
 		socket.on('message', handleMessage);
 		socket.on('message_code', handleMessageCode);
 		socket.on('update_channel', handleUpdateChannel);
 
 		return () => {
-			console.log('socket.off chat.');
 			socket.off('message');
 			socket.off('message_code');
 			setErrorPostMessage('');
 			socket.off('update_channel');
 		};
-
-	}, [conversationId]);
+	},[conversationId, updateChannel]);
 
 	return (
 		<div className='chatPage'>
