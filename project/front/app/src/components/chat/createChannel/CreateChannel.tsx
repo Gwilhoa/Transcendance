@@ -96,7 +96,7 @@ const AddUserId = ({usersId, setUserId}: AddUserIdProps) => {
 				!usersId.includes(user.id) ? (
 					<div className='user' key={user.id} onClick={() => handleOnClick(user.id)}>
 						<ProfilImage id={user.id} OnClickOpenProfil={false}
-									 OverwriteClassName='chat-message-image-profil'/>
+							OverwriteClassName='chat-message-image-profil'/>
 						<ProfilName id={user.id}/>
 					</div>
 				) : (
@@ -172,7 +172,7 @@ const CreateChannel = () => {
 				<h3>Channel Name</h3>
 				<button className='close-create-channel' onClick={() => dispatch(switchChatModalCreateChannel())}/>
 				<input className='channel-name-input' type='text' placeholder='Channel Name' value={channelParams.name}
-					   onChange={(e) => onSubmitChannelName(e.target.value)}/>
+					onChange={(e) => onSubmitChannelName(e.target.value)}/>
 				<div className='ButtonChangeTypeChannel'>
 					<h3>Channel Type</h3>
 					<button className='channel-type-button' onClick={() => handleChannelTypeChange(0)}>Private</button>

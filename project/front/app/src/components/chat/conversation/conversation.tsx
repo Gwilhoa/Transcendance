@@ -54,15 +54,17 @@ function Conversation(
 	return (
 		<div className='chat-conversation'>
 			<div className='chat-conversation-header'>
-				<p className='chat-conversation-channel-name'>
-					{channel.name}
-				</p>
 				{errorGetMessage ?
-					<p className="errorGetMessage">
+					<p className="chat-error-get-message">
 						{"you can't access this channel"}
 					</p>
-					:
-					<ButtonListChannel/>
+					: 
+						<>
+							<p className='chat-conversation-channel-name'>
+								{channel.name}
+							</p>
+							<ButtonListChannel/>
+						</>	
 				}
 			</div>
 			{(listMessages != null && listMessages.length > 0) ?

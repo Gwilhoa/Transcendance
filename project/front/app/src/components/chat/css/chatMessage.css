@@ -23,6 +23,10 @@
     height: calc(100% - var(--search-bar-height));
 }
 
+.chat-error-get-message{
+    grid-column-start: 2;
+}
+
 .chat-scroll-converation {
     overflow-y: auto;
     max-height: calc(100% - var(--search-bar-height));

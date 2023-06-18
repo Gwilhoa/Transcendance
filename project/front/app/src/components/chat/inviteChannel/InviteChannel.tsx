@@ -75,7 +75,7 @@ const AddUserId = ({usersId, setUserId, channelId}: AddUserIdProps) => {
 				!usersId.includes(user.id) ? (
 					<div className='user' key={user.id} onClick={() => handleOnClick(user.id)}>
 						<ProfilImage id={user.id} OnClickOpenProfil={false}
-									 OverwriteClassName='chat-message-image-profil'/>
+							OverwriteClassName='chat-message-image-profil'/>
 						<ProfilName id={user.id}/>
 					</div>
 				) : null

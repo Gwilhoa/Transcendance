@@ -65,13 +65,13 @@ const OneScoreBlock = ({status, myScore, opponentScore, opponentId, myUsername, 
 			<div className='history-score'>
 				<div className='player'>
 					<img className='image' src={user1Image} onClick={() => dispatch(openModal(id))}
-						 title={myUsername}></img>
+						title={myUsername}></img>
 					<p>{myScore}</p>
 				</div>
 				<p>against</p>
 				<div className='player'>
 					<img className='image' src={user2Image} onClick={() => dispatch(openModal(opponentId))}
-						 title={opponentUsername}></img>
+						title={opponentUsername}></img>
 					<p>{opponentScore}</p>
 				</div>
 			</div>

@@ -7,11 +7,11 @@ const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
 
 const SendMessage = ({
-						 conversation,
-						 errorPostMessage,
-						 setPostMessage,
-						 postMessage
-					 }: {
+		conversation,
+		errorPostMessage,
+		setPostMessage,
+		postMessage
+		}: {
 	conversation: string,
 	errorPostMessage: string,
 	setPostMessage: Dispatch<SetStateAction<boolean>>,
@@ -47,7 +47,7 @@ const SendMessage = ({
 		<div className='chat-bottom-input'>
 			<div className='chat-input-send-bar'>
 				<input className='chat-input-message' type='text' placeholder='Message' value={message}
-					   onKeyDown={handleKeyDown} onChange={(e) => setMessage(e.target.value)}/>
+					onKeyDown={handleKeyDown} onChange={(e) => setMessage(e.target.value)}/>
 				<button className='chat-button-send-message' onClick={handleSendMessage}>{'>'}</button>
 				{errorPostMessage != '' ? <div className='chat-error-post-message'>{errorPostMessage}</div> : null}
 				{postMessage && timer ?

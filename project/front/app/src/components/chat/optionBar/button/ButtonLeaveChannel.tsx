@@ -13,7 +13,7 @@ const ButtonLeaveChannel = ({channelId}: { channelId: string }) => {
 
 	return (
 		<div className='' onClick={() => leaveChannel()}>
-			🚪
+			➔
 		</div>
 	);
 }

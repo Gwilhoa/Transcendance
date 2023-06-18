@@ -85,7 +85,7 @@ export const ProfilImage = ({id, OnClickOpenProfil, OverwriteClassName}: {
 
 	return (
 		<div key={'image'} className={'profil-image' + ' ' + OverwriteClassName}
-			 onClick={OnClickOpenProfil === true ? () => dispatch(openModal(id)) : undefined}>
+				onClick={OnClickOpenProfil === true ? () => dispatch(openModal(id)) : undefined}>
 			<img className='circle-image' src={image} alt='selected'/>
 			<div className={'profil-status' + ' ' + userStatus}></div>
 		</div>
