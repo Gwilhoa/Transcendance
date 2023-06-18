@@ -84,13 +84,11 @@ const AddUserId = ({ usersId, setUserId }: AddUserIdProps) => {
 			}
 			return prevListId;
 		});
-		console.log('here');
-		console.log(usersId);
 	};
 
     if (listUser == null || listUser.length == 0)
     {
-        return (<></>);
+        return (null);
     }
     console.log(listUser);
     return (

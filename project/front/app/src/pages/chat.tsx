@@ -1,18 +1,20 @@
 import './css/chat.css'
-import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import Conversation from '../components/chat/conversation/conversation';
 import CreateChannel from '../components/chat/createChannel/CreateChannel';
 import InviteChannel from '../components/chat/inviteChannel/InviteChannel';
 import OptionBar from '../components/chat/optionBar/optionBar';
 import SideBarChat from '../components/chat/sidebar';
-import ErrorToken from '../components/IfError';
+import ErrorToken, { setErrorLocalStorage } from '../components/IfError';
 import { RootState } from '../redux/store';
 import SendMessage from '../components/chat/input/sendmessage';
-import { setConversation } from '../redux/chat/conversationIdSlice';
 import SocketSingleton from '../socket';
 import UpdateChannel from "../components/chat/inviteChannel/UpdateChannel";
 import ListUserChannel from '../components/chat/ListUsers';
+import axios from 'axios';
+import { cookies } from '../App';
+import { useNavigate } from 'react-router-dom';
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
 
@@ -44,7 +46,12 @@ export interface Message {
 	user: User;
 }
 
-export const initialUserState: User= {
+export interface ChanMessage {
+	channelId: string;
+	ListMessages: Array<Message>;
+}
+
+export const initialUserState: User = {
 	id: '',
 	email: '',
 	username: '',
@@ -53,9 +60,9 @@ export const initialUserState: User= {
 	status: 0,
 }
 
-export const initialChannelState: Channel= {
+export const initialChannelState: Channel = {
 	id: '',
-	name: 'New Channel',
+	name: '',
 	topic: null,
 	type: 0,
 	pwd: null,
@@ -63,46 +70,192 @@ export const initialChannelState: Channel= {
 	creator: initialUserState,
 	admins: [],
 	bannedUsers: [],
-
 }
 
+////////////////////////// CHAT ///////////////////////////////////////////////
 function Chat() {
-	const dispatch = useDispatch();
 	const isOpenSideBar = useSelector((state: RootState) => state.modalChat.isOpenSideBar);
 	const isOpenCreateChannel = useSelector((state: RootState) => state.modalChat.isOpenCreateChannel);
 	const isOpenInviteChannel = useSelector((state: RootState) => state.modalChat.isOpenInviteChannel);
 	const isOpenUpdateChannel = useSelector((state: RootState) => state.modalChat.isOpenUpdateChannel);
 	const isOpenListUserChannel = useSelector((state: RootState) => state.modalChat.isOpenListUser);
-	const conversationId = useSelector((state: RootState) => state.conversation.id);
+
+	const navigate = useNavigate();
+
+	const [channel, setChannel] = useState<Channel>(initialChannelState);
+	const [listChannel, setListChannel] = useState<Array<Channel>>([]);
+
+	const [conversationId, setConversationId] = useState<string>('');
+
+	const [messages, setMessages] = useState<Array<Message>>([]);
+	const [errorGetMessage, setErrorGetMessage] = useState<boolean>(false);
+	const [errorPostMessage, setErrorPostMessage] = useState<string>('');
+	const [sendMessage, setSendMessage] = useState<boolean>(false);
 	
+////////////////////////// FETCH DATA /////////////////////////////////////////
+	const fetchListChannel = async () => {
+		try {
+			const response = await axios.get(process.env.REACT_APP_IP + ':3000/user/channels', {
+				headers: {
+				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+				},
+			});
+			console.log(response);
+			setListChannel(response.data);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const fetchListMessage = async () => {
+		try {
+			const response = await axios.get(process.env.REACT_APP_IP + ':3000/channel/message/' + conversationId, {
+				headers: {
+				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+				},
+			});
+			console.log(response);
+			if (response.status === 204) {
+				setMessages([]);
+			}
+			else {
+				setMessages(response.data);
+			}
+			setErrorGetMessage(false);
+		} catch (error: any) {
+			console.error(error);
+			if (error.response.status === 401 || error.response.status === 500) {
+						setErrorLocalStorage('unauthorized');
+						navigate('/Error');
+			}
+			setErrorGetMessage(true);
+		}
+	};
+
+	const findChannel = () => {
+		listChannel.map((itemChannel) => { 
+			if (itemChannel.id == conversationId) {
+				setChannel({...itemChannel});
+			}
+		});
+	};
+
+////////////////////////// SOCKET /////////////////////////////////////////////
+
 	useEffect(() => {
-		if (conversationId === '' && localStorage.getItem('conversationId') != '') {
-			dispatch(setConversation('' + localStorage.getItem('conversationId')));
+		fetchListChannel();
+
+		socket.on('join_code', handleJoinCode);
+
+		return () => {
+			socket.off('join_code');		
 		}
 	}, []);
 
-	useEffect(() =>{
-		socket.on('join_code', (data: any) => {
-			console.log('join_code ' + data.code)
-			console.log(data);
-			dispatch(setConversation(data.channel_id));
-			return ;
-		});
-	}, [socket])
+////////////////////////// HANDLE SOCKET //////////////////////////////////////
+	const handleJoinCode = (data: any) => {
+		console.log(data);
+		console.log('Join_Code');
+		if (data.channel_id) {
+			setConversationId(data.channel_id);
+			setListChannel((prevListChannel) => [...prevListChannel, data.channel]);
+		}
+	};
+
+	const handleMessage = (data: any) => {
+		if (data.channel == conversationId) {
+			const newItemMessage: Message = {
+				content: data.content,
+				id: data.id,
+				user: data.user,
+				date: data.date,
+			}
+			console.log(newItemMessage);
+			setMessages((prevListMessage) => {
+				if (prevListMessage.length === 0) {
+					return [newItemMessage];
+				} 
+				else if (!prevListMessage.some((message) => message.id === newItemMessage.id)) {
+					return [...prevListMessage, newItemMessage];
+				}
+				else {
+					return prevListMessage;
+				}
+			});
+		}
+		return ;
+	};
+
+	const handleMessageCode = (data: any) => {
+		console.log(data);
+		setSendMessage(false);
+		if (data.code == 3) {
+			setErrorPostMessage('Invalid Format');
+		}
+		if (data.code == 0) {
+			setErrorPostMessage('');
+		}
+	};
+
+	const handleUpdateChannel = (data: any) => {
+		console.log('HEY I CHANGE NAME : ' + data?.channel_id + " :" + conversationId);
+		setListChannel((prevListChannel) => 
+			prevListChannel.map((itemChannel) => {
+				if (itemChannel.id === data.channel_id) {
+					return { ...itemChannel, name: data.name };
+				}
+				return itemChannel;
+			})
+		)
+		if (data.channel_id === conversationId) {
+			setChannel((prevChannel) => ({...prevChannel, name: data.name}));
+		}
+	};
+
+	useEffect(()=>{
+		console.log('channel id : ' + conversationId);
+		fetchListMessage();
+		findChannel();
+
+		socket.on('message', handleMessage);
+		socket.on('message_code', handleMessageCode);
+		socket.on('update_channel', handleUpdateChannel);
+
+		return () => {
+			console.log('socket.off chat.');
+			socket.off('message');
+			socket.off('message_code');
+			setErrorPostMessage('');
+			socket.off('update_channel');
+		};
+
+	},[conversationId]);
 
 	return (
 		<div className='chatPage'>
 			<ErrorToken />
 			<OptionBar/>
-			{isOpenSideBar && ( <SideBarChat /> )}
+			{isOpenSideBar && ( <SideBarChat 
+									listChannel={listChannel} 
+									setConversationId={setConversationId} 
+								/> )}
 			{isOpenCreateChannel && ( <CreateChannel /> )}
-			{isOpenInviteChannel && ( <InviteChannel /> )}
-			{isOpenUpdateChannel && ( <UpdateChannel /> )}
+			{isOpenInviteChannel && ( <InviteChannel channel={channel}/> )}
+			{isOpenUpdateChannel && ( <UpdateChannel channel={channel}/> )}
 			<div className='chat-right-page'>
-				<Conversation />
-				<SendMessage />
+				<Conversation 
+					listMessages={messages} 
+					channel={channel} 
+					errorGetMessage={errorGetMessage}
+				/>
+				<SendMessage 
+					conversation={conversationId} 
+					errorPostMessage={errorPostMessage}
+					setPostMessage={setSendMessage}
+					postMessage={sendMessage}
+				/>
 			</div>
-			{isOpenListUserChannel && ( <ListUserChannel /> )}
+			{isOpenListUserChannel && ( <ListUserChannel channel={channel} /> )}
 		</div>
 	);
 }
