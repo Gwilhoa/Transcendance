@@ -2,6 +2,8 @@ import React from 'react'
 import { Channel } from '../../pages/chat';
 import ButtonInviteChannel from './optionBar/button/ButtonInviteChannelModal';
 import ButtonUpdateChannel from './optionBar/button/ButtonUpdateChannel';
+import ButtonLeaveChannel from './optionBar/button/ButtonLeaveChannel';
+
 
 const ChannelSideBar = ({ channel }: {channel: Channel}) => {
 
@@ -31,9 +33,8 @@ const ChannelSideBar = ({ channel }: {channel: Channel}) => {
 					<ButtonInviteChannel />
 					<ButtonUpdateChannel /> 
 				</>
-			) : (
-				null
-			)}
+			) : null}
+				<ButtonLeaveChannel channelId={channel.id} />
 			</div>
 		</div>		
 	);

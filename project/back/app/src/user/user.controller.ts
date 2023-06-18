@@ -18,8 +18,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtIsAuthGuard } from '../auth/guard/jwt.guard';
 import { GetUser } from '../auth/decorator/auth.decorator';
 import * as path from 'path';
-import * as fs from 'fs';
 import { extname } from 'path';
+import * as fs from 'fs';
 import { promisify } from 'util';
 import fetch from 'node-fetch';
 
@@ -27,6 +27,7 @@ import fetch from 'node-fetch';
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
   @Get()
   async getUsers(): Promise<User[]> {
     return this.userService.getUsers();
@@ -156,6 +157,7 @@ export class UserController {
 
     return response.status(HttpStatus.OK).send(ret);
   }
+
   @Delete('/friend')
   async removeFriend(
     @GetUser('sub') id: string,
@@ -171,6 +173,7 @@ export class UserController {
     }
     response.status(200).send(ret);
   }
+
   @Get('/friend')
   async getFriends(@GetUser('sub') id: string, @Res() response) {
     const ret = await this.userService.getFriends(id);

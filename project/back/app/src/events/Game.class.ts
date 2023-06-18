@@ -52,12 +52,12 @@ export class Game {
   private _wait_ball: number;
   private _player1_stop: number;
   private _player2_stop: number;
-  private _stop:boolean;
-  private _playerstop:string;
+  private _stop: boolean;
+  private _playerstop: string;
   private _time_stop_user1: number;
   private _time_stop_user2: number;
   private _loop_stop: NodeJS.Timeout;
-  private _started:boolean;
+  private _started: boolean;
 
   public constructor(
     id: string,
@@ -107,58 +107,33 @@ export class Game {
     return this._user2;
   }
 
-  private delayStop = () => {
-    if ((this._playerstop == this._user1.id && this._time_stop_user1 == 0) || (this._playerstop == this._user2.id  && this._time_stop_user2 == 0)) {
-      clearInterval(this._loop_stop);
-      this._stop = false;
-      this._loopid = setInterval(this.gameLoop, Game.default_update);
-      this._user1.emit('is_stop_game', { stop: false, stoper: false });
-      this._user2.emit('is_stop_game', { stop: false, stoper: false });
-      return;
-    }
-
-    if (this._playerstop == this._user1.id ) {
-      this._user1.emit('stop_game', { time: this._time_stop_user1 });
-      this._user2.emit('stop_game', { time: this._time_stop_user1 });
-    }
-    else {
-      this._user1.emit('stop_game', { time: this._time_stop_user2 });
-      this._user2.emit('stop_game', { time: this._time_stop_user2 });
-    }
-
-
-    if (this._playerstop == this._user1.id)
-      this._time_stop_user1 -= 1
-    else
-      this._time_stop_user2 -= 1
-  }
-
   public updateRacket = (player: Socket, y: number) => {
-
     if (y == 2 && this._started) {
-      console.log("enter");
+      console.log('enter');
       console.log(this._stop);
       console.log(player.id);
       console.log(this._playerstop);
       if (this._stop && player.id == this._playerstop) {
-        console.log('clearinterval')
+        console.log('clearinterval');
 
         clearInterval(this._loop_stop);
         this._stop = false;
         this._loopid = setInterval(this.gameLoop, Game.default_update);
         this._user1.emit('is_stop_game', { stop: false, stoper: false });
         this._user2.emit('is_stop_game', { stop: false, stoper: false });
-        return ;
+        return;
       }
       if (!this._stop) {
-        if ((player.id === this._user1.id && this._time_stop_user1 > 0) || (player.id === this._user2.id && this._time_stop_user2 > 0)) {
+        if (
+          (player.id === this._user1.id && this._time_stop_user1 > 0) ||
+          (player.id === this._user2.id && this._time_stop_user2 > 0)
+        ) {
           this._stop = true;
           clearInterval(this._loopid);
           if (player.id == this._user1.id) {
             this._user1.emit('is_stop_game', { stop: true, stoper: true });
             this._user2.emit('is_stop_game', { stop: true, stoper: false });
-          }
-          else {
+          } else {
             this._user1.emit('is_stop_game', { stop: true, stoper: false });
             this._user2.emit('is_stop_game', { stop: true, stoper: true });
           }
@@ -191,9 +166,7 @@ export class Game {
       }
     }
 
-
-    if (!this._isPowerUp)
-      return
+    if (!this._isPowerUp) return;
 
     if (y == 3) {
       if (player.id == this._user2.id && this._player2_reversey > 0) {
@@ -216,7 +189,7 @@ export class Game {
       }
     }
 
-    if (y == 5)  {
+    if (y == 5) {
       if (player.id == this._user1.id && this._player1_stop > 0) {
         this._player1_stop -= 1;
         this._wait_ball = 100;
@@ -226,10 +199,9 @@ export class Game {
         this._wait_ball = 100;
       }
     }
+  };
 
-  }
-
-  public definePowerUp(powerup:boolean) {
+  public definePowerUp(powerup: boolean) {
     this._isPowerUp = powerup;
     this._player1_reversey = Game.default_maxpowerupreverse;
     this._player2_reversey = Game.default_maxpowerupreverse;
@@ -237,7 +209,6 @@ export class Game {
     this._player2_reversex = Game.default_maxpowerupreverse;
     this._player1_stop = Game.default_maxpowerupstop;
     this._player2_stop = Game.default_maxpowerupstop;
-
   }
 
   public getGameInfo() {
@@ -253,6 +224,7 @@ export class Game {
       package: this._package,
     };
   }
+
   public async start() {
     console.log('power up ' + this._isPowerUp);
     await sleep(3000);
@@ -267,6 +239,137 @@ export class Game {
     this._loopid = setInterval(this.gameLoop, Game.default_update);
     this._started = true;
   }
+
+  public gameLoop = async () => {
+    if (this._wait_ball > 0) {
+      this._wait_ball -= 1;
+      return;
+    }
+    this._futurballx = this._ballx + Math.sin(this._angle) * this._speedball;
+    this._futurbally = this._bally + Math.cos(this._angle) * this._speedball;
+    const minposition =
+      this._minY + Game.default_rackwidth + Game.default_radiusball;
+    const maxposition =
+      this._maxY - Game.default_rackwidth - Game.default_radiusball;
+
+    if (this._bally <= minposition) {
+      if (
+        this._futurballx >= this._rack1y &&
+        this._futurballx <= this._rack1y + Game.default_racklenght
+      ) {
+        if (this._isPowerUp) this._speedball *= 1.05;
+        else this._speedball *= 1.15;
+        this._angle = Math.PI - this._angle;
+        const distbar = this._futurbally - minposition;
+        this._futurbally -= 2 * distbar;
+      } else {
+      }
+    }
+
+    if (this._futurbally >= maxposition) {
+      if (
+        this._futurballx >= this._rack2y &&
+        this._futurballx <= this._rack2y + Game.default_racklenght
+      ) {
+        if (this._isPowerUp) this._speedball *= 1.05;
+        else this._speedball *= 1.15;
+        this._angle = Math.PI - this._angle;
+        const distbar = this._futurbally - maxposition;
+        this._futurbally -= 2 * distbar;
+      } else {
+      }
+    }
+
+    if (this._futurbally < Game.default_sizeMinY - Game.default_radiusball) {
+      this._score1 = this.endBattle(this._score1);
+      if (this._score1 >= Game.default_victorygoal) {
+        await this.endWar(this._user1, this._user2, 1);
+        return;
+      } else {
+        this.clear();
+        this.start();
+        return;
+      }
+    }
+
+    if (this._futurbally > Game.default_sizeMaxY + Game.default_radiusball) {
+      this._score2 = this.endBattle(this._score2);
+      if (this._score2 >= Game.default_victorygoal) {
+        await this.endWar(this._user2, this._user1, 2);
+        return;
+      } else {
+        this.clear();
+        this.start();
+        return;
+      }
+    }
+
+    if (
+      this._futurballx < this._minX + Game.default_radiusball ||
+      this._futurballx > this._maxX - Game.default_radiusball
+    ) {
+      if (this._futurballx < this._minX + Game.default_radiusball) {
+        const distbar =
+          this._futurballx - (this._minX + Game.default_radiusball);
+        this._futurballx -= 2 * distbar;
+      } else {
+        const distbar =
+          this._futurballx - (this._maxX + Game.default_radiusball);
+        this._futurballx -= 2 * distbar;
+      }
+      this._angle = -this._angle;
+    }
+    this._ballx = this._futurballx;
+    this._bally = this._futurbally;
+    this._io.to(this._id).emit('update_game', this.getGameInfo());
+  };
+
+  onFinish(callback) {
+    this._finishCallback.push(callback);
+  }
+
+  public async remake() {
+    this._io.to(this._id).emit('finish_game', {
+      score1: 0,
+      score2: 0,
+      status: 'remake',
+      username: 'none',
+    });
+    this._user2.leave(this._id);
+    this._user1.leave(this._id);
+    this.clear();
+    this.executeFinishCallbacks();
+  }
+
+  public clear() {
+    if (this._loopid != null) clearInterval(this._loopid);
+    this._loopid = null;
+  }
+
+  private delayStop = () => {
+    if (
+      (this._playerstop == this._user1.id && this._time_stop_user1 == 0) ||
+      (this._playerstop == this._user2.id && this._time_stop_user2 == 0)
+    ) {
+      clearInterval(this._loop_stop);
+      this._stop = false;
+      this._loopid = setInterval(this.gameLoop, Game.default_update);
+      this._user1.emit('is_stop_game', { stop: false, stoper: false });
+      this._user2.emit('is_stop_game', { stop: false, stoper: false });
+      return;
+    }
+
+    if (this._playerstop == this._user1.id) {
+      this._user1.emit('stop_game', { time: this._time_stop_user1 });
+      this._user2.emit('stop_game', { time: this._time_stop_user1 });
+    } else {
+      this._user1.emit('stop_game', { time: this._time_stop_user2 });
+      this._user2.emit('stop_game', { time: this._time_stop_user2 });
+    }
+
+    if (this._playerstop == this._user1.id) this._time_stop_user1 -= 1;
+    else this._time_stop_user2 -= 1;
+  };
 
   private endWar = async (userWin: Socket, userDefeat: Socket, winuser) => {
     this._time_stop_user1 = Game.default_maxtimestop;
@@ -322,118 +425,7 @@ export class Game {
     return scoreWin;
   };
 
-  public gameLoop = async () => {
-    if (this._wait_ball > 0) {
-      this._wait_ball -= 1;
-      return;
-    }
-    this._futurballx = this._ballx + Math.sin(this._angle) * this._speedball;
-    this._futurbally = this._bally + Math.cos(this._angle) * this._speedball;
-    const minposition =
-      this._minY + Game.default_rackwidth + Game.default_radiusball;
-    const maxposition =
-      this._maxY - Game.default_rackwidth - Game.default_radiusball;
-
-    if (this._bally <= minposition) {
-      if (
-        this._futurballx >= this._rack1y &&
-        this._futurballx <= this._rack1y + Game.default_racklenght
-      ) {
-        if (this._isPowerUp)
-          this._speedball *= 1.05;
-        else
-          this._speedball *= 1.15;
-        this._angle = Math.PI - this._angle;
-        const distbar = this._futurbally - minposition;
-        this._futurbally -= 2 * distbar;
-      } else {
-        
-      }
-    }
-
-    if (this._futurbally >= maxposition) {
-      if (
-        this._futurballx >= this._rack2y &&
-        this._futurballx <= this._rack2y + Game.default_racklenght
-      ) {
-        if (this._isPowerUp)
-          this._speedball *= 1.05;
-        else
-          this._speedball *= 1.15;
-        this._angle = Math.PI - this._angle;
-        const distbar = this._futurbally - maxposition;
-        this._futurbally -= 2 * distbar;
-      } else {
-      }
-    }
-  
-  if (this._futurbally < (Game.default_sizeMinY - Game.default_radiusball)) {
-    this._score1 = this.endBattle(this._score1);
-    if (this._score1 >= Game.default_victorygoal) {
-      await this.endWar(this._user1, this._user2, 1);
-      return;
-    } else {
-      this.clear();
-      this.start();
-      return;
-    }
-  }
-
-  if (this._futurbally > (Game.default_sizeMaxY + Game.default_radiusball)) {
-    this._score2 = this.endBattle(this._score2);
-    if (this._score2 >= Game.default_victorygoal) {
-      await this.endWar(this._user2, this._user1, 2);
-    return;
-  } else {
-    this.clear();
-    this.start();
-    return;
-    }
-  } 
-    
-  if (
-      this._futurballx < this._minX + Game.default_radiusball ||
-      this._futurballx > this._maxX - Game.default_radiusball
-    ) {
-      if (this._futurballx < this._minX + Game.default_radiusball) {
-        const distbar =
-          this._futurballx - (this._minX + Game.default_radiusball);
-        this._futurballx -= 2 * distbar;
-      } else {
-        const distbar =
-          this._futurballx - (this._maxX + Game.default_radiusball);
-        this._futurballx -= 2 * distbar;
-      }
-      this._angle = -this._angle;
-    }
-    this._ballx = this._futurballx;
-    this._bally = this._futurbally;
-    this._io.to(this._id).emit('update_game', this.getGameInfo());
-  };
-
   private executeFinishCallbacks() {
     this._finishCallback.forEach((callback) => callback());
-  }
-
-  onFinish(callback) {
-    this._finishCallback.push(callback);
-  }
-
-  public async remake() {
-    this._io.to(this._id).emit('finish_game', {
-      score1: 0,
-      score2: 0,
-      status: 'remake',
-      username: 'none',
-    });
-    this._user2.leave(this._id);
-    this._user1.leave(this._id);
-    this.clear();
-    this.executeFinishCallbacks();
-  }
-
-  public clear() {
-    if (this._loopid != null) clearInterval(this._loopid);
-    this._loopid = null;
   }
 }

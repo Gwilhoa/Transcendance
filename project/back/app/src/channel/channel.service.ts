@@ -1,4 +1,4 @@
-import { flatten, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { addAdminDto } from 'src/dto/add-admin.dto';
 import { CreateChannelDto } from 'src/dto/create-channel.dto';
@@ -12,7 +12,6 @@ import { ChannelType } from 'src/utils/channel.enum';
 import { BanUserDto } from '../dto/ban-user.dto';
 import * as bcrypt from 'bcrypt';
 import { includeUser } from '../utils/socket.function';
-import { User } from '../user/user.entity';
 
 @Injectable()
 export class ChannelService {
@@ -357,8 +356,8 @@ export class ChannelService {
     const channel = await this.channelRepository
       .createQueryBuilder('channel')
       .leftJoinAndSelect('channel.bannedUsers', 'bannedUsers')
-        .leftJoinAndSelect('channel.users', 'users')
-        .leftJoinAndSelect('channel.admins', 'admins')
+      .leftJoinAndSelect('channel.users', 'users')
+      .leftJoinAndSelect('channel.admins', 'admins')
       .where('channel.id = :id', { id: body.channel_id })
       .getOne();
     if (channel == null) throw new Error('Channel not found');
@@ -417,8 +416,8 @@ export class ChannelService {
       .createQueryBuilder('channel')
       .leftJoinAndSelect('channel.users', 'users')
       .leftJoinAndSelect('channel.admins', 'admins')
-        .leftJoinAndSelect('channel.creator', 'creator')
-        .leftJoinAndSelect('channel.bannedUsers', 'bannedUsers')
+      .leftJoinAndSelect('channel.creator', 'creator')
+      .leftJoinAndSelect('channel.bannedUsers', 'bannedUsers')
       .where('channel.id = :id', { id: channel_id })
       .getOne();
     if (channel.type == ChannelType.MP_CHANNEL)
