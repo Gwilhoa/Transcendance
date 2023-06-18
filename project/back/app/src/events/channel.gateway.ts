@@ -17,6 +17,8 @@ import {
 import { UserService } from '../user/user.service';
 import { sendMessageDTO } from '../dto/sendmessage.dto';
 import { AuthService } from '../auth/auth.service';
+import { Channel } from '../channel/channel.entity';
+import { JoinChannelDto } from '../dto/join-channel.dto';
 
 @WebSocketGateway()
 export class ChannelGateway implements OnGatewayInit {
@@ -78,6 +80,7 @@ export class ChannelGateway implements OnGatewayInit {
         };
         socket.join(channel_id);
         socket.emit('join_code', send);
+        this.server.to(channel_id).emit('join_code', send);
       }
       return;
     }
@@ -194,11 +197,29 @@ export class ChannelGateway implements OnGatewayInit {
         channel: channel,
       };
     } else if (!(await this.channelService.isInChannel(user.id, channel.id))) {
-      send = {
-        code: 2,
-        channel_id: channel_id,
-        channel: channel,
-      };
+      let ch;
+      const ChannelDTO = new JoinChannelDto();
+      ChannelDTO.channel_id = channel_id;
+      ChannelDTO.user_id = user_id;
+      ChannelDTO.password = payload.password;
+      try {
+        ch = await this.channelService.joinChannel(ChannelDTO);
+        client.join(channel_id);
+        send = {
+          code: 2,
+          channel_id: channel_id,
+          channel: ch,
+        };
+        this.server.to(channel_id).emit('user_join', send);
+      } catch (e) {
+        send = {
+          code: 1,
+          channel_id: channel_id,
+          channel: channel,
+        };
+        client.emit('join_code', send);
+        return;
+      }
     } else {
       client.join(channel_id);
       send = {
