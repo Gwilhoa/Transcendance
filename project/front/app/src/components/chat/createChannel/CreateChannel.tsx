@@ -193,7 +193,7 @@ const CreateChannel = () => {
 								placeholder='Password'
 								type='password'
 								id='password'
-								onChange={() => handlePasswordChange}
+								onChange={(e) => handlePasswordChange(e.target.value)}
 							/>
 						</div>
 					</>

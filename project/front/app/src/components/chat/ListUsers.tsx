@@ -1,7 +1,7 @@
 import './css/listUsers.css';
 import React from 'react';
 import {useDispatch} from 'react-redux';
-import {Channel, isAdmin, User} from '../../pages/chat';
+import {Channel, isAdmin, isMe, User} from '../../pages/chat';
 import {ProfilImage} from '../profil/ProfilImage';
 import {ProfilName} from '../profil/ProfilName';
 import {openModal} from '../../redux/modal/modalSlice';
@@ -94,7 +94,7 @@ const ListAdmin = ({channel}: listUserProps) => {
 							/>
 						</div>
 						<ProfilName id={user.id}/>
-						{ isAdmin(channel) ?
+						{ isAdmin(channel) && !isMe(user) ?
 							<DeleteAdmin id={user.id} channel={channel} />
 						:
 							null
@@ -129,8 +129,14 @@ const ListUser = ({channel}: listUserProps) => {
 						<div className='chat-list-users-user-name' onClick={() => dispatch(openModal(user.id))}>
 							<ProfilName id={user.id}/>
 						</div>
-						<MakeAdmin id={user.id} channel={channel}/>
-						<BanHammer id={user.id} channel={channel}/>
+						{ isAdmin(channel) && !isMe(user) ?
+							<>
+								<MakeAdmin id={user.id} channel={channel} />
+								<BanHammer id={user.id} channel={channel} />
+							</>
+						:
+							null
+						}
 					</div>
 				)
 			))}
@@ -152,7 +158,11 @@ const ListBannedUser = ({channel}: listUserProps) => {
 					<div className='chat-list-users-user-name' onClick={() => dispatch(openModal(user.id))}>
 						<ProfilName id={user.id}/>
 					</div>
-					<UnBanHammer id={user.id} channel={channel}/>
+					{ isAdmin(channel) && !isMe(user) ?
+						<UnBanHammer id={user.id} channel={channel}/>
+					:
+						null
+					}
 				</div>
 			))}
 		</>

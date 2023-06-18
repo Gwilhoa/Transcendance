@@ -74,6 +74,10 @@ export const ProfilName = ({id}: { id: string | null }) => {
 				changeName();
 		});
 
+		return () => {
+			socket.off('update_profil');
+			socket.off('connection_server');
+		};
 	}, [navigate, socket])
 
 	return (
