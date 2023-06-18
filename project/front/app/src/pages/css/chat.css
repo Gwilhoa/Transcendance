@@ -21,3 +21,13 @@
     height: 3rem;
     width: 3rem;
 }
+
+.profil-image.chat-small-user-image {
+    width: 4rem;
+    height: 4rem;
+    cursor: pointer;
+}
+
+.chat-users-list-add-user-by-id{
+    overflow-y: auto;
+}
