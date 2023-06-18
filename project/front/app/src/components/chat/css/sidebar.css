@@ -41,11 +41,16 @@
     transform: translate(-50%, -50%);
     max-height: 40rem;
 	/* min-height: 20rem; */
+	/* min-height: 20rem; */
     width: 30rem;
     overflow: auto;
     background-color: var(--box-color);
     color: var(--light-color);
     border-radius: 20px;
+}
+
+.chat-channel-invite-people > h2{
+	margin-bottom: 2.5rem;
 }
 
 .chat-side-bar-close-add-people-channel {
@@ -81,7 +86,7 @@
 .chat-channel-invite-add-user-by-id{
 	/* max-height: 25rem; */
 	overflow-y: auto;
-	/* min-height: 5rem; */
+	min-height: 5rem;
 }
 
 /* end Invite page */
