@@ -31,6 +31,7 @@ import {
 } from 'src/utils/requestcode.enum';
 import { addAdminDto } from '../dto/add-admin.dto';
 import { sleep } from '../utils/sleep';
+import { BanUserDto } from '../dto/ban-user.dto';
 
 @WebSocketGateway({
   cors: {
@@ -276,28 +277,33 @@ export class EventsGateway
     send = {
       code: 0,
       channel_id: channel_id,
+      channel: channel,
     };
     if (channel == null) {
       send = {
         code: 1,
         channel_id: channel_id,
+        channel: channel,
       };
     } else if (!(await this.channelService.isInChannel(user.id, channel.id))) {
       send = {
         code: 2,
         channel_id: channel_id,
+        channel: channel,
       };
     } else {
       client.join(channel_id);
       send = {
         code: 0,
         channel_id: channel_id,
+        channel: channel,
       };
     }
     client.emit('join_code', send);
     send = {
       user_id: user.id,
       channel_id: channel_id,
+      channel: channel,
     };
     this.server.to(channel_id).emit('user_join', send);
   }
@@ -521,7 +527,7 @@ export class EventsGateway
     const user_id = getIdFromSocket(client, this.clients);
     const game_id = this.ingame.get(user_id);
     const game: Game = this.games[game_id];
-    game.definePowerUp(payload.powerup)
+    game.definePowerUp(payload.powerup);
     if (game == null) {
       return;
     } else {
@@ -736,6 +742,7 @@ export class EventsGateway
         const send = {
           user_id: receiver_id,
           channel_id: channel_id,
+          channel: ch,
         };
         socket.join(channel_id);
         socket.emit('join_code', send);
@@ -763,33 +770,6 @@ export class EventsGateway
       });
     }
     client.emit('update_channel', ret);
-  }
-
-  @SubscribeMessage('delete_admin')
-  async delete_admin(client: Socket, payload: any) {
-    const user_id = getIdFromSocket(client, this.clients);
-    const channel_id = payload.channel_id;
-    const admin_id = payload.admin_id;
-    const addAdmin = new addAdminDto();
-    addAdmin.channel_id = channel_id;
-    addAdmin.user_id = admin_id;
-    try {
-      const chan = await this.channelService.deleteAdmin(addAdmin, user_id);
-      if (chan != null) {
-        this.server.to(chan.id).emit('admin_code', {
-          channel_id: chan.id,
-          admins: chan.admins,
-        });
-      }
-      client.emit('admin_code', {
-        message: 'ok',
-      });
-    } catch (e) {
-      client.emit('add_admin', {
-        message: e.message,
-      });
-      return;
-    }
   }
 
   @SubscribeMessage('add_admin')
@@ -820,5 +800,94 @@ export class EventsGateway
   }
 
   @SubscribeMessage('remove_admin')
-  async remove_admin(client: Socket, payload: any) {}
+  async remove_admin(client: Socket, payload: any) {
+    const user_id = getIdFromSocket(client, this.clients);
+    const channel_id = payload.channel_id;
+    const admin_id = payload.admin_id;
+    const addAdmin = new addAdminDto();
+    addAdmin.channel_id = channel_id;
+    addAdmin.user_id = admin_id;
+    try {
+      const chan = await this.channelService.deleteAdmin(addAdmin, user_id);
+      if (chan != null) {
+        this.server.to(chan.id).emit('admin_code', {
+          channel_id: chan.id,
+          admins: chan.admins,
+        });
+      }
+      client.emit('admin_code', {
+        message: 'ok',
+      });
+    } catch (e) {
+      client.emit('admin_code', {
+        message: e.message,
+      });
+      return;
+    }
+  }
+
+  @SubscribeMessage('ban_user')
+  async ban_user(client: Socket, payload: any) {
+    const user_id = getIdFromSocket(client, this.clients);
+    const channel_id = payload.channel_id;
+    const ban_id = payload.ban_id;
+    const addBan = new BanUserDto();
+    addBan.channel_id = channel_id;
+    addBan.user_id = ban_id;
+    try {
+      const chan = await this.channelService.banUser(addBan, user_id);
+      if (chan != null) {
+        this.server.to(chan.id).emit('ban_code', {
+          channel_id: chan.id,
+          bans: chan.bannedUsers,
+        });
+      }
+    } catch (e) {
+      client.emit('ban_code', {
+        message: e.message,
+      });
+      return;
+    }
+  }
+
+  @SubscribeMessage('unban_user')
+  async unban_user(client: Socket, payload: any) {
+    const user_id = getIdFromSocket(client, this.clients);
+    const channel_id = payload.channel_id;
+    const ban_id = payload.unban_id;
+    const addBan = new BanUserDto();
+    addBan.channel_id = channel_id;
+    addBan.user_id = ban_id;
+    try {
+      const chan = await this.channelService.deleteBanUser(addBan, user_id);
+      if (chan != null) {
+        this.server.to(chan.id).emit('ban_code', {
+          channel_id: chan.id,
+          bans: chan.bannedUsers,
+        });
+      }
+    } catch (e) {
+      client.emit('ban_code', {
+        message: e.message,
+      });
+      return;
+    }
+  }
+
+  @SubscribeMessage('block_user')
+  async block_user(client: Socket, payload: any) {
+    const user_id = getIdFromSocket(client, this.clients);
+    const block_id = payload.block_id;
+    try {
+      const user = await this.userService.addBlocked(user_id, block_id);
+      client.emit('block_code', {
+        message: 'ok',
+      });
+    } catch (e) {
+      client.emit('block_code', {
+        message: e.message,
+      });
+      return;
+    }
+  }
 }

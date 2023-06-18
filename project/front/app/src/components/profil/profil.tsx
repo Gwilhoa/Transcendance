@@ -12,6 +12,7 @@ import { ProfilImage } from './ProfilImage';
 import axios from 'axios';
 import SocketSingleton from '../../socket';
 import {ProfilName} from './ProfilName';
+import { error } from 'console';
 const cookies = new Cookies();
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
@@ -117,7 +118,9 @@ export default function Profil() {
 			}
 			return;
 		})
-
+		
+		
+		
 		socket.on('friend_request', (data: any) => {
 			console.log('friend request => ' + data.code);
 			if (data.id == id && (data.code == 2 || data.code == 7 || data.code == 5)) {
@@ -126,8 +129,26 @@ export default function Profil() {
 			}
 			return;
 		})
-	}, [socket])
+		if (!isMe) {
 
+			axios.get(process.env.REACT_APP_IP + ':3000/user/friend/blocked', {
+				headers: {
+					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+				},
+			})
+			.then((data) => {
+				console.log(data)
+				//setIsUserBlocked(data)
+			})
+			.catch((error) => {
+				console.error(error);
+			})
+			return;
+		}
+		
+
+	}, [socket]);
+	
 	useEffect(() => {
 		if (id === localStorage.getItem('id')) {
 			setIsMe(true);
@@ -226,6 +247,20 @@ export default function Profil() {
 		socket.emit('challenge', { rival_id: id });
 	}
 
+
+	const handleChangeBlocke = () => {
+		//await axios.get('/friend/blocked', {
+
+		//})
+		if (isUserBlocked) {
+			console.log('dd')
+		//	socket.emit('')block_id, block_code
+		}
+		else {
+			console.log('dd')
+		}
+	}
+
 	initialElement.push(
 		<div key='ProfilImage'>
         <ProfilImage id = {'' + id} OnClickOpenProfil={false} OverwriteClassName = ''/>
@@ -310,9 +345,11 @@ export default function Profil() {
 									Challenge
 								</button>
 								<br/>
-								<button onClick={() => handlechallenge(id)}>
+								<button onClick={() => handleChangeBlocke()}>
 									{
-										
+										isUserBlocked ? (
+											'unblock'
+										) : 'block'
 									}
 								</button>
 							</div>
