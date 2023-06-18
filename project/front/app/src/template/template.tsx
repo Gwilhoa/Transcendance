@@ -44,7 +44,7 @@ const Template = () => {
 		if (data.code == 4) {
 			friendId = data.id;
 			setNotif(<Notification message={'New friend'} onConfirm={confirmFriend} onCancel={rejectFriend}
-								   hasButton={true} setVisible={setNotifVisible}/>);
+				hasButton={true} setVisible={setNotifVisible}/>);
 			setNotifVisible(true)
 		}
 	})

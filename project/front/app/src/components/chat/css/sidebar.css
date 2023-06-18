@@ -18,15 +18,16 @@
     justify-content: space-between;
 }
 
-.chat-side-bar-channel-invite {
+.chat-side-bar-channel-modify-button {
+	display: flex;
+	margin-right: 1rem;
+	opacity: .7;
+}
+
+.chat-side-bar-channel-modify-channel {
     margin: 0 0.7rem;
 }
 
-.chat-side-bar-channel-modify-button {
-    display: flex;
-    margin-right: 1rem;
-    opacity: .7;
-}
 
 /* Invite page */
 
@@ -45,6 +46,8 @@
 
 .chat-side-bar-invite-channel-input {
     background-color: var(--background-color);
+	width: 75%;
+	margin: 0 0 3rem;
 }
 
 /* end Invite page */

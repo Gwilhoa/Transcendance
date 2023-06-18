@@ -87,7 +87,7 @@ const Add = () => {
 			{listUser.map((user) => (
 				<div className='user' key={user.id} onClick={() => dispatch(openModal(user.id))}>
 					<img className='image'
-						 src='https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/42_Logo.svg/1200px-42_Logo.svg.png'></img>
+						src='https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/42_Logo.svg/1200px-42_Logo.svg.png'></img>
 					<p className='name'>{user.username}</p>
 					<p className='status'>{user.status}</p>
 					<p className='xp'>{user.experience}XP</p>

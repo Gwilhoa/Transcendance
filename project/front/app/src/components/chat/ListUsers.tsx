@@ -90,7 +90,7 @@ const ListAdmin = ({channel}: listUserProps) => {
 					>
 						<div className='chat-list-users-user-name' onClick={() => dispatch(openModal(user.id))}>
 							<ProfilImage OnClickOpenProfil={true} id={user.id}
-										 OverwriteClassName='chat-list-user-image'/>
+								OverwriteClassName='chat-list-user-image'/>
 						</div>
 						<ProfilName id={user.id}/>
 						<DeleteAdmin id={user.id} channel={channel}/>

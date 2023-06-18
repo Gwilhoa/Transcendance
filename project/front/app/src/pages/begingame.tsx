@@ -63,7 +63,7 @@ const BeginGame = () => {
 			<ErrorToken/>
 			<h2 style={{color: 'white'}}> Searching players... </h2>
 			<animated.img src={"https://pic.onlinewebfonts.com/svg/img_155544.png"} className={"gameimg"}
-						  style={spinnerAnimation}></animated.img>
+				style={spinnerAnimation}></animated.img>
 		</div>
 	);
 }

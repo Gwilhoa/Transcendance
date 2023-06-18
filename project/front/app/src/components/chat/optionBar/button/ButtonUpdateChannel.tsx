@@ -7,7 +7,7 @@ const ButtonUpdateChannel = () => {
 	const dispatch = useDispatch();
 
 	return (
-		<div className='' onClick={() => dispatch(switchChatModalUpdateChannel())}>
+		<div className='chat-side-bar-channel-modify-channel' onClick={() => dispatch(switchChatModalUpdateChannel())}>
 			⚙
 		</div>
 	);
