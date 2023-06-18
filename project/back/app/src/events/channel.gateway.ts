@@ -250,6 +250,7 @@ export class ChannelGateway implements OnGatewayInit {
       };
     } else {
       client.leave(channel_id);
+      await this.channelService.leaveChannel(user.id, channel.id);
       send = {
         code: 0,
       };
