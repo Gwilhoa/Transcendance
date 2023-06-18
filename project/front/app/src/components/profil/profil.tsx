@@ -28,6 +28,7 @@ export default function Profil() {
 	const [defeats, setDefeat] = useState<number>(0);
 	const [experience, setExperience] = useState<number>(0);
 	const [hasFriendRequest, setHasFriendRequest] = useState<number>(0);
+	const [isUserBlocked, setIsUserBlocked] = useState(false);
 	const id = useSelector((state: RootState) => state.modal.id);
 	const dispatch = useDispatch();
 
@@ -244,7 +245,7 @@ export default function Profil() {
 				</p>
 				<p>
 				<span className='profil-game-info-title'>Ratio</span>
-				<span>{defeats === 0 ? (victories === 0 ? 0 : 1) : victories/defeats}</span>
+				<span>{defeats === 0 ? (victories === 0 ? 0 : 1) : (victories/defeats).toString().slice(0, 7)}</span>
 				</p>
 			</div>
 			<p className='profil-experience'>{experience} XP</p>
@@ -307,6 +308,12 @@ export default function Profil() {
 								<br/>
 								<button onClick={() => handlechallenge(id)}>
 									Challenge
+								</button>
+								<br/>
+								<button onClick={() => handlechallenge(id)}>
+									{
+										
+									}
 								</button>
 							</div>
 						) : (
