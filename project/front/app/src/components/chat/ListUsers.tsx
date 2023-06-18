@@ -1,7 +1,7 @@
 import './css/listUsers.css';
 import React from 'react';
 import {useDispatch} from 'react-redux';
-import {Channel, User} from '../../pages/chat';
+import {Channel, isAdmin, User} from '../../pages/chat';
 import {ProfilImage} from '../profil/ProfilImage';
 import {ProfilName} from '../profil/ProfilName';
 import {openModal} from '../../redux/modal/modalSlice';
@@ -90,10 +90,20 @@ const ListAdmin = ({channel}: listUserProps) => {
 					>
 						<div className='chat-list-users-user-name' onClick={() => dispatch(openModal(user.id))}>
 							<ProfilImage OnClickOpenProfil={true} id={user.id}
-								OverwriteClassName='chat-list-user-image'/>
+								OverwriteClassName='chat-list-user-image'
+							/>
 						</div>
 						<ProfilName id={user.id}/>
-						<DeleteAdmin id={user.id} channel={channel}/>
+						{ isAdmin(channel) ?
+							<DeleteAdmin id={user.id} channel={channel} />
+						:
+							null
+						}
+						{ channel.creator.id === '' + localStorage.getItem('id') ?
+							<BanHammer id={user.id} channel={channel} />
+						:
+							null
+						}
 					</div>
 				)
 			))}
