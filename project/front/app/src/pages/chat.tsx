@@ -94,7 +94,7 @@ function Chat() {
 	const [listChannel, setListChannel] = useState<Array<Channel>>([]);
 
 	const [conversationId, setConversationId] = useState<string>('');
-	const [updateChannel, setUpdateChannel] = useState<boolean>(false);
+	const [updateChannel, setUpdateChannel] = useState<number>(0);
 
 	const [messages, setMessages] = useState<Array<Message>>([]);
 	const [errorGetMessage, setErrorGetMessage] = useState<boolean>(false);
@@ -166,7 +166,7 @@ function Chat() {
 	const handleUpdateUserChannel = (data: any) => {
 		console.log('user_update');
 		console.log(data);
-		if (data.code == 0) {
+		if (data.code === 0) {
 			setListChannel((prevListChannel) => {
 				let channelExists = false;
 
@@ -181,7 +181,6 @@ function Chat() {
 				});
 
 				if (channelExists) {
-					setUpdateChannel(!updateChannel);
 					return updatedListChannel;
 				} 
 				else {
@@ -190,6 +189,11 @@ function Chat() {
 				}
 			});		
 		}
+		setUpdateChannel(updateChannel+1);
+		if (updateChannel > 10) {
+			setUpdateChannel(0);
+		}
+		findChannel();
 	};
 
 	const handleUserCode = (data: any) => {
