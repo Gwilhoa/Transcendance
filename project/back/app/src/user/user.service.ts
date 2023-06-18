@@ -19,6 +19,7 @@ import { Server } from 'socket.io';
 @Injectable()
 export class UserService {
   @WebSocketServer() server: Server;
+
   constructor(
     private jwt: JwtService,
     @InjectRepository(User) private userRepository: Repository<User>,
@@ -96,6 +97,7 @@ export class UserService {
     }
     return false;
   }
+
   public async createUsers(code) {
     const retIntra = await this.authService.getIntraToken(code);
     if (retIntra == null) {
@@ -536,6 +538,7 @@ export class UserService {
     }
     return users;
   }
+
   public async changeStatus(id: string, status: number) {
     const user = await this.userRepository.findOneBy({ id: id });
     if (user == null) {
@@ -622,6 +625,7 @@ export class UserService {
       .getOne();
     return await this.removeFriend(user, friend);
   }
+
   async removeFriend(user: User, blocked: User) {
     user.friends = user.friends.filter((element) => element.id != blocked.id);
     blocked.friends = blocked.friends.filter(

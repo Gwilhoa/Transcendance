@@ -1,4 +1,4 @@
-import { flatten, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { addAdminDto } from 'src/dto/add-admin.dto';
 import { CreateChannelDto } from 'src/dto/create-channel.dto';
@@ -12,7 +12,6 @@ import { ChannelType } from 'src/utils/channel.enum';
 import { BanUserDto } from '../dto/ban-user.dto';
 import * as bcrypt from 'bcrypt';
 import { includeUser } from '../utils/socket.function';
-import { User } from '../user/user.entity';
 
 @Injectable()
 export class ChannelService {
@@ -129,13 +128,11 @@ export class ChannelService {
   }
 
   public async leaveChannel(user_id, channel_id) {
-    const chan = await this.channelRepository.findOneBy({
-      id: channel_id,
-    });
+    const chan = await this.getChannelById(channel_id);
     if (chan == null) throw new Error('Channel not found');
     const user = await this.userService.getUserById(user_id);
     if (user == null) throw new Error('User not found');
-    if (!chan.users.includes(user)) throw new Error('User not in channel');
+    if (!includeUser(user, chan.users)) throw new Error('User not in channel');
     chan.users = chan.users.filter((u) => u.id != user.id);
     await this.channelRepository.save(chan);
     return user;
@@ -231,6 +228,7 @@ export class ChannelService {
   }
 
   public async sendMessage(body: sendMessageDTO, user_id) {
+    console.log(body.content);
     if (body.content.length > 4242 || body.content.length <= 0)
       throw new Error('Message too long (max 4242) or empty');
     const message = new Message();
@@ -250,6 +248,7 @@ export class ChannelService {
     channel.messages.push(message);
     await this.channelRepository.save(channel);
     const ret: any = await this.messageRepository.save(message);
+    console.log(ret.content);
     ret.channel = channel.id;
     return ret;
   }
@@ -357,8 +356,8 @@ export class ChannelService {
     const channel = await this.channelRepository
       .createQueryBuilder('channel')
       .leftJoinAndSelect('channel.bannedUsers', 'bannedUsers')
-        .leftJoinAndSelect('channel.users', 'users')
-        .leftJoinAndSelect('channel.admins', 'admins')
+      .leftJoinAndSelect('channel.users', 'users')
+      .leftJoinAndSelect('channel.admins', 'admins')
       .where('channel.id = :id', { id: body.channel_id })
       .getOne();
     if (channel == null) throw new Error('Channel not found');
@@ -417,8 +416,8 @@ export class ChannelService {
       .createQueryBuilder('channel')
       .leftJoinAndSelect('channel.users', 'users')
       .leftJoinAndSelect('channel.admins', 'admins')
-        .leftJoinAndSelect('channel.creator', 'creator')
-        .leftJoinAndSelect('channel.bannedUsers', 'bannedUsers')
+      .leftJoinAndSelect('channel.creator', 'creator')
+      .leftJoinAndSelect('channel.bannedUsers', 'bannedUsers')
       .where('channel.id = :id', { id: channel_id })
       .getOne();
     if (channel.type == ChannelType.MP_CHANNEL)

@@ -26,6 +26,7 @@ const SendMessage = ( {
 		console.log('send message pls : ' + conversation);
 		socket.emit('send_message', {token: cookies.get('jwtAuthorization'), channel_id: conversation , content: message});
 		setMessage('');
+		setTimer(false);
 		setPostMessage(true);
 
 		setTimeout(() => {
@@ -37,7 +38,6 @@ const SendMessage = ( {
 	const handleKeyDown = (event:any) => {
 		if (event.key === 'Enter') {
 			handleSendMessage();
-			setTimer(false);
 		}
 	};
 
@@ -46,9 +46,9 @@ const SendMessage = ( {
 			<div className='chat-input-send-bar'>
 				<input className='chat-input-message' type='text' placeholder='Message' value={message}  onKeyDown={handleKeyDown} onChange={(e) => setMessage(e.target.value)}/>
 				<button className='chat-button-send-message' onClick={handleSendMessage}>{'>'}</button>
+				{errorPostMessage != '' ? <div className='chat-error-post-message'>{errorPostMessage}</div> : null}
+				{postMessage && timer ? <div className='chat-error-post-message'>message not send try to reconnect</div> : null}
 			</div>
-			{errorPostMessage != '' ? <div className='chat-error-post-message'>{errorPostMessage}</div> : null}
-			{postMessage && timer ? <div className='chat-error-post-message'>message not send try to reconnect</div> : null}
 		</div>
 	)
 }
