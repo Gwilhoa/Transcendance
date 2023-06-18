@@ -245,6 +245,12 @@ export class UserGateway implements OnGatewayInit {
   async unblock_user(client: Socket, payload: any) {
     const user_id = client.data.id;
     const unblock_id = payload.unblock_id;
+    if (unblock_id == null) {
+      client.emit('block_code', {
+        message: 'unblock_id is null',
+      });
+      return;
+    }
     try {
       const user = await this.userService.removeBlocked(user_id, unblock_id);
       client.emit('block_code', {
