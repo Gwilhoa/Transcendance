@@ -254,7 +254,7 @@ export class UserGateway implements OnGatewayInit {
     try {
       const user = await this.userService.removeBlocked(user_id, unblock_id);
       client.emit('block_code', {
-        message: 'ok',
+        message: 'reject',
       });
     } catch (e) {
       client.emit('block_code', {

@@ -145,12 +145,14 @@ export default function Profil() {
 		socket.on('block_code',(data) => {
 			console.log(data);
 			if (data.message === 'ok')
-				setIsUserBlocked(true)
+				setIsUserBlocked(true);
+			if (data.message === 'reject')
+				setIsUserBlocked(false);
 			else 
 				console.log(data.message);
 		});
-		
 
+		
 	}, []);
 	
 	useEffect(() => {
@@ -257,13 +259,13 @@ export default function Profil() {
 
 		//})
 		if (isUserBlocked) {
-			socket.emit('unblock_user', {block_id:id})
+			socket.emit('unblock_user', {unblock_id:id})
 			console.log('dd')
 		//	socket.emit('')block_id, block_code
 		}
 		else {
 			socket.emit('block_user', {block_id:id})
-			console.log('dd')
+			console.log('aa')
 		}
 	}
 
