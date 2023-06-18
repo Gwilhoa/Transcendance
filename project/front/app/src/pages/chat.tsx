@@ -15,6 +15,7 @@ import ListUserChannel from '../components/chat/ListUsers';
 import axios from 'axios';
 import {cookies} from '../App';
 import {useNavigate} from 'react-router-dom';
+import { channel } from 'diagnostics_channel';
 
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
@@ -78,6 +79,13 @@ export const isAdmin = (channel: Channel) => {
 			return (true);
 		}
 		return (false);
+};
+
+export const isMe = (user: User) => {
+	if (user.id === '' + localStorage.getItem('id')) {
+		return (true);
+	}
+	return (false);
 };
 
 ////////////////////////// CHAT ///////////////////////////////////////////////
