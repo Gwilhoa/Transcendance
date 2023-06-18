@@ -155,7 +155,8 @@ function Chat() {
 ////////////////////////// HANDLE SOCKET //////////////////////////////////////
 	const handleJoinCode = (data: any) => {
 		console.log(data);
-		if (data.code == 0) {
+		console.log('Join_Code');
+		if (data.channel_id) {
 			setConversationId(data.channel_id);
 			setListChannel((prevListChannel) => [...prevListChannel, data.channel]);
 		}
