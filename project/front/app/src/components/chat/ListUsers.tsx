@@ -34,13 +34,13 @@ const MakeAdmin = ( { id, channel }: changeChannelProps ) => {
 
 const BanHammer = ( { id, channel }: changeChannelProps ) => {
 	
-	const handleClickMakeAdmin = () => {
+	const handleClickBanHammer = () => {
 		socket.emit('ban_user', { channel_id: channel.id, ban_id: id });
 		console.log('ON CLICK ban user');
 	};
 
 	return (
-		<div className='button-making-admin' onClick={handleClickMakeAdmin}>
+		<div className='button-ban-hammer' onClick={handleClickBanHammer}>
 		Ban
 		</div>
 	);
@@ -48,13 +48,13 @@ const BanHammer = ( { id, channel }: changeChannelProps ) => {
 
 const UnBanHammer = ( { id, channel }: changeChannelProps ) => {
 	
-	const handleClickMakeAdmin = () => {
+	const handleClickUnbanHammer = () => {
 		socket.emit('unban_user', { channel_id: channel.id, unban_id: id });
 		console.log('unban user');
 	};
 
 	return (
-		<div className='button-making-admin' onClick={handleClickMakeAdmin}>
+		<div className='button-unban-hammer' onClick={handleClickUnbanHammer}>
 		UnBan
 		</div>
 	);

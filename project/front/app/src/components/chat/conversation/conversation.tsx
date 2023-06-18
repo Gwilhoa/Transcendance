@@ -58,15 +58,14 @@ function Conversation(
 				<p className='chat-conversation-channel-name'>
 					{channel.name}
 				</p>
-				<ButtonListChannel />
+				{ errorGetMessage ? 
+					<p className="errorGetMessage" >
+						{"you can't access this channel"}
+					</p> 
+				: 
+					<ButtonListChannel />
+				}	
 			</div>
-			{ errorGetMessage ? 
-				<p className="errorGetMessage" >
-					{"you can't access this channel"}
-				</p> 
-			: 
-				null
-			}	
 			{ (listMessages != null && listMessages.length > 0) ? 
 				<div className='chat-scroll-converation'>
 					<div>
@@ -80,14 +79,12 @@ function Conversation(
 						)))}
 						</div>
 				</div> : ( 
-				channel.id == '' && !errorGetMessage ? (
-					<p className="chat-conversation-never-join-channel">
-						{"you don't have access to any channel"}
-					</p>
-				) : ( 
+				channel.id != '' && !errorGetMessage ? (
 					<p className="chat-conversation-write-the-first-message">
 						no message on the channel, write the first one
 					</p>
+				) : ( 
+					null
 				)
 			)}
 		</div>
