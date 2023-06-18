@@ -876,6 +876,7 @@ export class EventsGateway
 
   @SubscribeMessage('block_user')
   async block_user(client: Socket, payload: any) {
+    console.log('bloqué');
     const user_id = getIdFromSocket(client, this.clients);
     const block_id = payload.block_id;
     try {

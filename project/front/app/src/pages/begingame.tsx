@@ -44,11 +44,11 @@ const BeginGame = () => {
           alert("Error, you are already in game");
         }
       });
-<<<<<<< HEAD
 
       socket.on('game_found', (data) => {
           console.log(data);
           dispatch(setBeginStatus({decide: data.decide, playerstate: data.user, gameid: data.game_id}));
+          socket.emit('leave_matchmaking')
           navigate("/optiongame")
       });
       
@@ -57,21 +57,9 @@ const BeginGame = () => {
           socket.off('matchmaking_code');
           socket.off('game_found');
       };
-=======
->>>>>>> origin/main
-
-		socket.on('game_found', (data) => {
-			console.log(data);
-			dispatch(setBeginStatus({decide: data.decide, playerstate: data.user, gameid: data.game_id}));
-            socket.emit('leave_matchmaking')
-			navigate("/optiongame")
-		});
     }, [socket]);
 
-<<<<<<< HEAD
     
-=======
->>>>>>> origin/main
     const spinnerAnimation = useSpring({
         from: { transform: 'rotate(0deg)' },
         to: { transform: 'rotate(360deg)' },

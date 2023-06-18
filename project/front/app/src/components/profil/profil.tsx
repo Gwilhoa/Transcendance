@@ -111,12 +111,10 @@ export default function Profil() {
 						navigate('/Error');
 					});
 				setIsFriend(!isFriend);
-				return;
 			}
 			else if (data.code === 5 || data.code === 7) {
 				setIsFriend(!isFriend);
 			}
-			return;
 		})
 		
 		
@@ -125,10 +123,9 @@ export default function Profil() {
 			console.log('friend request => ' + data.code);
 			if (data.id == id && (data.code == 2 || data.code == 7 || data.code == 5)) {
 				setIsFriend(!isFriend);
-				return;
 			}
-			return;
 		})
+
 		if (!isMe) {
 
 			axios.get(process.env.REACT_APP_IP + ':3000/user/friend/blocked', {
@@ -143,11 +140,18 @@ export default function Profil() {
 			.catch((error) => {
 				console.error(error);
 			})
-			return;
 		}
+
+		socket.on('block_code',(data) => {
+			console.log(data);
+			if (data.message === 'ok')
+				setIsUserBlocked(true)
+			else 
+				console.log(data.message);
+		});
 		
 
-	}, [socket]);
+	}, []);
 	
 	useEffect(() => {
 		if (id === localStorage.getItem('id')) {
@@ -253,10 +257,12 @@ export default function Profil() {
 
 		//})
 		if (isUserBlocked) {
+			socket.emit('unblock_user', {block_id:id})
 			console.log('dd')
 		//	socket.emit('')block_id, block_code
 		}
 		else {
+			socket.emit('block_user', {block_id:id})
 			console.log('dd')
 		}
 	}
