@@ -106,11 +106,11 @@ const Game: React.FC<GameProps> = () => {
 	useEffect(() => {
 		window.addEventListener("keydown", handleKeyPress);
 		if (playerstats == 2) {
-			setColor1("red")
-			setColor2("blue")
+			setColor1("#ff5e33")
+			setColor2("#2d53ff")
 		} else {
-			setColor1("blue");
-			setColor2("red")
+			setColor1("#2d53ff");
+			setColor2("#ff5e33")
 		}
 		socket.on('option_receive', (data) => {
 			setNbBall(data.ball);

@@ -42,42 +42,69 @@ export class ChannelGateway implements OnGatewayInit {
     const sender_id = client.data.id;
     const receiver = await this.userService.getUserById(receiver_id);
     const sender = await this.userService.getUserById(sender_id);
+    const channel = await this.channelService.getChannelById(channel_id);
     if (receiver == null || sender == null) {
-      client.emit('invite_request', {
-        code: ChannelCode.UNEXISTING_USER,
+      client.emit('update_user_channel', {
+        code: 1,
+        sender_id: sender_id,
+        message: 'user not found',
+        channel: channel,
+      });
+      this.server.to(channel_id).emit('update_user_channel', {
+        code: 1,
+        sender_id: sender_id,
+        channel: channel,
       });
       return;
     }
-    const channel = await this.channelService.getChannelById(channel_id);
     if (channel == null) {
-      client.emit('invite_request', {
-        code: ChannelCode.UNEXISTING_CHANNEL,
+      client.emit('update_user_channel', {
+        code: 1,
+        sender_id: sender_id,
+        message: 'channel not found',
+        channel: channel,
+      });
+      this.server.to(channel_id).emit('update_user_channel', {
+        code: 1,
+        channel: channel,
+        sender_id: sender_id,
       });
     } else {
       let ch = null;
       try {
-        this.logger.debug('invite_channel');
         ch = await this.channelService.inviteChannel(
           sender_id,
           receiver_id,
           channel_id,
         );
       } catch (e) {
-        client.emit('invite_request', {
+        client.emit('update_user_channel', {
+          code: 1,
+          channel: channel,
+          sender_id: sender_id,
           message: e.message,
+        });
+        this.server.to(channel_id).emit('update_user_channel', {
+          code: 1,
+          channel: channel,
+          sender_id: sender_id,
         });
         return;
       }
       if (ch != null) {
         const socket = getSocketFromId(receiver_id, getSockets(this.server));
-        const send = {
-          user_id: receiver_id,
-          channel_id: channel_id,
-          channel: ch,
-        };
         socket.join(channel_id);
-        socket.emit('join_code', send);
-        this.server.to(channel_id).emit('join_code', send);
+        socket.emit('update_user_channel', {
+          code: 0,
+          channel: ch,
+          sender_id: sender_id,
+          message: 'ok',
+        });
+        this.server.to(channel_id).emit('update_user_channel', {
+          code: 0,
+          channel: ch,
+          sender_id: sender_id,
+        });
       }
       return;
     }
@@ -85,8 +112,6 @@ export class ChannelGateway implements OnGatewayInit {
 
   @SubscribeMessage('update_channel')
   async update_channel(client: Socket, payload: any) {
-    this.logger.debug('update_channel');
-    this.logger.debug(payload);
     const channel_id = payload.channel_id;
     const user_id = client.data.id;
     let ret = null;
@@ -97,7 +122,9 @@ export class ChannelGateway implements OnGatewayInit {
         payload,
       );
     } catch (e) {
-      client.emit('update_channel', {
+      client.emit('update_user_channel', {
+        code: 1,
+        channel: channel_id,
         message: e.message,
       });
     }

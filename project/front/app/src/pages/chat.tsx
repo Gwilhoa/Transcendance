@@ -10,7 +10,7 @@ import ErrorToken, {setErrorLocalStorage} from '../components/IfError';
 import {RootState} from '../redux/store';
 import SendMessage from '../components/chat/input/sendmessage';
 import SocketSingleton from '../socket';
-import UpdateChannel from "../components/chat/inviteChannel/UpdateChannel";
+import ModifyChannel from "../components/chat/modifyChannel/ModifyChannel";
 import ListUserChannel from '../components/chat/ListUsers';
 import axios from 'axios';
 import {cookies} from '../App';
@@ -245,7 +245,7 @@ function Chat() {
 			/>)}
 			{isOpenCreateChannel && (<CreateChannel/>)}
 			{isOpenInviteChannel && (<InviteChannel channel={channel}/>)}
-			{isOpenUpdateChannel && (<UpdateChannel channel={channel}/>)}
+			{isOpenUpdateChannel && (<ModifyChannel channel={channel}/>)}
 			<div className='chat-right-page'>
 				<Conversation
 					listMessages={messages}
