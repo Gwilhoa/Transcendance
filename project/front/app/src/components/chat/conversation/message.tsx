@@ -49,7 +49,9 @@ function Messages({message, listImage}: { message: Message, listImage: Array<ima
 					</div>
 				</div>
 				<div className='chat-content-message'>
-					{message.content}
+					<pre>
+						{message.content}
+					</pre>
 				</div>
 			</div>
 		</div>
