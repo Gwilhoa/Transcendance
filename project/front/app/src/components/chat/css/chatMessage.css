@@ -26,11 +26,24 @@
 .chat-scroll-converation{
     overflow-y: auto;
     max-height: calc(100% - var(--search-bar-height));
-    /* position: relative; */
-    overflow: auto;
-    display: flex;
+    position: relative;
+    /* overflow: auto; */
+    /* display: flex;
     flex-direction: column;
-    justify-content: flex-end;
+    justify-content: flex-end; */
+    /* display: flex;
+  flex-direction: column; */
+  /* overflow-anchor: none; */
+  /* margin: 0 auto; */
+  /* scroll-snap-align: start; */
+  /* scroll-behavior: smooth; */
+  /* -ms-scroll-snap-y: inherit; */
+  /* behavior: smooth;
+        block: end;
+        inline: nearest; */
+        /* display: flex;
+        flex-direction: column; */
+        /* bottom: 0; */
     
 }
 
@@ -40,12 +53,27 @@
     object-fit: cover; 
     border-radius: 50%;
     cursor: pointer;
+    /* position: 'fixed';
+    bottom: 0; */
 }
+
+/* .chat-scroll-converation > div:last-child{
+    position: relative;
+    bottom: 0;
+} */
+
 
 .chat-my-message, .chat-other-message{
     color: var(--light-color);
     margin: 2em;
+    /* justify-content: flex-end; */
+    /* align-items: flex-end; */
     display: flex;
+    /* position: fixed; */
+    /* position: relative;
+    bottom: 0; */
+    /* position: absolute;
+  bottom: 0; */
 }
 
 .chat-message-header-and-content{

@@ -28,6 +28,7 @@ function Conversation() {
 	const dispatch = useDispatch();
 	const conversationId = useSelector((state: RootState) => state.conversation.id);
 
+
 	const addImageProfil = ( id: string) => {
 		let add = true;
 
@@ -177,8 +178,6 @@ function Conversation() {
 			}	
 			{ (listMessage != null && listMessage.length > 0) ? 
 				<div className='chat-scroll-converation'>
-					<div>
-
 					{(listMessage.map((message) => (		
 						<Messages 
 						key={message.id} 
@@ -186,7 +185,6 @@ function Conversation() {
 						listImage={listImageProfil}
 						/>
 						)))}
-						</div>
 				</div> : ( 
 				conversationId == '' ? (
 					<p className="chat-conversation-never-join-channel">
