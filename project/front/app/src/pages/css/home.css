@@ -6,7 +6,7 @@
     padding: 0.1rem;
     color: var(--light-color);
     font-size: 1rem;
-    width: 25%;
+    width: max(25%, 15rem);
     height: 3rem;
     margin-top: 2rem;
     padding: 1rem;

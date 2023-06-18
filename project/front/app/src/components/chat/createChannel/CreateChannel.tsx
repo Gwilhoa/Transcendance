@@ -122,10 +122,14 @@ const CreateChannel = () => {
 	};
 
 	const handlePasswordChange = (str: string) => {
+		console.log('pwd : ');
 		setChannelParams((prevChannelParams) => ({
 			...prevChannelParams,
 			pwd: str,
 		}));
+		console.log(channelParams.pwd);
+		console.log(str);
+		
 	};
 
 	const handleChannelTypeChange = (type: number) => {
