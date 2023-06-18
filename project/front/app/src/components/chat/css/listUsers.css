@@ -2,6 +2,7 @@
     color: var(--light-color);
     background-color: var(--box-color);
     width: 30rem;
+    overflow-y: auto;
 }
 
 .chat-right-bar-list-user > div {
