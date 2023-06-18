@@ -29,6 +29,7 @@ import {
   FriendCode,
   messageCode,
 } from 'src/utils/requestcode.enum';
+import { addAdminDto } from '../dto/add-admin.dto';
 import { sleep } from '../utils/sleep';
 
 @WebSocketGateway({
@@ -696,6 +697,8 @@ export class EventsGateway
 
   @SubscribeMessage('invite_channel')
   async invite_channel(client: Socket, payload: any) {
+    this.logger.debug('invite_channel');
+    this.logger.debug(payload);
     const channel_id = payload.channel_id;
     const receiver_id = payload.receiver_id;
     const sender_id = getIdFromSocket(client, this.clients);
@@ -713,8 +716,10 @@ export class EventsGateway
       client.emit('invite_request', {
         code: ChannelCode.UNEXISTING_CHANNEL,
       });
+    } else {
       let ch = null;
       try {
+        this.logger.debug('invite_channel');
         ch = await this.channelService.inviteChannel(
           sender_id,
           receiver_id,
@@ -727,9 +732,13 @@ export class EventsGateway
         return;
       }
       if (ch != null) {
-        client.emit('invite_request', {
-          code: ChannelCode.INVITE_SUCCESS,
-        });
+        const socket = getSocketFromId(receiver_id, this.clients);
+        const send = {
+          user_id: receiver_id,
+          channel_id: channel_id,
+        };
+        socket.join(channel_id);
+        socket.emit('join_code', send);
       }
       return;
     }
@@ -737,6 +746,8 @@ export class EventsGateway
 
   @SubscribeMessage('update_channel')
   async update_channel(client: Socket, payload: any) {
+    this.logger.debug('update_channel');
+    this.logger.debug(payload);
     const channel_id = payload.channel_id;
     const user_id = getIdFromSocket(client, this.clients);
     let ret = null;
@@ -753,4 +764,61 @@ export class EventsGateway
     }
     client.emit('update_channel', ret);
   }
+
+  @SubscribeMessage('delete_admin')
+  async delete_admin(client: Socket, payload: any) {
+    const user_id = getIdFromSocket(client, this.clients);
+    const channel_id = payload.channel_id;
+    const admin_id = payload.admin_id;
+    const addAdmin = new addAdminDto();
+    addAdmin.channel_id = channel_id;
+    addAdmin.user_id = admin_id;
+    try {
+      const chan = await this.channelService.deleteAdmin(addAdmin, user_id);
+      if (chan != null) {
+        this.server.to(chan.id).emit('admin_code', {
+          channel_id: chan.id,
+          admins: chan.admins,
+        });
+      }
+      client.emit('admin_code', {
+        message: 'ok',
+      });
+    } catch (e) {
+      client.emit('add_admin', {
+        message: e.message,
+      });
+      return;
+    }
+  }
+
+  @SubscribeMessage('add_admin')
+  async add_admin(client: Socket, payload: any) {
+    const user_id = getIdFromSocket(client, this.clients);
+    const channel_id = payload.channel_id;
+    const admin_id = payload.admin_id;
+    const addAdmin = new addAdminDto();
+    addAdmin.channel_id = channel_id;
+    addAdmin.user_id = admin_id;
+    try {
+      const chan = await this.channelService.addAdmin(addAdmin, user_id);
+      if (chan != null) {
+        this.server.to(chan.id).emit('admin_code', {
+          channel_id: chan.id,
+          admins: chan.admins,
+        });
+      }
+      client.emit('admin_code', {
+        message: 'ok',
+      });
+    } catch (e) {
+      client.emit('add_admin', {
+        message: e.message,
+      });
+      return;
+    }
+  }
+
+  @SubscribeMessage('remove_admin')
+  async remove_admin(client: Socket, payload: any) {}
 }

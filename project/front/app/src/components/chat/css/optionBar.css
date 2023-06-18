@@ -1,7 +1,7 @@
 .chat-option-bar {
 	background-color: var(--background-color);
 	display: flex;
-	width: 6rem;
+	width: var(--option-bar-width);
 	flex-direction: column;
 	align-items: center;
 	border-right: 0.2rem solid var(--primary-color);
@@ -11,9 +11,9 @@
 
 .chat-hamburger-buttton {
 	background: var(--box-color);
+	display: flex;
 	justify-content: center;
 	align-items: center;
-	display: flex;
 	flex-direction: column;
 	border-radius: 50%;
 	width: 5rem;
@@ -34,15 +34,27 @@
 /* add channel button */
 
 .chat-add-channel-button{
-	background-color: var(--box-color);
+	--b: 6px; /* the thickness */
+	width: 3rem;
+	height: 3rem;
+	border: 1rem solid var(--box-color); 
 	border-radius: 50%;
-	width: 5rem;
-	height:  5rem;
+	background:
+	conic-gradient(from 90deg at var(--b) var(--b),var(--box-color) 90deg,var(--primary-color) 0) 
+	calc(100% + var(--b)/2) calc(100% + var(--b)/2)/
+	calc(50%  + var(--b))   calc(50%  + var(--b));
+	cursor: pointer;
+	margin-bottom: 0.5rem;
+}
+
+.chat-invite-channel-button{
+	background: var(--box-color);
 	display: flex;
-	font-size: 3rem;
 	justify-content: center;
 	align-items: center;
-	color : var(--primary-color);
-	cursor: pointer;
-	font-weight: 300;
+	width: 5rem;
+	height: 5rem; 
+	border-radius: 50%;
+	font-size: 4rem;
+	color: var(--primary-color);
 }

@@ -1,5 +1,4 @@
 :root {
-
   --header-size: 90px;
   --main-width:100%;
   --light-color: #FFFFFF;
@@ -7,6 +6,7 @@
   --background-color: #111827;
   --box-color:#1F2937;
   --primary-color: rgb(79 199 238);
+  --close-button-color: rgb(189, 39, 39);
 }
 
 body {

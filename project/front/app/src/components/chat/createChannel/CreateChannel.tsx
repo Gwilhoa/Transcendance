@@ -2,29 +2,40 @@ import '../css/CreateChannel.css'
 import React, { useCallback, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { switchChatModalCreateChannel } from '../../../redux/chat/modalChatSlice';
-import { Channel } from '../../../pages/chat';
-import { ButtonInputToggle } from '../../utils/inputButton';
+import { Channel, User } from '../../../pages/chat';
 import { cookies } from '../../../App';
 import axios from 'axios';
-import { setConversation } from '../../../redux/chat/conversationIdSlice';
 import SocketSingleton from '../../../socket';
 import { Search } from '../../search/userSearch';
 import { IUser } from '../../utils/interface';
 import { useNavigate } from 'react-router-dom';
-import { openModal } from '../../../redux/modal/modalSlice';
 import { setErrorLocalStorage } from '../../IfError';
 import { RootState } from '../../../redux/store';
+import { ProfilImage } from '../../profil/ProfilImage';
+import { ProfilName } from '../../profil/ProfilName';
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
 
+const initialUserState: User= {
+	id: '',
+	email: '',
+	username: '',
+	enabled2FA: false,
+	experience: 0,
+	status: 0,
+}
 
-const initialState: Channel= {
+const initialChannelState: Channel= {
 	id: '',
 	name: 'New Channel',
 	topic: null,
 	type: 0,
 	pwd: null,
 	users: [],
+	creator: initialUserState,
+	admins: [],
+	bannedUsers: [],
+
 }
 
 type AddUserIdProps = {
@@ -36,17 +47,12 @@ const AddUserId = ({ usersId, setUserId }: AddUserIdProps) => {
     const [listUser, setListUser] = useState<Array<IUser> | null >([]);
 
     const navigate = useNavigate();
-    const dispatch = useDispatch();
     
-    console.log('Add');
     const searchUser = (useSelector((state: RootState) => state.searchUser.users));
     useEffect(() => {
         setListUser(searchUser);
     },[searchUser]);
 
-    console.log(listUser?.length);
-    if (listUser == null)
-        console.log('listUser null');
     const refresh = useCallback(() => {
         axios.get(process.env.REACT_APP_IP + ':3000/user/friend', {
             headers: {
@@ -68,29 +74,20 @@ const AddUserId = ({ usersId, setUserId }: AddUserIdProps) => {
         if (listUser == null)
         {
             refresh();
-            socket.on('friend_code', (data: any) => {
-                if (data.code == 2) {
-                    refresh()
-                    return;
-                }
-                else if (data.code === 5 || data.code === 7) {
-                    refresh();
-                }
-                return;
-            })
-            
-            socket.on('friend_request', (data: any) => {
-                console.log('before code');
-                if (data.code == 2 || data.code == 7) {
-                    console.log('refresh friend request');
-                    refresh();
-                    return;
-                }
-                return;
-            })
         }
-    }, [listUser, refresh, socket]);
+    }, [listUser, refresh]);
     
+	const handleOnClick = (id: string) => {
+		setUserId((prevListId) => {
+			if(!prevListId.some((idInList) => id === idInList)) {
+				return [...prevListId, id];
+			}
+			return prevListId;
+		});
+		console.log('here');
+		console.log(usersId);
+	};
+
     if (listUser == null || listUser.length == 0)
     {
         return (<></>);
@@ -98,14 +95,14 @@ const AddUserId = ({ usersId, setUserId }: AddUserIdProps) => {
     console.log(listUser);
     return (
         <div className='users-list'>
-            {listUser.map((user) => (
+            {listUser.slice(0, 3).map((user) => (
 				!usersId.includes(user.id) ? (
-					<div className='user' key={user.id} onClick={() => dispatch(openModal(user.id))}>
-						<img className='image' src='https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/42_Logo.svg/1200px-42_Logo.svg.png'></img>
-						<p className='name'>{user.username}</p>
+					<div className='user' key={user.id} onClick={() => handleOnClick(user.id)}>
+						<ProfilImage id={user.id} OnClickOpenProfil={false} OverwriteClassName = 'chat-message-image-profil'/>
+						<ProfilName  id={user.id} />
 					</div>
 				) : (
-					<></>
+					<div key='notUser'></div>
 				)
             ))}
         </div>
@@ -115,7 +112,8 @@ const AddUserId = ({ usersId, setUserId }: AddUserIdProps) => {
 
 const CreateChannel = () => {
 	const dispatch = useDispatch();
-	const [channelParams, setChannelParams] = useState<Channel>(initialState);
+	const navigate = useNavigate();
+	const [channelParams, setChannelParams] = useState<Channel>(initialChannelState);
 	const [usersId, setUserId] = useState<Array<string>>([]);
 
 	const onSubmitChannelName = (str: string) => {
@@ -155,14 +153,17 @@ const CreateChannel = () => {
 			.then((response) => {
 				console.log(response);
 				socket.emit('join_channel', {channel_id: response.data.id});
+				usersId.map((userId) =>{
+					socket.emit('invite_channel', {receiver_id: userId, channel_id: response.data.id});
+				});
 				dispatch(switchChatModalCreateChannel());
 			})
 			.catch((error) => {
-				console.error(error)
+					if (error.response.status === 401 || error.response.status === 500) {
+						setErrorLocalStorage('unauthorized');
+						navigate('/Error');
+					}
 			});
-		if (channelParams.type == 0 ) {
-			console.log('hey need an other call')
-		}
 		return;
 	};
 

@@ -7,6 +7,7 @@ import { Channel } from '../../pages/chat';
 import { setConversation } from '../../redux/chat/conversationIdSlice';
 import { RootState } from '../../redux/store';
 import SocketSingleton from '../../socket';
+import ChannelSideBar from './Channel';
 
 function SideBarChat() {
 	const [listChannel, setListChannel] = useState<Array<Channel>>([]);
@@ -44,24 +45,17 @@ function SideBarChat() {
 
 	const handleSwitchChannel = (id: string) => {
 		dispatch(setConversation(id));
+		console.log('set conversation sidebar = ' + id);
 	}
 
-	const parseChannelName = (channel: Channel) => {
-		if (channel.type !== 3) {
-			return (channel.name);
-		}
-		if (channel.users[0].id != localStorage.getItem('id')) {
-			return (channel.users[0].username);
-		}
-		return (channel.users[1].username)
-	}
+
 
 	return (
 		<div className='chatSideBar'>
 			{listChannel.map((channel) => (
-				<button onClick={() => handleSwitchChannel(channel.id)} key={channel.id}>
-					{parseChannelName(channel)}
-				</button>
+				<div onClick={() => handleSwitchChannel(channel.id)} key={channel.id}>
+					<ChannelSideBar channelId={channel.id} />
+				</div>
 			))}
 		</div>
 	);

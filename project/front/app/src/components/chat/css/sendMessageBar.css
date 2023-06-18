@@ -3,11 +3,11 @@
     border-radius: 50px;
     margin-left: 1.5rem;
     margin-right: 1.5rem;
-    width: 60%;
-    position: absolute;
-    bottom: 1rem;
+    /* right: 0;
+    left: 0;
+    bottom: 1rem; */
     display: flex;
-    height: 3rem;
+    height: var(--search-bar-size);
     color: var(--light-color);
     padding-left: 2rem;
 }
@@ -16,7 +16,7 @@
     font-size: 1.75rem;
     border: none;
     background-color: var(--box-color);
-    width: 95%;
+    width: calc(100% - 3rem);
     color: var(--light-color);
     outline: none;
 
@@ -28,5 +28,11 @@
     background-color: transparent;
     border: none;
     cursor: pointer;
+    color: var(--light-color);
+}
+
+.chat-conversation-never-join-channel, .chat-conversation-write-the-first-message{
+    margin: 2rem 2rem 2rem;
+    font-weight: 500;
     color: var(--light-color);
 }

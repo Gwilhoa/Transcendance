@@ -13,13 +13,6 @@ const ButtonOpenModalSideBar = () => {
 			<div className='chat-hamburger-buttton-bar'></div>
 			<div className='chat-hamburger-buttton-bar'></div>
 	</div>
-			// <button 
-			// 	onClick={() => dispatch(switchChatModalSideBar())} 
-			// 	className='chat-hamburger-buttton'
-			// >
-			// 	&#9776;
-			// 	{/* <MdViewList /> */}
-			// </button>
   );
 }
 export default ButtonOpenModalSideBar;

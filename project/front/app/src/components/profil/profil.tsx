@@ -228,7 +228,7 @@ export default function Profil() {
 
 	initialElement.push(
 		<div key='ProfilImage'>
-        <ProfilImage id = {'' + id} OnClickOpenProfil={false} diameter = '50'/>
+        <ProfilImage id = {'' + id} OnClickOpenProfil={false} OverwriteClassName = ''/>
 		</div>
     )
 

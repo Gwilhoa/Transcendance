@@ -6,7 +6,6 @@ import Game from './pages/game';
 import EndGame from './pages/endgame';
 import TryToReconnect from './pages/BackError';
 import Home from './pages/home';
-import Chat from './pages/chat';
 import History from './pages/history';
 import Template from './template/template';
 import TokenPage from './pages/authenticate';
@@ -14,6 +13,7 @@ import NotTwoFa from './components/authenticate/AuthenticateComponentsNotTwoFa'
 import TwoFa from './components/authenticate/AuthenticateComponentsTwoFa'
 import React from 'react';
 import Cookies from 'universal-cookie';
+import Chat from './pages/chat';
 import BeginGame from "./pages/begingame";
 import OptionGame from "./pages/optiongame";
 
