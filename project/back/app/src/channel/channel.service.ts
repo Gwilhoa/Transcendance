@@ -134,8 +134,7 @@ export class ChannelService {
     if (user == null) throw new Error('User not found');
     if (!includeUser(user, chan.users)) throw new Error('User not in channel');
     chan.users = chan.users.filter((u) => u.id != user.id);
-    await this.channelRepository.save(chan);
-    return user;
+    return await this.channelRepository.save(chan);
   }
 
   public async addAdmin(body: addAdminDto, user_id) {
