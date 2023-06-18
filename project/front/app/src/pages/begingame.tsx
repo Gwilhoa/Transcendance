@@ -11,8 +11,10 @@ import ErrorToken from '../components/IfError';
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
 const cookies = new Cookies();
+
 const BeginGame = () => {
-    const gamefound = useRef(false);
+  
+  const gamefound = useRef(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -32,19 +34,21 @@ const BeginGame = () => {
           alert("Error, you are already in game");
         }
       });
+
+      socket.on('game_found', (data) => {
+          console.log(data);
+          dispatch(setBeginStatus({decide: data.decide, playerstate: data.user, gameid: data.game_id}));
+          navigate("/optiongame")
+      });
       
       return () => {
-          console.log("oui")
-          socket.emit('leave_matchmaking')
+          socket.emit('leave_matchmaking');
+          socket.off('matchmaking_code');
+          socket.off('game_found');
       };
 
     }, []);
 
-    socket.on('game_found', (data) => {
-        console.log(data);
-        dispatch(setBeginStatus({decide: data.decide, playerstate: data.user, gameid: data.game_id}));
-        navigate("/optiongame")
-    });
     
     const spinnerAnimation = useSpring({
         from: { transform: 'rotate(0deg)' },

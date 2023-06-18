@@ -96,69 +96,75 @@ const Game: React.FC<GameProps> = () => {
     socket.emit("input_game", {game_id: gameId, type: 2})
   }
   
-  socket.on('create_game', (any) => {
-    console.log('WESH')
-    console.log(any);
-  })
   
   
   useEffect(() => {
-    window.addEventListener("keydown", handleKeyPress);
-    if (playerstats == 2) {
-      setColor1("red")
-      setColor2("blue")
-    }
-    else {
-      setColor1("blue");
-      setColor2("red")
-    }
-    socket.on('option_receive', (data) => {
-      setNbBall(data.ball);
-      setNbMap(data.map);
-      setIsPowerup(data.powerup);
-      console.log(data)
-    })
+      socket.on('create_game', (any) => {
+        console.log('WESH')
+        console.log(any);
+      })
 
-    socket.on('game_start', () => {
-      socket.emit('input_game', { game_id: gameId, position: paddle1, token: cookies.get('jwtAuthorization')}); 
-    })
+      window.addEventListener("keydown", handleKeyPress);
+      if (playerstats == 2) {
+        setColor1("red")
+        setColor2("blue")
+      }
+      else {
+        setColor1("blue");
+        setColor2("red")
+      }
+      socket.on('option_receive', (data) => {
+        setNbBall(data.ball);
+        setNbMap(data.map);
+        setIsPowerup(data.powerup);
+        console.log(data)
+      })
 
-    socket.on('stop_game', (any) => {
+      socket.on('game_start', () => {
+        socket.emit('input_game', { game_id: gameId, position: paddle1, token: cookies.get('jwtAuthorization')}); 
+      })
+
+      socket.on('stop_game', (any) => {
+        
+        console.log(any);
+        setTimeStop(any.time);
+      })
+
+      socket.on('is_stop_game', (any) => {
+        console.log(any);
+        setStop(any.stop);
       
-      console.log(any);
-      setTimeStop(any.time);
-    })
+        setIamStoper(any.stoper);
+        console.log(any.stoper);
+        console.log(IamStoper);
+      })
 
-    socket.on('is_stop_game', (any) => {
-      console.log(any);
-      setStop(any.stop);
-     
-      setIamStoper(any.stoper);
-      console.log(any.stoper);
-      console.log(IamStoper);
-    })
-
-    socket.on('update_game', (data) => {
-      setScore1(data.score1);
-      setScore2(data.score2);
-      setBall({x: (data.ballx), y: (data.bally)});
-      setPaddle2(data.rack2y)
-      setPaddle1(data.rack1y);
-    });
+      socket.on('update_game', (data) => {
+        setScore1(data.score1);
+        setScore2(data.score2);
+        setBall({x: (data.ballx), y: (data.bally)});
+        setPaddle2(data.rack2y)
+        setPaddle1(data.rack1y);
+      });
+      
+      socket.on('finish_game', (any) => {
+        if (isCall) {
+        const content = {status: any.status, adversary: any.adversary, score1: any.score1, score2: any.score2, gameid: gameId};
+        dispatch(setFinalStatus(content));
+        navigate('/endGame');
+        isCall = !isCall;
+      }
+      });
     
-    socket.on('finish_game', (any) => {
-      if (isCall) {
-      const content = {status: any.status, adversary: any.adversary, score1: any.score1, score2: any.score2, gameid: gameId};
-      dispatch(setFinalStatus(content));
-      navigate('/endGame');
-      isCall = !isCall;
-    }
-  });
-  
-    return () => {
-      socket.off('update_game');
-      socket.emit('');
-    };
+      return () => {
+        socket.off('update_game');
+        socket.off('finish_game');
+        socket.off('is_stop_game');
+        socket.off('stop_game');
+        socket.off('option_receive');
+        socket.off('game_start');
+        socket.off('create_game');
+      };
   }, []);
 
   return (

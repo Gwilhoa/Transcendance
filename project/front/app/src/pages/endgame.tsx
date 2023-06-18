@@ -46,12 +46,7 @@ const EndGame = () => {
     socket.emit('game_finished', {rematch : true});
   }
 
-  socket.on('game_found', (data) => {
-    console.log(data);
-    dispatch(setBeginStatus({decide: data.decide, playerstate: data.user, gameid: data.game_id}));
-    navigate("/optiongame")
-  });
-
+  
   const replaybutton = () => {
     myrevengeRef.current = true;
     socket.emit('game_finished', {rematch : true})
@@ -62,6 +57,14 @@ const EndGame = () => {
       setMyrevenge(true);
   }
 
+  useEffect(() => {
+
+    socket.on('game_found', (data) => {
+      console.log(data);
+    dispatch(setBeginStatus({decide: data.decide, playerstate: data.user, gameid: data.game_id}));
+    navigate("/optiongame")
+  });
+  
   socket.on('rematch', (any: { rematch: any; }) => {
     const rematch = any.rematch;
     if (rematch) {
@@ -69,21 +72,24 @@ const EndGame = () => {
         launchReplay();
       }
       else
-        setRevenge(true);
+      setRevenge(true);
     }
     else {
-        setMyReplay(false);
+      setMyReplay(false);
     }
-    });
-
+  });
+  return() => {
+    socket.off('rematch')
+    socket.off('game_found')
+  }
+  }, [])
   useEffect(() => {
+
     if (finalStatus == null || finalStatus.adversary == null) {
       socket.emit('leave_game')
       navigate('/home');
     }
   } , [finalStatus, navigate]);
-
-
 
   return (
     <>

@@ -32,7 +32,18 @@ const OptionGame = () => {
     const couille = useSelector((state: RootState) => state.beginToOption.gameid);
     useEffect(() => {
         if (couille == null)
-            navigate('/home');
+        navigate('/home');
+        
+        
+        socket.on('will_started', (data) => {
+            console.log(data);
+            navigate('/game');
+        })
+
+        return () => {
+            socket.off('will_started');
+        }
+        
     }, [])
     console.log('playerstats ' + playerstats + '\ndecide ' + decide);
 
@@ -52,10 +63,6 @@ const OptionGame = () => {
         socket.emit('option_send', {ball:nbBall, map:nbMap, powerup: isPowerup})
     }
     
-    socket.on('will_started', (data) => {
-        console.log(data);
-        navigate('/game');
-    })
 
     const selectBall = (str:string) => {
         setNbBall(str)
