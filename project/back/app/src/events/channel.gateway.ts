@@ -257,6 +257,8 @@ export class ChannelGateway implements OnGatewayInit {
       }
     } else {
       client.join(channel_id);
+      send.message = 'joined';
+      client.emit('update_user_channel', send);
     }
   }
 
@@ -461,7 +463,7 @@ export class ChannelGateway implements OnGatewayInit {
         channel: channel,
         code: 1,
         sender_id: user_id,
-        message: 'ok',
+        message: e.message,
       });
     }
   }
