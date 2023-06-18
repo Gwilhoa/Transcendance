@@ -86,6 +86,7 @@ function Chat() {
 	const [listChannel, setListChannel] = useState<Array<Channel>>([]);
 
 	const [conversationId, setConversationId] = useState<string>('');
+	const [updateChannel, setUpdateChannel] = useState<boolean>(false);
 
 	const [messages, setMessages] = useState<Array<Message>>([]);
 	const [errorGetMessage, setErrorGetMessage] = useState<boolean>(false);
@@ -156,11 +157,29 @@ function Chat() {
 
 ////////////////////////// HANDLE SOCKET //////////////////////////////////////
 	const handleJoinCode = (data: any) => {
-		console.log('join_code');
-		console.log(data);
 		if (data.channel_id) {
-			setConversationId(data.channel_id);
-			setListChannel((prevListChannel) => [...prevListChannel, data.channel]);
+			setListChannel((prevListChannel) => {
+				let channelExists = false;
+
+				const updatedListChannel = prevListChannel.map((itemChannel) => {
+					if (itemChannel.id === data.channel_id) {
+						channelExists = true;
+						console.log('updated channel');
+						console.log(data.channel);
+						return data.channel;
+					}
+					return itemChannel;
+				});
+
+				if (channelExists) {
+					setUpdateChannel(!updateChannel);
+					return updatedListChannel;
+				} 
+				else {
+					setConversationId(data.channel_id);
+					return [...updatedListChannel, data.channel];
+				}
+			});		
 		}
 	};
 
@@ -222,20 +241,20 @@ function Chat() {
 	useEffect(()=>{
 		fetchListMessage();
 		findChannel();
+		console.log('change channel');
 
 		socket.on('message', handleMessage);
 		socket.on('message_code', handleMessageCode);
 		socket.on('update_channel', handleUpdateChannel);
 
 		return () => {
-			console.log('socket.off chat.');
 			socket.off('message');
 			socket.off('message_code');
 			setErrorPostMessage('');
 			socket.off('update_channel');
 		};
 
-	},[conversationId]);
+	},[conversationId, updateChannel]);
 
 	return (
 		<div className='chatPage'>
