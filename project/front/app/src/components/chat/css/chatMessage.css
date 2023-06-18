@@ -74,6 +74,9 @@
     bottom: 0; */
     /* position: absolute;
   bottom: 0; */
+  /* word-wrap: break-word; */
+  /* word-break: keep-all; */
+  word-break: break-all;
 }
 
 .chat-message-header-and-content{
