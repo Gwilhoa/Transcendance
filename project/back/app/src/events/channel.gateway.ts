@@ -201,7 +201,9 @@ export class ChannelGateway implements OnGatewayInit {
       const ChannelDTO = new JoinChannelDto();
       ChannelDTO.channel_id = channel_id;
       ChannelDTO.user_id = user_id;
-      ChannelDTO.password = payload.password;
+      if (payload.password != null) {
+        ChannelDTO.password = payload.password;
+      }
       try {
         ch = await this.channelService.joinChannel(ChannelDTO);
         client.join(channel_id);
@@ -216,6 +218,7 @@ export class ChannelGateway implements OnGatewayInit {
           code: 1,
           channel_id: channel_id,
           channel: channel,
+          message: e.message,
         };
         client.emit('join_code', send);
         return;
