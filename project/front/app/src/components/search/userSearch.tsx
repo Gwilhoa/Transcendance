@@ -7,7 +7,7 @@ import { setUsers, addUser, setUsersNull } from '../../redux/search/searchSlice'
 import SocketSingleton from '../../socket';
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
-export const Search = ({ defaultAllUsers }: { defaultAllUsers: boolean }) => {
+export const Search = ({ defaultAllUsers,  OverwriteClassName}: { defaultAllUsers: boolean, OverwriteClassName: string }) => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const id = localStorage.getItem('id');
@@ -41,6 +41,6 @@ export const Search = ({ defaultAllUsers }: { defaultAllUsers: boolean }) => {
     }, [navigate, dispatch, socket]);
     
         return (
-        <input type='search' placeholder='Search' className='search-bar' onChange={handleOnChange}></input>
+        <input type='search' placeholder='Search' className={'search-bar' + ' ' + OverwriteClassName} onChange={handleOnChange}></input>
     );
 }

@@ -196,7 +196,7 @@ const CreateChannel = () => {
 			<>
 				<div className='divFindUser'>
 					<h6>Invite some people:</h6>
-					<Search defaultAllUsers={true}/>
+					<Search defaultAllUsers={true} OverwriteClassName={''}/>
 					<AddUserId usersId={usersId} setUserId={setUserId}/>
 				</div>
 			</>

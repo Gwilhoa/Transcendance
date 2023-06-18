@@ -104,11 +104,11 @@ const InviteChannel = ({ channel }: { channel: Channel }) => {
 					<>
 						<h2>Invite some people</h2>
 						<button 
-							className='close-create-channel' 
+							className='chat-side-bar-close-add-people-channel' 
 							onClick={() => dispatch(switchChatModalInviteChannel())} 
 						/>
-						<div className='invite-channel-main'>
-							<Search defaultAllUsers={true}/>
+						<div className='chat-side-bar-invite-channel'>
+							<Search defaultAllUsers={true} OverwriteClassName={'chat-side-bar-invite-channel-input'}/>
 							<AddUserId 
 								usersId={usersId} 
 								setUserId={setUserId} 

@@ -106,7 +106,7 @@ const Home = () => {
             <div className='home'>
 				<ErrorToken />
                 <div className='scrollBlock'>
-                    <Search defaultAllUsers={false}/>
+                    <Search defaultAllUsers={false} OverwriteClassName={''}/>
                     <Add/>
                 </div>
             </div>
