@@ -256,7 +256,6 @@ export class EventsGateway
         date: msg.date,
       };
       this.server.to(channel.id).emit('message', sendmsg);
-      //this.server.emit('message', sendmsg);
     }
     client.emit('message_code', send);
   }
@@ -522,24 +521,20 @@ export class EventsGateway
 
   @SubscribeMessage('option_send')
   async option_send(client: Socket, payload: any) {
-    const user_id = getIdFromSocket(client, this.clients);
+    const user_id = client.data.id;
     const game_id = this.ingame.get(user_id);
     const game: Game = this.games[game_id];
     game.definePowerUp(payload.powerup);
-    if (game == null) {
-      return;
-    } else {
-      this.server.to(game_id).emit('will_started', { time: 3 });
-      await sleep(1000);
-      this.server.to(game_id).emit('option_receive', payload);
-      this.server.to(game_id).emit('will_started', { time: 2 });
-      await sleep(1000);
-      this.server.to(game_id).emit('will_started', { time: 1 });
-      await sleep(1000);
-      this.server.to(game_id).emit('will_started', { time: 0 });
-      await sleep(1000);
-      game.start();
-    }
+    this.server.to(game_id).emit('will_started', { time: 3 });
+    await sleep(1000);
+    this.server.to(game_id).emit('option_receive', payload);
+    this.server.to(game_id).emit('will_started', { time: 2 });
+    await sleep(1000);
+    this.server.to(game_id).emit('will_started', { time: 1 });
+    await sleep(1000);
+    this.server.to(game_id).emit('will_started', { time: 0 });
+    await sleep(1000);
+    game.start();
   }
   @SubscribeMessage('input_game')
   async input_game(client: Socket, payload: any) {
@@ -573,7 +568,7 @@ export class EventsGateway
   @SubscribeMessage('game_finished')
   async game_finished(client: Socket, payload: any) {
     const rematch = payload.rematch;
-    const id = getIdFromSocket(client, this.clients);
+    const id = client.data.id;
     const game_id = this.ingame.get(id);
     const game = this.games[game_id];
     if (game != null) {
@@ -581,8 +576,8 @@ export class EventsGateway
         this.games.delete(game_id);
         game.getUser1().emit('rematch', { rematch: false });
         game.getUser2().emit('rematch', { rematch: false });
-        this.ingame.delete(getIdFromSocket(game.getUser1(), this.clients));
-        this.ingame.delete(getIdFromSocket(game.getUser2(), this.clients));
+        this.ingame.delete(game.getUser1().data.id);
+        this.ingame.delete(game.getUser2().data.id);
         this.logger.debug('game ' + game_id + ' finished');
       } else {
         if (this.rematch.get(game_id) == null) {
@@ -604,8 +599,8 @@ export class EventsGateway
           };
           game.getUser1().emit('rematch', send);
           game.getUser2().emit('rematch', send);
-          this.ingame.delete(getIdFromSocket(game.getUser1(), this.clients));
-          this.ingame.delete(getIdFromSocket(game.getUser2(), this.clients));
+          this.ingame.delete(game.getUser1().data.id);
+          this.ingame.delete(game.getUser2().data.id);
           this.rematch.delete(game_id);
           this.logger.debug('game ' + game_id + ' finished and rematch');
           this.play_game(game.getUser1(), game.getUser2());
@@ -622,7 +617,7 @@ export class EventsGateway
     const socket = this.server.sockets.sockets.get(rival_id);
     if (socket != null) {
       if (this.dual.get(rival_id) != null) {
-        if (this.dual.get(rival_id) == getIdFromSocket(client, this.clients)) {
+        if (this.dual.get(rival_id) == client.data.id) {
           this.dual.delete(rival_id);
           socket.emit('receive_challenge', {
             message: 'ok game will started soon',
@@ -638,9 +633,9 @@ export class EventsGateway
           return;
         }
       } else {
-        this.dual.set(getIdFromSocket(client, this.clients), rival_id);
+        this.dual.set(client.data.id, rival_id);
         socket.emit('receive_challenge', {
-          rival: getIdFromSocket(client, this.clients),
+          rival: client.data.id,
         });
       }
     } else {
@@ -652,12 +647,12 @@ export class EventsGateway
 
   @SubscribeMessage('leave_game')
   async leave_game(client: Socket, payload: any) {
-    const id = getIdFromSocket(client, this.clients);
+    const id = client.data.id;
     const game_id = this.ingame.get(id);
     const game = this.games[game_id];
     if (game != null) {
-      this.ingame.delete(getIdFromSocket(game.getUser1(), this.clients));
-      this.ingame.delete(getIdFromSocket(game.getUser2(), this.clients));
+      this.ingame.delete(client.data.id);
+      this.ingame.delete(client.data.id);
       game.remake();
     } else {
       this.ingame.delete(id);
@@ -667,7 +662,8 @@ export class EventsGateway
   @SubscribeMessage('unfriend_request')
   async unfriend_request(client: Socket, payload: any) {
     const friend_id = payload.friend_id;
-    const user_id = getIdFromSocket(client, this.clients);
+    const user_id = client.data.id;
+    const friend_socket = getSocketFromId(friend_id, this.sockets);
     if (await this.userService.isfriend(user_id, friend_id)) {
       await this.userService.removeFriends(user_id, friend_id);
       const mpchannel = await this.channelService.getmpchannel(
@@ -678,8 +674,8 @@ export class EventsGateway
       client.emit('friend_code', {
         code: FriendCode.UNFRIEND_SUCCESS,
       });
-      if (getSocketFromId(friend_id, this.clients)) {
-        getSocketFromId(friend_id, this.clients).emit('friend_code', {
+      if (friend_socket != null) {
+        friend_socket.emit('friend_code', {
           code: FriendCode.NEW_UNFRIEND,
           id: user_id,
         });
@@ -694,7 +690,7 @@ export class EventsGateway
   @SubscribeMessage('research_name')
   async research_name(client: Socket, payload: any) {
     const name = payload.name;
-    const user_id = getIdFromSocket(client, this.clients);
+    const user_id = client.data.id;
     const users = await this.userService.getUserBySimilarNames(name, user_id);
     client.emit('research_name', users);
   }
@@ -705,7 +701,7 @@ export class EventsGateway
     this.logger.debug(payload);
     const channel_id = payload.channel_id;
     const receiver_id = payload.receiver_id;
-    const sender_id = getIdFromSocket(client, this.clients);
+    const sender_id = client.data.id;
 
     const receiver = await this.userService.getUserById(receiver_id);
     const sender = await this.userService.getUserById(sender_id);
@@ -736,7 +732,7 @@ export class EventsGateway
         return;
       }
       if (ch != null) {
-        const socket = getSocketFromId(receiver_id, this.clients);
+        const socket = getSocketFromId(receiver_id, this.sockets);
         const send = {
           user_id: receiver_id,
           channel_id: channel_id,
@@ -754,7 +750,7 @@ export class EventsGateway
     this.logger.debug('update_channel');
     this.logger.debug(payload);
     const channel_id = payload.channel_id;
-    const user_id = getIdFromSocket(client, this.clients);
+    const user_id = client.data.id;
     let ret = null;
     try {
       ret = await this.channelService.updateChannel(
@@ -772,7 +768,7 @@ export class EventsGateway
 
   @SubscribeMessage('add_admin')
   async add_admin(client: Socket, payload: any) {
-    const user_id = getIdFromSocket(client, this.clients);
+    const user_id = client.data.id;
     const channel_id = payload.channel_id;
     const admin_id = payload.admin_id;
     const addAdmin = new addAdminDto();
@@ -799,7 +795,7 @@ export class EventsGateway
 
   @SubscribeMessage('remove_admin')
   async remove_admin(client: Socket, payload: any) {
-    const user_id = getIdFromSocket(client, this.clients);
+    const user_id = client.data.id;
     const channel_id = payload.channel_id;
     const admin_id = payload.admin_id;
     const addAdmin = new addAdminDto();
@@ -826,7 +822,7 @@ export class EventsGateway
 
   @SubscribeMessage('ban_user')
   async ban_user(client: Socket, payload: any) {
-    const user_id = getIdFromSocket(client, this.clients);
+    const user_id = client.data.id;
     const channel_id = payload.channel_id;
     const ban_id = payload.ban_id;
     const addBan = new BanUserDto();
@@ -850,7 +846,7 @@ export class EventsGateway
 
   @SubscribeMessage('unban_user')
   async unban_user(client: Socket, payload: any) {
-    const user_id = getIdFromSocket(client, this.clients);
+    const user_id = client.data.id;
     const channel_id = payload.channel_id;
     const ban_id = payload.unban_id;
     const addBan = new BanUserDto();
@@ -874,7 +870,7 @@ export class EventsGateway
 
   @SubscribeMessage('block_user')
   async block_user(client: Socket, payload: any) {
-    const user_id = getIdFromSocket(client, this.clients);
+    const user_id = client.data.id;
     const block_id = payload.block_id;
     try {
       const user = await this.userService.addBlocked(user_id, block_id);
