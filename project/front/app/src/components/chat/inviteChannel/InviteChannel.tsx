@@ -1,3 +1,4 @@
+import '../css/inviteChannel.css';
 import axios from 'axios';
 import React, {useCallback, useEffect, useState} from 'react'
 import {useDispatch, useSelector} from 'react-redux';
