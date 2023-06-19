@@ -284,7 +284,7 @@ function Chat() {
 	return (
 		<div className='chatPage'>
 			<ErrorToken/>
-			<OptionBar/>
+			<OptionBar setId={setConversationId}/>
 			{isOpenSideBar && (<SideBarChat
 				listChannel={listChannel}
 				setConversationId={setConversationId}
