@@ -69,13 +69,17 @@ function Conversation(
 			</div>
 			{(listMessages != null && listMessages.length > 0) ?
 				<div className='chat-scroll-converation'>
+					{/* <div> */}
+
 					{(listMessages.map((message) => (
 						<Messages
-							key={message.id}
-							message={message}
-							listImage={listImageProfil}
+						key={message.id}
+						message={message}
+						listImage={listImageProfil}
 						/>
-					)))}
+						)))}
+					{/* </div> */}
+					{/* <span className='chat-conversation-sticky'></span> */}
 				</div> : (
 					channel.id != '' && !errorGetMessage ? (
 						<p className="chat-conversation-write-the-first-message">
