@@ -17,10 +17,10 @@
     margin: 0;
 }
 
-.profil-image {
+/* .profil-image {
     height: 3rem;
     width: 3rem;
-}
+} */
 
 .profil-image.chat-small-user-image {
     width: 4rem;

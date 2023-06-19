@@ -48,9 +48,11 @@ function Messages({message, listImage}: { message: Message, listImage: Array<ima
 						<Timer dateString={message.date}/>
 					</div>
 				</div>
-				<div className='chat-content-message'>
-					{message.content}
-				</div>
+				{/* <div className='chat-content-message'> */}
+					<pre  className='chat-content-message'>
+							{message.content}
+					</pre>
+				{/* </div> */}
 			</div>
 		</div>
 	);

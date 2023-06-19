@@ -70,12 +70,12 @@ const AddUserId = ({usersId, setUserId, channelId}: AddUserIdProps) => {
 	}
 	console.log(listUser);
 	return (
-		<div className='users-list'>
+		<div className='chat-channel-invite-add-user-by-id'>
 			{listUser.slice(0, 6).map((user) => (
 				!usersId.includes(user.id) ? (
-					<div key={user.id} onClick={() => handleOnClick(user.id)}>
+					<div className='chat-invite-people-user' key={user.id} onClick={() => handleOnClick(user.id)}>
 						<ProfilImage id={user.id} OnClickOpenProfil={false}
-							OverwriteClassName='chat-side-bar-invite-channel-user-image'/>
+							OverwriteClassName='chat-small-user-image'/>
 						<ProfilName id={user.id}/>
 					</div>
 				) : null
@@ -97,7 +97,7 @@ const InviteChannel = ({channel}: { channel: Channel }) => {
 
 	return (
 		<div className='page-shadow'>
-			<div className='create-channel'>
+			<div className='chat-channel-invite-people'>
 				{channel.type !== 3 ? (
 					<>
 						<h2>Invite some people</h2>

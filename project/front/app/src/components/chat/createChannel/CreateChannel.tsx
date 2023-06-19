@@ -145,33 +145,32 @@ const CreateChannel = () => {
 			if (pwd.length === 0) {
 				setErrorPwd(true);
 			}
+			return ;
 		}
-		else {
-			axios.post(process.env.REACT_APP_IP + ':3000/channel/create',
-				{
-					name: channelParams.name,
-					creator_id: localStorage.getItem('id'),
-					type: channelParams.type,
-					password: channelParams.pwd,
-				},
-				{
-					headers: {Authorization: `bearer ${cookies.get('jwtAuthorization')}`,}
-				})
-				.then((response) => {
-					console.log(response);
-					socket.emit('join_channel', {channel_id: response.data.id});
-					usersId.map((userId) => {
-						socket.emit('invite_channel', {receiver_id: userId, channel_id: response.data.id});
-					});
-					dispatch(switchChatModalCreateChannel());
-				})
-				.catch((error) => {
-					if (error.response.status === 401 || error.response.status === 500) {
-						setErrorLocalStorage('unauthorized');
-						navigate('/Error');
-					}
+		axios.post(process.env.REACT_APP_IP + ':3000/channel/create',
+			{
+				name: channelParams.name,
+				creator_id: localStorage.getItem('id'),
+				type: channelParams.type,
+				password: channelParams.pwd,
+			},
+			{
+				headers: {Authorization: `bearer ${cookies.get('jwtAuthorization')}`,}
+			})
+			.then((response) => {
+				console.log(response);
+				socket.emit('join_channel', {channel_id: response.data.id});
+				usersId.map((userId) => {
+					socket.emit('invite_channel', {receiver_id: userId, channel_id: response.data.id});
 				});
-		}
+				dispatch(switchChatModalCreateChannel());
+			})
+			.catch((error) => {
+				if (error.response.status === 401 || error.response.status === 500) {
+					setErrorLocalStorage('unauthorized');
+					navigate('/Error');
+				}
+			});
 		return;
 	};
 

@@ -29,14 +29,13 @@ const Game: React.FC<GameProps> = () => {
 	isCall = true;
 	const navigate = useNavigate();
 	const gameId = useSelector((state: RootState) => state.beginToOption.gameid);
-	const [score1, setScore1] = useState(0);
-	const [score2, setScore2] = useState(0);
 
 	const [ball, setBall] = useState({x: 50, y: 50});
 	const [paddle1, setPaddle1] = useState(42.5);
 	const [paddle2, setPaddle2] = useState(42.5);
 	const [color1, setColor1] = useState("white");
 	const [color2, setColor2] = useState("white");
+	const [started, setStarted] = useState("");
 
 	const playerstats = useSelector((state: RootState) => state.beginToOption.playerstate);
 
@@ -102,6 +101,14 @@ const Game: React.FC<GameProps> = () => {
 		console.log(any);
 	})
 
+	socket.on('will_started', (data) => {
+		if (data.time == 0) {
+			setStarted("0 | 0");
+		} else {
+			setStarted(data.time);
+		}
+	});
+
 
 	useEffect(() => {
 		window.addEventListener("keydown", handleKeyPress);
@@ -139,8 +146,7 @@ const Game: React.FC<GameProps> = () => {
 		})
 
 		socket.on('update_game', (data) => {
-			setScore1(data.score1);
-			setScore2(data.score2);
+			setStarted(data.score2 + " | " + data.score1)
 			setBall({x: (data.ballx), y: (data.bally)});
 			setPaddle2(data.rack2y)
 			setPaddle1(data.rack1y);
@@ -175,7 +181,7 @@ const Game: React.FC<GameProps> = () => {
 			<div className="parentscore">
 				<div className="score">
 					<h1>
-						{score2 + " | " + score1}
+						{started}
 					</h1>
 				</div>
 			</div>

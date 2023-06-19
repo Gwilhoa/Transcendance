@@ -31,6 +31,28 @@
 
 /* Invite page */
 
+.chat-channel-invite-people{
+    position: absolute;
+    text-align: center;
+    position: fixed;
+    z-index: 2;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    max-height: 40rem;
+	/* min-height: 20rem; */
+	/* min-height: 20rem; */
+    width: 30rem;
+    overflow: auto;
+    background-color: var(--box-color);
+    color: var(--light-color);
+    border-radius: 20px;
+}
+
+.chat-channel-invite-people > h2{
+	margin-bottom: 2.5rem;
+}
+
 .chat-side-bar-close-add-people-channel {
     position: absolute;
     right: 17px;
@@ -50,9 +72,21 @@
 	margin: 0 0 3rem;
 }
 
-.chat-side-bar-invite-channel-user-image{
-	/* width: 2.5rem;
-	height: 2.5rem; */
+.chat-invite-people-user{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.chat-invite-people-user > div{
+	margin-left: 1rem
+}
+
+
+.chat-channel-invite-add-user-by-id{
+	/* max-height: 25rem; */
+	overflow-y: auto;
+	min-height: 5rem;
 }
 
 /* end Invite page */
