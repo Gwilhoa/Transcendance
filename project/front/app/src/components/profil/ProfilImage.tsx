@@ -56,11 +56,14 @@ export const ProfilImage = ({id, OnClickOpenProfil, OverwriteClassName}: {
 			},
 		})
 			.then((response) => {
-				if (response.data.status === UserStatus.CONNECTED) {
-					setUserStatus('profil-status-connected');
-				}
 				if (response.data.status === UserStatus.IN_GAME) {
 					setUserStatus('profil-status-in-game');
+				}
+				else if (response.data.status === UserStatus.CONNECTED) {
+					setUserStatus('profil-status-connected');
+				}
+				else {
+					setUserStatus('profil-status-disconnected');
 				}
 			})
 			.catch((error) => {
@@ -70,10 +73,23 @@ export const ProfilImage = ({id, OnClickOpenProfil, OverwriteClassName}: {
 			});
 
 		socket.on('connection_server', (data: any) => {
-			if (data.connected.includes() != null)
-				setUserStatus('profil-status-connected');
-			if (data.connected.includes() != null)
-				setUserStatus('profil-status-in-game');
+			console.log(data);
+			for (const ingame_id of data.ingame)
+			{
+				if (ingame_id == id) {
+					setUserStatus('profil-status-in-game');
+					return;
+				}
+		}
+			for (const connected_id of data.connected) {
+				console.log(connected_id + ' ' + id);
+				if (connected_id == id) {
+					console.log('connected')
+					setUserStatus('profil-status-connected');
+					return;
+				}
+				setUserStatus('profil-status-disconnected');
+			}
 		});
 
 		socket.on('update_profil', (data: any) => {

@@ -17,7 +17,7 @@ import { CreateGameDTO } from 'src/dto/create-game.dto';
 import { UserStatus } from 'src/utils/user.enum';
 import {
   disconnect,
-  getKeys,
+  getKeys, getSockets,
   send_connection_server,
   wrongtoken,
 } from 'src/utils/socket.function';
@@ -48,7 +48,7 @@ export class EventsGateway
   ) {}
 
   sendconnected() {
-    send_connection_server(this.clients, this.ingame, this.server);
+    send_connection_server(getSockets(this.server), this.ingame, this.server);
   }
 
   afterInit() {
