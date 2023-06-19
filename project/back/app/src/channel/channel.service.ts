@@ -469,6 +469,8 @@ export class ChannelService {
     for (const u of channel.users) {
       if (u.id == user.id) throw new Error('User already in this channel');
     }
+    if (includeUser(user, channel.bannedUsers))
+      throw new Error('User is banned of this channel');
     channel.users.push(user);
     return await this.channelRepository.save(channel);
   }
