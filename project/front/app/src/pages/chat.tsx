@@ -1,6 +1,6 @@
 import './css/chat.css'
 import React, {useEffect, useState} from 'react';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import Conversation from '../components/chat/conversation/conversation';
 import CreateChannel from '../components/chat/createChannel/CreateChannel';
 import InviteChannel from '../components/chat/inviteChannel/InviteChannel';
@@ -15,7 +15,7 @@ import ListUserChannel from '../components/chat/ListUsers';
 import axios from 'axios';
 import {cookies} from '../App';
 import {useNavigate} from 'react-router-dom';
-import { channel } from 'diagnostics_channel';
+import { switchChatModalListUser } from '../redux/chat/modalChatSlice';
 
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
@@ -101,6 +101,7 @@ function Chat() {
 	const isOpenListUserChannel = useSelector((state: RootState) => state.modalChat.isOpenListUser);
 
 	const navigate = useNavigate();
+	const dispatch = useDispatch();
 
 	const [channel, setChannel] = useState<Channel>(initialChannelState);
 	const [listChannel, setListChannel] = useState<Array<Channel>>([]);
@@ -170,6 +171,13 @@ function Chat() {
 	};
 
 	const findChannel = () => {
+		if (listChannel.length == 0) {
+			setChannel(initialChannelState);
+			if (isOpenListUserChannel) {
+				dispatch(switchChatModalListUser());
+			}
+			return ;
+		}
 		listChannel.map((itemChannel) => {
 			if (itemChannel.id == conversationId) {
 				setChannel({...itemChannel});
@@ -185,13 +193,12 @@ function Chat() {
 
 		socket.on('update_user_channel', handleUpdateUserChannel);
 		socket.on('user_join', handleUserCode);
-		socket.on('delete_channel', handleDeleteChannel);
 		socket.on('research_channel', handleResearchChannel);
 
 		return () => {
 			socket.off('update_user_channel');
 			socket.off('user_join');
-			socket.off('delete_channel');
+			socket.off('research_channel');
 		}
 	}, []);
 
@@ -234,7 +241,6 @@ function Chat() {
 		if (updateChannel > 10) {
 			setUpdateChannel(0);
 		}
-		findChannel();
 	};
 
 	const handleUserCode = (data: any) => {
@@ -278,6 +284,12 @@ function Chat() {
 	const handleDeleteChannel = (data: any) => {
 		console.log('delete channel');
 		console.log(data);
+		if (conversationId == data.id) {
+			setConversationId('');
+		}
+		setListChannel((prevListChannel) =>
+			prevListChannel.filter((itemChannel) => itemChannel.id !== data.id)
+		);
 	};
 
 	const handleUpdateChannel = (data: any) => {
@@ -303,8 +315,10 @@ function Chat() {
 		socket.on('message', handleMessage);
 		socket.on('message_code', handleMessageCode);
 		socket.on('update_channel', handleUpdateChannel);
+		socket.on('delete_channel', handleDeleteChannel);
 
 		return () => {
+			socket.off('delete_channel');
 			socket.off('message');
 			socket.off('message_code');
 			setErrorPostMessage('');
@@ -317,7 +331,7 @@ function Chat() {
 
 		<div className='chatPage'>
 			<ErrorToken/>
-			<OptionBar/>
+			<OptionBar setId={setConversationId}/>
 			{isOpenSideBar && (<SideBarChat
 				listChannel={listChannel}
 				setConversationId={setConversationId}

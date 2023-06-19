@@ -79,7 +79,7 @@ const AddUserId = ({usersId, setUserId, channelId}: AddUserIdProps) => {
 							OverwriteClassName='chat-small-user-image'/>
 						<ProfilName id={user.id}/>
 					</div>
-				) : null
+				) : <div key="notUser"></div>
 			))}
 		</div>
 	);
