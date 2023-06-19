@@ -1,6 +1,6 @@
 import '../css/chatMessage.css'
 import axios from 'axios';
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import {cookies} from '../../../App';
 import {Channel, Message} from '../../../pages/chat'
 import Messages from './message';
@@ -19,11 +19,18 @@ function Conversation(
 		{ listMessages: Array<Message>, channel: Channel, errorGetMessage: boolean }) {
 	const [listImageProfil, setListImageProfil] = useState<Array<imageProfil>>([]);
 	const navigate = useNavigate();
+	const scrollRef = useRef(null);
 
 	useEffect(() => {
 		listMessages.map((itemMessage) => addImageProfil(itemMessage.user.id));
+		scrollToBottom();
 	}, [listMessages]);
 
+	const scrollToBottom = () => {
+		if (scrollRef.current) {
+			(scrollRef.current as HTMLElement).scrollIntoView({ behavior: 'smooth', block: 'end' });
+		}
+	};
 
 	const addImageProfil = (id: string) => {
 		let add = true;
@@ -78,8 +85,7 @@ function Conversation(
 						listImage={listImageProfil}
 						/>
 						)))}
-					{/* </div> */}
-					{/* <span className='chat-conversation-sticky'></span> */}
+					<div ref={scrollRef} />
 				</div> : (
 					channel.id != '' && !errorGetMessage ? (
 						<p className="chat-conversation-write-the-first-message">
