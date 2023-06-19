@@ -3,9 +3,6 @@
     border-radius: 50px;
     margin-left: 1.5rem;
     margin-right: 1.5rem;
-    /* right: 0;
-    left: 0;
-    bottom: 1rem; */
     display: flex;
     height: var(--search-bar-size);
     color: var(--light-color);

@@ -66,7 +66,6 @@ code {
 
 .main-template {
     position: absolute;
-    /* top: var(--header-size); */
     height: calc(100vh - (var(--header-size)));
     top: var(--header-size);
     width: var(--main-width);

@@ -363,12 +363,12 @@ function Chat() {
 				/>
 			</div>
 			) : (
-				<div>
+				<div className='chat-page-channel'>
 					<h1>Channels disponible</h1>
 					<input onChange={(e) => updateAvailableChannel(e.target.value)}/>
 					{ listAvailableChannel.length > 0 ? (
 						listAvailableChannel.map((itemChannel) => (
-							<div key={itemChannel.id}>
+							<div className='chat-page-channels-channel' key={itemChannel.id}>
 								<p>{itemChannel.name}</p>
 								<button>Join</button>
 							</div>
