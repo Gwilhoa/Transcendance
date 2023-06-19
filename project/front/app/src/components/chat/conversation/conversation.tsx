@@ -76,7 +76,6 @@ function Conversation(
 			</div>
 			{(listMessages != null && listMessages.length > 0) ?
 				<div className='chat-scroll-converation'>
-					{/* <div> */}
 
 					{(listMessages.map((message) => (
 						<Messages
