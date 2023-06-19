@@ -273,16 +273,26 @@ export class ChannelService {
   async getAvailableChannels(id: string) {
     const user = await this.userService.getUserById(id);
     if (user == null) throw new Error('User not found');
-    const channels = await this.channelRepository.find();
+    const channels = await this.channelRepository
+      .createQueryBuilder('channel')
+      .leftJoinAndSelect('channel.users', 'users')
+      .leftJoinAndSelect('channel.bannedUsers', 'bannedUsers')
+      .leftJoinAndSelect('channel.admins', 'admins')
+      .leftJoinAndSelect('channel.creator', 'creator')
+      .getMany();
+    const chan = [];
     if (channels == null) return null;
-    channels.filter((c) => !c.users.includes(user));
-    channels.filter((c) => c.type != ChannelType.PRIVATE_CHANNEL);
-    channels.filter(
-      (c) => c.bannedUsers != null && c.bannedUsers.includes(user),
-    );
-    channels.filter((c) => c.type != ChannelType.MP_CHANNEL);
-    if (channels.length == 0) return null;
-    return channels;
+    for (const c of channels) {
+      if (
+        c.type != ChannelType.PRIVATE_CHANNEL &&
+        c.type != ChannelType.MP_CHANNEL &&
+        !includeUser(user, c.bannedUsers) &&
+        !includeUser(user, c.users)
+      )
+        chan.push(c);
+    }
+    if (chan.length == 0) return null;
+    return chan;
   }
 
   async getAdmin(body: addAdminDto, id: string) {
