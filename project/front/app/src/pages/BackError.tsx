@@ -4,7 +4,7 @@ import Reconnect from '../components/authenticate/Reconnect';
 
 const TryToReconnect = () => {
 	return (
-			<Reconnect/> 
+		<Reconnect/>
 	);
 }
 

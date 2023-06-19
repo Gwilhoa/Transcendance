@@ -5,7 +5,7 @@ class SocketSingleton {
 	private static instance: SocketSingleton;
 	private socket;
 
-	private constructor () {
+	private constructor() {
 		this.socket = io(process.env.REACT_APP_IP + ':3000', {
 			transports: ['websocket']
 		});
@@ -15,7 +15,7 @@ class SocketSingleton {
 				await new Promise((resolve) => setTimeout(resolve, 100));
 				jwtAuthorization = cookies.get('jwtAuthorization');
 			}
-			this.socket.emit('connection', { token: jwtAuthorization });
+			this.socket.emit('connection', {token: jwtAuthorization});
 			console.log('connected');
 		});
 

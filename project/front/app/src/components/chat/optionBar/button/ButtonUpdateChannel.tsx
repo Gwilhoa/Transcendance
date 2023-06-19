@@ -1,14 +1,13 @@
 import '../../css/optionBar.css'
 import React from 'react'
-import { MdPlaylistAdd } from 'react-icons/md';
-import { useDispatch } from 'react-redux';
-import {switchChatModalInviteChannel, switchChatModalUpdateChannel} from '../../../../redux/chat/modalChatSlice';
+import {useDispatch} from 'react-redux';
+import {switchChatModalUpdateChannel} from '../../../../redux/chat/modalChatSlice';
 
 const ButtonUpdateChannel = () => {
 	const dispatch = useDispatch();
 
 	return (
-		<div className='' onClick={() => dispatch(switchChatModalUpdateChannel())}>
+		<div className='chat-side-bar-channel-modify-channel' onClick={() => dispatch(switchChatModalUpdateChannel())}>
 			⚙
 		</div>
 	);

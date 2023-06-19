@@ -18,7 +18,6 @@ import { LeaveChannelDto } from '../dto/leave-channel.dto';
 import { addAdminDto } from '../dto/add-admin.dto';
 import { BanUserDto } from '../dto/ban-user.dto';
 import { GetMessageDto } from '../dto/get-message.dto';
-import { sendMessageDTO } from '../dto/sendmessage.dto';
 import { MpCreateDto } from '../dto/mp-create.dto';
 
 @UseGuards(JwtIsAuthGuard)
@@ -221,7 +220,7 @@ export class ChannelController {
 
   @Get('/id/:id')
   async getChannelById(@Param('id') id: string, @Res() resp) {
-    if (id == "null" || id == null) {
+    if (id == 'null' || id == null) {
       return resp.status(400).send('Invalid id');
     }
     const channel = await this.channelService.getChannelById(id);

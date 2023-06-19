@@ -1,128 +1,128 @@
 :root {
-  --widthCanvas: "1";
-  --heightCanvas: "1";
+    --widthCanvas: "1";
+    --heightCanvas: "1";
 }
 
 
 .game-container {
-  overflow: hidden; 
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  margin: 0 auto;
-  width: 100%;
-  height: 100vh;
-  object-fit: contain;
-  display: inline-block;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    margin: 0 auto;
+    width: 100%;
+    height: 100vh;
+    object-fit: contain;
+    display: inline-block;
 }
 
 .buttonLeave {
-  background-color: beige;
-  width: 30%;
-  height: 10%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 10px;
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+    background-color: beige;
+    width: 30%;
+    height: 10%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .buttonResume {
-  background-color: beige;
-  width: 30%;
-  height: 10%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 10px;
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
-  position: absolute;
-  top: 20%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+    background-color: beige;
+    width: 30%;
+    height: 10%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .textTime {
-  color: antiquewhite;
-  text-align: center;
-  font-size: 20px;
+    color: antiquewhite;
+    text-align: center;
+    font-size: 20px;
 }
 
 
 .game-canvas {
-  overflow: hidden;
-  position: absolute;
-  top: 0;
-  height: 100%;
-  width: 100%;
-  background-color: black;
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    background-color: black;
 }
 
 .paddle1,
 .paddle2 {
-  position: absolute;
-  width: 1%;
-  height: 15%;
-  background-color: var(--light-color);
+    position: absolute;
+    width: 1%;
+    height: 15%;
+    background-color: var(--light-color);
 }
 
 .paddle1 {
-  left: 1%;
+    left: 1%;
 }
 
 .paddle2 {
-  right: 1%;
+    right: 1%;
 }
 
 .parentscore {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 2;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-.score { 
-  color: rgb(115, 121, 69);
-  font-size: calc(5vw + 5vh);
-  white-space: nowrap;
+.score {
+    color: rgb(115, 121, 69);
+    font-size: calc(5vw + 5vh);
+    white-space: nowrap;
 }
 
 .fill {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .backgroundimg {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  z-index: 4;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 4;
 
-  background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.5);
 }
 
 .ball {
-  z-index: 3;
-  position: absolute;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
+    z-index: 3;
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
 }

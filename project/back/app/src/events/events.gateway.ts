@@ -12,26 +12,16 @@ import { Server, Socket } from 'socket.io';
 import { UserService } from 'src/user/user.service';
 import { AuthService } from 'src/auth/auth.service';
 import { ChannelService } from 'src/channel/channel.service';
-import { sendMessageDTO } from 'src/dto/sendmessage.dto';
 import { GameService } from 'src/game/game.service';
 import { CreateGameDTO } from 'src/dto/create-game.dto';
 import { UserStatus } from 'src/utils/user.enum';
 import {
-  getIdFromSocket,
-  getKeys,
-  getSocketFromId,
+  disconnect,
+  getKeys, getSockets,
   send_connection_server,
-  verifyToken,
   wrongtoken,
 } from 'src/utils/socket.function';
-import {
-  ChannelCode,
-  FriendCode,
-  messageCode,
-} from 'src/utils/requestcode.enum';
-import { addAdminDto } from '../dto/add-admin.dto';
 import { sleep } from '../utils/sleep';
-import { BanUserDto } from '../dto/ban-user.dto';
 
 @WebSocketGateway({
   cors: {
@@ -42,7 +32,7 @@ export class EventsGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
   @WebSocketServer() server: Server;
-  private clients: Map<string, Socket> = new Map<string, Socket>();
+  private clients: string[] = [];
   private ingame: Map<string, string> = new Map<string, string>();
   private games: Map<string, Game> = new Map<string, Game>();
   private rematch: Map<string, boolean> = new Map<string, boolean>();
@@ -58,7 +48,7 @@ export class EventsGateway
   ) {}
 
   sendconnected() {
-    send_connection_server(this.clients, this.ingame, this.server);
+    send_connection_server(getSockets(this.server), this.ingame, this.server);
   }
 
   afterInit() {
@@ -66,7 +56,7 @@ export class EventsGateway
   }
 
   async handleDisconnect(client: Socket) {
-    const id = getIdFromSocket(client, this.clients);
+    const id = client.data.id;
     if (id == null) {
       client.disconnect();
       return;
@@ -74,10 +64,10 @@ export class EventsGateway
     this.logger.log(`Client disconnected: ${id}`);
     if ((await this.userService.changeStatus(id, UserStatus.OFFLINE)) == null) {
       wrongtoken(client);
-      this.clients.delete(id);
+      this.clients = disconnect(id, this.clients);
       this.sendconnected();
     }
-    this.clients.delete(id);
+    this.clients = disconnect(id, this.clients);
     if (getKeys(this.ingame).includes(id)) {
       const game = await this.gameService.remakeGame(this.ingame.get(id));
       if (game == null) {
@@ -85,7 +75,7 @@ export class EventsGateway
         return;
       }
       this.ingame.delete(id);
-      this.games[game.id].remake();
+      await this.games[game.id].remake();
       this.games.delete(game.id);
     }
     if (this.matchmaking.includes(client)) {
@@ -96,6 +86,7 @@ export class EventsGateway
 
   //on connection
   async handleConnection(client: Socket) {
+    client.setMaxListeners(20);
     let id;
     this.logger.debug('New connexion');
     await client.on('connection', async (data) => {
@@ -112,7 +103,7 @@ export class EventsGateway
         return;
       }
       this.logger.debug(`Client connected: ${id} for ${client.id}`);
-      this.clients.set(id, client);
+      client.data.id = id;
       this.sendconnected();
       let channels = null;
       try {
@@ -130,228 +121,6 @@ export class EventsGateway
       }
       this.logger.log(`Client connected: ${id}`);
     });
-  }
-
-  //on friend request
-  @SubscribeMessage('friend_request') //reception d'une demande d'ami / accepter une demande d'ami
-  async handleFriendRequest(client: Socket, payload: any) {
-    let send;
-    const friend_id = payload.friend_id;
-    const user_id = getIdFromSocket(client, this.clients);
-    this.logger.log(`new friend request from ${user_id} to ${friend_id}`);
-    const user = await this.userService.getUserById(user_id);
-    const friend = await this.userService.getUserById(friend_id);
-    let ret;
-    if (friend == null) {
-      ret = {
-        code: FriendCode.UNEXISTING_USER,
-      };
-    } else if (await this.userService.isfriend(user_id, friend_id)) {
-      ret = {
-        code: FriendCode.ALREADY_FRIEND,
-      };
-    } else if (await this.userService.asfriendrequestby(user_id, friend_id)) {
-      await this.userService.removeFriendRequest(user_id, friend_id);
-      this.logger.debug('friend id : ' + friend_id);
-      if (getSocketFromId(friend_id, this.clients) != null) {
-        this.logger.debug(
-          'socket friend id : ' + getSocketFromId(friend_id, this.clients).id,
-        );
-        send = {
-          code: FriendCode.NEW_FRIEND,
-          id: user_id,
-        };
-        getSocketFromId(friend_id, this.clients).emit('friend_request', send);
-      }
-      await this.userService.addFriend(user_id, friend_id);
-      await this.userService.addFriend(friend_id, user_id);
-      ret = {
-        code: FriendCode.NEW_FRIEND,
-      };
-    } else {
-      ret = {
-        code: FriendCode.FRIEND_REQUEST_SENT,
-      };
-      const requestFriend = await this.userService.addFriendRequest(
-        user_id,
-        friend_id,
-      );
-      this.logger.debug('friend id : ' + friend_id);
-      console.log(this.clients);
-      if (getSocketFromId(friend_id, this.clients) != null) {
-        this.logger.debug(
-          'socket friend id : ' + getSocketFromId(friend_id, this.clients).id,
-        );
-        send = {
-          code: FriendCode.FRIEND_REQUEST,
-          id: user.id,
-          request: requestFriend.id,
-        };
-        getSocketFromId(friend_id, this.clients).emit('friend_request', send);
-      }
-    }
-    this.logger.debug(`friend request code: ${ret.code}`);
-    client.emit('friend_code', ret);
-  }
-
-  //on send message
-  @SubscribeMessage('send_message')
-  async handleMessage(client: Socket, payload: any) {
-    if (
-      payload.token == null ||
-      payload.channel_id == null ||
-      payload.content == null ||
-      payload.channel_id.length <= 0
-    ) {
-      client.emit('message_code', messageCode.INVALID_FORMAT);
-    }
-    const token = payload.token;
-    const channel_id = payload.channel_id;
-    let message = payload.content;
-    let send;
-    const user_id = getIdFromSocket(client, this.clients);
-    try {
-      verifyToken(token, this.authService);
-    } catch (error) {
-      wrongtoken(client);
-      return;
-    }
-    const user = await this.userService.getUserById(user_id);
-    const channel = await this.channelService.getChannelById(channel_id);
-    if (user == null) {
-      send = {
-        code: messageCode.UNAUTHORIZED,
-      };
-    } else if (channel == null) {
-      send = {
-        code: messageCode.UNEXISTING_CHANNEL,
-      };
-    } else if (!(await this.channelService.isInChannel(user.id, channel.id))) {
-      send = {
-        code: messageCode.UNACCESSIBLE_CHANNEL,
-      };
-    } else {
-      message = new sendMessageDTO();
-      message.content = payload.content;
-      message.channel_id = payload.channel_id;
-      let msg;
-      try {
-        msg = await this.channelService.sendMessage(message, user.id);
-      } catch (error) {
-        send = {
-          code: messageCode.INVALID_FORMAT,
-        };
-        client.emit('message_code', send);
-        return;
-      }
-      send = {
-        code: messageCode.SUCCESS,
-      };
-      const sendmsg = {
-        id: msg.id,
-        content: msg.content,
-        user: msg.user,
-        channel: msg.channel,
-        date: msg.date,
-      };
-      this.server.to(channel.id).emit('message', sendmsg);
-      //this.server.emit('message', sendmsg);
-    }
-    client.emit('message_code', send);
-  }
-
-  @SubscribeMessage('join_channel')
-  async handleJoinChannel(client: Socket, payload: any) {
-    let send;
-    const channel_id = payload.channel_id;
-    const user_id = getIdFromSocket(client, this.clients);
-    if (user_id == null) {
-      send = {
-        code: 401,
-      };
-      client.emit('join_code', send);
-      return;
-    }
-    const user = await this.userService.getUserById(user_id);
-    const channel = await this.channelService.getChannelById(channel_id);
-    send = {
-      code: 0,
-      channel_id: channel_id,
-      channel: channel,
-    };
-    if (channel == null) {
-      send = {
-        code: 1,
-        channel_id: channel_id,
-        channel: channel,
-      };
-    } else if (!(await this.channelService.isInChannel(user.id, channel.id))) {
-      send = {
-        code: 2,
-        channel_id: channel_id,
-        channel: channel,
-      };
-    } else {
-      client.join(channel_id);
-      send = {
-        code: 0,
-        channel_id: channel_id,
-        channel: channel,
-      };
-    }
-    client.emit('join_code', send);
-    send = {
-      user_id: user.id,
-      channel_id: channel_id,
-      channel: channel,
-    };
-    this.server.to(channel_id).emit('user_join', send);
-  }
-
-  @SubscribeMessage('leave_channel')
-  async handleLeaveChannel(client: Socket, payload: any) {
-    let send;
-    const token = payload.token;
-    const channel_id = payload.channel_id;
-    const user_id = getIdFromSocket(client, this.clients);
-    try {
-      verifyToken(token, this.authService);
-    } catch (error) {
-      wrongtoken(client);
-      return;
-    }
-    if (user_id == null) {
-      send = {
-        code: 401,
-      };
-      client.emit('leave_code', send);
-      return;
-    }
-    const user = await this.userService.getUserById(user_id);
-    const channel = await this.channelService.getChannelById(channel_id);
-    send = {
-      code: 0,
-    };
-    if (channel == null) {
-      send = {
-        code: 1,
-      };
-    } else if (!(await this.channelService.isInChannel(user.id, channel.id))) {
-      send = {
-        code: 2,
-      };
-    } else {
-      client.leave(channel_id);
-      send = {
-        code: 0,
-      };
-    }
-    client.emit('leave_code', send);
-    send = {
-      user_id: user.id,
-      channel_id: channel_id,
-    };
-    this.server.to(channel_id).emit('user_leave', send);
   }
 
   @SubscribeMessage('join_matchmaking')
@@ -408,11 +177,8 @@ export class EventsGateway
       let j = 0;
       while (j < this.matchmaking.length) {
         const pretended_player = this.matchmaking[j];
-        const player_id = getIdFromSocket(player, this.clients);
-        const pretended_player_id = getIdFromSocket(
-          pretended_player,
-          this.clients,
-        );
+        const player_id = player.data.id;
+        const pretended_player_id = pretended_player.data.id;
         if (
           pretended_player_id != null &&
           pretended_player_id != player_id &&
@@ -465,8 +231,8 @@ export class EventsGateway
 
   async play_game(player: Socket, rival: Socket) {
     const create_gameDTO = new CreateGameDTO();
-    create_gameDTO.user1_id = getIdFromSocket(player, this.clients);
-    create_gameDTO.user2_id = getIdFromSocket(rival, this.clients);
+    create_gameDTO.user1_id = player.data.id;
+    create_gameDTO.user2_id = rival.data.id;
     if (create_gameDTO.user1_id == null || create_gameDTO.user2_id == null) {
       player.emit('game_found', {
         game_id: null,
@@ -524,25 +290,22 @@ export class EventsGateway
 
   @SubscribeMessage('option_send')
   async option_send(client: Socket, payload: any) {
-    const user_id = getIdFromSocket(client, this.clients);
+    const user_id = client.data.id;
     const game_id = this.ingame.get(user_id);
     const game: Game = this.games[game_id];
     game.definePowerUp(payload.powerup);
-    if (game == null) {
-      return;
-    } else {
-      this.server.to(game_id).emit('will_started', { time: 3 });
-      await sleep(1000);
-      this.server.to(game_id).emit('option_receive', payload);
-      this.server.to(game_id).emit('will_started', { time: 2 });
-      await sleep(1000);
-      this.server.to(game_id).emit('will_started', { time: 1 });
-      await sleep(1000);
-      this.server.to(game_id).emit('will_started', { time: 0 });
-      await sleep(1000);
-      game.start();
-    }
+    this.server.to(game_id).emit('will_started', { time: 3 });
+    await sleep(1000);
+    this.server.to(game_id).emit('option_receive', payload);
+    this.server.to(game_id).emit('will_started', { time: 2 });
+    await sleep(1000);
+    this.server.to(game_id).emit('will_started', { time: 1 });
+    await sleep(1000);
+    this.server.to(game_id).emit('will_started', { time: 0 });
+    await sleep(1000);
+    game.start();
   }
+
   @SubscribeMessage('input_game')
   async input_game(client: Socket, payload: any) {
     const game_id = payload.game_id;
@@ -575,7 +338,7 @@ export class EventsGateway
   @SubscribeMessage('game_finished')
   async game_finished(client: Socket, payload: any) {
     const rematch = payload.rematch;
-    const id = getIdFromSocket(client, this.clients);
+    const id = client.data.id;
     const game_id = this.ingame.get(id);
     const game = this.games[game_id];
     if (game != null) {
@@ -583,8 +346,8 @@ export class EventsGateway
         this.games.delete(game_id);
         game.getUser1().emit('rematch', { rematch: false });
         game.getUser2().emit('rematch', { rematch: false });
-        this.ingame.delete(getIdFromSocket(game.getUser1(), this.clients));
-        this.ingame.delete(getIdFromSocket(game.getUser2(), this.clients));
+        this.ingame.delete(game.getUser1().data.id);
+        this.ingame.delete(game.getUser2().data.id);
         this.logger.debug('game ' + game_id + ' finished');
       } else {
         if (this.rematch.get(game_id) == null) {
@@ -606,8 +369,8 @@ export class EventsGateway
           };
           game.getUser1().emit('rematch', send);
           game.getUser2().emit('rematch', send);
-          this.ingame.delete(getIdFromSocket(game.getUser1(), this.clients));
-          this.ingame.delete(getIdFromSocket(game.getUser2(), this.clients));
+          this.ingame.delete(game.getUser1().data.id);
+          this.ingame.delete(game.getUser2().data.id);
           this.rematch.delete(game_id);
           this.logger.debug('game ' + game_id + ' finished and rematch');
           this.play_game(game.getUser1(), game.getUser2());
@@ -624,7 +387,7 @@ export class EventsGateway
     const socket = this.server.sockets.sockets.get(rival_id);
     if (socket != null) {
       if (this.dual.get(rival_id) != null) {
-        if (this.dual.get(rival_id) == getIdFromSocket(client, this.clients)) {
+        if (this.dual.get(rival_id) == client.data.id) {
           this.dual.delete(rival_id);
           socket.emit('receive_challenge', {
             message: 'ok game will started soon',
@@ -640,9 +403,9 @@ export class EventsGateway
           return;
         }
       } else {
-        this.dual.set(getIdFromSocket(client, this.clients), rival_id);
+        this.dual.set(client.data.id, rival_id);
         socket.emit('receive_challenge', {
-          rival: getIdFromSocket(client, this.clients),
+          rival: client.data.id,
         });
       }
     } else {
@@ -654,240 +417,15 @@ export class EventsGateway
 
   @SubscribeMessage('leave_game')
   async leave_game(client: Socket, payload: any) {
-    const id = getIdFromSocket(client, this.clients);
+    const id = client.data.id;
     const game_id = this.ingame.get(id);
     const game = this.games[game_id];
     if (game != null) {
-      this.ingame.delete(getIdFromSocket(game.getUser1(), this.clients));
-      this.ingame.delete(getIdFromSocket(game.getUser2(), this.clients));
+      this.ingame.delete(client.data.id);
+      this.ingame.delete(client.data.id);
       game.remake();
     } else {
       this.ingame.delete(id);
-    }
-  }
-
-  @SubscribeMessage('unfriend_request')
-  async unfriend_request(client: Socket, payload: any) {
-    const friend_id = payload.friend_id;
-    const user_id = getIdFromSocket(client, this.clients);
-    if (await this.userService.isfriend(user_id, friend_id)) {
-      await this.userService.removeFriends(user_id, friend_id);
-      const mpchannel = await this.channelService.getmpchannel(
-        user_id,
-        friend_id,
-      );
-      await this.channelService.deletechannel(mpchannel.id);
-      client.emit('friend_code', {
-        code: FriendCode.UNFRIEND_SUCCESS,
-      });
-      if (getSocketFromId(friend_id, this.clients)) {
-        getSocketFromId(friend_id, this.clients).emit('friend_code', {
-          code: FriendCode.NEW_UNFRIEND,
-          id: user_id,
-        });
-      }
-    } else {
-      client.emit('friend_code', {
-        code: FriendCode.UNEXISTING_FRIEND,
-      });
-    }
-  }
-
-  @SubscribeMessage('research_name')
-  async research_name(client: Socket, payload: any) {
-    const name = payload.name;
-    const user_id = getIdFromSocket(client, this.clients);
-    const users = await this.userService.getUserBySimilarNames(name, user_id);
-    client.emit('research_name', users);
-  }
-
-  @SubscribeMessage('invite_channel')
-  async invite_channel(client: Socket, payload: any) {
-    this.logger.debug('invite_channel');
-    this.logger.debug(payload);
-    const channel_id = payload.channel_id;
-    const receiver_id = payload.receiver_id;
-    const sender_id = getIdFromSocket(client, this.clients);
-
-    const receiver = await this.userService.getUserById(receiver_id);
-    const sender = await this.userService.getUserById(sender_id);
-    if (receiver == null || sender == null) {
-      client.emit('invite_request', {
-        code: ChannelCode.UNEXISTING_USER,
-      });
-      return;
-    }
-    const channel = await this.channelService.getChannelById(channel_id);
-    if (channel == null) {
-      client.emit('invite_request', {
-        code: ChannelCode.UNEXISTING_CHANNEL,
-      });
-    } else {
-      let ch = null;
-      try {
-        this.logger.debug('invite_channel');
-        ch = await this.channelService.inviteChannel(
-          sender_id,
-          receiver_id,
-          channel_id,
-        );
-      } catch (e) {
-        client.emit('invite_request', {
-          message: e.message,
-        });
-        return;
-      }
-      if (ch != null) {
-        const socket = getSocketFromId(receiver_id, this.clients);
-        const send = {
-          user_id: receiver_id,
-          channel_id: channel_id,
-          channel: ch,
-        };
-        socket.join(channel_id);
-        socket.emit('join_code', send);
-      }
-      return;
-    }
-  }
-
-  @SubscribeMessage('update_channel')
-  async update_channel(client: Socket, payload: any) {
-    this.logger.debug('update_channel');
-    this.logger.debug(payload);
-    const channel_id = payload.channel_id;
-    const user_id = getIdFromSocket(client, this.clients);
-    let ret = null;
-    try {
-      ret = await this.channelService.updateChannel(
-        channel_id,
-        user_id,
-        payload,
-      );
-    } catch (e) {
-      client.emit('update_channel', {
-        message: e.message,
-      });
-    }
-    client.emit('update_channel', ret);
-  }
-
-  @SubscribeMessage('add_admin')
-  async add_admin(client: Socket, payload: any) {
-    const user_id = getIdFromSocket(client, this.clients);
-    const channel_id = payload.channel_id;
-    const admin_id = payload.admin_id;
-    const addAdmin = new addAdminDto();
-    addAdmin.channel_id = channel_id;
-    addAdmin.user_id = admin_id;
-    try {
-      const chan = await this.channelService.addAdmin(addAdmin, user_id);
-      if (chan != null) {
-        this.server.to(chan.id).emit('admin_code', {
-          channel_id: chan.id,
-          admins: chan.admins,
-        });
-      }
-      client.emit('admin_code', {
-        message: 'ok',
-      });
-    } catch (e) {
-      client.emit('add_admin', {
-        message: e.message,
-      });
-      return;
-    }
-  }
-
-  @SubscribeMessage('remove_admin')
-  async remove_admin(client: Socket, payload: any) {
-    const user_id = getIdFromSocket(client, this.clients);
-    const channel_id = payload.channel_id;
-    const admin_id = payload.admin_id;
-    const addAdmin = new addAdminDto();
-    addAdmin.channel_id = channel_id;
-    addAdmin.user_id = admin_id;
-    try {
-      const chan = await this.channelService.deleteAdmin(addAdmin, user_id);
-      if (chan != null) {
-        this.server.to(chan.id).emit('admin_code', {
-          channel_id: chan.id,
-          admins: chan.admins,
-        });
-      }
-      client.emit('admin_code', {
-        message: 'ok',
-      });
-    } catch (e) {
-      client.emit('admin_code', {
-        message: e.message,
-      });
-      return;
-    }
-  }
-
-  @SubscribeMessage('ban_user')
-  async ban_user(client: Socket, payload: any) {
-    const user_id = getIdFromSocket(client, this.clients);
-    const channel_id = payload.channel_id;
-    const ban_id = payload.ban_id;
-    const addBan = new BanUserDto();
-    addBan.channel_id = channel_id;
-    addBan.user_id = ban_id;
-    try {
-      const chan = await this.channelService.banUser(addBan, user_id);
-      if (chan != null) {
-        this.server.to(chan.id).emit('ban_code', {
-          channel_id: chan.id,
-          bans: chan.bannedUsers,
-        });
-      }
-    } catch (e) {
-      client.emit('ban_code', {
-        message: e.message,
-      });
-      return;
-    }
-  }
-
-  @SubscribeMessage('unban_user')
-  async unban_user(client: Socket, payload: any) {
-    const user_id = getIdFromSocket(client, this.clients);
-    const channel_id = payload.channel_id;
-    const ban_id = payload.unban_id;
-    const addBan = new BanUserDto();
-    addBan.channel_id = channel_id;
-    addBan.user_id = ban_id;
-    try {
-      const chan = await this.channelService.deleteBanUser(addBan, user_id);
-      if (chan != null) {
-        this.server.to(chan.id).emit('ban_code', {
-          channel_id: chan.id,
-          bans: chan.bannedUsers,
-        });
-      }
-    } catch (e) {
-      client.emit('ban_code', {
-        message: e.message,
-      });
-      return;
-    }
-  }
-
-  @SubscribeMessage('block_user')
-  async block_user(client: Socket, payload: any) {
-    const user_id = getIdFromSocket(client, this.clients);
-    const block_id = payload.block_id;
-    try {
-      const user = await this.userService.addBlocked(user_id, block_id);
-      client.emit('block_code', {
-        message: 'ok',
-      });
-    } catch (e) {
-      client.emit('block_code', {
-        message: e.message,
-      });
-      return;
     }
   }
 }

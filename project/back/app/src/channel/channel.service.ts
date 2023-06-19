@@ -1,4 +1,4 @@
-import { flatten, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { addAdminDto } from 'src/dto/add-admin.dto';
 import { CreateChannelDto } from 'src/dto/create-channel.dto';
@@ -12,7 +12,6 @@ import { ChannelType } from 'src/utils/channel.enum';
 import { BanUserDto } from '../dto/ban-user.dto';
 import * as bcrypt from 'bcrypt';
 import { includeUser } from '../utils/socket.function';
-import { User } from '../user/user.entity';
 
 @Injectable()
 export class ChannelService {
@@ -129,16 +128,13 @@ export class ChannelService {
   }
 
   public async leaveChannel(user_id, channel_id) {
-    const chan = await this.channelRepository.findOneBy({
-      id: channel_id,
-    });
+    const chan = await this.getChannelById(channel_id);
     if (chan == null) throw new Error('Channel not found');
     const user = await this.userService.getUserById(user_id);
     if (user == null) throw new Error('User not found');
-    if (!chan.users.includes(user)) throw new Error('User not in channel');
+    if (!includeUser(user, chan.users)) throw new Error('User not in channel');
     chan.users = chan.users.filter((u) => u.id != user.id);
-    await this.channelRepository.save(chan);
-    return user;
+    return await this.channelRepository.save(chan);
   }
 
   public async addAdmin(body: addAdminDto, user_id) {
@@ -231,6 +227,7 @@ export class ChannelService {
   }
 
   public async sendMessage(body: sendMessageDTO, user_id) {
+    console.log(body.content);
     if (body.content.length > 4242 || body.content.length <= 0)
       throw new Error('Message too long (max 4242) or empty');
     const message = new Message();
@@ -250,6 +247,7 @@ export class ChannelService {
     channel.messages.push(message);
     await this.channelRepository.save(channel);
     const ret: any = await this.messageRepository.save(message);
+    console.log(ret.content);
     ret.channel = channel.id;
     return ret;
   }
@@ -272,19 +270,58 @@ export class ChannelService {
     return channels;
   }
 
+  async researchAvailableChannels(id: string, name: string) {
+    if (name == null || name == '') {
+      return await this.getAvailableChannels(id);
+    }
+    const user = await this.userService.getUserById(id);
+    if (user == null) throw new Error('User not found');
+    const channels = await this.channelRepository
+      .createQueryBuilder('channel')
+      .leftJoinAndSelect('channel.users', 'users')
+      .leftJoinAndSelect('channel.bannedUsers', 'bannedUsers')
+      .leftJoinAndSelect('channel.admins', 'admins')
+      .leftJoinAndSelect('channel.creator', 'creator')
+      .where('channel.name LIKE :name', { name: `%${name}%` })
+      .getMany();
+    const chan = [];
+    if (channels == null) return null;
+    for (const c of channels) {
+      if (
+        c.type != ChannelType.PRIVATE_CHANNEL &&
+        c.type != ChannelType.MP_CHANNEL &&
+        !includeUser(user, c.bannedUsers) &&
+        !includeUser(user, c.users)
+      )
+        chan.push(c);
+    }
+    if (chan.length == 0) return null;
+    return chan;
+  }
+
   async getAvailableChannels(id: string) {
     const user = await this.userService.getUserById(id);
     if (user == null) throw new Error('User not found');
-    const channels = await this.channelRepository.find();
+    const channels = await this.channelRepository
+      .createQueryBuilder('channel')
+      .leftJoinAndSelect('channel.users', 'users')
+      .leftJoinAndSelect('channel.bannedUsers', 'bannedUsers')
+      .leftJoinAndSelect('channel.admins', 'admins')
+      .leftJoinAndSelect('channel.creator', 'creator')
+      .getMany();
+    const chan = [];
     if (channels == null) return null;
-    channels.filter((c) => !c.users.includes(user));
-    channels.filter((c) => c.type != ChannelType.PRIVATE_CHANNEL);
-    channels.filter(
-      (c) => c.bannedUsers != null && c.bannedUsers.includes(user),
-    );
-    channels.filter((c) => c.type != ChannelType.MP_CHANNEL);
-    if (channels.length == 0) return null;
-    return channels;
+    for (const c of channels) {
+      if (
+        c.type != ChannelType.PRIVATE_CHANNEL &&
+        c.type != ChannelType.MP_CHANNEL &&
+        !includeUser(user, c.bannedUsers) &&
+        !includeUser(user, c.users)
+      )
+        chan.push(c);
+    }
+    if (chan.length == 0) return null;
+    return chan;
   }
 
   async getAdmin(body: addAdminDto, id: string) {
@@ -306,12 +343,7 @@ export class ChannelService {
     if (self_user == null) throw new Error('User not found');
     const target = await this.userService.getUserById(body.user_id);
     if (target == null) throw new Error('User not found');
-    const channel = await this.channelRepository
-      .createQueryBuilder('channel')
-      .leftJoinAndSelect('channel.admins', 'admins')
-      .leftJoinAndSelect('channel.users', 'users')
-      .where('channel.id = :id', { id: body.channel_id })
-      .getOne();
+    const channel = await this.getChannelById(body.channel_id);
     if (channel == null) throw new Error('Channel not found');
     let f = false;
     for (const admin of channel.admins) {
@@ -357,8 +389,9 @@ export class ChannelService {
     const channel = await this.channelRepository
       .createQueryBuilder('channel')
       .leftJoinAndSelect('channel.bannedUsers', 'bannedUsers')
-        .leftJoinAndSelect('channel.users', 'users')
-        .leftJoinAndSelect('channel.admins', 'admins')
+      .leftJoinAndSelect('channel.users', 'users')
+      .leftJoinAndSelect('channel.admins', 'admins')
+      .leftJoinAndSelect('channel.creator', 'creator')
       .where('channel.id = :id', { id: body.channel_id })
       .getOne();
     if (channel == null) throw new Error('Channel not found');
@@ -417,8 +450,8 @@ export class ChannelService {
       .createQueryBuilder('channel')
       .leftJoinAndSelect('channel.users', 'users')
       .leftJoinAndSelect('channel.admins', 'admins')
-        .leftJoinAndSelect('channel.creator', 'creator')
-        .leftJoinAndSelect('channel.bannedUsers', 'bannedUsers')
+      .leftJoinAndSelect('channel.creator', 'creator')
+      .leftJoinAndSelect('channel.bannedUsers', 'bannedUsers')
       .where('channel.id = :id', { id: channel_id })
       .getOne();
     if (channel.type == ChannelType.MP_CHANNEL)
