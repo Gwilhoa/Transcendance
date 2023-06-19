@@ -69,7 +69,7 @@
 
 .chat-my-message, .chat-other-message {
     color: var(--light-color);
-    margin: 2em;
+    margin: 1rem;
     /* justify-content: flex-end; */
     /* align-items: flex-end; */
     display: flex;
@@ -99,7 +99,11 @@
     opacity: 0.5;
 }
 
-.chat-content-message {
+pre {
+    white-space: pre-wrap;
+}
+
+.chat-content-message{
     font-size: 1.125rem;
     opacity: 0.8;
     /* word-wrap: break-word; */
