@@ -20,8 +20,6 @@ const BeginGame = () => {
 
   useEffect(() => {
       socket.emit('join_matchmaking', {token : cookies.get('jwtAuthorization')});
-      
-
       return () => {
           console.log("oui")
           socket.emit('leave_matchmaking')
@@ -47,7 +45,7 @@ const BeginGame = () => {
 
       socket.on('game_found', (data) => {
           console.log(data);
-          dispatch(setBeginStatus({decide: data.decide, playerstate: data.user, gameid: data.game_id}));
+          dispatch(setBeginStatus({decide: data.decide, playerstate: data.user, gameid: data.game_id, gamestate: 1}));
           socket.emit('leave_matchmaking')
           navigate("/optiongame")
       });

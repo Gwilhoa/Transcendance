@@ -30,10 +30,10 @@ const OptionGame = () => {
     const decide = useSelector((state: RootState) => state.beginToOption.decide);
     const playerstats = useSelector((state: RootState) => state.beginToOption.playerstate);
     const couille = useSelector((state: RootState) => state.beginToOption.gameid);
+    const gamestate = useSelector((state: RootState) => state.beginToOption.gamestate)
     useEffect(() => {
-        if (couille == null)
-        navigate('/home');
-        
+        if (couille == null || gamestate == 0)
+            navigate('/home');
         
         socket.on('will_started', (data) => {
             console.log(data);

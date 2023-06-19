@@ -1,7 +1,7 @@
 import './css/game.css'
 import React, { useState, useEffect, useRef } from "react";
 import Cookies from 'universal-cookie';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import ErrorToken from '../components/IfError';
 import {useDispatch, useSelector} from 'react-redux';
 import {setFinalStatus} from "../redux/game/gameSlice";
@@ -18,6 +18,7 @@ interface GameProps {
 
 const Game: React.FC<GameProps> = () => {
 
+  const location = useLocation();
   const animatedBall = useSpring({
     from: { transform: 'rotate(0deg)' },
     to: { transform: 'rotate(360deg)' },
@@ -52,7 +53,7 @@ const Game: React.FC<GameProps> = () => {
 
   const socketInstance = SocketSingleton.getInstance();
   const socket = socketInstance.getSocket();
-  
+
   
   const ballStyles = {
     top: `${ball.x - 2}%`,
@@ -99,15 +100,17 @@ const Game: React.FC<GameProps> = () => {
   
   
   useEffect(() => {
-      socket.on('create_game', (any) => {
-        console.log('WESH')
-        console.log(any);
-      })
+    const previousPageUrl = location?.state?.prevPath ?? '';
+    console.log(previousPageUrl);
 
-      window.addEventListener("keydown", handleKeyPress);
-      if (playerstats == 2) {
-        setColor1("red")
-        setColor2("blue")
+    socket.on('create_game', (any) => {
+      console.log(any);
+    })
+    
+    window.addEventListener("keydown", handleKeyPress);
+    if (playerstats == 2) {
+      setColor1("red")
+      setColor2("blue")
       }
       else {
         setColor1("blue");
@@ -119,11 +122,11 @@ const Game: React.FC<GameProps> = () => {
         setIsPowerup(data.powerup);
         console.log(data)
       })
-
+      
       socket.on('game_start', () => {
         socket.emit('input_game', { game_id: gameId, position: paddle1, token: cookies.get('jwtAuthorization')}); 
       })
-
+      
       socket.on('stop_game', (any) => {
         
         console.log(any);
@@ -133,15 +136,17 @@ const Game: React.FC<GameProps> = () => {
       socket.on('is_stop_game', (any) => {
         console.log(any);
         setStop(any.stop);
-      
         setIamStoper(any.stoper);
         console.log(any.stoper);
         console.log(IamStoper);
       })
-
+      
       socket.on('update_game', (data) => {
         setScore1(data.score1);
         setScore2(data.score2);
+        data.ballx -= 1;
+        if(data.ballx > 98)
+          data.ballx = 98
         setBall({x: (data.ballx), y: (data.bally)});
         setPaddle2(data.rack2y)
         setPaddle1(data.rack1y);
@@ -149,11 +154,11 @@ const Game: React.FC<GameProps> = () => {
       
       socket.on('finish_game', (any) => {
         if (isCall) {
-        const content = {status: any.status, adversary: any.adversary, score1: any.score1, score2: any.score2, gameid: gameId};
-        dispatch(setFinalStatus(content));
-        navigate('/endGame');
-        isCall = !isCall;
-      }
+          const content = {status: any.status, adversary: any.adversary, score1: any.score1, score2: any.score2, gameid: gameId};
+          dispatch(setFinalStatus(content));
+          navigate('/endGame');
+          isCall = !isCall;
+        }
       });
     
       return () => {
@@ -164,11 +169,12 @@ const Game: React.FC<GameProps> = () => {
         socket.off('option_receive');
         socket.off('game_start');
         socket.off('create_game');
+        leaveGame();
       };
-  }, []);
-
-  return (
-    <>
+    }, []);
+    
+    return (
+      <>
 
     <ErrorToken />
     <img className="fill" src={nbMap}/>
