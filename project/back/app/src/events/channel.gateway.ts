@@ -324,7 +324,7 @@ export class ChannelGateway implements OnGatewayInit {
     try {
       const chan = await this.channelService.banUser(addBan, user_id);
       if (chan != null) {
-        const socket: Socket = getSocketFromId(ban_id, this.server);
+        const socket: Socket = getSocketFromId(ban_id, getSockets(this.server));
         if (socket != null) {
           socket.leave(channel_id);
           socket.emit('delete_channel', { id: channel_id });
