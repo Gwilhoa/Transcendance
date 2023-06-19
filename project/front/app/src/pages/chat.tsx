@@ -15,7 +15,6 @@ import ListUserChannel from '../components/chat/ListUsers';
 import axios from 'axios';
 import {cookies} from '../App';
 import {useNavigate} from 'react-router-dom';
-import { channel } from 'diagnostics_channel';
 
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
@@ -88,6 +87,10 @@ export const isMe = (user: User) => {
 	return (false);
 };
 
+const updateAvailableChannel = (input: string) => {
+	console.log(input);
+	socket.emit('research_channel', {search: input})
+}
 ////////////////////////// CHAT ///////////////////////////////////////////////
 function Chat() {
 	const isOpenSideBar = useSelector((state: RootState) => state.modalChat.isOpenSideBar);
@@ -100,6 +103,7 @@ function Chat() {
 
 	const [channel, setChannel] = useState<Channel>(initialChannelState);
 	const [listChannel, setListChannel] = useState<Array<Channel>>([]);
+	const [listAvailableChannel, setListAvailableChannel] = useState<Array<Channel>>([]);
 
 	const [conversationId, setConversationId] = useState<string>('');
 	const [updateChannel, setUpdateChannel] = useState<number>(0);
@@ -110,6 +114,19 @@ function Chat() {
 	const [sendMessage, setSendMessage] = useState<boolean>(false);
 
 ////////////////////////// FETCH DATA /////////////////////////////////////////
+	const fetchAvailableChannel = async () => {
+		try {
+			const response = await axios.get(process.env.REACT_APP_IP + ':3000/channel/available', {
+				headers: {
+					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+				},
+			});
+			console.log(response.data);
+			setListAvailableChannel(response.data);
+		} catch (error) {
+			console.error(error);
+		}
+	}
 	const fetchListChannel = async () => {
 		try {
 			const response = await axios.get(process.env.REACT_APP_IP + ':3000/user/channels', {
@@ -125,6 +142,9 @@ function Chat() {
 	};
 
 	const fetchListMessage = async () => {
+		if (conversationId === '') {
+			return;
+		}
 		try {
 			const response = await axios.get(process.env.REACT_APP_IP + ':3000/channel/message/' + conversationId, {
 				headers: {
@@ -160,10 +180,12 @@ function Chat() {
 
 	useEffect(() => {
 		fetchListChannel();
+		fetchAvailableChannel();
 
 		socket.on('update_user_channel', handleUpdateUserChannel);
 		socket.on('user_join', handleUserCode);
 		socket.on('delete_channel', handleDeleteChannel);
+		socket.on('research_channel', handleResearchChannel);
 
 		return () => {
 			socket.off('update_user_channel');
@@ -173,6 +195,14 @@ function Chat() {
 	}, []);
 
 ////////////////////////// HANDLE SOCKET //////////////////////////////////////
+
+	const handleResearchChannel = (data: any) => {
+		console.log('research_channel');
+		console.log(data);
+		if (data.channels.length == 0)
+			return;
+		setListAvailableChannel(data.channels);
+	}
 	const handleUpdateUserChannel = (data: any) => {
 		console.log('user_update');
 		console.log(data);
@@ -282,6 +312,8 @@ function Chat() {
 	},[conversationId, updateChannel]);
 
 	return (
+		<>
+
 		<div className='chatPage'>
 			<ErrorToken/>
 			<OptionBar setId={setConversationId}/>
@@ -292,7 +324,9 @@ function Chat() {
 			{isOpenCreateChannel && (<CreateChannel/>)}
 			{isOpenInviteChannel && (<InviteChannel channel={channel}/>)}
 			{isOpenUpdateChannel && (<ModifyChannel channel={channel}/>)}
+			{conversationId !== '' ? (
 			<div className='chat-right-page'>
+
 				<Conversation
 					listMessages={messages}
 					channel={channel}
@@ -305,8 +339,24 @@ function Chat() {
 					postMessage={sendMessage}
 				/>
 			</div>
+			) : (
+				<div>
+					<h1>Channels disponible</h1>
+					<input onChange={(e) => updateAvailableChannel(e.target.value)}/>
+					{ listAvailableChannel.length > 0 ? (
+						listAvailableChannel.map((itemChannel) => (
+							<div key={itemChannel.id}>
+								<p>{itemChannel.name}</p>
+								<button>Join</button>
+							</div>
+						))
+					) : null
+					}
+				</div>
+			)}
 			{isOpenListUserChannel && (<ListUserChannel channel={channel}/>)}
 		</div>
+		</>
 	);
 }
 
