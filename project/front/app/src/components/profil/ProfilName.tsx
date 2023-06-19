@@ -67,7 +67,7 @@ export const ProfilName = ({id}: { id: string | null }) => {
 			});
 
 		socket.on('connection_server', (data: any) => {
-			for (const id_ingame of data.in_game) {
+			for (const id_ingame of data.ingame) {
 				if (id_ingame == id) {
 					setUserStatus('profil-status-in-game');
 					return;
