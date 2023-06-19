@@ -270,6 +270,35 @@ export class ChannelService {
     return channels;
   }
 
+  async researchAvailableChannels(id: string, name: string) {
+    if (name == null || name == '') {
+      return await this.getAvailableChannels(id);
+    }
+    const user = await this.userService.getUserById(id);
+    if (user == null) throw new Error('User not found');
+    const channels = await this.channelRepository
+      .createQueryBuilder('channel')
+      .leftJoinAndSelect('channel.users', 'users')
+      .leftJoinAndSelect('channel.bannedUsers', 'bannedUsers')
+      .leftJoinAndSelect('channel.admins', 'admins')
+      .leftJoinAndSelect('channel.creator', 'creator')
+      .where('channel.name LIKE :name', { name: `%${name}%` })
+      .getMany();
+    const chan = [];
+    if (channels == null) return null;
+    for (const c of channels) {
+      if (
+        c.type != ChannelType.PRIVATE_CHANNEL &&
+        c.type != ChannelType.MP_CHANNEL &&
+        !includeUser(user, c.bannedUsers) &&
+        !includeUser(user, c.users)
+      )
+        chan.push(c);
+    }
+    if (chan.length == 0) return null;
+    return chan;
+  }
+
   async getAvailableChannels(id: string) {
     const user = await this.userService.getUserById(id);
     if (user == null) throw new Error('User not found');
@@ -362,6 +391,7 @@ export class ChannelService {
       .leftJoinAndSelect('channel.bannedUsers', 'bannedUsers')
       .leftJoinAndSelect('channel.users', 'users')
       .leftJoinAndSelect('channel.admins', 'admins')
+      .leftJoinAndSelect('channel.creator', 'creator')
       .where('channel.id = :id', { id: body.channel_id })
       .getOne();
     if (channel == null) throw new Error('Channel not found');

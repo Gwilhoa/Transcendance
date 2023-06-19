@@ -49,12 +49,16 @@ export const ProfilName = ({id}: { id: string | null }) => {
 			},
 		})
 			.then((response) => {
-				if (response.data.status === UserStatus.CONNECTED) {
-					setUserStatus('profil-status-connected');
-				}
-				if (response.data.status === UserStatus.IN_GAME) {
+				if (response.data.status == UserStatus.IN_GAME) {
 					setUserStatus('profil-status-in-game');
 				}
+				else if (response.data.status == UserStatus.CONNECTED) {
+					setUserStatus('profil-status-connected');
+				}
+				else {
+					setUserStatus('profil-status-disconnected');
+				}
+
 			})
 			.catch((error) => {
 				setErrorLocalStorage('Error ' + error.response.status);
@@ -63,10 +67,19 @@ export const ProfilName = ({id}: { id: string | null }) => {
 			});
 
 		socket.on('connection_server', (data: any) => {
-			if (data.connected.includes() != null)
-				setUserStatus('profil-status-connected');
-			if (data.connected.includes() != null)
-				setUserStatus('profil-status-in-game');
+			for (const id_ingame of data.ingame) {
+				if (id_ingame == id) {
+					setUserStatus('profil-status-in-game');
+					return;
+				}
+			}
+			for (const id_connected of data.connected) {
+				if (id_connected == id) {
+					setUserStatus('profil-status-connected');
+					return;
+				}
+			}
+			setUserStatus('profil-status-disconnected')
 		});
 
 		socket.on('update_profil', (data: any) => {
