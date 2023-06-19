@@ -100,6 +100,7 @@ function Chat() {
 
 	const [channel, setChannel] = useState<Channel>(initialChannelState);
 	const [listChannel, setListChannel] = useState<Array<Channel>>([]);
+	const [listAvailableChannel, setListAvailableChannel] = useState<Array<Channel>>([]);
 
 	const [conversationId, setConversationId] = useState<string>('');
 	const [updateChannel, setUpdateChannel] = useState<number>(0);
@@ -110,6 +111,19 @@ function Chat() {
 	const [sendMessage, setSendMessage] = useState<boolean>(false);
 
 ////////////////////////// FETCH DATA /////////////////////////////////////////
+	const fetchAvailableChannel = async () => {
+		try {
+			const response = await axios.get(process.env.REACT_APP_IP + ':3000/channel/available', {
+				headers: {
+					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+				},
+			});
+			console.log(response.data);
+			setListAvailableChannel(response.data);
+		} catch (error) {
+			console.error(error);
+		}
+	}
 	const fetchListChannel = async () => {
 		try {
 			const response = await axios.get(process.env.REACT_APP_IP + ':3000/user/channels', {
@@ -125,6 +139,9 @@ function Chat() {
 	};
 
 	const fetchListMessage = async () => {
+		if (conversationId === '') {
+			return;
+		}
 		try {
 			const response = await axios.get(process.env.REACT_APP_IP + ':3000/channel/message/' + conversationId, {
 				headers: {
@@ -160,6 +177,7 @@ function Chat() {
 
 	useEffect(() => {
 		fetchListChannel();
+		fetchAvailableChannel();
 
 		socket.on('update_user_channel', handleUpdateUserChannel);
 		socket.on('user_join', handleUserCode);
@@ -282,6 +300,8 @@ function Chat() {
 	},[conversationId, updateChannel]);
 
 	return (
+		<>
+
 		<div className='chatPage'>
 			<ErrorToken/>
 			<OptionBar/>
@@ -292,7 +312,9 @@ function Chat() {
 			{isOpenCreateChannel && (<CreateChannel/>)}
 			{isOpenInviteChannel && (<InviteChannel channel={channel}/>)}
 			{isOpenUpdateChannel && (<ModifyChannel channel={channel}/>)}
+			{conversationId !== '' ? (
 			<div className='chat-right-page'>
+
 				<Conversation
 					listMessages={messages}
 					channel={channel}
@@ -305,8 +327,20 @@ function Chat() {
 					postMessage={sendMessage}
 				/>
 			</div>
+			) : (
+				<div>
+					<h1>Channels disponible</h1>
+					{listAvailableChannel.map((itemChannel) => (
+						<div key={itemChannel.id}>
+							<p>{itemChannel.name}</p>
+							<button>Join</button>
+						</div>
+					))}
+				</div>
+			)}
 			{isOpenListUserChannel && (<ListUserChannel channel={channel}/>)}
 		</div>
+		</>
 	);
 }
 
