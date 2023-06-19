@@ -138,14 +138,12 @@ const CreateChannel = () => {
 	};
 
 	const handleNewChannel = () => {
-		console.log('send');
-		console.log(channelParams);
 		if (channelParams.type === 2) {
 			const pwd = '' + channelParams.pwd;
 			if (pwd.length === 0) {
 				setErrorPwd(true);
+				return ;
 			}
-			return ;
 		}
 		axios.post(process.env.REACT_APP_IP + ':3000/channel/create',
 			{
