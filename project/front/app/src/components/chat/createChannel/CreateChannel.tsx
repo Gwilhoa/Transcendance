@@ -31,7 +31,7 @@ const initialChannelState: Channel = {
 	name: 'New Channel',
 	topic: null,
 	type: 0,
-	pwd: null,
+	pwd: '',
 	users: [],
 	creator: initialUserState,
 	admins: [],
@@ -113,6 +113,7 @@ const CreateChannel = () => {
 	const navigate = useNavigate();
 	const [channelParams, setChannelParams] = useState<Channel>(initialChannelState);
 	const [usersId, setUserId] = useState<Array<string>>([]);
+	const [errorPwd, setErrorPwd] = useState<boolean>(false);
 
 	const onSubmitChannelName = (str: string) => {
 		setChannelParams((prevChannelParams) => ({
@@ -122,14 +123,11 @@ const CreateChannel = () => {
 	};
 
 	const handlePasswordChange = (str: string) => {
-		console.log('pwd : ');
+		setErrorPwd(false);
 		setChannelParams((prevChannelParams) => ({
 			...prevChannelParams,
 			pwd: str,
 		}));
-		console.log(channelParams.pwd);
-		console.log(str);
-		
 	};
 
 	const handleChannelTypeChange = (type: number) => {
@@ -140,8 +138,13 @@ const CreateChannel = () => {
 	};
 
 	const handleNewChannel = () => {
-		console.log('send');
-		console.log(channelParams);
+		if (channelParams.type === 2) {
+			const pwd = '' + channelParams.pwd;
+			if (pwd.length === 0) {
+				setErrorPwd(true);
+				return ;
+			}
+		}
 		axios.post(process.env.REACT_APP_IP + ':3000/channel/create',
 			{
 				name: channelParams.name,
@@ -195,6 +198,13 @@ const CreateChannel = () => {
 								id='password'
 								onChange={(e) => handlePasswordChange(e.target.value)}
 							/>
+							{ errorPwd ? 
+								<p>
+									{"password length can't be null"}
+								</p>
+							:
+								null
+							}
 						</div>
 					</>
 				) : (<></>)}

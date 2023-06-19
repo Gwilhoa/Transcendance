@@ -163,10 +163,12 @@ function Chat() {
 
 		socket.on('update_user_channel', handleUpdateUserChannel);
 		socket.on('user_join', handleUserCode);
+		socket.on('delete_channel', handleDeleteChannel);
 
 		return () => {
 			socket.off('update_user_channel');
 			socket.off('user_join');
+			socket.off('delete_channel');
 		}
 	}, []);
 
@@ -240,6 +242,11 @@ function Chat() {
 		if (data.code == 0) {
 			setErrorPostMessage('');
 		}
+	};
+
+	const handleDeleteChannel = (data: any) => {
+		console.log('delete channel');
+		console.log(data);
 	};
 
 	const handleUpdateChannel = (data: any) => {

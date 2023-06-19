@@ -25,6 +25,7 @@ export default function Profil() {
 	const [isFriend, setIsFriend] = useState<boolean>(false);
 	const [checked, setChecked] = useState(false);
 	const [errorName, setErrorName] = useState<boolean>(false);
+	const [errorNameMessage, setErrorNameMessage] = useState<string>('');
 	const [victories, setVictory] = useState<number>(0);
 	const [defeats, setDefeat] = useState<number>(0);
 	const [experience, setExperience] = useState<number>(0);
@@ -86,9 +87,6 @@ export default function Profil() {
 	}, [navigate, dispatch]);
 
 	useEffect(() => {
-		socket.on('receive_challenge', (data: any) => {
-			console.log('receive_challenge');
-		});
 		socket.on('friend_code', (data: any) => {
 			console.log(data.code);
 			if (data.code === 2 && !isFriend) {
@@ -125,7 +123,12 @@ export default function Profil() {
 			}
 			return;
 		})
-	}, [socket])
+
+		return () => {
+			socket.off('friend_request');
+			socket.off('friend_code');
+		}
+	}, [isFriend]);
 
 	useEffect(() => {
 		if (id === localStorage.getItem('id')) {
@@ -164,8 +167,16 @@ export default function Profil() {
 				setErrorName(false);
 			})
 			.catch((error) => {
+				if (error.response.status == 401 
+					|| error.response.status == 500) {
+					setErrorLocalStorage('Error ' + error.response.status);
+					console.error(error);
+					navigate('/Error');
+				}
 				console.error(error);
 				setErrorName(true);
+				const message = '' + error.response.data;
+				setErrorNameMessage(message.substr(19));
 			});
 	}
 
@@ -269,7 +280,7 @@ export default function Profil() {
 					classInput='profil-button'
 					classButton='profil-button'
 				/>
-				{errorName ? <p className='Error-msg'>*Name already Exist</p> : <></>}
+				{errorName ? <p className='Error-msg'>{errorNameMessage}</p> : <></>}
 			</div>
 		)
 
