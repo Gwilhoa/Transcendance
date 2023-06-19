@@ -324,6 +324,11 @@ export class ChannelGateway implements OnGatewayInit {
     try {
       const chan = await this.channelService.banUser(addBan, user_id);
       if (chan != null) {
+        const socket: Socket = getSocketFromId(ban_id, this.server);
+        if (socket != null) {
+          socket.leave(channel_id);
+          socket.emit('delete_channel', { id: channel_id });
+        }
         this.server.to(chan.id).emit('update_user_channel', {
           channel: chan,
           sender_id: user_id,
@@ -466,5 +471,14 @@ export class ChannelGateway implements OnGatewayInit {
         message: e.message,
       });
     }
+  }
+
+  @SubscribeMessage('research_channel')
+  async research_channel(client: Socket, payload: any) {
+    const ch = await this.channelService.researchAvailableChannels(
+      client.data.id,
+      payload.search,
+    );
+    client.emit('research_channel', { channels: ch });
   }
 }

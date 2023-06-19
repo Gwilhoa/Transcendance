@@ -88,6 +88,10 @@ export const isMe = (user: User) => {
 	return (false);
 };
 
+const updateAvailableChannel = (input: string) => {
+	console.log(input);
+	socket.emit('research_channel', {search: input})
+}
 ////////////////////////// CHAT ///////////////////////////////////////////////
 function Chat() {
 	const isOpenSideBar = useSelector((state: RootState) => state.modalChat.isOpenSideBar);
@@ -181,6 +185,7 @@ function Chat() {
 
 		socket.on('update_user_channel', handleUpdateUserChannel);
 		socket.on('user_join', handleUserCode);
+		socket.on('research_channel', handleResearchChannel);
 
 		return () => {
 			socket.off('update_user_channel');
@@ -189,6 +194,14 @@ function Chat() {
 	}, []);
 
 ////////////////////////// HANDLE SOCKET //////////////////////////////////////
+
+	const handleResearchChannel = (data: any) => {
+		console.log('research_channel');
+		console.log(data);
+		if (data.channels.length == 0)
+			return;
+		setListAvailableChannel(data.channels);
+	}
 	const handleUpdateUserChannel = (data: any) => {
 		console.log('user_update');
 		console.log(data);
@@ -323,12 +336,16 @@ function Chat() {
 			) : (
 				<div>
 					<h1>Channels disponible</h1>
-					{listAvailableChannel.map((itemChannel) => (
-						<div key={itemChannel.id}>
-							<p>{itemChannel.name}</p>
-							<button>Join</button>
-						</div>
-					))}
+					<input onChange={(e) => updateAvailableChannel(e.target.value)}/>
+					{ listAvailableChannel.length > 0 ? (
+						listAvailableChannel.map((itemChannel) => (
+							<div key={itemChannel.id}>
+								<p>{itemChannel.name}</p>
+								<button>Join</button>
+							</div>
+						))
+					) : null
+					}
 				</div>
 			)}
 			{isOpenListUserChannel && (<ListUserChannel channel={channel}/>)}
