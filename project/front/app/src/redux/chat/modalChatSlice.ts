@@ -35,6 +35,9 @@ const modalChatSlice = createSlice({
 		switchChatModalListUser: (state) => {
 			state.isOpenListUser = !state.isOpenListUser;
 		},
+		closeChatModalListUser: (state) => {
+			state.isOpenListUser = false;
+		},
 	},
 });
 
@@ -45,6 +48,7 @@ export const
 		switchChatModalInviteChannel,
 		switchChatModalUpdateChannel,
 		switchChatModalListUser,
+		closeChatModalListUser,
 	} = modalChatSlice.actions;
 
 export default modalChatSlice.reducer;

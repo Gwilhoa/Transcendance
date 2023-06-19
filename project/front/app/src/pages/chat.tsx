@@ -15,7 +15,7 @@ import ListUserChannel from '../components/chat/ListUsers';
 import axios from 'axios';
 import {cookies} from '../App';
 import {useNavigate} from 'react-router-dom';
-import { switchChatModalListUser } from '../redux/chat/modalChatSlice';
+import { closeChatModalListUser, switchChatModalListUser } from '../redux/chat/modalChatSlice';
 
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
@@ -76,6 +76,13 @@ export const initialChannelState: Channel = {
 
 export const isAdmin = (channel: Channel) => {
 		if (channel.admins.some((admin) => admin.id === localStorage.getItem('id'))) {
+			return (true);
+		}
+		return (false);
+};
+
+export const isBan = (channel: Channel, user: User) => {
+		if (channel.bannedUsers.some((banned) => banned.id === user.id)) {
 			return (true);
 		}
 		return (false);
@@ -286,6 +293,7 @@ function Chat() {
 		console.log(data);
 		if (conversationId == data.id) {
 			setConversationId('');
+			dispatch(closeChatModalListUser());
 		}
 		setListChannel((prevListChannel) =>
 			prevListChannel.filter((itemChannel) => itemChannel.id !== data.id)
@@ -321,8 +329,8 @@ function Chat() {
 			socket.off('delete_channel');
 			socket.off('message');
 			socket.off('message_code');
-			setErrorPostMessage('');
 			socket.off('update_channel');
+			setErrorPostMessage('');
 		};
 	},[conversationId, updateChannel]);
 
