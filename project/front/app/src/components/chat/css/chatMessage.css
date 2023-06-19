@@ -78,9 +78,6 @@
     bottom: 0; */
     /* position: absolute;
   bottom: 0; */
-    /* word-wrap: break-word; */
-    /* word-break: keep-all; */
-    word-break: break-all;
 }
 
 .chat-message-header-and-content {
@@ -105,4 +102,7 @@
 .chat-content-message {
     font-size: 1.125rem;
     opacity: 0.8;
+    /* word-wrap: break-word; */
+    /* word-break: keep-all; */
+    word-break: break-all;
 }
