@@ -1,8 +1,8 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { IUser } from '../../components/utils/interface';
+import {createSlice, PayloadAction} from '@reduxjs/toolkit';
+import {IUser} from '../../components/utils/interface';
 
 interface SearchState {
-    users: Array<IUser> | null;
+	users: Array<IUser> | null;
 }
 
 const initialState: SearchState = {
@@ -16,15 +16,15 @@ const searchSlice = createSlice({
 		setUsers: (state, action: PayloadAction<any>) => {
 			state.users = action.payload;
 		},
-        addUser: (state, action: PayloadAction<any>) => {
-            state.users?.push(action.payload);
-        },
-        setUsersNull:(state) =>{
-            state.users = null;
-        },
+		addUser: (state, action: PayloadAction<any>) => {
+			state.users?.push(action.payload);
+		},
+		setUsersNull: (state) => {
+			state.users = null;
+		},
 	},
 });
 
-export const { setUsers, setUsersNull, addUser } = searchSlice.actions;
+export const {setUsers, setUsersNull, addUser} = searchSlice.actions;
 
 export default searchSlice.reducer;

@@ -1,11 +1,11 @@
 import './css/begingame.css'
 import Cookies from 'universal-cookie';
-import { animated, useSpring } from 'react-spring';
+import {animated, useSpring} from 'react-spring';
 import React, {useEffect, useRef} from 'react';
 import SocketSingleton from '../socket';
-import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { setBeginStatus } from '../redux/game/beginToOption';
+import {useNavigate} from 'react-router-dom';
+import {useDispatch} from 'react-redux';
+import {setBeginStatus} from '../redux/game/beginToOption';
 import ErrorToken from '../components/IfError';
 
 const socketInstance = SocketSingleton.getInstance();
@@ -25,23 +25,23 @@ const BeginGame = () => {
           socket.emit('leave_matchmaking')
       };
 
-    }, []);
+	}, []);
 
 	useEffect(() => {
 
-      socket.on('matchmaking_code', (data:any) => {
-        console.log(data)
-          if (!gamefound.current)
-              return;
-        if (data["code"] === 0) {
-          console.log('enter matchmaking successfull');
-            gamefound.current = true;
-        } else {
-          console.log('aie aie aie')
-          navigate("/home");
-          alert("Error, you are already in game");
-        }
-      });
+		socket.on('matchmaking_code', (data: any) => {
+			console.log(data)
+			if (!gamefound.current)
+				return;
+			if (data["code"] === 0) {
+				console.log('enter matchmaking successfull');
+				gamefound.current = true;
+			} else {
+				console.log('aie aie aie')
+				navigate("/home");
+				alert("Error, you are already in game");
+			}
+		});
 
       socket.on('game_found', (data) => {
           console.log(data);
@@ -65,13 +65,14 @@ const BeginGame = () => {
         config: { duration: 4000 },
     });
 
-  return (
-    <div className='center-page'>
-        <ErrorToken />
-        <h2 style={{color: 'white'}}> Searching players... </h2>
-        <animated.img src={"https://pic.onlinewebfonts.com/svg/img_155544.png"} className={"gameimg"} style={spinnerAnimation}></animated.img>
-    </div>
-  );
+	return (
+		<div className='center-page'>
+			<ErrorToken/>
+			<h2 style={{color: 'white'}}> Searching players... </h2>
+			<animated.img src={"https://pic.onlinewebfonts.com/svg/img_155544.png"} className={"gameimg"}
+				style={spinnerAnimation}></animated.img>
+		</div>
+	);
 }
 
 export default BeginGame;

@@ -1,14 +1,14 @@
 import './profil.css'
-import React, { useCallback, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ButtonInputToggle } from '../utils/inputButton';
+import React, {useCallback, useEffect, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {ButtonInputToggle} from '../utils/inputButton';
 import LogoutButton from './logout';
-import { setErrorLocalStorage } from '../IfError'
+import {setErrorLocalStorage} from '../IfError'
 import Cookies from 'universal-cookie';
-import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from '../../redux/store';
-import { closeModal } from '../../redux/modal/modalSlice';
-import { ProfilImage } from './ProfilImage';
+import {useDispatch, useSelector} from 'react-redux';
+import {RootState} from '../../redux/store';
+import {closeModal} from '../../redux/modal/modalSlice';
+import {ProfilImage} from './ProfilImage';
 import axios from 'axios';
 import SocketSingleton from '../../socket';
 import {ProfilName} from './ProfilName';
@@ -21,10 +21,11 @@ const socket = socketInstance.getSocket();
 export default function Profil() {
 	const initialElement = [];
 	const navigate = useNavigate();
-	const [isMe, setIsMe] =  useState<boolean>(false);
-	const [isFriend, setIsFriend] =  useState<boolean>(false);
-    const [checked, setChecked] = useState(false);
+	const [isMe, setIsMe] = useState<boolean>(false);
+	const [isFriend, setIsFriend] = useState<boolean>(false);
+	const [checked, setChecked] = useState(false);
 	const [errorName, setErrorName] = useState<boolean>(false);
+	const [errorNameMessage, setErrorNameMessage] = useState<string>('');
 	const [victories, setVictory] = useState<number>(0);
 	const [defeats, setDefeat] = useState<number>(0);
 	const [experience, setExperience] = useState<number>(0);
@@ -34,7 +35,7 @@ export default function Profil() {
 	const dispatch = useDispatch();
 
 	console.log(id);
-	const refresh = useCallback(( id: string | null ) => {
+	const refresh = useCallback((id: string | null) => {
 
 		axios.get(process.env.REACT_APP_IP + ':3000/user/id/' + id, {
 			headers: {
@@ -70,7 +71,7 @@ export default function Profil() {
 				}
 			})
 		axios.get(process.env.REACT_APP_IP + ':3000/user/friend/request', {
-			headers: { Authorization: `Bearer ${cookies.get('jwtAuthorization')}`, },
+			headers: {Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,},
 		}).then((Response) => {
 			for (const request of Response.data) {
 				console.log(request);
@@ -87,9 +88,6 @@ export default function Profil() {
 	}, [navigate, dispatch]);
 
 	useEffect(() => {
-		socket.on('receive_challenge', (data: any) => {
-			console.log('receive_challenge');
-		});
 		socket.on('friend_code', (data: any) => {
 			console.log(data.code);
 			if (data.code === 2 && !isFriend) {
@@ -111,6 +109,7 @@ export default function Profil() {
 						navigate('/Error');
 					});
 				setIsFriend(!isFriend);
+				return;
 			}
 			else if (data.code === 5 || data.code === 7) {
 				setIsFriend(!isFriend);
@@ -126,41 +125,18 @@ export default function Profil() {
 			}
 		})
 
-		if (!isMe) {
-
-			axios.get(process.env.REACT_APP_IP + ':3000/user/friend/blocked', {
-				headers: {
-					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
-				},
-			})
-			.then((data) => {
-				console.log(data)
-				//setIsUserBlocked(data)
-			})
-			.catch((error) => {
-				console.error(error);
-			})
+		return () => {
+			socket.off('friend_request');
+			socket.off('friend_code');
 		}
+	}, [isFriend]);
 
-		socket.on('block_code',(data) => {
-			console.log(data);
-			if (data.message === 'ok')
-				setIsUserBlocked(true);
-			if (data.message === 'reject')
-				setIsUserBlocked(false);
-			else 
-				console.log(data.message);
-		});
-
-		
-	}, []);
-	
 	useEffect(() => {
 		if (id === localStorage.getItem('id')) {
 			setIsMe(true);
 		}
 		refresh(id);
-		
+
 		axios.get(process.env.REACT_APP_IP + ':3000/auth/2fa/is2FA', {
 			headers: {
 				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
@@ -181,26 +157,35 @@ export default function Profil() {
 	}, [navigate, id, refresh, dispatch]);
 
 	const changeName = (str: string) => {
-			axios.post(process.env.REACT_APP_IP + ':3000/user/name',
-				{ name: str }, 
-				{ headers: {
-					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`, 
-				},})
-				.then(() => {
-					setErrorName(false);
-				})
-				.catch((error) => {
+		axios.post(process.env.REACT_APP_IP + ':3000/user/name',
+			{name: str},
+			{
+				headers: {
+					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+				},
+			})
+			.then(() => {
+				setErrorName(false);
+			})
+			.catch((error) => {
+				if (error.response.status == 401 
+					|| error.response.status == 500) {
+					setErrorLocalStorage('Error ' + error.response.status);
 					console.error(error);
-					setErrorName(true);
-				});
-    }
+					navigate('/Error');
+				}
+				console.error(error);
+				setErrorName(true);
+				const message = '' + error.response.data;
+				setErrorNameMessage(message.substr(19));
+			});
+	}
 
-    const clicked = () => {
+	const clicked = () => {
 		if (!checked) {
 			navigate('/CreateTwoFa');
 			dispatch(closeModal());
-		}
-		else {
+		} else {
 			axios.get(process.env.REACT_APP_IP + ':3000/auth/2fa/disable', {
 				headers: {
 					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
@@ -213,7 +198,7 @@ export default function Profil() {
 				});
 			setChecked(false);
 		}
-    }
+	}
 
 	const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const file = event.target.files && event.target.files[0];
@@ -240,19 +225,18 @@ export default function Profil() {
 
 	const handleAddFriend = (id: string | null) => {
 		console.log('add friend ' + id);
-		socket.emit('friend_request', { friend_id: id });
+		socket.emit('friend_request', {friend_id: id});
 	};
 
 	const handleUnFriend = (id: string | null) => {
 		console.log('add friend ' + id);
-		socket.emit('unfriend_request', { friend_id: id });
+		socket.emit('unfriend_request', {friend_id: id});
 	};
 
 	const handlechallenge = (id: string | null) => {
 		console.log('challenge ' + id);
-		socket.emit('challenge', { rival_id: id });
+		socket.emit('challenge', {rival_id: id});
 	}
-
 
 	const handleChangeBlocke = () => {
 		//await axios.get('/friend/blocked', {
@@ -271,9 +255,9 @@ export default function Profil() {
 
 	initialElement.push(
 		<div key='ProfilImage'>
-        <ProfilImage id = {'' + id} OnClickOpenProfil={false} OverwriteClassName = ''/>
+			<ProfilImage id={'' + id} OnClickOpenProfil={false} OverwriteClassName=''/>
 		</div>
-    )
+	)
 
 	initialElement.push(
 		<div className='score-profil' key='score-profil'>
@@ -283,70 +267,69 @@ export default function Profil() {
 					<span>{victories}</span>
 				</p>
 				<p className='profil-score-middlle-one'>
-				<span className='profil-game-info-title'>Loose</span>
-				<span>{defeats}</span>
+					<span className='profil-game-info-title'>Loose</span>
+					<span>{defeats}</span>
 				</p>
 				<p>
 				<span className='profil-game-info-title'>Ratio</span>
-				<span>{defeats === 0 ? (victories === 0 ? 0 : 1) : (victories/defeats).toString().slice(0, 7)}</span>
+				<span>{defeats === 0 ? (victories === 0 ? 0 : 1) : (victories / defeats).toFixed(2)}</span>
 				</p>
 			</div>
 			<p className='profil-experience'>{experience} XP</p>
 		</div>
-    )
-    
-    if (isMe) {
-        initialElement.push(
+	)
+
+	if (isMe) {
+		initialElement.push(
 			<div className='browse-file' key='changeImage'>
 				<input type='file' onChange={handleImageChange} id='files'/>
 				<label htmlFor='files' className='profil-button'>Change image</label>
 			</div>
+		)
 
-        )
-        
-        initialElement.push(
-            <div key='changeName' className='ChangeNameDiv'>
-					<ButtonInputToggle
+		initialElement.push(
+			<div key='changeName' className='ChangeNameDiv'>
+				<ButtonInputToggle
 					onInputSubmit={changeName}
 					textInButton='Change name'
 					placeHolder='New name'
 					classInput='profil-button'
 					classButton='profil-button'
-					/>
-				{errorName ? <p className='Error-msg'>*Name already Exist</p> : <></>}
-            </div>
-            )
-            
-        initialElement.push(
+				/>
+				{errorName ? <p className='Error-msg'>{errorNameMessage}</p> : <></>}
+			</div>
+		)
+
+		initialElement.push(
 			<div className='change2FA' key='2FA'>
 				<label className='switch'>
-					<input type='checkbox' name='2FA' checked={checked} onChange={clicked} />
+					<input type='checkbox' name='2FA' checked={checked} onChange={clicked}/>
 					<span className='slider'></span>
 				</label>
 				<p>2FA</p>
 			</div>
-            )
+		)
 		initialElement.push(
 			<div key='logout' className='logout'>
 				<LogoutButton/>
-			</div>	
+			</div>
 		)
 	}
 
-    return (
-        <div className='profil-modal'>
+	return (
+		<div className='profil-modal'>
 			<div className='profil-title'>
 				<button className='close-profil' onClick={() => dispatch(closeModal())}></button>
-				<h2> <ProfilName  id={id}/> </h2>
+				<h2><ProfilName id={id}/></h2>
 			</div>
-            <div> 
+			<div>
 				{initialElement}
-				{ !isMe ? (
+				{!isMe ? (
 					<>
-						{ !isFriend ? (
+						{!isFriend ? (
 							<div className='other-user-profil'>
 								<button onClick={() => handleAddFriend(id)}>
-									{ hasFriendRequest == 1 ? 'accept request' : hasFriendRequest == 2 ? 'waiting' : 'add friend' }
+									{hasFriendRequest == 1 ? 'accept request' : hasFriendRequest == 2 ? 'waiting' : 'add friend'}
 								</button>
 								<br/>
 								<button onClick={() => handlechallenge(id)}>
@@ -375,8 +358,8 @@ export default function Profil() {
 					</>
 				) : (<></>)}
 			</div>
-            <br/>
-        </div>
-    )
+			<br/>
+		</div>
+	)
 }
 

@@ -1,4 +1,4 @@
-import { Route, Routes } from 'react-router-dom';
+import {Route, Routes} from 'react-router-dom';
 import Auth from './pages/Auth';
 import NotFound from './pages/PageNotFound';
 import CreateTwoFaPage from './pages/CreateTwoFa';
@@ -26,19 +26,19 @@ const AppInsideBrowser = () => {
 			<Routes>
 				<Route path="/" Component={Auth}/>
 				<Route path="*" Component={NotFound}/>
-				<Route path="/authenticate" Component={TokenPage} />
-				<Route path="/authenticate/NotTwoFa" Component={NotTwoFa} />
-				<Route path="/authenticate/TwoFa" Component={TwoFa} />
-				<Route path="/Error" Component={TryToReconnect} />
-				<Route path="/game" element={<Game gameId={0} />} />
+				<Route path="/authenticate" Component={TokenPage}/>
+				<Route path="/authenticate/NotTwoFa" Component={NotTwoFa}/>
+				<Route path="/authenticate/TwoFa" Component={TwoFa}/>
+				<Route path="/Error" Component={TryToReconnect}/>
+				<Route path="/game" element={<Game gameId={0}/>}/>
 				<Route path="/optionGame" element={<OptionGame></OptionGame>}/>
 				<Route element={<Template/>}>
-					<Route path="/home" element={<Home></Home>} />
-					<Route path="/chat/*" element={<Chat></Chat>} />
-					<Route path="/begingame/*" element={<BeginGame></BeginGame> }/>
+					<Route path="/home" element={<Home></Home>}/>
+					<Route path="/chat/*" element={<Chat></Chat>}/>
+					<Route path="/begingame/*" element={<BeginGame></BeginGame>}/>
 					<Route path="/CreateTwoFa" element={<CreateTwoFaPage></CreateTwoFaPage>}/>
-					<Route path="/history" element={<History></History>} />
-					<Route path="/endgame/*" element={<EndGame></EndGame>} />
+					<Route path="/history" element={<History></History>}/>
+					<Route path="/endgame/*" element={<EndGame></EndGame>}/>
 				</Route>
 			</Routes>
 		</>
@@ -46,11 +46,9 @@ const AppInsideBrowser = () => {
 }
 
 
-
-
 function App() {
 	return (
-			<AppInsideBrowser/>
+		<AppInsideBrowser/>
 	);
 
 }

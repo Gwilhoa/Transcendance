@@ -1,10 +1,10 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 
 interface ConversationState {
 	id: string;
 }
 
-const initialState: ConversationState= {
+const initialState: ConversationState = {
 	id: '',
 };
 
@@ -19,6 +19,6 @@ const conversationIdSlice = createSlice({
 	},
 });
 
-export const { setConversation } = conversationIdSlice.actions;
+export const {setConversation} = conversationIdSlice.actions;
 
 export default conversationIdSlice.reducer;

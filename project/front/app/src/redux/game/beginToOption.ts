@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 
 interface GameState {
 	decide:boolean;
@@ -20,12 +20,12 @@ const beginGameSlice = createSlice({
 	reducers: {
 		setBeginStatus: (state, action: PayloadAction<any>) => {
 			state.decide = action.payload.decide;
-            state.playerstate = action.payload.playerstate;
+			state.playerstate = action.payload.playerstate;
 			state.gameid = action.payload.gameid;
 		},
 	},
 });
 
-export const { setBeginStatus } = beginGameSlice.actions;
+export const {setBeginStatus} = beginGameSlice.actions;
 
 export default beginGameSlice.reducer;
