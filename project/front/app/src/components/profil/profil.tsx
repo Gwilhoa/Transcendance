@@ -335,13 +335,13 @@ export default function Profil() {
 									Challenge
 								</button>
 								<br />
-								<button onClick={() => handleHistory(id)}>
-									history
-								</button>
 							</>
 						)}
 					</div>
 				) : (<></>)}
+				<button onClick={() => handleHistory(id)}>
+					history
+				</button>
 			</div>
 			<br/>
 		</div>
