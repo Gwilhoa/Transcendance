@@ -240,7 +240,7 @@ export class ChannelService {
       .createQueryBuilder('channel')
       .leftJoinAndSelect('channel.messages', 'messages')
       .leftJoinAndSelect('channel.users', 'users')
-      .leftJoinAndSelect('channel.mutedUsers', 'mutedUsers')
+      .leftJoinAndSelect('channel.mutedUser', 'mutedUsers')
       .where('channel.id = :id', { id: body.channel_id })
       .getOne();
     if (channel == null) throw new Error('Channel not found');
