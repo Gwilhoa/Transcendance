@@ -225,12 +225,15 @@ input:checked + .slider:before {
 }
 
 .other-user-profil > button {
+    display: inline-block;
     border: 0.2rem solid var(--primary-color);
-    background-color: var(--light-color);
     border-radius: 1rem;
-    padding: 0.2rem;
-    height: 2rem;
-    width: 8rem;
+    background-color: var(--box-color);
+    padding: 0.1rem;
+    color: var(--light-color);
     font-size: 1rem;
-    margin: 0.5rem
+    width: 8rem;
+    outline: none;
+    cursor: pointer;
+    margin-bottom: 1rem;
 }

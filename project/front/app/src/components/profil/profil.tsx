@@ -329,6 +329,14 @@ export default function Profil() {
 								<button>
 									Challenge
 								</button>
+								<br/>
+								<button>
+									History
+								</button>
+								<br/>
+								<button>
+									Message
+								</button>
 							</div>
 						)}
 					</>
