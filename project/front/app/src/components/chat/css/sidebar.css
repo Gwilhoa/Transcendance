@@ -18,6 +18,13 @@
     justify-content: space-between;
 }
 
+.chat-side-bar-no-conversation-found{
+    display:flex;
+    justify-content: center;
+    margin-top: 1.5rem;
+    opacity: .4;
+}
+
 .chat-side-bar-channel-modify-button {
 	display: flex;
 	margin-right: 1rem;

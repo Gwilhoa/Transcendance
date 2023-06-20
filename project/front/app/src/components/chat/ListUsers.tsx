@@ -27,11 +27,25 @@ const MakeAdmin = ({id, channel}: changeChannelProps) => {
 	};
 
 	return (
-		<div className='button-making-admin' onClick={handleClickMakeAdmin}>
-			ADD
+		<div className='chat-list-users-button-making-admin' onClick={handleClickMakeAdmin}>
+			Admin
 		</div>
 	);
 };
+
+const DeleteAdmin = ({id, channel}: changeChannelProps) => {
+
+	const handleClickDeleteAdmin = () => {
+		socket.emit('remove_admin', {channel_id: channel.id, admin_id: id});
+		console.log('ON CLICK Delete admin');
+	};
+
+	return (
+		<div className='chat-list-users-button-deleting-admin' onClick={handleClickDeleteAdmin}>
+			Remove Admin
+		</div>
+	);
+}
 
 const BanHammer = ({id, channel}: changeChannelProps) => {
 
@@ -41,7 +55,7 @@ const BanHammer = ({id, channel}: changeChannelProps) => {
 	};
 
 	return (
-		<div className='button-ban-hammer' onClick={handleClickBanHammer}>
+		<div className='chat-list-users-button-ban-hammer' onClick={handleClickBanHammer}>
 			Ban
 		</div>
 	);
@@ -55,25 +69,12 @@ const UnBanHammer = ({id, channel}: changeChannelProps) => {
 	};
 
 	return (
-		<div className='button-unban-hammer' onClick={handleClickUnbanHammer}>
+		<div className='chat-list-users-button-unban-hammer' onClick={handleClickUnbanHammer}>
 			UnBan
 		</div>
 	);
 };
 
-const DeleteAdmin = ({id, channel}: changeChannelProps) => {
-
-	const handleClickDeleteAdmin = () => {
-		socket.emit('remove_admin', {channel_id: channel.id, admin_id: id});
-		console.log('ON CLICK Delete admin');
-	};
-
-	return (
-		<div className='button-deleting-admin' onClick={handleClickDeleteAdmin}>
-			Del
-		</div>
-	);
-}
 
 const ListAdmin = ({channel}: listUserProps) => {
 	const dispatch = useDispatch();
@@ -88,22 +89,24 @@ const ListAdmin = ({channel}: listUserProps) => {
 						className='chat-list-users-user'
 						key={user.id}
 					>
-						<div className='chat-list-users-user-name' onClick={() => dispatch(openModal(user.id))}>
-							<ProfilImage OnClickOpenProfil={true} id={user.id}
-								OverwriteClassName='chat-list-user-image'
-							/>
+						<ProfilImage OnClickOpenProfil={true} id={user.id} OverwriteClassName='chat-list-user-image'/>
+						<div className='chat-list-users-user-text'>
+							<div className='chat-list-users-user-name' onClick={() => dispatch(openModal(user.id))}>
+								<ProfilName id={user.id}/>
+							</div>
+							<div className='chat-list-users-buttons-user'>
+								{ isAdmin(channel) && !isMe(user) ?
+									<DeleteAdmin id={user.id} channel={channel} />
+									:
+									null
+								}
+								{ channel.creator.id === '' + localStorage.getItem('id') ?
+									<BanHammer id={user.id} channel={channel} />
+									:
+									null
+								}
+							</div>
 						</div>
-						<ProfilName id={user.id}/>
-						{ isAdmin(channel) && !isMe(user) ?
-							<DeleteAdmin id={user.id} channel={channel} />
-						:
-							null
-						}
-						{ channel.creator.id === '' + localStorage.getItem('id') ?
-							<BanHammer id={user.id} channel={channel} />
-						:
-							null
-						}
 					</div>
 				)
 			))}
@@ -125,18 +128,21 @@ const ListUser = ({channel}: listUserProps) => {
 						className='chat-list-users-user'
 						key={user.id}
 					>
-						<ProfilImage OnClickOpenProfil={true} id={user.id} OverwriteClassName='chat-list-user-image'/>
+					<ProfilImage OnClickOpenProfil={true} id={user.id} OverwriteClassName='chat-list-user-image'/>
+						
+					<div className='chat-list-users-user-text'>
 						<div className='chat-list-users-user-name' onClick={() => dispatch(openModal(user.id))}>
 							<ProfilName id={user.id}/>
-						</div>
-						{ isAdmin(channel) && !isMe(user) ?
-							<>
-								<MakeAdmin id={user.id} channel={channel} />
-								<BanHammer id={user.id} channel={channel} />
-							</>
-						:
+							</div>
+							{ isAdmin(channel) && !isMe(user) ?
+								<div className='chat-list-users-buttons-user'>
+									<MakeAdmin id={user.id} channel={channel} />
+									<BanHammer id={user.id} channel={channel} />
+								</div>
+							:
 							null
 						}
+						</div>
 					</div>
 				)
 			))}
@@ -155,15 +161,19 @@ const ListBannedUser = ({channel}: listUserProps) => {
 					key={user.id}
 				>
 					<ProfilImage OnClickOpenProfil={true} id={user.id} OverwriteClassName='chat-list-user-image'/>
-					<div className='chat-list-users-user-name' onClick={() => dispatch(openModal(user.id))}>
-						<ProfilName id={user.id}/>
+					<div className='chat-list-users-user-text'>
+						<div className='chat-list-users-user-name' onClick={() => dispatch(openModal(user.id))}>
+							<ProfilName id={user.id}/>
+						</div>
+						{ isAdmin(channel) && !isMe(user) ?
+							<div className='chat-list-users-buttons-user'>
+								<UnBanHammer id={user.id} channel={channel}/>
+							</div>
+						:
+						null}
 					</div>
-					{ isAdmin(channel) && !isMe(user) ?
-						<UnBanHammer id={user.id} channel={channel}/>
-					:
-						null
-					}
 				</div>
+
 			))}
 		</>
 	);
@@ -180,8 +190,10 @@ const ListUserMp = ({channel}: listUserProps) => {
 					key={user.id}
 				>
 					<ProfilImage OnClickOpenProfil={true} id={user.id} OverwriteClassName='chat-list-user-image'/>
-					<div className='chat-list-users-user-name' onClick={() => dispatch(openModal(user.id))}>
-						<ProfilName id={user.id}/>
+					<div className='chat-list-users-user-text'>
+						<div className='chat-list-users-user-name' onClick={() => dispatch(openModal(user.id))}>
+							<ProfilName id={user.id}/>
+						</div>
 					</div>
 				</div>
 			))}
@@ -198,8 +210,10 @@ const Creator = ({channel}: listUserProps) => {
 			className='chat-list-users-user'
 		>
 			<ProfilImage OnClickOpenProfil={true} id={channel.creator.id} OverwriteClassName='chat-list-user-image'/>
-			<div className='chat-list-users-user-name' onClick={() => dispatch(openModal(channel.creator.id))}>
-				<ProfilName id={channel.creator.id}/>
+			<div className='chat-list-users-user-text'>
+				<div className='chat-list-users-user-name' onClick={() => dispatch(openModal(channel.creator.id))}>
+					<ProfilName id={channel.creator.id}/>
+				</div>
 			</div>
 		</div>
 	);

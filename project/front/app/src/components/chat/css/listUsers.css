@@ -2,7 +2,7 @@
 .chat-right-bar-list-user {
     color: var(--light-color);
     background-color: var(--box-color);
-    width: 30rem;
+    width: 35rem;
     overflow-y: auto;
 }
 
@@ -28,4 +28,37 @@
     font-weight: bold;
     font-size: 1.25rem;
     cursor: pointer;
+}
+
+.chat-list-users-buttons-user{
+    display: flex;
+}
+
+.chat-list-users-button-making-admin{
+    background-color: rgb(230, 128, 26);
+    border: 0.25rem solid rgb(222, 102, 22);
+    border-radius: 6px;
+    margin: 0.5rem;
+    padding: 0 0.3rem;
+}
+
+
+.chat-list-users-button-deleting-admin{
+    background-color: rgb(230, 128, 26);
+    border: 0.25rem solid rgb(222, 102, 22);
+    border-radius: 6px;
+    margin: 0.5rem;
+    padding: 0 0.3rem;
+}
+
+.chat-list-users-button-ban-hammer{
+    background-color: rgb(230, 26, 26);
+    border: 0.25rem solid rgb(194, 0, 0);
+    border-radius: 6px;
+    margin: 0.5rem 0 0.5rem 0.5rem;
+    padding: 0 0.3rem;
+}
+
+.chat-list-users-button-unban-hammer{
+
 }
