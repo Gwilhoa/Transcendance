@@ -81,7 +81,7 @@ export class ChannelService {
       .leftJoinAndSelect('channel.bannedUsers', 'bannedUsers')
       .leftJoinAndSelect('channel.creator', 'creator')
       .leftJoinAndSelect('channel.users', 'users')
-      .leftJoinAndSelect('channel.mutedUsers', 'mutedUsers')
+      .leftJoinAndSelect('channel.mutedUser', 'mutedUsers')
       .where('channel.id = :id', { id: id })
       .getOne();
   }
