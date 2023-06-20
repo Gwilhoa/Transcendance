@@ -34,10 +34,10 @@ const AppInsideBrowser = () => {
 				<Route path="/optionGame" element={<OptionGame></OptionGame>}/>
 				<Route element={<Template/>}>
 					<Route path="/home" element={<Home></Home>}/>
-					<Route path="/chat/*" element={<Chat></Chat>}/>
+					<Route path="/chat" element={<Chat></Chat>}/>
 					<Route path="/begingame/*" element={<BeginGame></BeginGame>}/>
 					<Route path="/CreateTwoFa" element={<CreateTwoFaPage></CreateTwoFaPage>}/>
-					<Route path="/history" element={<History></History>}/>
+					<Route path="/history/*" element={<History></History>}/>
 					<Route path="/endgame/*" element={<EndGame></EndGame>}/>
 				</Route>
 			</Routes>
