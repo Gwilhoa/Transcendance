@@ -96,7 +96,9 @@ export const isMe = (user: User) => {
 };
 
 const updateAvailableChannel = (input: string) => {
-	console.log(input);
+	if (input === '') {
+		return;
+	}
 	socket.emit('research_channel', {search: input})
 }
 ////////////////////////// CHAT ///////////////////////////////////////////////
@@ -214,7 +216,7 @@ function Chat() {
 	const handleResearchChannel = (data: any) => {
 		console.log('research_channel');
 		console.log(data);
-		if (data.channels.length == 0)
+		if (!data.channels || data.channels.length == 0)
 			return;
 		setListAvailableChannel(data.channels);
 	}
