@@ -199,6 +199,7 @@ export class ChannelGateway implements OnGatewayInit {
       } catch (error) {
         send = {
           code: messageCode.INVALID_FORMAT,
+          message: error.message,
         };
         client.emit('message_code', send);
         return;
