@@ -43,6 +43,14 @@ export class Channel {
   })
   bannedUsers: User[];
 
+  @ManyToMany((type) => User, (user) => user.mutedChannels)
+  @JoinTable({
+    name: 'channels_muted_users',
+    joinColumn: { name: 'channel_id' },
+    inverseJoinColumn: { name: 'user_id' },
+  })
+  mutedUser: User[];
+
   @OneToMany((type) => Message, (message) => message.channel, {
     onDelete: 'CASCADE',
   })

@@ -15,7 +15,7 @@ import ListUserChannel from '../components/chat/ListUsers';
 import axios from 'axios';
 import {cookies} from '../App';
 import {useNavigate} from 'react-router-dom';
-import { switchChatModalListUser } from '../redux/chat/modalChatSlice';
+import { closeChatModalListUser, switchChatModalListUser } from '../redux/chat/modalChatSlice';
 
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
@@ -81,6 +81,13 @@ export const isAdmin = (channel: Channel) => {
 		return (false);
 };
 
+export const isBan = (channel: Channel, user: User) => {
+		if (channel.bannedUsers.some((banned) => banned.id === user.id)) {
+			return (true);
+		}
+		return (false);
+};
+
 export const isMe = (user: User) => {
 	if (user.id === '' + localStorage.getItem('id')) {
 		return (true);
@@ -89,7 +96,9 @@ export const isMe = (user: User) => {
 };
 
 const updateAvailableChannel = (input: string) => {
-	console.log(input);
+	if (input === '') {
+		return;
+	}
 	socket.emit('research_channel', {search: input})
 }
 ////////////////////////// CHAT ///////////////////////////////////////////////
@@ -207,7 +216,7 @@ function Chat() {
 	const handleResearchChannel = (data: any) => {
 		console.log('research_channel');
 		console.log(data);
-		if (data.channels.length == 0)
+		if (!data.channels || data.channels.length == 0)
 			return;
 		setListAvailableChannel(data.channels);
 	}
@@ -286,6 +295,7 @@ function Chat() {
 		console.log(data);
 		if (conversationId == data.id) {
 			setConversationId('');
+			dispatch(closeChatModalListUser());
 		}
 		setListChannel((prevListChannel) =>
 			prevListChannel.filter((itemChannel) => itemChannel.id !== data.id)
@@ -321,8 +331,8 @@ function Chat() {
 			socket.off('delete_channel');
 			socket.off('message');
 			socket.off('message_code');
-			setErrorPostMessage('');
 			socket.off('update_channel');
+			setErrorPostMessage('');
 		};
 	},[conversationId, updateChannel]);
 

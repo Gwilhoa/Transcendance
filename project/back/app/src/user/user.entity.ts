@@ -80,4 +80,7 @@ export class User {
 
   @Column({ nullable: false, default: 0 })
   defeats: number;
+
+  @ManyToMany((type) => Channel, (channel) => channel.mutedUser)
+  mutedChannels: Channel[];
 }

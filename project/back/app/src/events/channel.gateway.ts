@@ -301,6 +301,11 @@ export class ChannelGateway implements OnGatewayInit {
       client.emit('update_user_channel', send);
       return;
     } else {
+      if (channel.creator.id == user_id) {
+        this.server.to(channel_id).emit('delete_channel', send);
+        await this.channelService.deletechannel(channel_id);
+        return;
+      }
       client.leave(channel_id);
       send.channel = await this.channelService.leaveChannel(
         user_id,
