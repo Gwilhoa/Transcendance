@@ -33,17 +33,26 @@
 
 /* add channel button */
 
+
 .chat-add-channel-button {
-    --b: 6px; /* the thickness */
-    width: 3rem;
-    height: 3rem;
-    border: 1rem solid var(--box-color);
+    background: var(--box-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 5rem;
+    height: 5rem;
     border-radius: 50%;
-    background: conic-gradient(from 90deg at var(--b) var(--b), var(--box-color) 90deg, var(--primary-color) 0) calc(100% + var(--b) / 2) calc(100% + var(--b) / 2)/
-	calc(50% + var(--b)) calc(50% + var(--b));
+    font-size: 4rem;
+    color: var(--primary-color);
     cursor: pointer;
-    margin-bottom: 0.5rem;
 }
+
+.chat-add-channel-button-image{
+    height: 4rem;
+    fill : var(--primary-color);
+}
+
+/* home button */
 
 .chat-invite-channel-button {
     background: var(--box-color);
@@ -55,4 +64,23 @@
     border-radius: 50%;
     font-size: 4rem;
     color: var(--primary-color);
+}
+
+.chat-option-bar-home-button{
+    background: var(--box-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 5rem;
+    height: 5rem;
+    border-radius: 50%;
+    font-size: 4rem;
+    color: var(--primary-color);
+    cursor: pointer;
+    margin-bottom: 0.5rem;
+}
+
+.chat-option-bar-home-button-image{
+    height: 3rem;
+    fill : var(--primary-color);
 }

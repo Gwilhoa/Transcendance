@@ -357,7 +357,7 @@ function Chat() {
 			) : (
 				<div className='chat-page-channel'>
 					<h1>Channels disponible</h1>
-					<input onChange={(e) => updateAvailableChannel(e.target.value)}/>
+					<input className='chat-page-channels-input' placeholder='Search channel' onChange={(e) => updateAvailableChannel(e.target.value)}/>
 					{ listAvailableChannel.length > 0 ? (
 						listAvailableChannel.map((itemChannel) => (
 							<div className='chat-page-channels-channel' key={itemChannel.id}>
