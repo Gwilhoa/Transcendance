@@ -96,10 +96,10 @@ const Game: React.FC<GameProps> = () => {
 		socket.emit("input_game", {game_id: gameId, type: 2})
 	}
 
-	socket.on('create_game', (any) => {
-		console.log('WESH')
-		console.log(any);
-	})
+	// socket.on('create_game', (any) => {
+	// 	console.log('WESH')
+	// 	console.log(any);
+	// })
 
 	socket.on('will_started', (data) => {
 		if (data.time == 0) {

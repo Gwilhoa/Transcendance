@@ -21,25 +21,21 @@ const Head = () => {
 	});
 
 	useEffect(() => {
-		if (localStorage.getItem('id') === null) {
-			axios.get(process.env.REACT_APP_IP + ':3000/user/id', {
-				headers: {
-					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
-				},
+		axios.get(process.env.REACT_APP_IP + ':3000/user/id', {
+			headers: {
+				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+			},
+		})
+			.then((response) => {
+				console.log(response.data.id);
+				setId(response.data.id);
+				localStorage.setItem('id', response.data.id);
 			})
-				.then((response) => {
-					console.log(response.data.id);
-					setId(response.data.id);
-					localStorage.setItem('id', response.data.id);
-				})
-				.catch((error) => {
-					setErrorLocalStorage('Error ' + error.response.status);
-					console.error(error);
-					navigate('/Error');
-				});
-		} else {
-			setId(localStorage.getItem('id'));
-		}
+			.catch((error) => {
+				setErrorLocalStorage('Error ' + error.response.status);
+				console.error(error);
+				navigate('/Error');
+			});
 	}, [navigate]);
 
 	const dispatch = useDispatch();
@@ -62,7 +58,7 @@ const Head = () => {
 				<Link to="/begingame" className="navbar__link">
 					Game
 				</Link>
-				<Link to='/history' className='navbar__link'>
+				<Link to={'/history/' + id} className='navbar__link'>
 					History
 				</Link>
 				<button onClick={() => handleOpenModal(id)} className='navbar__link'>

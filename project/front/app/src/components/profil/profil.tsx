@@ -176,7 +176,7 @@ export default function Profil() {
 				console.error(error);
 				setErrorName(true);
 				const message = '' + error.response.data;
-				setErrorNameMessage(message.substr(19));
+				setErrorNameMessage(message.substring(19));
 			});
 	}
 
@@ -220,6 +220,11 @@ export default function Profil() {
 					navigate('/Error');
 				});
 		}
+	};
+
+	const handleHistory = (id: string | null) => {
+		navigate('/history/' + id);
+		dispatch(closeModal());
 	};
 
 	const handleAddFriend = (id: string | null) => {
@@ -309,9 +314,9 @@ export default function Profil() {
 			<div>
 				{initialElement}
 				{!isMe ? (
-					<>
+					<div className='other-user-profil'>
 						{!isFriend ? (
-							<div className='other-user-profil'>
+							<>
 								<button onClick={() => handleAddFriend(id)}>
 									{hasFriendRequest == 1 ? 'accept request' : hasFriendRequest == 2 ? 'waiting' : 'add friend'}
 								</button>
@@ -319,9 +324,9 @@ export default function Profil() {
 								<button onClick={() => handlechallenge(id)}>
 									Challenge
 								</button>
-							</div>
+							</>
 						) : (
-							<div className='other-user-profil'>
+							<>
 								<button onClick={() => handleUnFriend(id)}>
 									Unfriend
 								</button>
@@ -329,17 +334,13 @@ export default function Profil() {
 								<button>
 									Challenge
 								</button>
-								<br/>
-								<button>
-									History
+								<br />
+								<button onClick={() => handleHistory(id)}>
+									history
 								</button>
-								<br/>
-								<button>
-									Message
-								</button>
-							</div>
+							</>
 						)}
-					</>
+					</div>
 				) : (<></>)}
 			</div>
 			<br/>
