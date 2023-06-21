@@ -107,9 +107,8 @@ const Add = () => {
 						<ProfilImage id={user.id} OnClickOpenProfil={true} OverwriteClassName='home-users-list-user-image-profil' />
 						<p className='name'>{user.username}</p>
 						<p className='xp'>{user.experience}XP</p>
-						<p>{'victory: ' + user.victories}</p>
-						<p>{'defeats: ' + user.defeats}</p>
-						<p>{user.defeats === 0 ? (user.victories === 0 ? 0 : 1) : (user.victories / user.defeats).toFixed(2)}</p>
+						<p>{user.victories + '/' + user.defeats}</p>
+						<p>ratio : {user.defeats === 0 ? (user.victories === 0 ? 0 : 1) : (user.victories / user.defeats).toFixed(2)}</p>
 					</div>
 					<div className='home-users-list-user-buttons'>
 						<button 
