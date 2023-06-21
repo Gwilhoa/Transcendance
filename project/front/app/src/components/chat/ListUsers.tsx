@@ -75,6 +75,34 @@ const UnBanHammer = ({id, channel}: changeChannelProps) => {
 	);
 };
 
+const MuteButton = ({id, channel}: changeChannelProps) => {
+
+	const handleClickMute = () => {
+		socket.emit('add_muted', {channel_id: channel.id, mute_id: id});
+		console.log('mute user');
+	};
+
+	return (
+		<div className='chat-list-users-button-mute' onClick={handleClickMute}>
+			Mute
+		</div>
+	);
+}
+
+const UnMuteButton = ({id, channel}: changeChannelProps) => {
+
+	const handleClickMute = () => {
+		socket.emit('remove_muted', {channel_id: channel.id, mute_id: id});
+		console.log('mute user');
+	};
+
+	return (
+		<div className='chat-list-users-button-mute' onClick={handleClickMute}>
+			UnMute
+		</div>
+	);
+}
+
 
 const ListAdmin = ({channel}: listUserProps) => {
 	const dispatch = useDispatch();
@@ -117,13 +145,17 @@ const ListAdmin = ({channel}: listUserProps) => {
 const ListUser = ({channel}: listUserProps) => {
 	const dispatch = useDispatch();
 
+	const isMuted = (user: User, channel: Channel) => {
+		console.log(channel);
+		return channel.mutedUser.some((banned) => banned.id === user.id);
+
+	}
+
 	return (
 		<>
 			{channel.users.map((user: User) => (
 				user.id === channel.creator.id ||
-				channel.admins.some((admin) => admin.id === user.id) ? (
-					null
-				) : (
+				channel.admins.some((admin) => admin.id === user.id) ? null : (
 					<div
 						className='chat-list-users-user'
 						key={user.id}
@@ -138,6 +170,11 @@ const ListUser = ({channel}: listUserProps) => {
 								<div className='chat-list-users-buttons-user'>
 									<MakeAdmin id={user.id} channel={channel} />
 									<BanHammer id={user.id} channel={channel} />
+									{ isMuted(user, channel) ?
+										<UnMuteButton id={user.id} channel={channel} />
+										:
+										<MuteButton id={user.id} channel={channel} />
+									}
 								</div>
 							:
 							null

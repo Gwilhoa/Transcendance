@@ -499,13 +499,13 @@ export class ChannelGateway implements OnGatewayInit {
   async add_muted(client: Socket, payload: any) {
     const user_id = client.data.id;
     const channel_id = payload.channel_id;
-    const muted_id = payload.muted_id;
+    const muted_id = payload.mute_id;
     let chan;
     try {
       chan = await this.channelService.addMutedUser(
-        channel_id,
         muted_id,
         user_id,
+        channel_id,
       );
       client.emit('update_user_channel', {
         channel: chan,
@@ -538,13 +538,13 @@ export class ChannelGateway implements OnGatewayInit {
   async remove_muted(client: Socket, payload: any) {
     const user_id = client.data.id;
     const channel_id = payload.channel_id;
-    const muted_id = payload.muted_id;
+    const muted_id = payload.mute_id;
     let chan;
     try {
       chan = await this.channelService.removeMutedUser(
-        channel_id,
         muted_id,
         user_id,
+        channel_id,
       );
       client.emit('update_user_channel', {
         channel: chan,
