@@ -319,11 +319,7 @@ function Chat() {
 	const handleUpdateChannel = (data: any) => {
 		console.log('update_channel');
 		console.log(data);
-		if (data.code == 1) {
-			setErrorUpdateChannel(data.message);
-			setTimeout(function() {setErrorUpdateChannel('')}, 2000);
-		}
-		else {
+		if (data.code == 0) {
 			console.log('HEY I CHANGE NAME : ' + data?.channel_id + " :" + conversationId);
 			setListChannel((prevListChannel) =>
 				prevListChannel.map((itemChannel) => {

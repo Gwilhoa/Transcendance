@@ -17,9 +17,18 @@ const ChannelSideBar = ({channel}: { channel: Channel }) => {
 		return (channel.users[1].username)
 	};
 
+	const troncChannelName = (channel: Channel) => {
+		let name = parseChannelName(channel);
+		if (name.length < 13) {
+			return (name);
+		}
+		name = name.slice(0, 9) + '...';
+		return (name);
+	};
+
 	return (
 		<div className='chat-side-bar-channel'>
-			{parseChannelName(channel)}
+			{troncChannelName(channel)}
 			<div className='chat-side-bar-channel-modify-button'>
 				{isAdmin(channel) ? (
 					<>
