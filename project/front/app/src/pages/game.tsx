@@ -150,9 +150,11 @@ const Game: React.FC<GameProps> = () => {
 
 		socket.on('update_game', (data) => {
 			setStarted(data.score2 + " | " + data.score1)
-      data.ballx -= 1;
-        if(data.ballx > 98)
-          data.ballx = 98
+			data.ballx += 1;
+			if(data.ballx > 100) {
+				data.ballx = 100
+				console.log ("a");
+			}
 			setBall({x: (data.ballx), y: (data.bally)});
 			setPaddle2(data.rack2y)
 			setPaddle1(data.rack1y);

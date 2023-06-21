@@ -252,7 +252,7 @@ export class Game {
     const maxposition =
       this._maxY - Game.default_rackwidth - Game.default_radiusball;
 
-    if (this._futurbally <= minposition) {
+    if (this._futurbally <= minposition && this._futurbally > (minposition - 2)) {
       if (
         this._futurballx >= this._rack1y &&
         this._futurballx <= this._rack1y + Game.default_racklenght
@@ -266,7 +266,7 @@ export class Game {
       }
     }
 
-    if (this._futurbally >= maxposition) {
+    if (this._futurbally >= maxposition && this._futurbally < (maxposition + 2)) {
       if (
         this._futurballx >= this._rack2y &&
         this._futurballx <= this._rack2y + Game.default_racklenght
@@ -321,6 +321,7 @@ export class Game {
     }
     this._ballx = this._futurballx;
     this._bally = this._futurbally;
+  
     this._io.to(this._id).emit('update_game', this.getGameInfo());
   };
 

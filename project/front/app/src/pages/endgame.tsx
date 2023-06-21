@@ -100,10 +100,10 @@ const EndGame = () => {
 				<h1 className="end_game_title">{"you " + finalStatus?.status + " against " + finalStatus?.adversary}</h1>
 				<div className="end_game_buttons">
 					{revenge &&
-                        <p>ton adversaire veut une revenche</p>}
+                        <p>your opponent wants revenge</p>}
 
 					{myrevenge &&
-                        <p>demande prise en compte</p>}
+                        <p>request taken</p>}
 
 					{replay && !myrevenge &&
                         <button className='end_game_button' onClick={replaybutton}>Replay</button>}

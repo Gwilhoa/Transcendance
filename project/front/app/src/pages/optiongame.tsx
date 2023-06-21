@@ -92,7 +92,7 @@ const OptionGame = () => {
                 <>
                     <ErrorToken/>
                     <div className='game-waiting-settings'>
-                        Waiting idur opponent to choose settings...
+                        Waiting your opponent to choose settings...
                     </div>
                 </>
 			}
