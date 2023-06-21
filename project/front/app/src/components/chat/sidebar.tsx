@@ -15,11 +15,11 @@ function SideBarChat({listChannel, setConversationId}:
 
 	return (
 		<div className='chatSideBar'>
-			{listChannel.map((channel) => (
+			{listChannel.length !== 0 ? listChannel.map((channel) => (
 				<div onClick={() => handleSwitchChannel(channel.id)} key={channel.id}>
 					<ChannelSideBar channel={channel}/>
 				</div>
-			))}
+			)): <p className='chat-side-bar-no-conversation-found'>No conversation found!</p>}
 		</div>
 	);
 }

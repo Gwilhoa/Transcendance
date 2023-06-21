@@ -96,3 +96,8 @@
     color: var(--light-color);
     cursor: pointer;
 }
+
+.chat-create-channel-error-message{
+    color : var(--error-color);
+    font-size: 1.125rem;
+}

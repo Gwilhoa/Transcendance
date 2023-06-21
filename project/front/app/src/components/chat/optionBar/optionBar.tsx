@@ -10,8 +10,8 @@ const OptionBar = ({setId}: {setId: Dispatch<SetStateAction<string>>}) => {
 	return (
 		<div className='chat-option-bar'>
 			<ButtonOpenModalSideBar/>
-			<ButtonCreateChannel/>
 			<ButtonResetConversationId setId={setId}/>
+			<ButtonCreateChannel/>
 		</div>
 	);
 }

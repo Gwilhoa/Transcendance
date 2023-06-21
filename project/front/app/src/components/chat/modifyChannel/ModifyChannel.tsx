@@ -38,7 +38,7 @@ const ModifyChannel = ({channel}: { channel: Channel }) => {
 				
 				{(channel?.type == 1 || channel?.type == 2) ?
 					<>
-						<h3>Channel Name</h3>
+						<h3>Change Password</h3>
 						<input className='chat-side-bar-close-modify-channel-password' type='text' placeholder='old password'
 						onChange={(e) => setPassword(e.target.value)}/>
 					</>: <></>}

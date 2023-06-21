@@ -16,6 +16,7 @@ import axios from 'axios';
 import {cookies} from '../App';
 import {useNavigate} from 'react-router-dom';
 import { closeChatModalListUser, switchChatModalListUser } from '../redux/chat/modalChatSlice';
+import {it} from "node:test";
 
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
@@ -252,6 +253,11 @@ function Chat() {
 		}
 	};
 
+	const handleJoinChannel = (channel_id: string) => {
+		console.log('join_channel');
+		socket.emit('join_channel', {channel_id: channel_id});
+	}
+
 	const handleUserCode = (data: any) => {
 		console.log('user_join');
 		console.log(data);
@@ -322,6 +328,7 @@ function Chat() {
 		findChannel();
 		console.log('change channel');
 
+		socket.on('join_channel', handleJoinChannel);
 		socket.on('message', handleMessage);
 		socket.on('message_code', handleMessageCode);
 		socket.on('update_channel', handleUpdateChannel);
@@ -367,12 +374,12 @@ function Chat() {
 			) : (
 				<div className='chat-page-channel'>
 					<h1>Channels disponible</h1>
-					<input onChange={(e) => updateAvailableChannel(e.target.value)}/>
+					<input className='chat-page-channels-input' placeholder='Search channel' onChange={(e) => updateAvailableChannel(e.target.value)}/>
 					{ listAvailableChannel.length > 0 ? (
 						listAvailableChannel.map((itemChannel) => (
 							<div className='chat-page-channels-channel' key={itemChannel.id}>
 								<p>{itemChannel.name}</p>
-								<button>Join</button>
+								<button onClick={(e) => handleJoinChannel(itemChannel.id)}>Join</button>
 							</div>
 						))
 					) : null

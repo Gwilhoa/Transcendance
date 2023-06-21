@@ -9,14 +9,16 @@
     grid-column-start: 2;
     font-size: 1.35rem;
     font-weight: 525;
-    margin-top: 0 0.5rem;
 }
 
 .chat-list-users-button {
     margin-left: auto;
     margin-right: 1rem;
+    fill: var(--light-color);
+    opacity: 0.45;
+    height: 1.5rem;
     cursor: pointer;
-    margin-top: 0 0.5rem;
+    margin-top: 0.5rem;
 }
 
 .chat-conversation {
