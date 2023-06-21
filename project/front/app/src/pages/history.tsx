@@ -85,7 +85,7 @@ const OneScoreBlock = ({ game, playerId }: { game: Game, playerId: string }) => 
 				}
 			}
 		}
-	}, [playerId]);
+	}, [playerId, game]);
 
 	useEffect(() => {
 		axios.get(process.env.REACT_APP_IP + ':3000/user/image/' + playerId, {
@@ -125,7 +125,7 @@ const OneScoreBlock = ({ game, playerId }: { game: Game, playerId: string }) => 
 				navigate('/Error');
 				return;
 			});
-	}, [leftUser, rightUser, navigate, playerId]);
+	}, [leftUser, rightUser, navigate, playerId, game]);
 
 	if (messageWinner == '') {
 		return null;

@@ -44,6 +44,11 @@ const Head = () => {
 		dispatch(openModal(id));
 	};
 
+	const handleChat = () => {
+		navigate('/chat');
+		window.location.reload();
+	}
+
 	return (
 		<div className='navbar'>
 			<div className='navbar__link'>
@@ -52,9 +57,9 @@ const Head = () => {
 				</Link>
 			</div>
 			<div>
-				<Link to='/chat' className='navbar__link'>
+				<button onClick={() => handleChat()} className='navbar__link'>
 					Chat
-				</Link>
+				</button>
 				<Link to="/begingame" className="navbar__link">
 					Game
 				</Link>
