@@ -125,6 +125,7 @@ function Chat() {
 	const [errorPostMessage, setErrorPostMessage] = useState<string>('');
 	const [sendMessage, setSendMessage] = useState<boolean>(false);
 
+	const [password] = useState<Map<string, string>>(new Map());
 ////////////////////////// FETCH DATA /////////////////////////////////////////
 	const fetchAvailableChannel = async () => {
 		try {
@@ -257,7 +258,13 @@ function Chat() {
 
 	const handleJoinChannel = (channel_id: string) => {
 		console.log('join_channel');
-		socket.emit('join_channel', {channel_id: channel_id});
+		console.log(password.get(channel_id));
+		if (password.get(channel_id)) {
+			socket.emit('join_channel', {channel_id: channel_id, password: password.get(channel_id)});
+			return;
+		} else {
+			socket.emit('join_channel', {channel_id: channel_id});
+		}
 	}
 
 	const handleUserCode = (data: any) => {
@@ -381,7 +388,7 @@ function Chat() {
 							<div className='chat-page-channels-channel' key={itemChannel.id}>
 								<p>{itemChannel.name}</p>
 								{itemChannel.type == 2 ? (
-									<input  />
+									<input  onChange={event => password.set(itemChannel.id, event.target.value)}/>
 								) : null
 								}
 								<button onClick={(e) => handleJoinChannel(itemChannel.id)}>Join</button>

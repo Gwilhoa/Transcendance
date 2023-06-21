@@ -103,9 +103,7 @@ export class ChannelService {
   }
 
   public async joinChannel(body: JoinChannelDto) {
-    let chan = await this.channelRepository.findOneBy({
-      id: body.channel_id,
-    });
+    let chan = await this.getChannelById(body.channel_id);
     if (chan == null) throw new Error('Channel not found');
     const user = await this.userService.getUserById(body.user_id);
     if (user == null) throw new Error('User not found');
@@ -114,7 +112,7 @@ export class ChannelService {
         throw new Error('Password is required for PROTECTED_CHANNEL');
       let isvalid = false;
       try {
-        isvalid = await bcrypt.compare(chan.pwd, body.password);
+        isvalid = await bcrypt.compare(body.password, chan.pwd);
       } catch (err) {
         throw new Error('Can not verify password');
       }
