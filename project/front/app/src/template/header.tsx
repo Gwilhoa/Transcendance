@@ -21,21 +21,21 @@ const Head = () => {
 	});
 
 	useEffect(() => {
-		axios.get(process.env.REACT_APP_IP + ':3000/user/id', {
-			headers: {
-				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
-			},
-		})
-			.then((response) => {
-				console.log(response.data.id);
-				setId(response.data.id);
-				localStorage.setItem('id', response.data.id);
+			axios.get(process.env.REACT_APP_IP + ':3000/user/id', {
+				headers: {
+					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+				},
 			})
-			.catch((error) => {
-				setErrorLocalStorage('Error ' + error.response.status);
-				console.error(error);
-				navigate('/Error');
-			});
+				.then((response) => {
+					console.log(response.data.id);
+					setId(response.data.id);
+					localStorage.setItem('id', response.data.id);
+				})
+				.catch((error) => {
+					setErrorLocalStorage('Error ' + error.response.status);
+					console.error(error);
+					navigate('/Error');
+				});
 	}, [navigate]);
 
 	const dispatch = useDispatch();
