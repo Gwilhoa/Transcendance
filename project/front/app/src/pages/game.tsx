@@ -51,7 +51,7 @@ const Game: React.FC<GameProps> = () => {
 
 	const socketInstance = SocketSingleton.getInstance();
 	const socket = socketInstance.getSocket();
-
+	const gamestate = useSelector((state: RootState) => state.beginToOption.gamestate);
 
 	const ballStyles = {
 		top: `${ball.x - 2}%`,
@@ -110,6 +110,10 @@ const Game: React.FC<GameProps> = () => {
 
 
 	useEffect(() => {
+		if (gamestate != 2) {
+			socket.emit('leave_game');
+			navigate('/home')
+		}
 		window.addEventListener("keydown", handleKeyPress);
 		if (playerstats == 2) {
 			setColor1("#ff5e33")
@@ -155,6 +159,7 @@ const Game: React.FC<GameProps> = () => {
 		});
 
 		socket.on('finish_game', (any) => {
+			console.log(any)
 			if (isCall) {
 				const content = {
 					status: any.status,

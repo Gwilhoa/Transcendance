@@ -69,6 +69,7 @@ export class EventsGateway
     }
     this.clients = disconnect(id, this.clients);
     if (getKeys(this.ingame).includes(id)) {
+      this.logger.debug("disconnect in game");
       const game = await this.gameService.remakeGame(this.ingame.get(id));
       if (game == null) {
         this.logger.error('game not found');
@@ -291,8 +292,17 @@ export class EventsGateway
   @SubscribeMessage('option_send')
   async option_send(client: Socket, payload: any) {
     const user_id = client.data.id;
+    
     const game_id = this.ingame.get(user_id);
+    if (game_id == null) {
+
+      return;
+    }
     const game: Game = this.games[game_id];
+    if (game == null) {
+      return;
+    }
+
     game.definePowerUp(payload.powerup);
     this.server.to(game_id).emit('will_started', { time: 3 });
     await sleep(1000);

@@ -6,7 +6,9 @@ import React, {useEffect, useState} from 'react';
 import SocketSingleton from '../socket';
 import {useNavigate} from 'react-router-dom';
 import {RootState} from '../redux/store';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
+import ErrorToken from '../components/IfError';
+import { setBeginStatus } from '../redux/game/beginToOption';
 
 
 const socketInstance = SocketSingleton.getInstance();
@@ -22,18 +24,25 @@ const OptionGame = () => {
         loop: true,
         config: { duration: 4000 },
     });
+    const dispatch = useDispatch();
     const navigate = useNavigate();
     const decide = useSelector((state: RootState) => state.beginToOption.decide);
     const playerstats = useSelector((state: RootState) => state.beginToOption.playerstate);
-    const couille = useSelector((state: RootState) => state.beginToOption.gameid);
+    const id = useSelector((state: RootState) => state.beginToOption.gameid);
     const gamestate = useSelector((state: RootState) => state.beginToOption.gamestate)
+    console.log(gamestate);
     useEffect(() => {
-        if (couille == null || gamestate == 0)
+        if (id == null || gamestate != 1)
             navigate('/home');
+        dispatch(setBeginStatus({decide: decide, playerstate: playerstats, gameid: id ,gamestate: 2}));
         
         socket.on('will_started', (data) => {
             console.log(data);
             navigate('/game');
+        })
+
+        socket.on("finish_game", (data) => {
+            navigate('/home')
         })
 
         return () => {
@@ -41,16 +50,7 @@ const OptionGame = () => {
         }
         
     }, [])
-    console.log('playerstats ' + playerstats + '\ndecide ' + decide);
 
-	const hasproblem = useSelector((state: RootState) => state.beginToOption.gameid);
-	useEffect(() => {
-		if (hasproblem == null)
-			navigate('/home');
-		return () => {
-			socket.off('will_started');
-		}
-	}, [])
 	console.log('playerstats ' + playerstats + '\ndecide ' + decide);
 
 	const Ball1 = "https://s2.qwant.com/thumbr/0x380/6/6/6f4c8d9426e69610d320350bc3fabc62de2332249a7491f1b39bdac0998bd0/soccer-ball-drawing-easy-39.png?u=http%3A%2F%2Fgetdrawings.com%2Fimages%2Fsoccer-ball-drawing-easy-39.png&q=0&b=1&p=0&a=0";
@@ -90,14 +90,16 @@ const OptionGame = () => {
 		<>
 			{!decide &&
                 <>
+                    <ErrorToken/>
                     <div className='game-waiting-settings'>
-                        Waiting your opponent to choose settings...
+                        Waiting idur opponent to choose settings...
                     </div>
                 </>
 			}
 
 			{decide &&
                 <>
+                    <ErrorToken/>
                     <div className='title-choice'>
                         choose ball
                     </div>

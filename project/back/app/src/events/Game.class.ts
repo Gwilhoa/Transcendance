@@ -329,6 +329,7 @@ export class Game {
   }
 
   public async remake() {
+    console.log("finish game for " + this._user1.data.id + ' ' + this._user2.data.id);
     this._io.to(this._id).emit('finish_game', {
       score1: 0,
       score2: 0,

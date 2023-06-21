@@ -22,6 +22,7 @@ const beginGameSlice = createSlice({
 			state.decide = action.payload.decide;
 			state.playerstate = action.payload.playerstate;
 			state.gameid = action.payload.gameid;
+			state.gamestate = action.payload.gamestate;
 		},
 	},
 });
