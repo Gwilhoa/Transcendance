@@ -206,7 +206,6 @@ const History = () => {
 	const navigate = useNavigate();
 	const [username, setUsername] = useState<string>('');
 	const { id } = useParams();
-	const playerId = id;
 
 		const fetchDataUser = (userId: string) => {
 				if (id != null) {
@@ -241,12 +240,6 @@ const History = () => {
 			fetchDataUser(id);
 		}
 	}, [id, navigate]);
-
-	useEffect(() => {
-		if (id != playerId) {
-			window.location.reload();
-		}
-	}, [playerId, id]);
 
 	if (id == '' || id == null) {
 		return (null);

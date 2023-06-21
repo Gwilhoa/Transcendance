@@ -225,6 +225,7 @@ export default function Profil() {
 	const handleHistory = (id: string | null) => {
 		navigate('/history/' + id);
 		dispatch(closeModal());
+		window.location.reload();
 	};
 
 	const handleAddFriend = (id: string | null) => {
@@ -334,14 +335,14 @@ export default function Profil() {
 								<button>
 									Challenge
 								</button>
-								<br />
 							</>
 						)}
+						<br />
+						<button onClick={() => handleHistory(id)}>
+							history
+						</button>
 					</div>
 				) : (<></>)}
-				<button onClick={() => handleHistory(id)}>
-					history
-				</button>
 			</div>
 			<br/>
 		</div>

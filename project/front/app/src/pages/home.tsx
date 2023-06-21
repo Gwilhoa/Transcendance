@@ -11,6 +11,8 @@ import {openModal} from '../redux/modal/modalSlice';
 import {Search} from '../components/search/userSearch';
 import axios from 'axios';
 import SocketSingleton from '../socket';
+import Profil from '../components/profil/profil';
+import { ProfilImage } from '../components/profil/ProfilImage';
 
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
@@ -75,6 +77,12 @@ const Add = () => {
 				return;
 			})
 		}
+		return () => {
+			if (listUser == null) {
+				socket.off('friend_code');
+				socket.off('friend_request');
+			}
+		};
 	}, [listUser, refresh, socket]);
 
 	if (listUser == null || listUser.length == 0) {
@@ -82,15 +90,34 @@ const Add = () => {
 			<p className='no-friend'>Knowing how to enjoy your own company is an art. <span>Natasha Adamo</span></p>);
 	}
 	console.log(listUser);
+
+	const handleHistory = (id: string | null) => {
+		navigate('/history/' + id);
+	};
+
+	const handleChallenge = (id: string | null) => {
+		console.log('here we need to implement the channel');
+	};
+
 	return (
 		<div className='users-list'>
 			{listUser.map((user) => (
 				<div className='user' key={user.id} onClick={() => dispatch(openModal(user.id))}>
-					<img className='image'
-						src='https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/42_Logo.svg/1200px-42_Logo.svg.png'></img>
+					<ProfilImage id={user.id} OnClickOpenProfil={true} OverwriteClassName={''} />
 					<p className='name'>{user.username}</p>
-					<p className='status'>{user.status}</p>
 					<p className='xp'>{user.experience}XP</p>
+					<div 
+						onClick={() => handleHistory(user.id)}
+						className=''
+					> 
+						history 
+					</div>
+					<div 
+						onClick={() => handleChallenge(user.id)}
+						className=''
+					> 
+						Challenge 
+					</div>
 				</div>
 			))}
 		</div>
