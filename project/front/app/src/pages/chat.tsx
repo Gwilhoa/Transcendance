@@ -167,7 +167,6 @@ function Chat() {
 			if (response.status === 204) {
 				setMessages([]);
 			} else {
-				console.log(response.data);
 				setMessages(response.data);
 			}
 			setErrorGetMessage(false);
@@ -381,6 +380,10 @@ function Chat() {
 						listAvailableChannel.map((itemChannel) => (
 							<div className='chat-page-channels-channel' key={itemChannel.id}>
 								<p>{itemChannel.name}</p>
+								{itemChannel.type == 2 ? (
+									<input  />
+								) : null
+								}
 								<button onClick={(e) => handleJoinChannel(itemChannel.id)}>Join</button>
 							</div>
 						))
