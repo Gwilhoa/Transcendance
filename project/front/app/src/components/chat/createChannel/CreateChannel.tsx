@@ -36,6 +36,7 @@ const initialChannelState: Channel = {
 	creator: initialUserState,
 	admins: [],
 	bannedUsers: [],
+	mutedUser: [],
 
 }
 
