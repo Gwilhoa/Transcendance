@@ -127,28 +127,33 @@ export class ChannelGateway implements OnGatewayInit {
         payload,
       );
     } catch (e) {
-      client.emit('update_user_channel', {
+      client.emit('update_channel', {
         code: 1,
         channel: channel,
         message: e.message,
         sender_id: user_id,
       });
-      this.server.to(channel_id).emit('update_user_channel', {
+    }
+    if (ret == null) {
+      client.emit('update_channel', {
         code: 1,
         channel: channel,
+        message: 'channel not found',
         sender_id: user_id,
       });
+      return;
     }
-    client.emit('update_user_channel', {
+    client.emit('update_channel', {
       code: 0,
-      channel: channel,
-      message: 'ok',
-      sender_id: user_id,
+      channel_id: channel_id,
+      name: ret.name,
+      type: ret.type,
     });
-    this.server.to(channel_id).emit('update_user_channel', {
+    this.server.to(channel_id).emit('update_channel', {
       code: 0,
-      channel: channel,
-      sender_id: user_id,
+      channel_id: channel_id,
+      name: ret.name,
+      type: ret.type,
     });
   }
 

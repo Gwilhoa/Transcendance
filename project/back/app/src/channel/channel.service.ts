@@ -23,7 +23,7 @@ export class ChannelService {
 
   public async createChannel(body: CreateChannelDto) {
     let chan = new Channel();
-    if (body.name.length > 12)
+    if (body.name.length > 20)
       throw new Error('Channel name must be less than 12 characters');
     chan.name = body.name;
     chan.admins = [];
@@ -498,6 +498,7 @@ export class ChannelService {
           throw new Error('Wrong password');
         channel.pwd = await bcrypt.hash(body.password, 10);
       }
+      if (body.name > 20 || body.name < 1) throw new Error('name is too long');
       if (body.name != '') channel.name = body.name;
       const ret = await this.channelRepository.save(channel);
       return { channel_id: ret.id, name: ret.name };
