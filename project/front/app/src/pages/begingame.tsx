@@ -4,9 +4,10 @@ import {animated, useSpring} from 'react-spring';
 import React, {useEffect, useRef} from 'react';
 import SocketSingleton from '../socket';
 import {useNavigate} from 'react-router-dom';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {setBeginStatus} from '../redux/game/beginToOption';
 import ErrorToken from '../components/IfError';
+import {RootState} from '../redux/store';
 
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
@@ -15,10 +16,13 @@ const cookies = new Cookies();
 const BeginGame = () => {
   
   const gamefound = useRef(false);
+  const gamestate = useSelector((state: RootState) => state.beginToOption.gamestate);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   useEffect(() => {
+    if (gamestate != 10)
+        navigate("/home");
       socket.emit('join_matchmaking', {token : cookies.get('jwtAuthorization')});
       return () => {
           console.log("oui")
@@ -55,7 +59,7 @@ const BeginGame = () => {
           socket.off('matchmaking_code');
           socket.off('game_found');
       };
-    }, [socket]);
+    }, []);
 
     
     const spinnerAnimation = useSpring({
