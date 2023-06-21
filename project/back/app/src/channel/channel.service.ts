@@ -12,9 +12,12 @@ import { ChannelType } from 'src/utils/channel.enum';
 import { BanUserDto } from '../dto/ban-user.dto';
 import * as bcrypt from 'bcrypt';
 import { includeUser } from '../utils/socket.function';
+import {WebSocketServer} from "@nestjs/websockets";
+import {Server} from "socket.io";
 
 @Injectable()
 export class ChannelService {
+  @WebSocketServer() server: Server;
   constructor(
     @InjectRepository(Channel) private channelRepository: Repository<Channel>,
     @InjectRepository(Message) private messageRepository: Repository<Message>,
@@ -310,6 +313,7 @@ export class ChannelService {
       .leftJoinAndSelect('channel.bannedUsers', 'bannedUsers')
       .leftJoinAndSelect('channel.admins', 'admins')
       .leftJoinAndSelect('channel.creator', 'creator')
+      .leftJoinAndSelect('channel.mutedUser', 'mutedUser')
       .getMany();
     const chan = [];
     if (channels == null) return null;
@@ -496,11 +500,9 @@ export class ChannelService {
           throw new Error('Wrong password');
         channel.pwd = await bcrypt.hash(body.password, 10);
       }
-      if (body.name != '' && body.name.length < 20)
-      {
+      if (body.name != '' && body.name.length < 20) {
         channel.name = body.name;
-      }
-      else throw new Error('Name is too long');
+      } else throw new Error('Name is too long');
       const ret = await this.channelRepository.save(channel);
       return { channel_id: ret.id, name: ret.name };
     } else {
@@ -508,6 +510,12 @@ export class ChannelService {
         if (admin.id == user_id) {
           if (body.name != null) channel.name = body.name;
           const ret = await this.channelRepository.save(channel);
+          this.server.to(channel_id).emit('update_channel', {
+            code: 0,
+            channel_id: channel_id,
+            name: ret.name,
+            type: ret.type,
+          });
           return { channel_id: ret.id, name: ret.name };
         }
       }
@@ -551,5 +559,9 @@ export class ChannelService {
     }
     channel.mutedUser = mutedUsers;
     return await this.channelRepository.save(channel);
+  }
+
+  async modifyChannel(user_id, channel_id, body) {
+    
   }
 }
