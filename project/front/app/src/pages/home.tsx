@@ -95,6 +95,10 @@ const Add = () => {
 		navigate('/history/' + id);
 	};
 
+	const handleChallenge = (id: string | null) => {
+		console.log('here we need to implement the channel');
+	};
+
 	return (
 		<div className='users-list'>
 			{listUser.map((user) => (
@@ -107,6 +111,12 @@ const Add = () => {
 						className=''
 					> 
 						history 
+					</div>
+					<div 
+						onClick={() => handleChallenge(user.id)}
+						className=''
+					> 
+						Challenge 
 					</div>
 				</div>
 			))}
