@@ -496,8 +496,11 @@ export class ChannelService {
           throw new Error('Wrong password');
         channel.pwd = await bcrypt.hash(body.password, 10);
       }
-      if (body.name > 20 || body.name < 1) throw new Error('name is too long');
-      if (body.name != '') channel.name = body.name;
+      if (body.name != '' && body.name.length < 20)
+      {
+        channel.name = body.name;
+      }
+      else throw new Error('Name is too long');
       const ret = await this.channelRepository.save(channel);
       return { channel_id: ret.id, name: ret.name };
     } else {
