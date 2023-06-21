@@ -17,7 +17,7 @@
 }
 
 .profil-image.chat-list-user-image > .profil-status {
-    border: 0.25rem solid var(--background-color);
+    border: 0.25rem solid var(--box-color);
 }
 
 .chat-list-users-user {

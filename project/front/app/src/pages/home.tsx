@@ -87,7 +87,7 @@ const Add = () => {
 
 	if (listUser == null || listUser.length == 0) {
 		return (
-			<p className='no-friend'>Knowing how to enjoy your own company is an art. <span>Natasha Adamo</span></p>);
+			<p className='home-no-friend'>Knowing how to enjoy your own company is an art. <span>Natasha Adamo</span></p>);
 	}
 	console.log(listUser);
 
@@ -100,23 +100,30 @@ const Add = () => {
 	};
 
 	return (
-		<div className='users-list'>
+		<div className='home-users-list'>
 			{listUser.map((user) => (
-				<div className='user' key={user.id} onClick={() => dispatch(openModal(user.id))}>
-					<ProfilImage id={user.id} OnClickOpenProfil={true} OverwriteClassName={''} />
-					<p className='name'>{user.username}</p>
-					<p className='xp'>{user.experience}XP</p>
-					<div 
-						onClick={() => handleHistory(user.id)}
-						className=''
-					> 
-						history 
+				<div className='home-users-list-user' key={user.id} onClick={() => dispatch(openModal(user.id))}>
+					<div className='home-users-list-user-info'>
+						<ProfilImage id={user.id} OnClickOpenProfil={true} OverwriteClassName='home-users-list-user-image-profil' />
+						<p className='name'>{user.username}</p>
+						<p className='xp'>{user.experience}XP</p>
+						<p>{'victory: ' + user.victories}</p>
+						<p>{'defeats: ' + user.defeats}</p>
+						<p>{user.defeats === 0 ? (user.victories === 0 ? 0 : 1) : (user.victories / user.defeats).toFixed(2)}</p>
 					</div>
-					<div 
-						onClick={() => handleChallenge(user.id)}
-						className=''
-					> 
-						Challenge 
+					<div className='home-users-list-user-buttons'>
+						<button 
+							onClick={() => handleChallenge(user.id)}
+							className='home-users-list-user-buttons-challenge-button'
+						> 
+							Challenge 
+						</button>
+						<button 
+							onClick={() => handleHistory(user.id)}
+							className='home-users-list-user-buttons-hsitory-button'
+						> 
+							history 
+						</button>
 					</div>
 				</div>
 			))}

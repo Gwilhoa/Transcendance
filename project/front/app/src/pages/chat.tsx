@@ -398,7 +398,7 @@ function Chat() {
 							<div className='chat-page-channels-channel' key={itemChannel.id}>
 								<p>{itemChannel.name}</p>
 								{itemChannel.type == 2 ? (
-									<input  onChange={event => password.set(itemChannel.id, event.target.value)}/>
+									<input className='chat-page-channel-password-input' placeholder='Password' onChange={event => password.set(itemChannel.id, event.target.value)}/>
 								) : null
 								}
 								<button onClick={(e) => handleJoinChannel(itemChannel.id)}>Join</button>
