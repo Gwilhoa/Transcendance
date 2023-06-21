@@ -205,9 +205,11 @@ function Chat() {
 		socket.on('update_user_channel', handleUpdateUserChannel);
 		socket.on('user_join', handleUserCode);
 		socket.on('research_channel', handleResearchChannel);
+		socket.on('update_channel', handleUpdateChannel);
 
 		return () => {
 			socket.off('update_user_channel');
+			socket.off('update_channel');
 			socket.off('user_join');
 			socket.off('research_channel');
 		}
@@ -314,7 +316,7 @@ function Chat() {
 		setListChannel((prevListChannel) =>
 			prevListChannel.map((itemChannel) => {
 				if (itemChannel.id === data.channel_id) {
-					return {...itemChannel, name: data.name};
+					return {...itemChannel, name: data.name, type: data.type};
 				}
 				return itemChannel;
 			})
@@ -332,14 +334,13 @@ function Chat() {
 		socket.on('join_channel', handleJoinChannel);
 		socket.on('message', handleMessage);
 		socket.on('message_code', handleMessageCode);
-		socket.on('update_channel', handleUpdateChannel);
 		socket.on('delete_channel', handleDeleteChannel);
 
 		return () => {
+			socket.off('join_channel');
 			socket.off('delete_channel');
 			socket.off('message');
 			socket.off('message_code');
-			socket.off('update_channel');
 			setErrorPostMessage('');
 		};
 	},[conversationId, updateChannel]);

@@ -35,6 +35,7 @@ const OneScoreBlock = ({ game, playerId }: { game: Game, playerId: string }) => 
 	
 	const [messageWinner, setMessageWinner] = useState<string>('');
 
+
 	useEffect(() => {
 		console.log('try it')
 		if (game.score2 > game.score1) {
@@ -84,7 +85,7 @@ const OneScoreBlock = ({ game, playerId }: { game: Game, playerId: string }) => 
 				}
 			}
 		}
-	}, []);
+	}, [playerId]);
 
 	useEffect(() => {
 		axios.get(process.env.REACT_APP_IP + ':3000/user/image/' + playerId, {
@@ -124,7 +125,7 @@ const OneScoreBlock = ({ game, playerId }: { game: Game, playerId: string }) => 
 				navigate('/Error');
 				return;
 			});
-	}, [leftUser, rightUser, navigate]);
+	}, [leftUser, rightUser, navigate, playerId]);
 
 	if (messageWinner == '') {
 		return null;
@@ -203,36 +204,19 @@ const ListBlockScore = ({ userId, username }: { userId: string, username: string
 
 const History = () => {
 	const navigate = useNavigate();
-	const [id, setId] = useState<string>('');
 	const [username, setUsername] = useState<string>('');
-	const test = useParams();
+	const { id } = useParams();
+	const playerId = id;
 
-		const fetchDataUser = () => {
-			const url = window.location.href;
-			let index = 0;
-			let count = 0;
-			while (url.charAt(index)) {
-				if (url.charAt(index) == '/') {
-					count++;
-				}
-				index++;
-				if (count == 4) {
-					break ;
-				}
-			}
-			if (count < 4) {
-				navigate('/home')
-			}
-			const param = url.substring(index);
-			if (param.length > 0 ) {
-				axios.get(process.env.REACT_APP_IP + ':3000/user/id/' + param, {
+		const fetchDataUser = (userId: string) => {
+				if (id != null) {
+				axios.get(process.env.REACT_APP_IP + ':3000/user/id/' + userId, {
 					headers: {
 						Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
 					},
 				})
 					.then((response) => {
 						console.log(response);
-						setId(response.data.id);
 						setUsername(response.data.username);
 					})
 					.catch((error) => {
@@ -252,14 +236,19 @@ const History = () => {
 		};
 
 	useEffect(() => {
-		fetchDataUser();
+		console.log(id);
+		if (id != null) {
+			fetchDataUser(id);
+		}
+	}, [id, navigate]);
 
-		return () => {
-			fetchDataUser();
-		};
-	}, [window.location.href, navigate, test]);
+	useEffect(() => {
+		if (id != playerId) {
+			window.location.reload();
+		}
+	}, [playerId, id]);
 
-	if (id == '') {
+	if (id == '' || id == null) {
 		return (null);
 	}
 	return (

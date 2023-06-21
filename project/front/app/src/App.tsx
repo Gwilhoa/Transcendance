@@ -37,7 +37,7 @@ const AppInsideBrowser = () => {
 					<Route path="/chat" element={<Chat></Chat>}/>
 					<Route path="/begingame/*" element={<BeginGame></BeginGame>}/>
 					<Route path="/CreateTwoFa" element={<CreateTwoFaPage></CreateTwoFaPage>}/>
-					<Route path="/history/*" element={<History></History>}/>
+					<Route path="/history/:id" element={<History></History>}/>
 					<Route path="/endgame/*" element={<EndGame></EndGame>}/>
 				</Route>
 			</Routes>
