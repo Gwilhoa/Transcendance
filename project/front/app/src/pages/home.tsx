@@ -108,7 +108,13 @@ const Add = () => {
 						<p className='name'>{user.username}</p>
 						<p className='xp'>{user.experience}XP</p>
 						<p>{user.victories + '/' + user.defeats}</p>
-						<p>ratio : {user.defeats === 0 ? (user.victories === 0 ? 0 : 1) : (user.victories / user.defeats).toFixed(2)}</p>
+						<p>
+							{user.defeats + user.victories === 0 ? (
+								null
+							) : (
+								'WR: ' + 
+								((user.victories / (user.defeats + user.victories) * 100).toFixed(2)) + '%'
+							)}</p>
 					</div>
 					<div className='home-users-list-user-buttons'>
 						<button 
