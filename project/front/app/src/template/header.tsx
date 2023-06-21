@@ -47,7 +47,12 @@ const Head = () => {
 	const handleChat = () => {
 		navigate('/chat');
 		window.location.reload();
-	}
+	};
+
+	const handleHisto = () => {
+		navigate('/history/' + id);
+		window.location.reload();
+	};
 
 	return (
 		<div className='navbar'>
@@ -63,9 +68,9 @@ const Head = () => {
 				<Link to="/begingame" className="navbar__link">
 					Game
 				</Link>
-				<Link to={'/history/' + id} className='navbar__link'>
+				<button onClick={() => handleHisto()} className='navbar__link'>
 					History
-				</Link>
+				</button>
 				<button onClick={() => handleOpenModal(id)} className='navbar__link'>
 					Profil
 				</button>
