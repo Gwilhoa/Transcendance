@@ -240,11 +240,12 @@ export class ChannelService {
       .createQueryBuilder('channel')
       .leftJoinAndSelect('channel.messages', 'messages')
       .leftJoinAndSelect('channel.users', 'users')
-      .leftJoinAndSelect('channel.mutedUser', 'mutedUsers')
+      .leftJoinAndSelect('channel.mutedUser', 'mutedUser')
       .where('channel.id = :id', { id: body.channel_id })
       .getOne();
     if (channel == null) throw new Error('Channel not found');
-    if (includeUser(user, channel.mutedUser)) message.channel = channel;
+    if (includeUser(user, channel.mutedUser)) throw new Error('User is muted');
+    message.channel = channel;
     message.user = user;
     if (channel.messages == null) channel.messages = [];
     channel.messages.push(message);

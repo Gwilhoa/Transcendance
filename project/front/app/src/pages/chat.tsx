@@ -167,6 +167,7 @@ function Chat() {
 			if (response.status === 204) {
 				setMessages([]);
 			} else {
+				console.log(response.data);
 				setMessages(response.data);
 			}
 			setErrorGetMessage(false);
