@@ -15,7 +15,7 @@ import ListUserChannel from '../components/chat/ListUsers';
 import axios from 'axios';
 import {cookies} from '../App';
 import {useNavigate} from 'react-router-dom';
-import { closeChatModalListUser, switchChatModalListUser } from '../redux/chat/modalChatSlice';
+import { closeChatModalListUser, switchChatModalListUser, switchChatModalUpdateChannel } from '../redux/chat/modalChatSlice';
 import {it} from "node:test";
 
 const socketInstance = SocketSingleton.getInstance();
@@ -119,6 +119,7 @@ function Chat() {
 
 	const [conversationId, setConversationId] = useState<string>('');
 	const [updateChannel, setUpdateChannel] = useState<number>(0);
+	const [errorUpdateChannel, setErrorUpdateChannel] = useState<string>('');
 
 	const [messages, setMessages] = useState<Array<Message>>([]);
 	const [errorGetMessage, setErrorGetMessage] = useState<boolean>(false);
@@ -312,17 +313,25 @@ function Chat() {
 	};
 
 	const handleUpdateChannel = (data: any) => {
-		console.log('HEY I CHANGE NAME : ' + data?.channel_id + " :" + conversationId);
-		setListChannel((prevListChannel) =>
-			prevListChannel.map((itemChannel) => {
-				if (itemChannel.id === data.channel_id) {
-					return {...itemChannel, name: data.name, type: data.type};
-				}
-				return itemChannel;
-			})
-		)
-		if (data.channel_id === conversationId) {
-			setChannel((prevChannel) => ({...prevChannel, name: data.name}));
+		console.log('update_channel');
+		console.log(data);
+		if (data.code == 1) {
+			setErrorUpdateChannel(data.message);
+			setTimeout(function() {setErrorUpdateChannel('')}, 2000);
+		}
+		else {
+			console.log('HEY I CHANGE NAME : ' + data?.channel_id + " :" + conversationId);
+			setListChannel((prevListChannel) =>
+				prevListChannel.map((itemChannel) => {
+					if (itemChannel.id === data.channel_id) {
+						return {...itemChannel, name: data.name, type: data.type};
+					}
+					return itemChannel;
+				})
+			)
+			if (data.channel_id === conversationId) {
+				setChannel((prevChannel) => ({...prevChannel, name: data.name, type: data.type}));
+			}
 		}
 	};
 
@@ -366,6 +375,7 @@ function Chat() {
 					channel={channel}
 					errorGetMessage={errorGetMessage}
 				/>
+				{ errorUpdateChannel != '' ? <p>errorUpdateChannel</p> : null}
 				<SendMessage
 					conversation={conversationId}
 					errorPostMessage={errorPostMessage}
