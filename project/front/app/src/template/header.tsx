@@ -16,25 +16,6 @@ const Head = () => {
 	socket.on('message_code', (data: any) => {
 		console.log(data);
 	});
-	
-	// const [id, setId] = useState<string | null>(null);
-	// useEffect(() => {
-	// 	axios.get(process.env.REACT_APP_IP + ':3000/user/id', {
-	// 		headers: {
-	// 			Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
-	// 		},
-	// 	})
-	// 		.then((response) => {
-	// 			console.log(response.data.id);
-	// 			setId(response.data.id);
-	// 			localStorage.setItem('id', response.data.id);
-	// 		})
-	// 		.catch((error) => {
-	// 			setErrorLocalStorage('Error ' + error.response.status);
-	// 			console.error(error);
-	// 			navigate('/Error');
-	// 		});
-	// }, [navigate]);
 
 	const dispatch = useDispatch();
 

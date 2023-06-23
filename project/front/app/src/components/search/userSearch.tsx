@@ -19,10 +19,7 @@ export const Search = ({defaultAllUsers, OverwriteClassName}: {
 		const res = event.target.value;
 		if (res.length === 0 && defaultAllUsers === false) {
 			dispatch(setUsersNull());
-			console.log('handleOnChange null');
 		} else {
-			console.log('handleOnChange');
-			console.log('emit: ' + res);
 			socket.emit('research_name', {name: res});
 		}
 	};
@@ -30,16 +27,11 @@ export const Search = ({defaultAllUsers, OverwriteClassName}: {
 	useEffect(() => {
 		const id = localStorage.getItem('id');
 		socket.on('research_name', (data: any) => {
-			console.log('research_name received my_id : ' + id + 'user_id : ' + data.id);
 			const UsersWithoutYou = data.filter((user: IUser) => user.id !== id);
 			dispatch(setUsers(UsersWithoutYou));
-			console.log('research_name');
-			console.log(data);
 		});
 
 		socket.on('new_user', (data: IUser) => {
-			console.log('search find new user');
-			console.log(data);
 			if (data.id !== id)
 				dispatch(addUser(data));
 		});
