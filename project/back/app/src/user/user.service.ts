@@ -516,7 +516,11 @@ export class UserService {
     return user.games;
   }
 
-  public async getUserBySimilarNames(names: string, id: string) {
+  public async getUserBySimilarNames(
+    names: string,
+    id: string,
+    gethimself = false,
+  ) {
     const user = await this.userRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.blockedUsers', 'blockedUsers')
@@ -528,7 +532,10 @@ export class UserService {
       .getMany();
     const ret = [];
     for (const u of users) {
-      if (u.id != user.id && includeUser(u, user.blockedUsers)) {
+      if (u.id == user.id && gethimself == true) {
+        ret.push(u);
+      }
+      if (!includeUser(u, user.blockedUsers) && u.id != user.id) {
         ret.push(u);
       }
     }
