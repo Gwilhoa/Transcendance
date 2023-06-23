@@ -12,6 +12,7 @@ const cookies = new Cookies();
 
 
 const EndGame = () => {
+  console.log("je suis la !!!");
 	const myrevengeRef = useRef(false);
 	const [revenge, setRevenge] = useState(false);
 	const [myrevenge, setMyrevenge] = useState(false);
@@ -21,7 +22,6 @@ const EndGame = () => {
 	const socketInstance = SocketSingleton.getInstance();
 	const socket = socketInstance.getSocket();
 	const dispatch = useDispatch();
-	const [undefinedPlayer, setUndefinedPlayer] = useState(true);
 
 	socket.on('message_code', (data: any) => {
 		console.log(data);
@@ -60,11 +60,12 @@ const EndGame = () => {
 
     socket.on('game_found', (data) => {
       console.log(data);
-    dispatch(setBeginStatus({decide: data.decide, playerstate: data.user, gameid: data.game_id}));
+    dispatch(setBeginStatus({decide: data.decide, playerstate: data.user, gameid: data.game_id, gamestate: 1}));
     navigate("/optiongame")
   });
   
   socket.on('rematch', (any: { rematch: any; }) => {
+    console.log("rematch");
     const rematch = any.rematch;
     if (rematch) {
       if (myrevenge) {
@@ -78,8 +79,8 @@ const EndGame = () => {
     }
   });
   return() => {
-    /*socket.off('rematch')
-    socket.off('game_found')*/
+    socket.off('rematch')
+    /*socket.off('game_found')*/
   }
   }, [])
   useEffect(() => {

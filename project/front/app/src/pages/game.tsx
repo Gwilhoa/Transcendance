@@ -11,34 +11,32 @@ import {animated, useSpring} from 'react-spring';
 
 const cookies = new Cookies();
 
-let isCall = true;
 
 interface GameProps {
 	gameId: number;
 }
 
 const Game: React.FC<GameProps> = () => {
-  const animatedBall = useSpring({
-    from: { transform: 'rotate(0deg)' },
-    to: { transform: 'rotate(360deg)' },
-    loop: true,
-    config: { duration: 4000 },
-  });
+	const animatedBall = useSpring({
+		from: { transform: 'rotate(0deg)' },
+		to: { transform: 'rotate(360deg)' },
+		loop: true,
+		config: { duration: 4000 },
+	});
 
-	isCall = true;
 	const navigate = useNavigate();
 	const gameId = useSelector((state: RootState) => state.beginToOption.gameid);
-
+	
 	const [ball, setBall] = useState({x: 50, y: 50});
 	const [paddle1, setPaddle1] = useState(42.5);
 	const [paddle2, setPaddle2] = useState(42.5);
 	const [color1, setColor1] = useState("white");
 	const [color2, setColor2] = useState("white");
 	const [started, setStarted] = useState("");
-
+	
 	const playerstats = useSelector((state: RootState) => state.beginToOption.playerstate);
-
-
+	
+	
 	const [nbBall, setNbBall] = useState('button1');
 	const [nbMap, setNbMap] = useState('map1');
 	const [isPowerup, setIsPowerup] = useState(false);
@@ -48,58 +46,58 @@ const Game: React.FC<GameProps> = () => {
 	const dispatch = useDispatch();
 	const finalStatus = useSelector((state: RootState) => state.finalGame.finalStatus);
 	const [IamStoper, setIamStoper] = useState(false);
-
+	
 	const socketInstance = SocketSingleton.getInstance();
 	const socket = socketInstance.getSocket();
 	const gamestate = useSelector((state: RootState) => state.beginToOption.gamestate);
-
+	
 	const ballStyles = {
 		top: `${ball.x - 2}%`,
 		left: `${ball.y - 1}%`,
 	};
-
+	
 	const handleKeyPress = (event: KeyboardEvent) => {
 		switch (event.code) {
 			case 'KeyW':
 				socket.emit('input_game', {game_id: gameId, type: 0})
 				break;
-			case 'KeyS':
-				socket.emit('input_game', {game_id: gameId, type: 1})
-				break;
-			case 'ArrowUp':
-				socket.emit('input_game', {game_id: gameId, type: 0})
-				break;
-			case "ArrowDown":
-				socket.emit("input_game", {game_id: gameId, type: 1})
-				break;
-			case "Escape":
-				socket.emit("input_game", {game_id: gameId, type: 2})
-				break;
-			case "KeyA":
-				socket.emit("input_game", {game_id: gameId, type: 3})
-				break;
-			case "KeyQ":
+				case 'KeyS':
+					socket.emit('input_game', {game_id: gameId, type: 1})
+					break;
+					case 'ArrowUp':
+						socket.emit('input_game', {game_id: gameId, type: 0})
+						break;
+						case "ArrowDown":
+							socket.emit("input_game", {game_id: gameId, type: 1})
+							break;
+							case "Escape":
+								socket.emit("input_game", {game_id: gameId, type: 2})
+								break;
+								case "KeyA":
+									socket.emit("input_game", {game_id: gameId, type: 3})
+									break;
+									case "KeyQ":
 				socket.emit("input_game", {game_id: gameId, type: 4})
 				break;
-			case "KeyF":
-				socket.emit("input_game", {game_id: gameId, type: 5})
+				case "KeyF":
+					socket.emit("input_game", {game_id: gameId, type: 5})
 				break;
 		}
 	};
-
+	
 	const leaveGame = () => {
-		socket.emit('leave_game');
+		//socket.emit('leave_game');
 	}
-
+	
 	const resumeGame = () => {
 		socket.emit("input_game", {game_id: gameId, type: 2})
 	}
-
+	
 	socket.on('create_game', (any) => {
 		console.log('WESH')
 		console.log(any);
 	})
-
+	
 	socket.on('will_started', (data) => {
 		if (data.time == 0) {
 			setStarted("0 | 0");
@@ -107,9 +105,10 @@ const Game: React.FC<GameProps> = () => {
 			setStarted(data.time);
 		}
 	});
-
-
+	
+	
 	useEffect(() => {
+		let isCall = true;
 		if (gamestate != 2) {
 			socket.emit('leave_game');
 			navigate('/home')
@@ -171,6 +170,7 @@ const Game: React.FC<GameProps> = () => {
 					gameid: gameId
 				};
 				dispatch(setFinalStatus(content));
+				socket.off('finish_game');
 				navigate('/endGame');
 				isCall = !isCall;
 			}
@@ -178,12 +178,11 @@ const Game: React.FC<GameProps> = () => {
 
 
 			return () => {
-        /*socket.off('update_game');
-        socket.off('finish_game');
-        socket.off('is_stop_game');
+        socket.off('update_game');
+        socket.off('game_start');
+        /*socket.off('is_stop_game');
         socket.off('stop_game');
         socket.off('option_receive');
-        socket.off('game_start');
         socket.off('create_game');*/
         leaveGame();
       

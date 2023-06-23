@@ -295,12 +295,11 @@ export class Game {
     if (this._futurbally > Game.default_sizeMaxY + Game.default_radiusball) {
       this._score2 = this.endBattle(this._score2);
       if (this._score2 >= Game.default_victorygoal) {
-        this.clear();
         await this.endWar(this._user2, this._user1, 2);
         return;
       } else {
         this.clear();
-        await this.start();
+        this.start();
         return;
       }
     }
