@@ -284,11 +284,10 @@ export class Game {
       this._score1 = this.endBattle(this._score1);
       if (this._score1 >= Game.default_victorygoal) {
         await this.endWar(this._user1, this._user2, 1);
-        this.clear();
         return;
       } else {
         this.clear();
-        await this.start();
+        this.start();
         return;
       }
     }
@@ -316,8 +315,8 @@ export class Game {
         this._futurballx -= 2 * distbar;
       } else {
         const distbar =
-          this._futurballx - (this._maxX + Game.default_radiusball);
-        this._futurballx -= 2 * distbar;
+          this._futurballx - (this._maxX - Game.default_radiusball);
+        this._futurballx += 2 * distbar;
       }
       this._angle = -this._angle;
     }

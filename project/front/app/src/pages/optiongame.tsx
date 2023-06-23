@@ -46,7 +46,7 @@ const OptionGame = () => {
         })
 
         return () => {
-            socket.off('will_started');
+            //socket.off('will_started');
         }
         
     }, [])

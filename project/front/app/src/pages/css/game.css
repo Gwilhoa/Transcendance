@@ -122,7 +122,7 @@
 .ball {
     z-index: 3;
     position: absolute;
-    width: 2%;
-    height: 2%;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
 }

@@ -78,8 +78,8 @@ const EndGame = () => {
     }
   });
   return() => {
-    socket.off('rematch')
-    socket.off('game_found')
+    /*socket.off('rematch')
+    socket.off('game_found')*/
   }
   }, [])
   useEffect(() => {

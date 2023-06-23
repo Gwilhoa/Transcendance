@@ -56,8 +56,8 @@ const BeginGame = () => {
       
       return () => {
           socket.emit('leave_matchmaking');
-          socket.off('matchmaking_code');
-          socket.off('game_found');
+          /*socket.off('matchmaking_code');
+          socket.off('game_found');*/
       };
     }, []);
 

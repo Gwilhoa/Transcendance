@@ -178,13 +178,13 @@ const Game: React.FC<GameProps> = () => {
 
 
 			return () => {
-        socket.off('update_game');
+        /*socket.off('update_game');
         socket.off('finish_game');
         socket.off('is_stop_game');
         socket.off('stop_game');
         socket.off('option_receive');
         socket.off('game_start');
-        socket.off('create_game');
+        socket.off('create_game');*/
         leaveGame();
       
 		};
