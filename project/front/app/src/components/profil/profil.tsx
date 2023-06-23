@@ -116,6 +116,7 @@ export default function Profil() {
 					})
 					.then((response) => {
 						console.log(response);
+						socket.emit('join_channel', {channel_id: response.data.id});
 					})
 					.catch((error) => {
 						console.error(error);
@@ -131,6 +132,8 @@ export default function Profil() {
 		})
 
 		socket.on('friend_request', (data: any) => {
+			console.log('frend request :');
+			console.log(data);
 			console.log('friend request => ' + data.code);
 			if (data.id == id && (data.code == 2 || data.code == 7 || data.code == 5)) {
 				setIsFriend(!isFriend);
@@ -142,6 +145,8 @@ export default function Profil() {
 		return () => {
 			socket.off('friend_request');
 			socket.off('friend_code');
+			socket.off('receive_challenge');
+			socket.off('block_code');
 		}
 	}, [isFriend]);
 

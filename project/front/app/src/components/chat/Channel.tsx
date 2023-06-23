@@ -4,10 +4,7 @@ import ButtonInviteChannel from './optionBar/button/ButtonInviteChannelModal';
 import ButtonUpdateChannel from './optionBar/button/ButtonUpdateChannel';
 import ButtonLeaveChannel from './optionBar/button/ButtonLeaveChannel';
 
-
-const ChannelSideBar = ({channel}: { channel: Channel }) => {
-
-	const parseChannelName = (channel: Channel) => {
+export const parseChannelName = (channel: Channel) => {
 		if (channel.type !== 3) {
 			return (channel.name);
 		}
@@ -16,6 +13,8 @@ const ChannelSideBar = ({channel}: { channel: Channel }) => {
 		}
 		return (channel.users[1].username)
 	};
+
+const ChannelSideBar = ({channel}: { channel: Channel }) => {
 
 	const troncChannelName = (channel: Channel) => {
 		let name = parseChannelName(channel);
