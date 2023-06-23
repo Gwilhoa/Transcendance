@@ -53,6 +53,23 @@ function AuthenticateComponentsNotTwoFa() {
 					console.error(error);
 					navigate('/Error');
 				});
+			axios.get(process.env.REACT_APP_IP + ':3000/user/id', {
+				headers: {
+					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+				},
+			})
+				.then((response) => {
+					console.log('localstorage set : id :')
+					console.log(response.data.id);
+					console.log('id set in localstorage');
+					localStorage.setItem('id', response.data.id);
+					console.log(localStorage.getItem('id'))
+				})
+				.catch((error) => {
+					setErrorLocalStorage('Error ' + error.response.status);
+					console.error(error);
+					navigate('/Error');
+				});
 		}
 	}, [navigate, error]);
 

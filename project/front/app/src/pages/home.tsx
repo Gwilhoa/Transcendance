@@ -137,7 +137,7 @@ const Add = () => {
 }
 
 const Home = () => {
-
+	console.log('start home');
 
 	return (
 		<div className='home'>
