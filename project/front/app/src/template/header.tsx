@@ -72,9 +72,10 @@ const Head = () => {
 				</Link>
 			</div>
 			<div>
+
 				<button onClick={() => handleChat()} className='navbar__link'>
 					Chat
-				</Link>
+				</button>
 				<Link to="/begingame" className="navbar__link" onClick={setData}>
 					Game
 				</Link>
