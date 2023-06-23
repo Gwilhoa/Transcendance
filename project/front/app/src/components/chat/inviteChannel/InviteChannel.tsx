@@ -13,6 +13,7 @@ import {ProfilImage} from '../../profil/ProfilImage';
 import {ProfilName} from '../../profil/ProfilName';
 import {Search} from '../../search/userSearch';
 import {IUser} from '../../utils/interface';
+import {User} from '../../../pages/chat';
 
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
@@ -92,7 +93,7 @@ const InviteChannel = ({channel}: { channel: Channel }) => {
 	const [usersId, setUserId] = useState<Array<string>>([]);
 
 	useEffect(() => {
-		channel.users.map((element: IUser) => {
+		channel.users.map((element: User) => {
 			setUserId((prevList) => [...prevList, element.id]);
 		});
 	}, []);

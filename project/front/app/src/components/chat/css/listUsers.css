@@ -17,7 +17,7 @@
 }
 
 .profil-image.chat-list-user-image > .profil-status {
-    border: 0.25rem solid var(--background-color);
+    border: 0.25rem solid var(--box-color);
 }
 
 .chat-list-users-user {
@@ -34,24 +34,15 @@
     display: flex;
 }
 
-.chat-list-users-button-making-admin{
+.chat-list-users-button-making-admin, .chat-list-users-button-deleting-admin{
     background-color: rgb(230, 128, 26);
     border: 0.25rem solid rgb(222, 102, 22);
     border-radius: 6px;
-    margin: 0.5rem;
+    margin: 0.5rem 0 0.5rem 0.5rem;
     padding: 0 0.3rem;
 }
 
-
-.chat-list-users-button-deleting-admin{
-    background-color: rgb(230, 128, 26);
-    border: 0.25rem solid rgb(222, 102, 22);
-    border-radius: 6px;
-    margin: 0.5rem;
-    padding: 0 0.3rem;
-}
-
-.chat-list-users-button-ban-hammer{
+.chat-list-users-button-ban-hammer, .chat-list-users-button-unban-hammer{
     background-color: rgb(230, 26, 26);
     border: 0.25rem solid rgb(194, 0, 0);
     border-radius: 6px;
@@ -59,6 +50,10 @@
     padding: 0 0.3rem;
 }
 
-.chat-list-users-button-unban-hammer{
-
+.chat-list-users-button-mute, .chat-list-users-button-unmute{
+    background-color: rgb(123, 202, 255);
+    border: 0.25rem solid rgb(82, 186, 255);
+    border-radius: 6px;
+    margin: 0.5rem 0 0.5rem 0.5rem;
+    padding: 0 0.3rem;
 }

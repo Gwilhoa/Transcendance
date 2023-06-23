@@ -7,7 +7,7 @@ import {useDispatch} from 'react-redux';
 import {openModal} from '../redux/modal/modalSlice';
 import SocketSingleton from '../socket';
 import axios from 'axios';
-import { setBeginStatus } from '../redux/game/beginToOption';
+import {setBeginStatus} from "../redux/game/beginToOption";
 
 const cookies = new Cookies();
 
@@ -23,7 +23,6 @@ const Head = () => {
 	});
 
 	useEffect(() => {
-		// if (localStorage.getItem('id') === null) {
 			axios.get(process.env.REACT_APP_IP + ':3000/user/id', {
 				headers: {
 					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
@@ -39,11 +38,6 @@ const Head = () => {
 					console.error(error);
 					navigate('/Error');
 				});
-		// } else {
-		// 	setId(localStorage.getItem('id'));
-		// }
-
-		//todo: flo check stp
 	}, [navigate]);
 
 	const handleOpenModal = (id: string | null) => {
