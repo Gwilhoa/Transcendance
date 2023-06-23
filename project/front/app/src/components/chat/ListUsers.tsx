@@ -97,7 +97,7 @@ const UnMuteButton = ({id, channel}: changeChannelProps) => {
 	};
 
 	return (
-		<div className='chat-list-users-button-mute' onClick={handleClickMute}>
+		<div className='chat-list-users-button-unmute' onClick={handleClickMute}>
 			UnMute
 		</div>
 	);
