@@ -40,6 +40,12 @@ const Head = () => {
 				});
 	}, [navigate]);
 
+	useEffect(() => {
+		if (localStorage.getItem('id') == null) {
+			window.location.reload();
+		}
+	}, []);
+
 	const handleOpenModal = (id: string | null) => {
 		dispatch(openModal(id));
 	};

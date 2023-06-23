@@ -4,11 +4,6 @@ import {IUser} from '../utils/interface';
 import {useDispatch} from 'react-redux';
 import {addUser, setUsers, setUsersNull} from '../../redux/search/searchSlice';
 import SocketSingleton from '../../socket';
-import axios from 'axios';
-import Cookies from 'universal-cookie';
-import {setErrorLocalStorage} from '../IfError';
-
-const cookies = new Cookies();
 
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
@@ -24,7 +19,7 @@ const Search = (
 {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
-	const [myId, setMyId] = useState<string | null>(id);
+	const [myId] = useState<string | null>(id);
 	
 
 
@@ -39,24 +34,6 @@ const Search = (
 			socket.emit('research_name', {name: res});
 		}
 	};
-
-	if (myId == '' || myId == null) {
-		axios.get(process.env.REACT_APP_IP + ':3000/user/id', {
-			headers: {
-				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
-			},
-		})
-			.then((response) => {
-				console.log(response.data.id);
-				setMyId(response.data.id);
-				localStorage.setItem('id', response.data.id);
-			})
-			.catch((error) => {
-				setErrorLocalStorage('Error ' + error.response.status);
-				console.error(error);
-				navigate('/Error');
-			});
-	}
 	
 	useEffect(() => {
 		socket.on('research_name', (data: any) => {
