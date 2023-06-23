@@ -32,6 +32,7 @@ export default function Profil() {
 	const [hasFriendRequest, setHasFriendRequest] = useState<number>(0);
 	const id = useSelector((state: RootState) => state.modal.id);
 	const dispatch = useDispatch();
+	const [isUserBlocked, setIsUserBlocked] = useState(false);
 
 	console.log(id);
 	const refresh = useCallback((id: string | null) => {
@@ -87,6 +88,20 @@ export default function Profil() {
 	}, [navigate, dispatch]);
 
 	useEffect(() => {
+		socket.on('block_code',(data) => {
+			console.log(data);
+			if (data.message === 'ok')
+				setIsUserBlocked(true);
+				if (data.message === 'reject')
+					setIsUserBlocked(false);
+				else
+					console.log(data.message);
+		});
+
+		socket.on('receive_challenge', (data: any) => {
+			console.log('receive_challenge');
+		});
+
 		socket.on('friend_code', (data: any) => {
 			console.log(data.code);
 			if (data.code === 2 && !isFriend) {
@@ -243,7 +258,8 @@ export default function Profil() {
 		socket.emit('challenge', {rival_id: id});
 	}
 
-	initialElement.push(
+
+		initialElement.push(
 		<div key='ProfilImage'>
 			<ProfilImage id={'' + id} OnClickOpenProfil={false} OverwriteClassName=''/>
 		</div>
@@ -306,6 +322,15 @@ export default function Profil() {
 		)
 	}
 
+	function handleChangeBlock() {
+			if (isUserBlocked) {
+				socket.emit('unblock_user', {unblock_id:id})
+			}
+			else {
+				socket.emit('block_user', {block_id:id})
+			}
+	}
+
 	return (
 		<div className='profil-modal'>
 			<div className='profil-title'>
@@ -325,6 +350,14 @@ export default function Profil() {
 								<button onClick={() => handlechallenge(id)}>
 									Challenge
 								</button>
+								<button onClick={() => handleChangeBlock()}>
+									{
+										isUserBlocked ? (
+											'unblock'
+										) : 'block'
+									}
+								</button>
+
 							</>
 						) : (
 							<>

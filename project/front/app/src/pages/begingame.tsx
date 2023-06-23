@@ -37,7 +37,6 @@ const BeginGame = () => {
 				console.log('enter matchmaking successfull');
 				gamefound.current = true;
 			} else {
-				console.log('aie aie aie')
 				navigate("/home");
 				alert("Error, you are already in game");
 			}
@@ -49,6 +48,12 @@ const BeginGame = () => {
 			socket.emit('leave_matchmaking')
 			navigate("/optiongame")
 		});
+
+		return () => {
+			socket.emit('leave_matchmaking');
+			socket.off('matchmaking_code');
+			socket.off('game_found');
+		};
 	}, [socket]);
 
 	const spinnerAnimation = useSpring({
