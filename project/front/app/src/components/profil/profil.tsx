@@ -365,7 +365,7 @@ export default function Profil() {
 									Unfriend
 								</button>
 								<br/>
-								<button>
+								<button onClick={() => handlechallenge(id)}>
 									Challenge
 								</button>
 							</>
