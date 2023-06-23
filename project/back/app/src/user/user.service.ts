@@ -526,12 +526,11 @@ export class UserService {
       .createQueryBuilder('user')
       .where('user.username LIKE :name', { name: `%${names}%` })
       .getMany();
+    const ret = [];
     if (user.blockedUsers != null && user.blockedUsers.length > 0) {
       for (const u of users) {
-        for (const blockedUser of user.blockedUsers) {
-          if (blockedUser.id == id) {
-            users.splice(users.indexOf(u), 1);
-          }
+        if (u.id != user.id && includeUser(u, user.blockedUsers)) {
+          ret.push(u);
         }
       }
     }

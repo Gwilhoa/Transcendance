@@ -32,6 +32,7 @@ export class UserGateway implements OnGatewayInit {
     const user_id = client.data.id;
     this.logger.log('research_name + ' + user_id);
     const users = await this.userService.getUserBySimilarNames(name, user_id);
+    console.log(users);
     client.emit('research_name', users);
   }
 
