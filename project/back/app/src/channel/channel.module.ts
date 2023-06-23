@@ -12,14 +12,16 @@ import { AuthModule } from 'src/auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Message } from './message.entity';
 import { RequestFriend } from '../user/requestfriend.entity';
+import { ChannelGateway } from './channel.gateway';
 
 @Module({
   providers: [
-    ChannelService,
     AuthService,
     JwtService,
     ConfigService,
     UserService,
+    ChannelGateway,
+    ChannelService,
   ],
   controllers: [ChannelController],
   imports: [

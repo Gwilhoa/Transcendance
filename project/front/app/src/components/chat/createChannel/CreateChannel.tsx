@@ -36,6 +36,7 @@ const initialChannelState: Channel = {
 	creator: initialUserState,
 	admins: [],
 	bannedUsers: [],
+	mutedUser: [],
 
 }
 
@@ -203,8 +204,8 @@ const CreateChannel = () => {
 								onChange={(e) => handlePasswordChange(e.target.value)}
 							/>
 							{ errorPwd ? 
-								<p>
-									{"password length can't be null"}
+								<p className='chat-create-channel-error-message'>
+									{"* password length can't be null"}
 								</p>
 							:
 								null
@@ -222,8 +223,8 @@ const CreateChannel = () => {
 					</>
 				) : null}
 				{ errorMessage !== '' ? (
-					<p>
-						{errorMessage}
+					<p className='chat-create-channel-error-message'>
+						{'* ' + errorMessage}
 					</p>
 				) : null }
 				<button className='channel-create-channel-button' onClick={() => handleNewChannel()}>New Channel

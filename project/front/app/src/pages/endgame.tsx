@@ -23,10 +23,6 @@ const EndGame = () => {
 	const socket = socketInstance.getSocket();
 	const dispatch = useDispatch();
 
-	socket.on('message_code', (data: any) => {
-		console.log(data);
-	});
-
 	useEffect(() => {
 		return () => {
 			console.log("unmount revenge : " + myrevenge);

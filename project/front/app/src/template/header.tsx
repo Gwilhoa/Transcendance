@@ -7,7 +7,7 @@ import {useDispatch} from 'react-redux';
 import {openModal} from '../redux/modal/modalSlice';
 import SocketSingleton from '../socket';
 import axios from 'axios';
-import { setBeginStatus } from '../redux/game/beginToOption';
+import {setBeginStatus} from "../redux/game/beginToOption";
 
 const cookies = new Cookies();
 
@@ -23,7 +23,6 @@ const Head = () => {
 	});
 
 	useEffect(() => {
-		if (localStorage.getItem('id') === null) {
 			axios.get(process.env.REACT_APP_IP + ':3000/user/id', {
 				headers: {
 					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
@@ -39,13 +38,20 @@ const Head = () => {
 					console.error(error);
 					navigate('/Error');
 				});
-		} else {
-			setId(localStorage.getItem('id'));
-		}
 	}, [navigate]);
 
 	const handleOpenModal = (id: string | null) => {
 		dispatch(openModal(id));
+	};
+
+	const handleChat = () => {
+		navigate('/chat');
+		window.location.reload();
+	};
+
+	const handleHisto = () => {
+		navigate('/history/' + id);
+		window.location.reload();
 	};
 
 	const setData = () => {
@@ -60,15 +66,16 @@ const Head = () => {
 				</Link>
 			</div>
 			<div>
-				<Link to='/chat' className='navbar__link'>
+
+				<button onClick={() => handleChat()} className='navbar__link'>
 					Chat
-				</Link>
+				</button>
 				<Link to="/begingame" className="navbar__link" onClick={setData}>
 					Game
 				</Link>
-				<Link to='/history' className='navbar__link'>
+				<button onClick={() => handleHisto()} className='navbar__link'>
 					History
-				</Link>
+				</button>
 				<button onClick={() => handleOpenModal(id)} className='navbar__link'>
 					Profil
 				</button>

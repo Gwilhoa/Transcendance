@@ -4,5 +4,7 @@ export interface IUser {
 	username: string;
 	enabled2FA: boolean;
 	experience: number;
+	victories: number;
+	defeats: number;
 	status: number;
 }

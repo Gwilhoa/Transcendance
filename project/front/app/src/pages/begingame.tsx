@@ -14,7 +14,7 @@ const socket = socketInstance.getSocket();
 const cookies = new Cookies();
 
 const BeginGame = () => {
-  
+
   const gamefound = useRef(false);
   const gamestate = useSelector((state: RootState) => state.beginToOption.gamestate);
   const navigate = useNavigate();
@@ -41,7 +41,6 @@ const BeginGame = () => {
 				console.log('enter matchmaking successfull');
 				gamefound.current = true;
 			} else {
-				console.log('aie aie aie')
 				navigate("/home");
 				alert("Error, you are already in game");
 			}
@@ -53,7 +52,7 @@ const BeginGame = () => {
           socket.emit('leave_matchmaking')
           navigate("/optiongame")
       });
-      
+
       return () => {
           socket.emit('leave_matchmaking');
           /*socket.off('matchmaking_code');*/
@@ -61,7 +60,7 @@ const BeginGame = () => {
       };
     }, []);
 
-    
+
     const spinnerAnimation = useSpring({
         from: { transform: 'rotate(0deg)' },
         to: { transform: 'rotate(360deg)' },

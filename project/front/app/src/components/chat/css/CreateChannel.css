@@ -81,6 +81,25 @@
     width: 75%;
 }
 
+.chat-users-list-add-user-by-id{
+    margin-top: 2rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 4.5rem;
+}
+
+.chat-add-user-by-id{
+    display: flex;
+}
+
+.chat-add-user-by-id > div{
+    display: flex;
+    align-items: center;
+    margin-right: 0.7rem;
+}
+
 .chat-create-channel-find-user{
     margin: 1rem;
 }
@@ -95,4 +114,9 @@
     background-color: var(--primary-color);
     color: var(--light-color);
     cursor: pointer;
+}
+
+.chat-create-channel-error-message{
+    color : var(--error-color);
+    font-size: 1.125rem;
 }

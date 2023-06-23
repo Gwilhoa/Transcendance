@@ -11,6 +11,8 @@ import {openModal} from '../redux/modal/modalSlice';
 import {Search} from '../components/search/userSearch';
 import axios from 'axios';
 import SocketSingleton from '../socket';
+import Profil from '../components/profil/profil';
+import { ProfilImage } from '../components/profil/ProfilImage';
 
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
@@ -75,22 +77,59 @@ const Add = () => {
 				return;
 			})
 		}
+		return () => {
+			if (listUser == null) {
+				socket.off('friend_code');
+				socket.off('friend_request');
+			}
+		};
 	}, [listUser, refresh, socket]);
 
 	if (listUser == null || listUser.length == 0) {
 		return (
-			<p className='no-friend'>Knowing how to enjoy your own company is an art. <span>Natasha Adamo</span></p>);
+			<p className='home-no-friend'>Knowing how to enjoy your own company is an art. <span>Natasha Adamo</span></p>);
 	}
 	console.log(listUser);
+
+	const handleHistory = (id: string | null) => {
+		navigate('/history/' + id);
+	};
+
+	const handleChallenge = (id: string | null) => {
+		console.log('here we need to implement the channel');
+	};
+
 	return (
-		<div className='users-list'>
+		<div className='home-users-list'>
 			{listUser.map((user) => (
-				<div className='user' key={user.id} onClick={() => dispatch(openModal(user.id))}>
-					<img className='image'
-						src='https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/42_Logo.svg/1200px-42_Logo.svg.png'></img>
-					<p className='name'>{user.username}</p>
-					<p className='status'>{user.status}</p>
-					<p className='xp'>{user.experience}XP</p>
+				<div className='home-users-list-user' key={user.id} onClick={() => dispatch(openModal(user.id))}>
+					<div className='home-users-list-user-info'>
+						<ProfilImage id={user.id} OnClickOpenProfil={true} OverwriteClassName='home-users-list-user-image-profil' />
+						<p className='name'>{user.username}</p>
+						<p className='xp'>{user.experience}XP</p>
+						<p>{user.victories + '/' + user.defeats}</p>
+						<p>
+							{user.defeats + user.victories === 0 ? (
+								null
+							) : (
+								'WR: ' + 
+								((user.victories / (user.defeats + user.victories) * 100).toFixed(2)) + '%'
+							)}</p>
+					</div>
+					<div className='home-users-list-user-buttons'>
+						<button 
+							onClick={() => handleChallenge(user.id)}
+							className='home-users-list-user-buttons-challenge-button'
+						> 
+							Challenge 
+						</button>
+						<button 
+							onClick={() => handleHistory(user.id)}
+							className='home-users-list-user-buttons-hsitory-button'
+						> 
+							history 
+						</button>
+					</div>
 				</div>
 			))}
 		</div>
@@ -98,7 +137,7 @@ const Add = () => {
 }
 
 const Home = () => {
-
+	console.log('start home');
 
 	return (
 		<div className='home'>

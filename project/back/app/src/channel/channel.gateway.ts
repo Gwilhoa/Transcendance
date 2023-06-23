@@ -4,7 +4,7 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { ChannelService } from '../channel/channel.service';
+import { ChannelService } from './channel.service';
 import { Logger } from '@nestjs/common';
 import { Socket } from 'socket.io';
 import { ChannelCode, messageCode } from '../utils/requestcode.enum';
@@ -95,13 +95,15 @@ export class ChannelGateway implements OnGatewayInit {
       }
       if (ch != null) {
         const socket = getSocketFromId(receiver_id, getSockets(this.server));
-        socket.join(channel_id);
-        socket.emit('update_user_channel', {
-          code: 0,
-          channel: ch,
-          sender_id: sender_id,
-          message: 'ok',
-        });
+        if (socket != null) {
+          socket.join(channel_id);
+          socket.emit('update_user_channel', {
+            code: 0,
+            channel: ch,
+            sender_id: sender_id,
+            message: 'ok',
+          });
+        }
         this.server.to(channel_id).emit('update_user_channel', {
           code: 0,
           channel: ch,
@@ -125,28 +127,33 @@ export class ChannelGateway implements OnGatewayInit {
         payload,
       );
     } catch (e) {
-      client.emit('update_user_channel', {
+      client.emit('update_channel', {
         code: 1,
         channel: channel,
         message: e.message,
         sender_id: user_id,
       });
-      this.server.to(channel_id).emit('update_user_channel', {
+    }
+    if (ret == null) {
+      client.emit('update_channel', {
         code: 1,
         channel: channel,
+        message: 'channel not found',
         sender_id: user_id,
       });
+      return;
     }
-    client.emit('update_user_channel', {
+    client.emit('update_channel', {
       code: 0,
-      channel: channel,
-      message: 'ok',
-      sender_id: user_id,
+      channel_id: channel_id,
+      name: ret.name,
+      type: ret.type,
     });
-    this.server.to(channel_id).emit('update_user_channel', {
+    this.server.to(channel_id).emit('update_channel', {
       code: 0,
-      channel: channel,
-      sender_id: user_id,
+      channel_id: channel_id,
+      name: ret.name,
+      type: ret.type,
     });
   }
 
@@ -197,6 +204,7 @@ export class ChannelGateway implements OnGatewayInit {
       } catch (error) {
         send = {
           code: messageCode.INVALID_FORMAT,
+          message: error.message,
         };
         client.emit('message_code', send);
         return;
@@ -301,6 +309,11 @@ export class ChannelGateway implements OnGatewayInit {
       client.emit('update_user_channel', send);
       return;
     } else {
+      if (channel.creator.id == user_id) {
+        this.server.to(channel_id).emit('delete_channel', send);
+        await this.channelService.deletechannel(channel_id);
+        return;
+      }
       client.leave(channel_id);
       send.channel = await this.channelService.leaveChannel(
         user_id,
@@ -480,5 +493,83 @@ export class ChannelGateway implements OnGatewayInit {
       payload.search,
     );
     client.emit('research_channel', { channels: ch });
+  }
+
+  @SubscribeMessage('add_muted')
+  async add_muted(client: Socket, payload: any) {
+    const user_id = client.data.id;
+    const channel_id = payload.channel_id;
+    const muted_id = payload.mute_id;
+    let chan;
+    try {
+      chan = await this.channelService.addMutedUser(
+        muted_id,
+        user_id,
+        channel_id,
+      );
+      client.emit('update_user_channel', {
+        channel: chan,
+        code: 0,
+        sender_id: user_id,
+        message: 'ok',
+      });
+      this.server.to(chan.id).emit('update_user_channel', {
+        channel: chan,
+        code: 0,
+        sender_id: user_id,
+      });
+    } catch (e) {
+      chan = await this.channelService.getChannelById(channel_id);
+      client.emit('update_user_channel', {
+        channel: chan,
+        code: 1,
+        sender_id: user_id,
+        message: e.message,
+      });
+      this.server.to(chan.id).emit('update_user_channel', {
+        channel: chan,
+        code: 1,
+        sender_id: user_id,
+      });
+    }
+  }
+
+  @SubscribeMessage('remove_muted')
+  async remove_muted(client: Socket, payload: any) {
+    const user_id = client.data.id;
+    const channel_id = payload.channel_id;
+    const muted_id = payload.mute_id;
+    let chan;
+    try {
+      chan = await this.channelService.removeMutedUser(
+        muted_id,
+        user_id,
+        channel_id,
+      );
+      client.emit('update_user_channel', {
+        channel: chan,
+        code: 0,
+        sender_id: user_id,
+        message: 'ok',
+      });
+      this.server.to(chan.id).emit('update_user_channel', {
+        channel: chan,
+        code: 0,
+        sender_id: user_id,
+      });
+    } catch (e) {
+      chan = await this.channelService.getChannelById(channel_id);
+      client.emit('update_user_channel', {
+        channel: chan,
+        code: 1,
+        sender_id: user_id,
+        message: e.message,
+      });
+      this.server.to(chan.id).emit('update_user_channel', {
+        channel: chan,
+        code: 1,
+        sender_id: user_id,
+      });
+    }
   }
 }

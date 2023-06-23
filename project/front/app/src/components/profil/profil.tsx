@@ -88,6 +88,20 @@ export default function Profil() {
 	}, [navigate, dispatch]);
 
 	useEffect(() => {
+		socket.on('block_code',(data) => {
+			console.log(data);
+			if (data.message === 'ok')
+				setIsUserBlocked(true);
+				if (data.message === 'reject')
+					setIsUserBlocked(false);
+				else
+					console.log(data.message);
+		});
+
+		socket.on('receive_challenge', (data: any) => {
+			console.log('receive_challenge');
+		});
+
 		socket.on('friend_code', (data: any) => {
 			console.log(data.code);
 			if (data.code === 2 && !isFriend) {
@@ -102,6 +116,7 @@ export default function Profil() {
 					})
 					.then((response) => {
 						console.log(response);
+						socket.emit('join_channel', {channel_id: response.data.id});
 					})
 					.catch((error) => {
 						console.error(error);
@@ -115,10 +130,12 @@ export default function Profil() {
 				setIsFriend(!isFriend);
 			}
 		})
-		
-		
-		
+
+
+
 		socket.on('friend_request', (data: any) => {
+			console.log('frend request :');
+			console.log(data);
 			console.log('friend request => ' + data.code);
 			if (data.id == id && (data.code == 2 || data.code == 7 || data.code == 5)) {
 				setIsFriend(!isFriend);
@@ -128,6 +145,8 @@ export default function Profil() {
 		return () => {
 			socket.off('friend_request');
 			socket.off('friend_code');
+			socket.off('receive_challenge');
+			socket.off('block_code');
 		}
 	}, [isFriend]);
 
@@ -177,7 +196,7 @@ export default function Profil() {
 				console.error(error);
 				setErrorName(true);
 				const message = '' + error.response.data;
-				setErrorNameMessage(message.substr(19));
+				setErrorNameMessage(message.substring(19));
 			});
 	}
 
@@ -189,11 +208,11 @@ export default function Profil() {
 			setIsUserBlocked(true);
 			if (data.message === 'reject')
 			setIsUserBlocked(false);
-			else 
+			else
 			console.log(data.message);
 		});
 	}, []);
-		
+
 	const clicked = () => {
 		if (!checked) {
 			navigate('/CreateTwoFa');
@@ -234,6 +253,12 @@ export default function Profil() {
 					navigate('/Error');
 				});
 		}
+	};
+
+	const handleHistory = (id: string | null) => {
+		navigate('/history/' + id);
+		dispatch(closeModal());
+		window.location.reload();
 	};
 
 	const handleAddFriend = (id: string | null) => {
@@ -329,6 +354,15 @@ export default function Profil() {
 		)
 	}
 
+	function handleChangeBlock() {
+			if (isUserBlocked) {
+				socket.emit('unblock_user', {unblock_id:id})
+			}
+			else {
+				socket.emit('block_user', {block_id:id})
+			}
+	}
+
 	return (
 		<div className='profil-modal'>
 			<div className='profil-title'>
@@ -338,9 +372,9 @@ export default function Profil() {
 			<div>
 				{initialElement}
 				{!isMe ? (
-					<>
+					<div className='other-user-profil'>
 						{!isFriend ? (
-							<div className='other-user-profil'>
+							<>
 								<button onClick={() => handleAddFriend(id)}>
 									{hasFriendRequest == 1 ? 'accept request' : hasFriendRequest == 2 ? 'waiting' : 'add friend'}
 								</button>
@@ -356,19 +390,31 @@ export default function Profil() {
 										) : 'block'
 									}
 								</button>
-							</div>
+								<button onClick={() => handleChangeBlock()}>
+									{
+										isUserBlocked ? (
+											'unblock'
+										) : 'block'
+									}
+								</button>
+
+							</>
 						) : (
-							<div className='other-user-profil'>
+							<>
 								<button onClick={() => handleUnFriend(id)}>
 									Unfriend
 								</button>
 								<br/>
-								<button>
+								<button onClick={() => handlechallenge(id)}>
 									Challenge
 								</button>
-							</div>
+							</>
 						)}
-					</>
+						<br />
+						<button onClick={() => handleHistory(id)}>
+							history
+						</button>
+					</div>
 				) : (<></>)}
 			</div>
 			<br/>

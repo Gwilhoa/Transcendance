@@ -15,7 +15,8 @@ import ListUserChannel from '../components/chat/ListUsers';
 import axios from 'axios';
 import {cookies} from '../App';
 import {useNavigate} from 'react-router-dom';
-import { switchChatModalListUser } from '../redux/chat/modalChatSlice';
+import { closeChatModalListUser, switchChatModalListUser, switchChatModalUpdateChannel } from '../redux/chat/modalChatSlice';
+import {it} from "node:test";
 
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
@@ -39,6 +40,7 @@ export interface Channel {
 	users: Array<User>;
 	admins: Array<User>;
 	bannedUsers: Array<User>;
+	mutedUser: Array<User>;
 }
 
 export interface Message {
@@ -72,10 +74,18 @@ export const initialChannelState: Channel = {
 	creator: initialUserState,
 	admins: [],
 	bannedUsers: [],
+	mutedUser: [],
 }
 
 export const isAdmin = (channel: Channel) => {
 		if (channel.admins.some((admin) => admin.id === localStorage.getItem('id'))) {
+			return (true);
+		}
+		return (false);
+};
+
+export const isBan = (channel: Channel, user: User) => {
+		if (channel.bannedUsers.some((banned) => banned.id === user.id)) {
 			return (true);
 		}
 		return (false);
@@ -89,7 +99,9 @@ export const isMe = (user: User) => {
 };
 
 const updateAvailableChannel = (input: string) => {
-	console.log(input);
+	if (input === '') {
+		return;
+	}
 	socket.emit('research_channel', {search: input})
 }
 ////////////////////////// CHAT ///////////////////////////////////////////////
@@ -109,12 +121,14 @@ function Chat() {
 
 	const [conversationId, setConversationId] = useState<string>('');
 	const [updateChannel, setUpdateChannel] = useState<number>(0);
+	const [errorUpdateChannel, setErrorUpdateChannel] = useState<string>('');
 
 	const [messages, setMessages] = useState<Array<Message>>([]);
 	const [errorGetMessage, setErrorGetMessage] = useState<boolean>(false);
 	const [errorPostMessage, setErrorPostMessage] = useState<string>('');
 	const [sendMessage, setSendMessage] = useState<boolean>(false);
 
+	const [password] = useState<Map<string, string>>(new Map());
 ////////////////////////// FETCH DATA /////////////////////////////////////////
 	const fetchAvailableChannel = async () => {
 		try {
@@ -207,7 +221,7 @@ function Chat() {
 	const handleResearchChannel = (data: any) => {
 		console.log('research_channel');
 		console.log(data);
-		if (data.channels.length == 0)
+		if (!data.channels || data.channels.length == 0)
 			return;
 		setListAvailableChannel(data.channels);
 	}
@@ -242,6 +256,17 @@ function Chat() {
 			setUpdateChannel(0);
 		}
 	};
+
+	const handleJoinChannel = (channel_id: string) => {
+		console.log('join_channel');
+		console.log(password.get(channel_id));
+		if (password.get(channel_id)) {
+			socket.emit('join_channel', {channel_id: channel_id, password: password.get(channel_id)});
+			return;
+		} else {
+			socket.emit('join_channel', {channel_id: channel_id});
+		}
+	}
 
 	const handleUserCode = (data: any) => {
 		console.log('user_join');
@@ -286,6 +311,7 @@ function Chat() {
 		console.log(data);
 		if (conversationId == data.id) {
 			setConversationId('');
+			dispatch(closeChatModalListUser());
 		}
 		setListChannel((prevListChannel) =>
 			prevListChannel.filter((itemChannel) => itemChannel.id !== data.id)
@@ -293,17 +319,21 @@ function Chat() {
 	};
 
 	const handleUpdateChannel = (data: any) => {
-		console.log('HEY I CHANGE NAME : ' + data?.channel_id + " :" + conversationId);
-		setListChannel((prevListChannel) =>
-			prevListChannel.map((itemChannel) => {
-				if (itemChannel.id === data.channel_id) {
-					return {...itemChannel, name: data.name};
-				}
-				return itemChannel;
-			})
-		)
-		if (data.channel_id === conversationId) {
-			setChannel((prevChannel) => ({...prevChannel, name: data.name}));
+		console.log('update_channel');
+		console.log(data);
+		if (data.code == 0) {
+			console.log('HEY I CHANGE NAME : ' + data?.channel_id + " :" + conversationId);
+			setListChannel((prevListChannel) =>
+				prevListChannel.map((itemChannel) => {
+					if (itemChannel.id === data.channel_id) {
+						return {...itemChannel, name: data.name, type: data.type};
+					}
+					return itemChannel;
+				})
+			);
+			if (data.channel_id === conversationId) {
+				setChannel((prevChannel) => ({...prevChannel, name: data.name, type: data.type}));
+			}
 		}
 	};
 
@@ -312,17 +342,19 @@ function Chat() {
 		findChannel();
 		console.log('change channel');
 
+		socket.on('join_channel', handleJoinChannel);
 		socket.on('message', handleMessage);
 		socket.on('message_code', handleMessageCode);
-		socket.on('update_channel', handleUpdateChannel);
 		socket.on('delete_channel', handleDeleteChannel);
+		socket.on('update_channel', handleUpdateChannel);
 
 		return () => {
+			socket.off('update_channel');
+			socket.off('join_channel');
 			socket.off('delete_channel');
 			socket.off('message');
 			socket.off('message_code');
 			setErrorPostMessage('');
-			socket.off('update_channel');
 		};
 	},[conversationId, updateChannel]);
 
@@ -347,6 +379,7 @@ function Chat() {
 					channel={channel}
 					errorGetMessage={errorGetMessage}
 				/>
+				{ errorUpdateChannel != '' ? <p>errorUpdateChannel</p> : null}
 				<SendMessage
 					conversation={conversationId}
 					errorPostMessage={errorPostMessage}
@@ -357,12 +390,16 @@ function Chat() {
 			) : (
 				<div className='chat-page-channel'>
 					<h1>Channels disponible</h1>
-					<input onChange={(e) => updateAvailableChannel(e.target.value)}/>
+					<input className='chat-page-channels-input' placeholder='Search channel' onChange={(e) => updateAvailableChannel(e.target.value)}/>
 					{ listAvailableChannel.length > 0 ? (
 						listAvailableChannel.map((itemChannel) => (
 							<div className='chat-page-channels-channel' key={itemChannel.id}>
 								<p>{itemChannel.name}</p>
-								<button>Join</button>
+								{itemChannel.type == 2 ? (
+									<input className='chat-page-channel-password-input' placeholder='Password' onChange={event => password.set(itemChannel.id, event.target.value)}/>
+								) : null
+								}
+								<button onClick={(e) => handleJoinChannel(itemChannel.id)}>Join</button>
 							</div>
 						))
 					) : null

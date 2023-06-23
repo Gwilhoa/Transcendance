@@ -58,6 +58,7 @@ export class Game {
   private _time_stop_user2: number;
   private _loop_stop: NodeJS.Timeout;
   private _started: boolean;
+  private _endgame: boolean;
 
   public constructor(
     id: string,
@@ -65,12 +66,10 @@ export class Game {
     user2: Socket,
     io: Server,
     gameService: GameService,
-    finishCallback = [],
   ) {
     this._id = id;
     this._user1 = user1;
     this._user2 = user2;
-    this._finishCallback = finishCallback;
     this._rack1y = Game.default_positionR;
     this._rack2y = Game.default_positionR;
     this._score1 = 0;
@@ -93,6 +92,7 @@ export class Game {
     this._time_stop_user1 = Game.default_maxtimestop;
     this._time_stop_user2 = Game.default_maxtimestop;
     this._started = false;
+    this._endgame = false;
   }
 
   public getId() {
@@ -284,10 +284,11 @@ export class Game {
       this._score1 = this.endBattle(this._score1);
       if (this._score1 >= Game.default_victorygoal) {
         await this.endWar(this._user1, this._user2, 1);
+        this.clear();
         return;
       } else {
         this.clear();
-        this.start();
+        await this.start();
         return;
       }
     }
@@ -299,7 +300,7 @@ export class Game {
         return;
       } else {
         this.clear();
-        this.start();
+        await this.start();
         return;
       }
     }
@@ -308,7 +309,7 @@ export class Game {
       (this._futurballx < this._minX + (Game.default_radiusball + 1)) || (
       this._futurballx > (this._maxX - (Game.default_radiusball + 1)))
     ) {
-      if (this._futurballx < this._minX + Game.default_radiusball + 1) {
+      if (this._futurballx < this._minX + Game.default_radiusball) {
         const distbar =
           this._futurballx - (this._minX + Game.default_radiusball);
         this._futurballx -= 2 * distbar;
@@ -321,7 +322,7 @@ export class Game {
     }
     this._ballx = this._futurballx;
     this._bally = this._futurbally;
-  
+
     this._io.to(this._id).emit('update_game', this.getGameInfo());
   };
 
@@ -340,7 +341,7 @@ export class Game {
     this._user2.leave(this._id);
     this._user1.leave(this._id);
     this.clear();
-    this.executeFinishCallbacks();
+    return;
   }
 
   public clear() {
@@ -374,6 +375,8 @@ export class Game {
   };
 
   private endWar = async (userWin: Socket, userDefeat: Socket, winuser) => {
+    if (this._endgame) return;
+    this._endgame = true;
     this._time_stop_user1 = Game.default_maxtimestop;
     this._time_stop_user2 = Game.default_maxtimestop;
     console.log('game finish ' + this._id);
@@ -409,7 +412,6 @@ export class Game {
       adversary: losename,
     });
     this.clear();
-    this.executeFinishCallbacks();
   };
 
   private endBattle = (scoreWin: number): number => {
@@ -426,8 +428,4 @@ export class Game {
     }
     return scoreWin;
   };
-
-  private executeFinishCallbacks() {
-    this._finishCallback.forEach((callback) => callback());
-  }
 }

@@ -1,40 +1,101 @@
 import './css/history.css'
 import React, {useEffect, useState} from 'react';
 import ErrorToken, {setErrorLocalStorage} from '../components/IfError';
-import {useNavigate} from 'react-router-dom';
+import {useNavigate, useParams} from 'react-router-dom';
 import {cookies} from '../App'
 import {useDispatch} from 'react-redux';
 import {openModal} from '../redux/modal/modalSlice';
 import axios from 'axios';
+import { User } from './chat';
 
-
-interface ShowScore {
-	status: string;
-	myScore: string;
-	opponentScore: string;
-	opponentId: string;
-	myUsername: string;
-	opponentUsername: string;
+interface Game {
+	finished: string;
+	id: string;
+	score1: number;
+	score2: number;
+	user1: User;
+	user2: User;
 }
 
-const vistoryScore = 3;
-
-const OneScoreBlock = ({status, myScore, opponentScore, opponentId, myUsername, opponentUsername}: ShowScore) => {
+const OneScoreBlock = ({ game, playerId }: { game: Game, playerId: string }) => {
 	const navigate = useNavigate();
-	const [image, setImage] = useState<string>('');
-	const [user1Image, setUser1Image] = useState<string>('');
-	const [user2Image, setUser2Image] = useState<string>('');
-	const id = localStorage.getItem('id');
 	const dispatch = useDispatch();
+
+	const [leftImage, setLeftImage] = useState<string>('');
+	const [rightImage, setRightImage] = useState<string>('');
+
+	const [leftUser, setLeftUser] = useState<User>(game.user1);
+	const [leftScore, setLeftScore] = useState<number>(game.score1);
+
+	const [rightUser, setRightUser] = useState<User>(game.user2);
+	const [rightScore, setRightScore] = useState<number>(game.score2);
+
+	const [userWinner, setUserWinner] = useState<number>(1);
+
+	
+	const [messageWinner, setMessageWinner] = useState<string>('');
+
+
 	useEffect(() => {
-		axios.get(process.env.REACT_APP_IP + ':3000/user/image/' + id, {
+		console.log('try it')
+		if (game.score2 > game.score1) {
+			setUserWinner(2);
+		}
+		if (playerId == localStorage.getItem('id')) {
+			if (game.user2.id == '' + localStorage.getItem('id')) {
+				setLeftUser(game.user2);
+				setLeftScore(game.score2)
+				setRightUser(game.user1);
+				setRightScore(game.score1);
+				if (userWinner == 2) {
+					setMessageWinner('You won');
+				}
+				else {
+					setMessageWinner('You loose');
+				}
+			}
+			else {
+				if (userWinner == 1) {
+					setMessageWinner('You won');
+				}
+				else {
+					setMessageWinner('You loose');
+				}
+			}
+		}
+		else {
+			if (game.user2.id == playerId) {
+				setLeftUser(game.user2);
+				setLeftScore(game.score2)
+				setRightUser(game.user1);
+				setRightScore(game.score1);
+				if (userWinner == 2) {
+					setMessageWinner(game.user2.username + ' won');
+				}
+				else {
+					setMessageWinner(game.user2.username + ' loose');
+				}
+			}
+			else {
+				if (userWinner == 1) {
+					setMessageWinner(game.user1.username + ' won');
+				}
+				else {
+					setMessageWinner(game.user1.username + ' loose');
+				}
+			}
+		}
+	}, [playerId, game]);
+
+	useEffect(() => {
+		axios.get(process.env.REACT_APP_IP + ':3000/user/image/' + playerId, {
 			headers: {
 				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
 			},
 		})
 			.then((response) => {
 				const data = response.data;
-				setUser1Image(data);
+				setLeftImage(data);
 			})
 			.catch((error) => {
 				setErrorLocalStorage('Error ' + error.response.status);
@@ -42,14 +103,21 @@ const OneScoreBlock = ({status, myScore, opponentScore, opponentId, myUsername, 
 				navigate('/Error');
 				return;
 			});
-		axios.get(process.env.REACT_APP_IP + ':3000/user/image/' + opponentId, {
+		let image;
+		if (game.user1.id == playerId) {
+			image = game.user2.id;
+		}
+		else {
+			image = game.user1.id;
+		}
+		axios.get(process.env.REACT_APP_IP + ':3000/user/image/' + image, {
 			headers: {
 				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
 			},
 		})
 			.then((response) => {
 				const data = response.data;
-				setUser2Image(data);
+				setRightImage(data);
 			})
 			.catch((error) => {
 				setErrorLocalStorage('Error ' + error.response.status);
@@ -57,110 +125,125 @@ const OneScoreBlock = ({status, myScore, opponentScore, opponentId, myUsername, 
 				navigate('/Error');
 				return;
 			});
-	}, [id, navigate, opponentId]);
+	}, [leftUser, rightUser, navigate, playerId, game]);
+
+	if (messageWinner == '') {
+		return null;
+	}
 
 	return (
 		<div className='score-block'>
-			<h3 className='status'>{status}</h3>
+			<h3 className='status'>{messageWinner}</h3>
 			<div className='history-score'>
 				<div className='player'>
-					<img className='image' src={user1Image} onClick={() => dispatch(openModal(id))}
-						title={myUsername}></img>
-					<p>{myScore}</p>
+					<img className='image' src={leftImage} onClick={() => dispatch(openModal(leftUser.id))}
+						title={leftUser.username}></img>
+					<p>{leftScore}</p>
 				</div>
 				<p>against</p>
 				<div className='player'>
-					<img className='image' src={user2Image} onClick={() => dispatch(openModal(opponentId))}
-						title={opponentUsername}></img>
-					<p>{opponentScore}</p>
+					<img className='image' src={rightImage} onClick={() => dispatch(openModal(rightUser.id))}
+						title={rightUser.username}></img>
+					<p>{rightScore}</p>
 				</div>
 			</div>
 		</div>
 	);
 };
 
-function getUserIndex(game: any) {
-	const id = localStorage.getItem('id');
-	if (game.user1.id == id)
-		return 1;
-	return 2;
-}
-
-
-const Add = () => {
-	const blocks = [];
-	const [response, setResponse] = useState<any>(null);
+const ListBlockScore = ({ userId, username }: { userId: string, username: string }) => {
+	const [listGame, setListGame] = useState<Array<Game>>([]);
 
 	const navigate = useNavigate();
 	useEffect(() => {
-		axios.get(process.env.REACT_APP_IP + ':3000/game', {
+		console.log(process.env.REACT_APP_IP + ':3000/game/history/' + userId);
+		axios.get(process.env.REACT_APP_IP + ':3000/game/history/' + userId, {
 			headers: {
 				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
 			},
 		})
-			.then((res) => {
-				console.log(res);
-				setResponse(res.data);
+			.then((response) => {
+				console.log('here response histo');
+				console.log(response);
+				setListGame(response.data);
 			})
 			.catch((error) => {
 				console.error(error);
 				setErrorLocalStorage(error.response.status);
 				navigate('/Error');
 			})
-	}, [navigate]);
-	console.log('toto');
+	}, []);
 
-	if (response == null || response.length == 0) {
-		return (<p className='no-game-played'>{"You don't have played a game yet!"}</p>);
-	}
-	console.log(response)
-	let i = 0;
-	for (const game of response) {
-		let status: string;
-		status = game.finished;
-		if (status != 'REMAKE') {
-			if (game.user1.id == localStorage.getItem('id') && game.score1 > game.score2)
-				status = 'Victory';
-			else
-				status = 'Defeat';
-		} else
-			status = 'Remake';
-		let myScore: string;
-		let opponentScore: string;
-		let opponentId: string;
-		let myUsername: string;
-		let opponentUsername: string;
-		if (getUserIndex(game) == 1) {
-			myScore = game.score1;
-			opponentScore = game.score2;
-			opponentId = game.user2.id;
-			myUsername = game.user1.username;
-			opponentUsername = game.user2.username;
-		} else {
-			myScore = game.score2;
-			opponentScore = game.score1;
-			opponentId = game.user1.id;
-			myUsername = game.user2.username;
-			opponentUsername = game.user1.username;
+	if (listGame == null || listGame.length == 0) {
+		if (userId == '' + localStorage.getItem('id')) {
+			return (<p className='no-game-played'>{"You don't have played a game yet!"}</p>);
 		}
-		blocks.push(
-			<OneScoreBlock
-				status={status}
-				myScore={myScore}
-				opponentScore={opponentScore}
-				opponentId={opponentId}
-				myUsername={myUsername}
-				opponentUsername={opponentUsername}
-				key={i}
-			/>
-		)
-		i++;
+		else {
+			return (<p className='no-game-played'>{ username + " has never yet played a game"}</p>);
+		}
 	}
-	return <div className='score-board'>{blocks}</div>;
+
+	return (
+		<div className='score-board'>
+			{
+				listGame.map((itemGame) => (
+					itemGame.finished == 'FINISHED' ? (
+						<div key={itemGame.id}>
+							<OneScoreBlock
+								game={itemGame}
+								playerId={userId}
+							/>
+						</div>
+					) : (
+						<div key={itemGame.id}></div>
+					)))
+			}
+		</div>
+	);
 }
 
 const History = () => {
-	console.log('aaa');
+	const navigate = useNavigate();
+	const [username, setUsername] = useState<string>('');
+	const { id } = useParams();
+
+		const fetchDataUser = (userId: string) => {
+				if (id != null) {
+				axios.get(process.env.REACT_APP_IP + ':3000/user/id/' + userId, {
+					headers: {
+						Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+					},
+				})
+					.then((response) => {
+						console.log(response);
+						setUsername(response.data.username);
+					})
+					.catch((error) => {
+						if (error.response.status == 401 || error.response.status == 500) {
+							setErrorLocalStorage('Error ' + error.response.status);
+							console.error(error);
+							navigate('/Error');
+						}
+						else (
+							navigate('/home')
+						)
+					});
+			}
+			else {
+				navigate('/home');
+			}
+		};
+
+	useEffect(() => {
+		console.log(id);
+		if (id != null) {
+			fetchDataUser(id);
+		}
+	}, [id, navigate]);
+
+	if (id == '' || id == null) {
+		return (null);
+	}
 	return (
 		<div className='page-history'>
 			<ErrorToken/>
@@ -170,7 +253,7 @@ const History = () => {
 				</div>
 			</header>
 			<div className='scrollBlock'>
-				<Add/>
+				<ListBlockScore userId={id} username={username} />
 			</div>
 		</div>
 	);

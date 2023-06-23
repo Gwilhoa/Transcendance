@@ -74,22 +74,6 @@ export class ChannelController {
     return response.status(201).send(ret);
   }
 
-  @Post('leave')
-  async leaveChannel(
-    @Body() body: LeaveChannelDto,
-    @GetUser('sub') user_id: string,
-    @Res() response,
-  ) {
-    let ret;
-    try {
-      ret = await this.channelService.leaveChannel(user_id, body.channel_id);
-    } catch (e) {
-      response.status(400).send(e.message);
-      return;
-    }
-    return response.status(200).send(ret);
-  }
-
   @Post('admin')
   async addAdmin(
     @Body() body: addAdminDto,
@@ -237,5 +221,22 @@ export class ChannelController {
       return resp.status(204).send('No content');
     }
     return resp.status(200).send(channels);
+  }
+
+  @Post('modifychannel/:id')
+  async modifyChannel(
+    @GetUser('sub') user_id,
+    @Param('id') channel_id,
+    @Body() body,
+    @Res() resp,
+  ) {
+    let ret;
+    try {
+      ret = await this.channelService.updateChannel(channel_id, user_id, body);
+    } catch (e) {
+      resp.status(400).send(e.message);
+      return;
+    }
+    return resp.status(200).send(ret);
   }
 }

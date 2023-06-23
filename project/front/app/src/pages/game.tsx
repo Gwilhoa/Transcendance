@@ -26,17 +26,17 @@ const Game: React.FC<GameProps> = () => {
 
 	const navigate = useNavigate();
 	const gameId = useSelector((state: RootState) => state.beginToOption.gameid);
-	
+
 	const [ball, setBall] = useState({x: 50, y: 50});
 	const [paddle1, setPaddle1] = useState(42.5);
 	const [paddle2, setPaddle2] = useState(42.5);
 	const [color1, setColor1] = useState("white");
 	const [color2, setColor2] = useState("white");
 	const [started, setStarted] = useState("");
-	
+
 	const playerstats = useSelector((state: RootState) => state.beginToOption.playerstate);
-	
-	
+
+
 	const [nbBall, setNbBall] = useState('button1');
 	const [nbMap, setNbMap] = useState('map1');
 	const [isPowerup, setIsPowerup] = useState(false);
@@ -46,16 +46,16 @@ const Game: React.FC<GameProps> = () => {
 	const dispatch = useDispatch();
 	const finalStatus = useSelector((state: RootState) => state.finalGame.finalStatus);
 	const [IamStoper, setIamStoper] = useState(false);
-	
+
 	const socketInstance = SocketSingleton.getInstance();
 	const socket = socketInstance.getSocket();
 	const gamestate = useSelector((state: RootState) => state.beginToOption.gamestate);
-	
+
 	const ballStyles = {
 		top: `${ball.x - 2}%`,
 		left: `${ball.y - 1}%`,
 	};
-	
+
 	const handleKeyPress = (event: KeyboardEvent) => {
 		switch (event.code) {
 			case 'KeyW':
@@ -84,20 +84,20 @@ const Game: React.FC<GameProps> = () => {
 				break;
 		}
 	};
-	
+
 	const leaveGame = () => {
 		//socket.emit('leave_game');
 	}
-	
+
 	const resumeGame = () => {
 		socket.emit("input_game", {game_id: gameId, type: 2})
 	}
-	
+
 	socket.on('create_game', (any) => {
 		console.log('WESH')
 		console.log(any);
 	})
-	
+
 	socket.on('will_started', (data) => {
 		if (data.time == 0) {
 			setStarted("0 | 0");
@@ -105,8 +105,8 @@ const Game: React.FC<GameProps> = () => {
 			setStarted(data.time);
 		}
 	});
-	
-	
+
+
 	useEffect(() => {
 		let isCall = true;
 		if (gamestate != 2) {
@@ -185,7 +185,7 @@ const Game: React.FC<GameProps> = () => {
         socket.off('option_receive');
         socket.off('create_game');*/
         leaveGame();
-      
+
 		};
 	}, []);
 

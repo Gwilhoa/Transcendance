@@ -4,7 +4,7 @@ import React, {useCallback, useEffect, useState} from 'react'
 import {useDispatch, useSelector} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
 import {cookies} from '../../../App';
-import {Channel} from '../../../pages/chat';
+import {Channel, isBan} from '../../../pages/chat';
 import {switchChatModalInviteChannel} from '../../../redux/chat/modalChatSlice';
 import {RootState} from '../../../redux/store';
 import SocketSingleton from '../../../socket';
@@ -13,6 +13,7 @@ import {ProfilImage} from '../../profil/ProfilImage';
 import {ProfilName} from '../../profil/ProfilName';
 import {Search} from '../../search/userSearch';
 import {IUser} from '../../utils/interface';
+import {User} from '../../../pages/chat';
 
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
@@ -21,9 +22,10 @@ type AddUserIdProps = {
 	usersId: Array<string>;
 	setUserId: React.Dispatch<React.SetStateAction<Array<string>>>;
 	channelId: string;
+	channel: Channel
 };
 
-const AddUserId = ({usersId, setUserId, channelId}: AddUserIdProps) => {
+const AddUserId = ({usersId, setUserId, channelId, channel}: AddUserIdProps) => {
 	const [listUser, setListUser] = useState<Array<IUser> | null>([]);
 
 	const navigate = useNavigate();
@@ -73,7 +75,7 @@ const AddUserId = ({usersId, setUserId, channelId}: AddUserIdProps) => {
 	return (
 		<div className='chat-channel-invite-add-user-by-id'>
 			{listUser.slice(0, 6).map((user) => (
-				!usersId.includes(user.id) ? (
+				!usersId.includes(user.id) && !isBan(channel, user) ? (
 					<div className='chat-invite-people-user' key={user.id} onClick={() => handleOnClick(user.id)}>
 						<ProfilImage id={user.id} OnClickOpenProfil={false}
 							OverwriteClassName='chat-small-user-image'/>
@@ -91,7 +93,7 @@ const InviteChannel = ({channel}: { channel: Channel }) => {
 	const [usersId, setUserId] = useState<Array<string>>([]);
 
 	useEffect(() => {
-		channel.users.map((element: IUser) => {
+		channel.users.map((element: User) => {
 			setUserId((prevList) => [...prevList, element.id]);
 		});
 	}, []);
@@ -109,6 +111,7 @@ const InviteChannel = ({channel}: { channel: Channel }) => {
 						<div className='chat-side-bar-invite-channel'>
 							<Search defaultAllUsers={true} OverwriteClassName={'chat-side-bar-invite-channel-input'}/>
 							<AddUserId
+								channel={channel}
 								usersId={usersId}
 								setUserId={setUserId}
 								channelId={channel.id}

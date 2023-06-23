@@ -10,6 +10,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UserStatus } from '../utils/user.enum';
 import { WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server } from 'socket.io';
+import { includeUser } from '../utils/socket.function';
 
 @WebSocketGateway({
   cors: {
@@ -274,6 +275,7 @@ export class UserService {
       .leftJoinAndSelect('channels.admins', 'admins')
       .leftJoinAndSelect('channels.creator', 'creator')
       .leftJoinAndSelect('channels.bannedUsers', 'bannedUsers')
+      .leftJoinAndSelect('channels.mutedUser', 'mutedUser')
       .where('user.id = :id', { id })
       .getOne();
     if (!user) {
@@ -514,7 +516,11 @@ export class UserService {
     return user.games;
   }
 
-  public async getUserBySimilarNames(names: string, id: string) {
+  public async getUserBySimilarNames(
+    names: string,
+    id: string,
+    gethimself = false,
+  ) {
     const user = await this.userRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.blockedUsers', 'blockedUsers')
@@ -524,19 +530,16 @@ export class UserService {
       .createQueryBuilder('user')
       .where('user.username LIKE :name', { name: `%${names}%` })
       .getMany();
-    if (user.blockedUsers != null && user.blockedUsers.length > 0) {
-      for (const u of users) {
-        for (const blockedUser of user.blockedUsers) {
-          if (blockedUser.id == id) {
-            users.splice(users.indexOf(u), 1);
-          }
-        }
+    const ret = [];
+    for (const u of users) {
+      if (u.id == user.id && gethimself == true) {
+        ret.push(u);
+      }
+      if (!includeUser(u, user.blockedUsers) && u.id != user.id) {
+        ret.push(u);
       }
     }
-    if (users == null) {
-      return null;
-    }
-    return users;
+    return ret;
   }
 
   public async changeStatus(id: string, status: number) {
@@ -594,21 +597,28 @@ export class UserService {
   }
 
   async removeBlocked(id: string, blocked_id: string) {
-    const user = await this.userRepository.findOneBy({ id: id });
-    const blocked_user = await this.userRepository.findOneBy({
-      id: blocked_id,
-    });
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.blockedUsers', 'blockedUsers')
+      .where('user.id = :id', { id: id })
+      .getOne();
+    const blocked_user = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.blockedUsers', 'blockedUsers')
+      .where('user.id = :id', { id: blocked_id })
+      .getOne();
     if (user == null || blocked_user == null) {
       throw new Error('User not found');
     }
-    if (
-      user.blockedUsers.find((element) => element.id == blocked_user.id) == null
-    ) {
+    if (includeUser(blocked_user, user.blockedUsers) == false) {
       throw new Error('User not blocked');
     }
-    user.blockedUsers = user.blockedUsers.filter(
-      (element) => element.id != blocked_user.id,
-    );
+    const blocks = [];
+    for (const block of user.blockedUsers) {
+      if (block.id != blocked_id) {
+        blocks.push(block);
+      }
+    }
     return await this.userRepository.save(user);
   }
 

@@ -13,8 +13,6 @@ import { GameService } from 'src/game/game.service';
 import { Game } from 'src/game/game.entity';
 import { Message } from '../channel/message.entity';
 import { RequestFriend } from '../user/requestfriend.entity';
-import { UserGateway } from './user.gateway';
-import { ChannelGateway } from './channel.gateway';
 
 @Module({
   imports: [
@@ -28,8 +26,6 @@ import { ChannelGateway } from './channel.gateway';
   ],
   controllers: [],
   providers: [
-    UserGateway,
-    ChannelGateway,
     EventsGateway,
     UserService,
     AuthService,
