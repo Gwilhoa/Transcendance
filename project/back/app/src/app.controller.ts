@@ -10,29 +10,4 @@ export class AppController {
     return this.appService.getHello();
   }
 
-  @Get('addbot')
-  async addbot(@Res() res) {
-    this.appService.addbot();
-    return res.status(400).send('ok');
-  }
-
-  @Get('addfriend/:id')
-  async addfriend(@Res() res, @Param('id') id) {
-    try {
-      this.appService.addfriend(id);
-    } catch (e) {
-      return res.status(400).send('Bad User');
-    }
-    return res.status(200).send('ok');
-  }
-
-  @Get('addgame/:id')
-  async addgame(@Res() res, @Param('id') id) {
-    try {
-      this.appService.addgame(id);
-    } catch (e) {
-      return res.status(400).send('Bad User');
-    }
-    return res.status(200).send('ok');
-  }
 }

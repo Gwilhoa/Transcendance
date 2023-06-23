@@ -4,7 +4,7 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { UserService } from '../user/user.service';
+import { UserService } from './user.service';
 import { Logger } from '@nestjs/common';
 import { Socket } from 'socket.io';
 import { getSocketFromId, getSockets } from '../utils/socket.function';

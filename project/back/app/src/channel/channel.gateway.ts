@@ -4,7 +4,7 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { ChannelService } from '../channel/channel.service';
+import { ChannelService } from './channel.service';
 import { Logger } from '@nestjs/common';
 import { Socket } from 'socket.io';
 import { ChannelCode, messageCode } from '../utils/requestcode.enum';

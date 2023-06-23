@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import {Inject, Injectable} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { addAdminDto } from 'src/dto/add-admin.dto';
 import { CreateChannelDto } from 'src/dto/create-channel.dto';
@@ -48,6 +48,7 @@ export class ChannelService {
       }
     }
     chan = await this.channelRepository.save(chan);
+    this.server.emit('newChannel', chan);
     return chan;
   }
 
@@ -559,9 +560,5 @@ export class ChannelService {
     }
     channel.mutedUser = mutedUsers;
     return await this.channelRepository.save(channel);
-  }
-
-  async modifyChannel(user_id, channel_id, body) {
-    
   }
 }
