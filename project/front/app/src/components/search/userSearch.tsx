@@ -14,8 +14,7 @@ export const Search = ({defaultAllUsers, OverwriteClassName}: {
 }) => {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
-	const id = localStorage.getItem('id');
-
+	
 	const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const res = event.target.value;
 		if (res.length === 0 && defaultAllUsers === false) {
@@ -27,10 +26,11 @@ export const Search = ({defaultAllUsers, OverwriteClassName}: {
 			socket.emit('research_name', {name: res});
 		}
 	};
-
+	
 	useEffect(() => {
+		const id = localStorage.getItem('id');
 		socket.on('research_name', (data: any) => {
-			console.log('research_name received');
+			console.log('research_name received my_id : ' + id + 'user_id : ' + data.id);
 			const UsersWithoutYou = data.filter((user: IUser) => user.id !== id);
 			dispatch(setUsers(UsersWithoutYou));
 			console.log('research_name');
@@ -38,8 +38,10 @@ export const Search = ({defaultAllUsers, OverwriteClassName}: {
 		});
 
 		socket.on('new_user', (data: IUser) => {
+			console.log('search find new user');
 			console.log(data);
-			dispatch(addUser(data));
+			if (data.id !== id)
+				dispatch(addUser(data));
 		});
 	}, [navigate, dispatch, socket]);
 

@@ -1,4 +1,5 @@
 import {Route, Routes} from 'react-router-dom';
+import Template from './template/template';
 import Auth from './pages/Auth';
 import NotFound from './pages/PageNotFound';
 import CreateTwoFaPage from './pages/CreateTwoFa';
@@ -7,20 +8,48 @@ import EndGame from './pages/endgame';
 import TryToReconnect from './pages/BackError';
 import Home from './pages/home';
 import History from './pages/history';
-import Template from './template/template';
 import TokenPage from './pages/authenticate';
 import NotTwoFa from './components/authenticate/AuthenticateComponentsNotTwoFa'
 import TwoFa from './components/authenticate/AuthenticateComponentsTwoFa'
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import Cookies from 'universal-cookie';
 import Chat from './pages/chat';
 import BeginGame from "./pages/begingame";
 import OptionGame from "./pages/optiongame";
+import axios from 'axios';
+import {setErrorLocalStorage} from './components/IfError';
+import { useNavigate} from 'react-router-dom';
 
 export const cookies = new Cookies();
 
 
 const AppInsideBrowser = () => {
+
+	const [id, setId] = useState<string | null>(null);
+	
+	const navigate = useNavigate();
+	
+	useEffect(() => {
+		axios.get(process.env.REACT_APP_IP + ':3000/user/id', {
+			headers: {
+				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+			},
+		})
+			.then((response) => {
+				console.log('localstorage set : id :')
+				console.log(response.data.id);
+				setId(response.data.id);
+				console.log('id set in localstorage');
+				localStorage.setItem('id', response.data.id);
+				console.log(localStorage.getItem('id'))
+			})
+			.catch((error) => {
+				setErrorLocalStorage('Error ' + error.response.status);
+				console.error(error);
+				navigate('/Error');
+			});
+	}, [navigate]);
+
 	return (
 		<>
 			<Routes>

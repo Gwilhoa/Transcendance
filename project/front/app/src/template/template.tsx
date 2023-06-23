@@ -56,6 +56,9 @@ const Template = () => {
 
 	return (
 		<div className='page'>
+			<header>
+				<Head/>
+			</header>
 			{notifVisible &&
                 <>
 					{notif}
@@ -64,9 +67,6 @@ const Template = () => {
 			<main className='main-template'>
 				<Outlet></Outlet>
 			</main>
-			<header>
-				<Head/>
-			</header>
 		</div>
 	);
 }
