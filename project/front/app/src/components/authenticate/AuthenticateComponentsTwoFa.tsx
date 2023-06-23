@@ -25,26 +25,10 @@ function AuthenticateComponentsTwoFa() {
 				.then(() => {
 					cookies.remove('Error');
 					navigate('/home');
+					window.location.reload();
 				})
 				.catch((error) => {
 					cookies.remove('tenMinToken');
-					setErrorLocalStorage('Error ' + error.response.status);
-					console.error(error);
-					navigate('/Error');
-				});
-			axios.get(process.env.REACT_APP_IP + ':3000/user/id', {
-				headers: {
-					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
-				},
-			})
-				.then((response) => {
-					console.log('localstorage set : id :')
-					console.log(response.data.id);
-					console.log('id set in localstorage');
-					localStorage.setItem('id', response.data.id);
-					console.log(localStorage.getItem('id'))
-				})
-				.catch((error) => {
 					setErrorLocalStorage('Error ' + error.response.status);
 					console.error(error);
 					navigate('/Error');
@@ -74,6 +58,7 @@ function AuthenticateComponentsTwoFa() {
 					setCookieJwt(response.data.access_token);
 					cookies.remove('tenMinToken');
 					navigate('/Home');
+					window.location.reload();
 				})
 				.catch((error) => {
 					if (error.response.status === 401) {
