@@ -11,22 +11,19 @@ import {animated, useSpring} from 'react-spring';
 
 const cookies = new Cookies();
 
-let isCall = true;
 
 interface GameProps {
 	gameId: number;
 }
 
 const Game: React.FC<GameProps> = () => {
-
 	const animatedBall = useSpring({
-		from: {transform: 'rotate(0deg)'},
-		to: {transform: 'rotate(360deg)'},
+		from: { transform: 'rotate(0deg)' },
+		to: { transform: 'rotate(360deg)' },
 		loop: true,
-		config: {duration: 4000},
+		config: { duration: 4000 },
 	});
 
-	isCall = true;
 	const navigate = useNavigate();
 	const gameId = useSelector((state: RootState) => state.beginToOption.gameid);
 
@@ -52,7 +49,7 @@ const Game: React.FC<GameProps> = () => {
 
 	const socketInstance = SocketSingleton.getInstance();
 	const socket = socketInstance.getSocket();
-
+	const gamestate = useSelector((state: RootState) => state.beginToOption.gamestate);
 
 	const ballStyles = {
 		top: `${ball.x - 2}%`,
@@ -64,42 +61,42 @@ const Game: React.FC<GameProps> = () => {
 			case 'KeyW':
 				socket.emit('input_game', {game_id: gameId, type: 0})
 				break;
-			case 'KeyS':
-				socket.emit('input_game', {game_id: gameId, type: 1})
-				break;
-			case 'ArrowUp':
-				socket.emit('input_game', {game_id: gameId, type: 0})
-				break;
-			case "ArrowDown":
-				socket.emit("input_game", {game_id: gameId, type: 1})
-				break;
-			case "Escape":
-				socket.emit("input_game", {game_id: gameId, type: 2})
-				break;
-			case "KeyA":
-				socket.emit("input_game", {game_id: gameId, type: 3})
-				break;
-			case "KeyQ":
+				case 'KeyS':
+					socket.emit('input_game', {game_id: gameId, type: 1})
+					break;
+					case 'ArrowUp':
+						socket.emit('input_game', {game_id: gameId, type: 0})
+						break;
+						case "ArrowDown":
+							socket.emit("input_game", {game_id: gameId, type: 1})
+							break;
+							case "Escape":
+								socket.emit("input_game", {game_id: gameId, type: 2})
+								break;
+								case "KeyA":
+									socket.emit("input_game", {game_id: gameId, type: 3})
+									break;
+									case "KeyQ":
 				socket.emit("input_game", {game_id: gameId, type: 4})
 				break;
-			case "KeyF":
-				socket.emit("input_game", {game_id: gameId, type: 5})
+				case "KeyF":
+					socket.emit("input_game", {game_id: gameId, type: 5})
 				break;
 		}
 	};
 
 	const leaveGame = () => {
-		socket.emit('leave_game');
+		//socket.emit('leave_game');
 	}
 
 	const resumeGame = () => {
 		socket.emit("input_game", {game_id: gameId, type: 2})
 	}
 
-	// socket.on('create_game', (any) => {
-	// 	console.log('WESH')
-	// 	console.log(any);
-	// })
+	socket.on('create_game', (any) => {
+		console.log('WESH')
+		console.log(any);
+	})
 
 	socket.on('will_started', (data) => {
 		if (data.time == 0) {
@@ -111,6 +108,11 @@ const Game: React.FC<GameProps> = () => {
 
 
 	useEffect(() => {
+		let isCall = true;
+		if (gamestate != 2) {
+			socket.emit('leave_game');
+			navigate('/home')
+		}
 		window.addEventListener("keydown", handleKeyPress);
 		if (playerstats == 2) {
 			setColor1("#ff5e33")
@@ -147,12 +149,18 @@ const Game: React.FC<GameProps> = () => {
 
 		socket.on('update_game', (data) => {
 			setStarted(data.score2 + " | " + data.score1)
+			data.ballx += 1;
+			if(data.ballx > 100) {
+				data.ballx = 100
+				console.log ("a");
+			}
 			setBall({x: (data.ballx), y: (data.bally)});
 			setPaddle2(data.rack2y)
 			setPaddle1(data.rack1y);
 		});
 
 		socket.on('finish_game', (any) => {
+			console.log(any)
 			if (isCall) {
 				const content = {
 					status: any.status,
@@ -162,14 +170,22 @@ const Game: React.FC<GameProps> = () => {
 					gameid: gameId
 				};
 				dispatch(setFinalStatus(content));
+				socket.off('finish_game');
 				navigate('/endGame');
 				isCall = !isCall;
 			}
 		});
 
-		return () => {
-			socket.off('update_game');
-			socket.emit('');
+
+			return () => {
+        socket.off('update_game');
+        socket.off('game_start');
+        /*socket.off('is_stop_game');
+        socket.off('stop_game');
+        socket.off('option_receive');
+        socket.off('create_game');*/
+        leaveGame();
+
 		};
 	}, []);
 
