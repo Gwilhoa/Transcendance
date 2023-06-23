@@ -527,17 +527,12 @@ export class UserService {
       .where('user.username LIKE :name', { name: `%${names}%` })
       .getMany();
     const ret = [];
-    if (user.blockedUsers != null && user.blockedUsers.length > 0) {
-      for (const u of users) {
-        if (u.id != user.id && includeUser(u, user.blockedUsers)) {
-          ret.push(u);
-        }
+    for (const u of users) {
+      if (u.id != user.id && includeUser(u, user.blockedUsers)) {
+        ret.push(u);
       }
     }
-    if (users == null) {
-      return null;
-    }
-    return users;
+    return ret;
   }
 
   public async changeStatus(id: string, status: number) {
