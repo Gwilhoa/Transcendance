@@ -252,7 +252,7 @@ export class Game {
     const maxposition =
       this._maxY - Game.default_rackwidth - Game.default_radiusball;
 
-    if (this._bally <= minposition) {
+    if (this._futurbally <= minposition && this._futurbally > (minposition - 2)) {
       if (
         this._futurballx >= this._rack1y &&
         this._futurballx <= this._rack1y + Game.default_racklenght
@@ -266,7 +266,7 @@ export class Game {
       }
     }
 
-    if (this._futurbally >= maxposition) {
+    if (this._futurbally >= maxposition && this._futurbally < (maxposition + 2)) {
       if (
         this._futurballx >= this._rack2y &&
         this._futurballx <= this._rack2y + Game.default_racklenght
@@ -305,22 +305,23 @@ export class Game {
     }
 
     if (
-      this._futurballx < this._minX + Game.default_radiusball ||
-      this._futurballx > this._maxX - Game.default_radiusball
+      (this._futurballx < this._minX + (Game.default_radiusball + 1)) || (
+      this._futurballx > (this._maxX - (Game.default_radiusball + 1)))
     ) {
-      if (this._futurballx < this._minX + Game.default_radiusball) {
+      if (this._futurballx < this._minX + Game.default_radiusball + 1) {
         const distbar =
           this._futurballx - (this._minX + Game.default_radiusball);
         this._futurballx -= 2 * distbar;
       } else {
         const distbar =
-          this._futurballx - (this._maxX + Game.default_radiusball);
-        this._futurballx -= 2 * distbar;
+          this._futurballx - (this._maxX - Game.default_radiusball);
+        this._futurballx += 2 * distbar;
       }
       this._angle = -this._angle;
     }
     this._ballx = this._futurballx;
     this._bally = this._futurbally;
+  
     this._io.to(this._id).emit('update_game', this.getGameInfo());
   };
 
@@ -329,6 +330,7 @@ export class Game {
   }
 
   public async remake() {
+    console.log("finish game for " + this._user1.data.id + ' ' + this._user2.data.id);
     this._io.to(this._id).emit('finish_game', {
       score1: 0,
       score2: 0,
