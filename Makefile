@@ -88,6 +88,7 @@ start: build
 database:
 	docker-compose up -d db
 	docker-compose up -d adminer
+	docker-compose up -d nginx
 
 # ~~~~~~~~~~~~~~ BACKEND ~~~~~~~~~~~~~~
 

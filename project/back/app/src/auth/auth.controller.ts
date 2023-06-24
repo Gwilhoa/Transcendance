@@ -40,7 +40,7 @@ export class AuthController {
   async getLogin(@Query() id, @Res() res) {
     const ip = process.env.IP;
     if (id.code == null) {
-      return res.redirect(ip + ':8080/error');
+      return res.redirect(ip + '/error');
     }
 
     const user = await this.userService.createUsers(id.code);
@@ -52,7 +52,7 @@ export class AuthController {
       user.email,
       false,
     );
-    res.redirect(ip + ':8080/authenticate?access_token=' + code.access_token);
+    res.redirect(ip + '/authenticate?access_token=' + code.access_token);
     return;
   }
 
