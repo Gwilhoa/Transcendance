@@ -8,6 +8,7 @@ import SocketSingleton from '../socket';
 
 const Template = () => {
 	let friendId = 0;
+	let rivalId = 0;
 	const [notif, setNotif] = useState(<></>);
 	const [notifVisible, setNotifVisible] = useState(false);
 
@@ -49,8 +50,19 @@ const Template = () => {
 		}
 	})
 
-	socket.on('challenge', (data: any) => {
+	function confirmChallenge() {
+		console.log('confirm challenge')
+		socket.emit('challenge', {rival_id: rivalId})
+	}
+
+	function rejectChallenge() {
+		console.log('reject challenge')
+	}
+
+	socket.on('receive_challenge', (data: any) => {
 		console.log(data);
+		rivalId = data.rival_id;
+		setNotif(<Notification message={data.rival_name + 'wants battle'} onConfirm={confirmChallenge} onCancel={rejectChallenge} hasButton={true} setVisible={setNotifVisible}/>)
 	});
 
 

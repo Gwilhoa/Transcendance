@@ -89,3 +89,13 @@ export function getSockets(server: Server): Socket[] {
   });
   return ret;
 }
+
+export function getdualrequest(dual: Map<string, string>, id: string): string {
+  let ret = null;
+  dual.forEach((value, key) => {
+    if (key == id) {
+      ret = value;
+    }
+  });
+  return ret;
+}

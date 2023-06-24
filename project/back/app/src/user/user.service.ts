@@ -469,13 +469,7 @@ export class UserService {
     if (user == null || myuser == null) {
       return false;
     }
-    if (myuser.blockedUsers == null || myuser.blockedUsers.length == 0) {
-      return false;
-    }
-    myuser.blockedUsers.forEach((element) => {
-      if (element.id == user.id) return true;
-    });
-    return false;
+    return includeUser(user, myuser.blockedUsers);
   }
 
   public async OneOfTwoBlocked(
@@ -619,6 +613,7 @@ export class UserService {
         blocks.push(block);
       }
     }
+    user.blockedUsers = blocks;
     return await this.userRepository.save(user);
   }
 
