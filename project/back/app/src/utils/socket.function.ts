@@ -19,8 +19,8 @@ export function getKeys(map: Map<any, any>) {
   return list;
 }
 
-export function wrongtoken(client: Socket) {
-  client.emit('connection_error', 'Invalid token');
+export function wrongtoken(client: Socket, canal: string) {
+  client.emit('connection_error', { message: 'Invalid token', canal: canal });
 }
 
 export function send_connection_server(

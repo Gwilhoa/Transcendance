@@ -21,7 +21,8 @@ import {
   getKeys,
   getSocketFromId,
   getSockets,
-  send_connection_server, verifyToken,
+  send_connection_server,
+  verifyToken,
   wrongtoken,
 } from 'src/utils/socket.function';
 import { sleep } from '../utils/sleep';
@@ -66,7 +67,7 @@ export class EventsGateway
     }
     this.logger.log(`Client disconnected: ${id}`);
     if ((await this.userService.changeStatus(id, UserStatus.OFFLINE)) == null) {
-      wrongtoken(client);
+      wrongtoken(client, 'connection');
       this.clients = disconnect(id, this.clients);
       this.sendconnected();
     }
@@ -99,13 +100,13 @@ export class EventsGateway
       try {
         id = this.authService.getIdFromToken(data.token);
       } catch (error) {
-        wrongtoken(client);
+        wrongtoken(client, 'connection');
         return;
       }
       if (
         (await this.userService.changeStatus(id, UserStatus.CONNECTED)) == null
       ) {
-        wrongtoken(client);
+        wrongtoken(client, 'connection');
         return;
       }
       this.logger.debug(`Client connected: ${id} for ${client.id}`);
@@ -115,11 +116,11 @@ export class EventsGateway
       try {
         channels = await this.channelService.getAccessibleChannels(id);
       } catch (error) {
-        wrongtoken(client);
+        wrongtoken(client, 'connection');
         return;
       }
       if (channels == null) {
-        wrongtoken(client);
+        wrongtoken(client, 'connection');
         return;
       }
       for (const channel of channels) {
@@ -132,15 +133,10 @@ export class EventsGateway
   @SubscribeMessage('join_matchmaking')
   async join_matchmaking(client: Socket, payload: any) {
     if (payload.token == null || verifyToken(payload.token, this.authService)) {
-      wrongtoken(client);
+      wrongtoken(client, 'join_matchmaking');
       return;
     }
     const id = client.data.id;
-    const user = await this.userService.getUserById(id);
-    if (user == null || user.status != UserStatus.CONNECTED) {
-      wrongtoken(client);
-      return;
-    }
     if (getKeys(this.ingame).includes(id)) {
       const send = {
         code: 1,
@@ -329,7 +325,7 @@ export class EventsGateway
   @SubscribeMessage('leave_matchmaking')
   async leave_matchmaking(client: Socket, payload: any) {
     if (payload.token == null || verifyToken(payload.token, this.authService)) {
-      wrongtoken(client);
+      wrongtoken(client, 'leave_matchmaking');
       return;
     }
     const tempmatchmaking = [];
@@ -351,7 +347,7 @@ export class EventsGateway
   @SubscribeMessage('game_finished')
   async game_finished(client: Socket, payload: any) {
     if (payload.token == null || verifyToken(payload.token, this.authService)) {
-      wrongtoken(client);
+      wrongtoken(client, 'game_finished');
       return;
     }
     const rematch = payload.rematch;
@@ -400,7 +396,7 @@ export class EventsGateway
   @SubscribeMessage('challenge')
   async dual_request(client: Socket, payload: any) {
     if (payload.token == null || verifyToken(payload.token, this.authService)) {
-      wrongtoken(client);
+      wrongtoken(client, 'challenge');
       return;
     }
     const rival_id = payload.rival_id;
@@ -445,7 +441,7 @@ export class EventsGateway
   @SubscribeMessage('leave_game')
   async leave_game(client: Socket, payload: any) {
     if (payload.token == null || verifyToken(payload.token, this.authService)) {
-      wrongtoken(client);
+      wrongtoken(client, 'leave_game');
       return;
     }
     const id = client.data.id;
