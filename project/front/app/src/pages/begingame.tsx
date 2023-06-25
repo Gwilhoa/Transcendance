@@ -26,7 +26,6 @@ const BeginGame = () => {
         navigate("/home");
 	socket.emit('join_matchmaking', {token : cookies.get('jwtAuthorization')});
 	return () => {
-		console.log("oui")
 		socket.emit('leave_matchmaking', {token : cookies.get('jwtAuthorization')})
 	};
 	}, []);

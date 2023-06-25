@@ -304,7 +304,7 @@ function Chat() {
 			dispatch(closeChatModalListUser());
 		}
 		setListChannel((prevListChannel) =>
-			prevListChannel.filter((itemChannel) => itemChannel.id !== data.id)
+			prevListChannel.filter((itemChannel) => itemChannel.id !== data.channel.id)
 		);
 	};
 
