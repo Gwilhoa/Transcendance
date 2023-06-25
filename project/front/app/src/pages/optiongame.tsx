@@ -81,82 +81,80 @@ const OptionGame = () => {
 	}
 
 	return (
-		<>
+		<div className='game-option-game-page'>
+            <ErrorToken/>
 			{!decide &&
-                <>
-                    <ErrorToken/>
-                    <div className='game-waiting-settings'>
-                        Waiting your opponent to choose settings...
-                    </div>
-                </>
+                <div className='game-waiting-settings'>
+                    Waiting your opponent to choose settings...
+                </div>
 			}
 
 			{decide &&
-                <>
-                    <ErrorToken/>
-                    <div className='title-choice'>
-                        choose ball
+                <div className='game-option-game-block'>
+                    <h1 className='game-option-game-title'>Choose option for the next game</h1>
+                    <div className='game-option-game-titles-option'>
+                        Ball
                     </div>
 
                     <div className="button-group">
                         <button
-                            className={`button ${nbBall === Ball1 ? 'selected' : ''}`}
+                            className={`button ${nbBall === Ball1 ? 'game-option-game-selected-button' : ''}`}
                             onClick={() => selectBall(Ball1)}>
                             Ball 1
                         </button>
                         <button
-                            className={`button ${nbBall === Ball2 ? 'selected' : ''}`}
+                            className={`button ${nbBall === Ball2 ? 'game-option-game-selected-button' : ''}`}
                             onClick={() => selectBall(Ball2)}>
                             Ball 2
                         </button>
                         <button
-                            className={`button ${nbBall === Ball3 ? 'selected' : ''}`}
+                            className={`button ${nbBall === Ball3 ? 'game-option-game-selected-button' : ''}`}
                             onClick={() => selectBall(Ball3)}>
                             Ball 3
                         </button>
                     </div>
-                    <div className='img'>
-                        <animated.img src={nbBall} className={"ball"} style={spinnerAnimationBall}></animated.img>
+                    <div className='game-option-game-ball'>
+                        <animated.img src={nbBall} className={'game-option-game-ball'} style={spinnerAnimationBall}></animated.img>
                     </div>
 
-                    <div className='title-choice'>
-                        choose map
+                    <div className='game-option-game-titles-option'>
+                        Map
                     </div>
 
                     <div className="button-group">
                         <button
-                            className={`button ${nbMap === Map1 ? 'selected' : ''}`}
+                            className={`button ${nbMap === Map1 ? 'game-option-game-selected-button' : ''}`}
                             onClick={() => selectMap(Map1)}>
                             Map 1
                         </button>
                         <button
-                            className={`button ${nbMap === Map2 ? 'selected' : ''}`}
+                            className={`button ${nbMap === Map2 ? 'game-option-game-selected-button' : ''}`}
                             onClick={() => selectMap(Map2)}>
                             Map 2
                         </button>
                         <button
-                            className={`button ${nbMap === Map3 ? 'selected' : ''}`}
+                            className={`button ${nbMap === Map3 ? 'game-option-game-selected-button' : ''}`}
                             onClick={() => selectMap(Map3)}>
                             Map 3
                         </button>
                     </div>
 
-                    <div className='img'>
+                    <div className='game-option-game-background'>
                         <img src={nbMap} width={300} height={200}/>
                     </div>
 
-                    <div className='title-choice'>
-                        choose if powerup
+                    <div className='game-option-game-titles-option'>
+                        Powerup
                     </div>
 
                     <div className="button-group">
                         <button
-                            className={`button ${isPowerup === false ? 'selected' : ''}`}
+                            className={`button ${isPowerup === false ? 'game-option-game-selected-button' : ''}`}
                             onClick={() => selectPowerUp(false)}>
                             no powerup
                         </button>
                         <button
-                            className={`button ${isPowerup === true ? 'selected' : ''}`}
+                            className={`button ${isPowerup === true ? 'game-option-game-selected-button' : ''}`}
                             onClick={() => selectPowerUp(true)}>
                             powerup
                         </button>
@@ -165,9 +163,9 @@ const OptionGame = () => {
                     <button className='enter' onClick={enterGame}>
                         confirm
                     </button>
-                </>
+                </div>
 			}
-		</>
+		</div>
 	);
 }
 

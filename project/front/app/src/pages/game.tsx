@@ -64,26 +64,26 @@ const Game: React.FC<GameProps> = () => {
 			case 'KeyW':
 				socket.emit('input_game', {game_id: gameId, type: 0})
 				break;
-				case 'KeyS':
-					socket.emit('input_game', {game_id: gameId, type: 1})
-					break;
-					case 'ArrowUp':
-						socket.emit('input_game', {game_id: gameId, type: 0})
-						break;
-						case "ArrowDown":
-							socket.emit("input_game", {game_id: gameId, type: 1})
-							break;
-							case "Escape":
-								socket.emit("input_game", {game_id: gameId, type: 2})
-								break;
-								case "KeyA":
-									socket.emit("input_game", {game_id: gameId, type: 3})
-									break;
-									case "KeyQ":
+			case 'KeyS':
+				socket.emit('input_game', {game_id: gameId, type: 1})
+				break;
+			case 'ArrowUp':
+				socket.emit('input_game', {game_id: gameId, type: 0})
+				break;
+			case "ArrowDown":
+				socket.emit("input_game", {game_id: gameId, type: 1})
+				break;
+			case "Escape":
+				socket.emit("input_game", {game_id: gameId, type: 2})
+				break;
+			case "KeyA":
+				socket.emit("input_game", {game_id: gameId, type: 3})
+				break;
+			case "KeyQ":
 				socket.emit("input_game", {game_id: gameId, type: 4})
 				break;
-				case "KeyF":
-					socket.emit("input_game", {game_id: gameId, type: 5})
+			case "KeyF":
+				socket.emit("input_game", {game_id: gameId, type: 5})
 				break;
 		}
 	};
@@ -104,7 +104,7 @@ const Game: React.FC<GameProps> = () => {
 	socket.on('will_started', (data) => {
 		if (data.time == 0) {
 			canPress.current = true;
-			setStarted("0 | 0");
+			setStarted("0  0");
 		} else {
 			setStarted(data.time);
 		}
@@ -152,7 +152,7 @@ const Game: React.FC<GameProps> = () => {
 		})
 
 		socket.on('update_game', (data) => {
-			setStarted(data.score2 + " | " + data.score1)
+			setStarted(data.score2 + "  " + data.score1)
 			console.log (data.ballx, data.bally);
 			data.ballx += 1;
 			if(data.ballx > 100) {
