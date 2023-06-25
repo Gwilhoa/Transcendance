@@ -519,7 +519,7 @@ export class ChannelService {
         channel.pwd = await bcrypt.hash(body.password, 10);
       }
       if (body.name.length < 20) {
-        if (channel.name.length > 0) channel.name = body.name;
+        if (body.name.length > 0) channel.name = body.name;
       } else throw new Error('Name is too long');
       const ret = await this.channelRepository.save(channel);
       this.server.to(channel_id).emit('update_channel', {
