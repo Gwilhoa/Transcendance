@@ -138,6 +138,7 @@ const Add = () => {
 
 const Home = () => {
 	console.log('start home');
+	const myId = useSelector((state: RootState) => state.id.id);
 
 	return (
 		<div className='home'>
@@ -146,7 +147,7 @@ const Home = () => {
 				<Search 
 					defaultAllUsers={false}
 					OverwriteClassName={''}
-					id={localStorage.getItem('id')}
+					id={myId}
 				/>
 				<Add/>
 			</div>

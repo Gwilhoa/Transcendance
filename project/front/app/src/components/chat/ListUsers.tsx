@@ -1,11 +1,12 @@
 import './css/listUsers.css';
 import React from 'react';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {Channel, isAdmin, isMe, User} from '../../pages/chat';
 import {ProfilImage} from '../profil/ProfilImage';
 import {ProfilName} from '../profil/ProfilName';
 import {openModal} from '../../redux/modal/modalSlice';
 import SocketSingleton from '../../socket';
+import { RootState } from '../../redux/store';
 
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
@@ -106,6 +107,7 @@ const UnMuteButton = ({id, channel}: changeChannelProps) => {
 
 const ListAdmin = ({channel}: listUserProps) => {
 	const dispatch = useDispatch();
+	const myId = useSelector((state: RootState) => state.id.id);
 
 	return (
 		<>
@@ -123,12 +125,12 @@ const ListAdmin = ({channel}: listUserProps) => {
 								<ProfilName id={user.id}/>
 							</div>
 							<div className='chat-list-users-buttons-user'>
-								{ isAdmin(channel) && !isMe(user) ?
+								{ isAdmin(channel, '' + myId) && !isMe(user, '' + myId) ?
 									<DeleteAdmin id={user.id} channel={channel} />
 									:
 									null
 								}
-								{ channel.creator.id === '' + localStorage.getItem('id') ?
+								{ channel.creator.id === '' + myId ?
 									<BanHammer id={user.id} channel={channel} />
 									:
 									null
@@ -144,6 +146,7 @@ const ListAdmin = ({channel}: listUserProps) => {
 
 const ListUser = ({channel}: listUserProps) => {
 	const dispatch = useDispatch();
+	const myId = useSelector((state: RootState) => state.id.id);
 
 	const isMuted = (user: User, channel: Channel) => {
 		console.log(channel);
@@ -166,7 +169,7 @@ const ListUser = ({channel}: listUserProps) => {
 						<div className='chat-list-users-user-name' onClick={() => dispatch(openModal(user.id))}>
 							<ProfilName id={user.id}/>
 							</div>
-							{ isAdmin(channel) && !isMe(user) ?
+							{ isAdmin(channel, ''+myId) && !isMe(user, ''+myId) ?
 								<div className='chat-list-users-buttons-user'>
 									<MakeAdmin id={user.id} channel={channel} />
 									<BanHammer id={user.id} channel={channel} />
@@ -189,6 +192,7 @@ const ListUser = ({channel}: listUserProps) => {
 
 const ListBannedUser = ({channel}: listUserProps) => {
 	const dispatch = useDispatch();
+	const myId = useSelector((state: RootState) => state.id.id);
 
 	return (
 		<>
@@ -202,7 +206,7 @@ const ListBannedUser = ({channel}: listUserProps) => {
 						<div className='chat-list-users-user-name' onClick={() => dispatch(openModal(user.id))}>
 							<ProfilName id={user.id}/>
 						</div>
-						{ isAdmin(channel) && !isMe(user) ?
+						{ isAdmin(channel, ''+myId) && !isMe(user, ''+myId) ?
 							<div className='chat-list-users-buttons-user'>
 								<UnBanHammer id={user.id} channel={channel}/>
 							</div>
