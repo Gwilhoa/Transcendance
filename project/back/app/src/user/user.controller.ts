@@ -89,7 +89,9 @@ export class UserController {
       imagePath = await this.userService.getImageById(id);
     } catch (e) {
       const asyncReadFile = promisify(fs.readFile);
-      const image = await asyncReadFile(__dirname + '/../../src/utils/null.png');
+      const image = await asyncReadFile(
+        __dirname + '/../../src/utils/null.png',
+      );
       fs.mkdirSync(__dirname + '/../../../images', { recursive: true });
       await this.userService.setAvatar(id, image, '.png');
       imagePath = await this.userService.getImageById(id);
