@@ -139,7 +139,6 @@ export class ChannelGateway implements OnGatewayInit {
     ) {
       client.emit('message_code', messageCode.INVALID_FORMAT);
     }
-    const token = payload.token;
     const channel_id = payload.channel_id;
     let message = payload.content;
     let send;

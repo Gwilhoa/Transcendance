@@ -29,7 +29,7 @@ const EndGame = () => {
 			if (!myrevengeRef.current)
 				socket.emit('game_finished', {rematch: false, token: cookies.get('jwtAuthorization')});
 		};
-	}, [socket]);
+	}, [myrevenge, socket]);
 
 	const homebutton = () => {
 		socket.emit('game_finished', {rematch: false, token: cookies.get('jwtAuthorization')});
@@ -74,7 +74,7 @@ const EndGame = () => {
     socket.off('rematch')
     /*socket.off('game_found')*/
   }
-  }, [])
+  }, [dispatch, launchReplay, myrevenge, navigate])
   useEffect(() => {
 
     if (finalStatus == null || finalStatus.adversary == null) {
