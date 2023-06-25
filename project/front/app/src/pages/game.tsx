@@ -189,10 +189,10 @@ const Game: React.FC<GameProps> = () => {
 			return () => {
         socket.off('update_game');
         socket.off('game_start');
-        /*socket.off('is_stop_game');
+        socket.off('is_stop_game');
         socket.off('stop_game');
         socket.off('option_receive');
-        socket.off('create_game');*/
+        socket.off('create_game');
         //leaveGame();
 
 		};
@@ -218,17 +218,24 @@ const Game: React.FC<GameProps> = () => {
 				style={{...animatedBall, ...ballStyles}}/>
 			{stop &&
                 <div className="game-shadow">
-					{IamStoper &&
-                        <button className='buttonResume' onClick={resumeGame}>
-                                resume
-                        </button>
-					}
-                    <button className='buttonLeave' onClick={leaveGame}>
-                            Leave
-                    </button>
-                    <div className='textTime'>
-							{timeStop}
-                    </div>
+					<div className='game-pause-page'>
+						<div className='game-pause-page-text-time'>
+							Time before restart :
+							<p>
+								{timeStop}
+							</p>
+						</div>
+						<div className='game-pause-menu-buttons'>
+							<button className='game-pause-menu-buttons-template game-pause-menu-leave-button' onClick={leaveGame}>
+									Leave
+							</button>
+							{IamStoper &&
+								<button className='game-pause-menu-buttons-template game-pause-menu-resume-button' onClick={resumeGame}>
+										resume
+								</button>
+							}
+						</div>
+					</div>
                 </div>}
 		</>
 
