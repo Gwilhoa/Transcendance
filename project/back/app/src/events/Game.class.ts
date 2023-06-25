@@ -335,6 +335,8 @@ export class Game {
       status: 'remake',
       username: 'none',
     });
+
+    
     this._user2.leave(this._id);
     this._user1.leave(this._id);
     this.clear();
