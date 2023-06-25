@@ -269,8 +269,7 @@ export class ChannelService {
     channel.messages.push(message);
     await this.channelRepository.save(channel);
     const ret: any = await this.messageRepository.save(message);
-    console.log(ret.content);
-    ret.channel = channel.id;
+    ret.channel = await this.getChannelById(body.channel_id);
     return ret;
   }
 

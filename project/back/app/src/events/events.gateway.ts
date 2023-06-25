@@ -57,6 +57,7 @@ export class EventsGateway
 
   afterInit() {
     this.logger.log('Socket server initialized');
+    this.server.setMaxListeners(20);
   }
 
   async handleDisconnect(client: Socket) {
@@ -93,7 +94,7 @@ export class EventsGateway
 
   //on connection
   async handleConnection(client: Socket) {
-    client.setMaxListeners(10);
+    client.setMaxListeners(20);
     let id;
     this.logger.debug('New connexion');
     await client.on('connection', async (data) => {

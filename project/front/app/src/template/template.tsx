@@ -81,7 +81,7 @@ const Template = () => {
 		});
 
 		socket.on('message', (data: any) => {
-			console.log(data)
+			console.log(data);
 		})
 
 		socket.on('friend_request', (data: any) => {

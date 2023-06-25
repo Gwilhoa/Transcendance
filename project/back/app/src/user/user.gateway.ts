@@ -96,8 +96,6 @@ export class UserGateway implements OnGatewayInit {
     } else {
       ret = {
         code: FriendCode.FRIEND_REQUEST_SENT,
-        user1: user_id,
-        user2: friend_id,
       };
       const requestFriend = await this.userService.addFriendRequest(
         user_id,
@@ -139,22 +137,17 @@ export class UserGateway implements OnGatewayInit {
       client.emit('delete_channel', { id: mpchannel.id });
       client.emit('friend_code', {
         code: FriendCode.UNFRIEND_SUCCESS,
-        user1: user_id,
-        user2: friend_id,
       });
       if (friend_socket != null) {
         friend_socket.emit('delete_channel', { id: mpchannel.id });
         friend_socket.emit('friend_code', {
           code: FriendCode.NEW_UNFRIEND,
-          user1: user_id,
-          user2: friend_id,
+          id: user_id,
         });
       }
     } else {
       client.emit('friend_code', {
         code: FriendCode.UNEXISTING_FRIEND,
-        user1: user_id,
-        user2: friend_id,
       });
     }
   }
