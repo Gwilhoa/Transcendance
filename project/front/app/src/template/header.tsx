@@ -50,7 +50,6 @@ const Head = () => {
 	}
 	}, [navigate]);
 
-
 	const handleOpenModal = (id: string | null) => {
 		dispatch(openModal(id));
 	};

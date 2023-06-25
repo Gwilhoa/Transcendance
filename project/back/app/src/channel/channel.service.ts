@@ -137,8 +137,8 @@ export class ChannelService {
       if (isvalid == false)
         throw new Error('Password is not valid for this channel');
     }
-    if (chan.bannedUsers != null && chan.bannedUsers.includes(user))
-      throw new Error('User is banned');
+    if (includeUser(user, chan.bannedUsers))
+      throw new Error('User is banned from this channel');
     chan.users.push(user);
     chan = await this.channelRepository.save(chan);
     return chan;

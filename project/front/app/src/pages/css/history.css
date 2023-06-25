@@ -1,18 +1,28 @@
+:root{
+    --history-title-height: 5rem;
+}
+
 .page-history {
     width: 100%;
-    top: var(--header-size);
     height: calc(100vh - (var(--header-size)));
-}
+    
+}    
 
 .history-title {
     color: var(--light-color);
-    border-bottom: 3px solid var(--light-color);
+    border-bottom: 0.2rem solid var(--light-color);
     font-size: 2.5rem;
-    padding-top: 1rem;
-    padding-bottom: 1rem;
+    display : flex;
+    align-items: center;
+    height: var(--history-title-height);
     margin-left: 2rem;
     margin-right: 2rem;
     font-weight: bold;
+}    
+
+.scrollBlock {
+    overflow: auto;
+    max-height: calc(100vh - var(--header-size) - var(--history-title-height) - 0.2rem);
 }
 
 .score-block {
@@ -30,20 +40,20 @@
     padding: 10px;
     height: 6.5rem;
     display: block;
-}
+}    
 
 .score-board {
     display: flex;
     flex-wrap: wrap;
     margin: 2rem;
-}
+}    
 
 .status {
     padding-left: 7.5px;
     font-size: 1.5rem;
     font-weight: bold;
     margin: 0;
-}
+}    
 
 .image {
     width: 2rem;
@@ -51,39 +61,34 @@
     margin: 0 0.5rem 0 0.5rem;
     border-radius: 50%;
     cursor: pointer;
-}
+}    
 
 .history-score {
     display: flex;
     justify-content: center;
     text-align: center;
-}
+}    
 
 .player {
     margin-left: 1rem;
     margin-right: 1rem;
-}
+}    
 
 p {
     margin: 0;
     font-size: 1.5rem;
     font-weight: bold;
     margin-top: 0.5rem;
-}
+}    
 
 .player > p {
     margin: 0;
-}
+}    
 
 .no-game-played {
     margin: 2rem;
     color: var(--light-color);
     font-size: 1.5rem;
     font-weight: bold;
-}
-
-.scrollBlock {
-    overflow: auto;
-    max-height: calc(100vh - var(--header-size));
-}
+}    
 

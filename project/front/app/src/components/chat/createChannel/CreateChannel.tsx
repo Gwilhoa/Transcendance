@@ -161,7 +161,7 @@ const CreateChannel = () => {
 			.then((response) => {
 				console.log(response);
 				setErrorMessage('');
-				socket.emit('join_channel', {channel_id: response.data.id});
+				socket.emit('join_channel', {channel_id: response.data.id, token: cookies.get('jwtAuthorization')});
 				usersId.map((userId) => {
 					socket.emit('invite_channel', {receiver_id: userId, channel_id: response.data.id});
 				});
