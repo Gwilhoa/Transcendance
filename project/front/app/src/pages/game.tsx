@@ -155,7 +155,7 @@ const Game: React.FC<GameProps> = () => {
 
 		socket.on('update_game', (data) => {
 			if (data.package > packageNumber) {
-				setStarted(data.score2 + " | " + data.score1)
+				setStarted(data.score2 + "  " + data.score1)
 				packageNumber = data.package;
 				console.log (data.ballx, data.bally);
 				data.ballx += 1;

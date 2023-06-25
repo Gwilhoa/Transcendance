@@ -12,7 +12,7 @@ import { setBeginStatus } from '../redux/game/beginToOption';
 
 import Ball1 from '../images/game/ball/Ball1.png';
 import Ball2 from '../images/game/ball/Ball2.webp';
-import Ball3 from '../images/game/ball/Ball3.jpg';
+import Ball3 from '../images/game/ball/Ball3.png';
 
 import Map1 from '../images/game/map/Map1.png';
 import Map2 from '../images/game/map/Map2.webp';
