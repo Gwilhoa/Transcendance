@@ -77,25 +77,16 @@ export const initialChannelState: Channel = {
 	mutedUser: [],
 }
 
-export const isAdmin = (channel: Channel) => {
-		if (channel.admins.some((admin) => admin.id === localStorage.getItem('id'))) {
-			return (true);
-		}
-		return (false);
+export const isAdmin = (channel: Channel, userId: string) => {
+		return (channel.admins.some((admin) => admin.id === userId));
 };
 
-export const isBan = (channel: Channel, user: User) => {
-		if (channel.bannedUsers.some((banned) => banned.id === user.id)) {
-			return (true);
-		}
-		return (false);
+export const isBan = (channel: Channel, userId: User) => {
+		return (channel.bannedUsers.some((banned) => banned.id === userId.id));
 };
 
-export const isMe = (user: User) => {
-	if (user.id === '' + localStorage.getItem('id')) {
-		return (true);
-	}
-	return (false);
+export const isMe = (user: User, myId: string) => {
+	return (user.id === myId);
 };
 
 const updateAvailableChannel = (input: string) => {

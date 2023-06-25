@@ -116,6 +116,7 @@ const CreateChannel = () => {
 	const [usersId, setUserId] = useState<Array<string>>([]);
 	const [errorPwd, setErrorPwd] = useState<boolean>(false);
 	const [errorMessage, setErrorMessage] = useState<string>('');
+	const myId = useSelector((state: RootState) => state.id.id);
 
 	const onSubmitChannelName = (str: string) => {
 		setChannelParams((prevChannelParams) => ({
@@ -150,7 +151,7 @@ const CreateChannel = () => {
 		axios.post(process.env.REACT_APP_IP + ':3000/channel/create',
 			{
 				name: channelParams.name,
-				creator_id: localStorage.getItem('id'),
+				creator_id: myId,
 				type: channelParams.type,
 				password: channelParams.pwd,
 			},
@@ -220,7 +221,7 @@ const CreateChannel = () => {
 							<Search 
 								defaultAllUsers={true} 
 								OverwriteClassName={'create-channel-invite-input'}
-								id={localStorage.getItem('id')}
+								id={myId}
 							/>
 							<AddUserId usersId={usersId} setUserId={setUserId}/>
 						</div>

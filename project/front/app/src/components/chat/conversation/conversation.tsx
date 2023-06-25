@@ -8,6 +8,8 @@ import {useNavigate} from 'react-router-dom';
 import {setErrorLocalStorage} from '../../IfError';
 import ButtonListChannel from '../optionBar/button/ButtonListUserModal';
 import { parseChannelName } from '../Channel';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../redux/store';
 
 export interface imageProfil {
 	id: string;
@@ -22,6 +24,7 @@ function Conversation(
 	const [listImageProfil, setListImageProfil] = useState<Array<imageProfil>>([]);
 	const navigate = useNavigate();
 	const scrollRef = useRef(null);
+	const myId = useSelector((state: RootState) => state.id.id);
 
 	useEffect(() => {
 		listMessages.map((itemMessage) => addImageProfil(itemMessage.user.id));
@@ -70,7 +73,7 @@ function Conversation(
 					: 
 						<>
 							<p className='chat-conversation-channel-name'>
-								{parseChannelName(channel)}
+								{parseChannelName(channel, '' + myId)}
 							</p>
 							<ButtonListChannel/>
 						</>	

@@ -22,6 +22,7 @@ export default function Profil() {
 	const initialElement = [];
 	const navigate = useNavigate();
 	const [isMe, setIsMe] = useState<boolean>(false);
+	const myId = useSelector((state: RootState) => state.id.id);
 	const [isFriend, setIsFriend] = useState<boolean>(false);
 	const [checked, setChecked] = useState(false);
 	const [errorName, setErrorName] = useState<boolean>(false);
@@ -79,7 +80,7 @@ export default function Profil() {
 					setHasFriendRequest(1);
 					return;
 				}
-				if (request.sender.id === localStorage.getItem('id') && request.receiver.id === id) {
+				if (request.sender.id === myId && request.receiver.id === id) {
 					setHasFriendRequest(2);
 					return;
 				}
@@ -161,7 +162,7 @@ export default function Profil() {
 	}, [isFriend]);
 
 	useEffect(() => {
-		if (id === localStorage.getItem('id')) {
+		if (id === myId) {
 			setIsMe(true);
 		}
 		refresh(id);

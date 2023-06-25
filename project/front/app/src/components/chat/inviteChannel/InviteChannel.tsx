@@ -91,6 +91,7 @@ const AddUserId = ({usersId, setUserId, channelId, channel}: AddUserIdProps) => 
 const InviteChannel = ({channel}: { channel: Channel }) => {
 	const dispatch = useDispatch();
 	const [usersId, setUserId] = useState<Array<string>>([]);
+	const myId = useSelector((state: RootState) => state.id.id);
 
 	useEffect(() => {
 		channel.users.map((element: User) => {
@@ -112,7 +113,7 @@ const InviteChannel = ({channel}: { channel: Channel }) => {
 							<Search 
 								defaultAllUsers={true} 
 								OverwriteClassName={'chat-side-bar-invite-channel-input'}
-								id={localStorage.getItem('id')}
+								id={myId}
 							/>
 							<AddUserId
 								channel={channel}
