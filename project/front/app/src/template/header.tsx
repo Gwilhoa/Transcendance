@@ -24,7 +24,7 @@ const Head = () => {
 		socket.on('message_code', (data: any) => {
 			console.log(data);
 		});
-	
+
 		return () => {
 			socket.off('message_code');
 		};
@@ -49,6 +49,7 @@ const Head = () => {
 				});
 	}
 	}, [navigate]);
+
 
 	const handleOpenModal = (id: string | null) => {
 		dispatch(openModal(id));

@@ -16,10 +16,15 @@ import {
   getSockets,
   includeUser,
 } from '../utils/socket.function';
-import { WebSocketServer } from '@nestjs/websockets';
+import { WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server } from 'socket.io';
 
 @Injectable()
+@WebSocketGateway({
+  cors: {
+    origin: '*',
+  },
+})
 export class ChannelService {
   @WebSocketServer() server: Server;
   constructor(
@@ -29,7 +34,7 @@ export class ChannelService {
   ) {}
 
   public async createChannel(body: CreateChannelDto) {
-    let chan = new Channel();
+    const chan = new Channel();
     if (body.name.length > 20)
       throw new Error('Channel name must be less than 12 characters');
     chan.name = body.name;
@@ -51,8 +56,8 @@ export class ChannelService {
         throw new Error('Can not hash password');
       }
     }
-    chan = await this.channelRepository.save(chan);
-    this.server.emit('newChannel', chan);
+    const ret = await this.channelRepository.save(chan);
+    this.server.emit('new_channel', ret);
     return chan;
   }
 
@@ -494,7 +499,7 @@ export class ChannelService {
   }
 
   async updateChannel(channel_id: any, user_id: any, body: any) {
-	  console.log(channel_id);
+    console.log(channel_id);
     const channel = await this.channelRepository
       .createQueryBuilder('channel')
       .leftJoinAndSelect('channel.admins', 'admins')
@@ -517,12 +522,12 @@ export class ChannelService {
         channel.name = body.name;
       } else throw new Error('Name is too long');
       const ret = await this.channelRepository.save(channel);
-	  this.server.to(channel_id).emit('update_channel', {
-		code: 0,
-		channel_id: channel_id,
-		name: ret.name,
-		type: ret.type,
-	  });
+      this.server.to(channel_id).emit('update_channel', {
+        code: 0,
+        channel_id: channel_id,
+        name: ret.name,
+        type: ret.type,
+      });
       return { channel_id: ret.id, name: ret.name };
     } else {
       for (const admin of channel.admins) {

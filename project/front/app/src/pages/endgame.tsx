@@ -80,6 +80,7 @@ const EndGame = () => {
     if (finalStatus == null || finalStatus.adversary == null) {
       socket.emit('leave_game', {token: cookies.get('jwtAuthorization')})
       navigate('/home');
+      window.location.reload()
     }
   } , [finalStatus, navigate]);
 
