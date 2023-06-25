@@ -31,7 +31,7 @@ const ModifyChannel = ({channel}: { channel: Channel }) => {
 		}).catch((error) => {
 			console.log('updatechannel');
 			console.error(error);
-			setErrorMessage(error.message);
+			setErrorMessage(error.response.data);
 		});
 	}
 
