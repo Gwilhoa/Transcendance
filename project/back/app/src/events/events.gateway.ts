@@ -132,7 +132,7 @@ export class EventsGateway
 
   @SubscribeMessage('join_matchmaking')
   async join_matchmaking(client: Socket, payload: any) {
-    if (payload.token == null || verifyToken(payload.token, this.authService)) {
+    if (payload.token == null || !verifyToken(payload.token, this.authService)) {
       wrongtoken(client, 'join_matchmaking');
       return;
     }
