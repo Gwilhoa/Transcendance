@@ -78,8 +78,10 @@ const EndGame = () => {
   useEffect(() => {
 
     if (finalStatus == null || finalStatus.adversary == null) {
-      socket.emit('leave_game')
+      socket.emit('leave_game');
+      console.log("A GNAGNAGNA JE PASSE ICI")
       navigate('/home');
+      window.location.reload()
     }
   } , [finalStatus, navigate]);
 

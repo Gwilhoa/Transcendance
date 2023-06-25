@@ -89,7 +89,7 @@ const Game: React.FC<GameProps> = () => {
 	};
 
 	const leaveGame = () => {
-		//socket.emit('leave_game');
+		window.location.reload()
 	}
 
 	const resumeGame = () => {
