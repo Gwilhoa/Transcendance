@@ -52,7 +52,10 @@ export class UserGateway implements OnGatewayInit {
 
   @SubscribeMessage('friend_request') //reception d'une demande d'ami / accepter une demande d'ami
   async handleFriendRequest(client: Socket, payload: any) {
-    if (payload.token == null || !verifyToken(payload.token, this.authService)) {
+    if (
+      payload.token == null ||
+      !verifyToken(payload.token, this.authService)
+    ) {
       wrongtoken(client, 'friend_request');
       return;
     }
@@ -93,6 +96,8 @@ export class UserGateway implements OnGatewayInit {
     } else {
       ret = {
         code: FriendCode.FRIEND_REQUEST_SENT,
+        user1: user_id,
+        user2: friend_id,
       };
       const requestFriend = await this.userService.addFriendRequest(
         user_id,
@@ -114,7 +119,10 @@ export class UserGateway implements OnGatewayInit {
 
   @SubscribeMessage('unfriend_request')
   async unfriend_request(client: Socket, payload: any) {
-    if (payload.token == null || !verifyToken(payload.token, this.authService)) {
+    if (
+      payload.token == null ||
+      !verifyToken(payload.token, this.authService)
+    ) {
       wrongtoken(client, 'unfriend_request');
       return;
     }
@@ -131,24 +139,32 @@ export class UserGateway implements OnGatewayInit {
       client.emit('delete_channel', { id: mpchannel.id });
       client.emit('friend_code', {
         code: FriendCode.UNFRIEND_SUCCESS,
+        user1: user_id,
+        user2: friend_id,
       });
       if (friend_socket != null) {
         friend_socket.emit('delete_channel', { id: mpchannel.id });
         friend_socket.emit('friend_code', {
           code: FriendCode.NEW_UNFRIEND,
-          id: user_id,
+          user1: user_id,
+          user2: friend_id,
         });
       }
     } else {
       client.emit('friend_code', {
         code: FriendCode.UNEXISTING_FRIEND,
+        user1: user_id,
+        user2: friend_id,
       });
     }
   }
 
   @SubscribeMessage('block_user')
   async block_user(client: Socket, payload: any) {
-    if (payload.token == null || !verifyToken(payload.token, this.authService)) {
+    if (
+      payload.token == null ||
+      !verifyToken(payload.token, this.authService)
+    ) {
       wrongtoken(client, 'block_user');
       return;
     }
@@ -178,7 +194,10 @@ export class UserGateway implements OnGatewayInit {
 
   @SubscribeMessage('unblock_user')
   async unblock_user(client: Socket, payload: any) {
-    if (payload.token == null || !verifyToken(payload.token, this.authService)) {
+    if (
+      payload.token == null ||
+      !verifyToken(payload.token, this.authService)
+    ) {
       wrongtoken(client, 'unblock_user');
       return;
     }

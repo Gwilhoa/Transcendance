@@ -7,13 +7,13 @@ export class Game {
   static default_positionBx = this.default_sizeMaxX / 2;
   static default_sizeMaxY = 100;
   static default_positionBy = this.default_sizeMaxY / 2;
-  static default_update = 16;
+  static default_update = 8;
   static default_racklenght = 15;
   static default_positionR =
     this.default_sizeMaxX / 2 - this.default_racklenght / 2;
   static default_rackwidth = 2;
   static default_radiusball = 1;
-  static default_speedBall = 0.5;
+  static default_speedBall = 0.25;
   static default_sizeMinX = 0;
   static default_sizeMinY = 0;
   static default_victorygoal = 3;
@@ -309,7 +309,7 @@ export class Game {
       this._futurballx > this._maxX - (Game.default_radiusball + 1)
     ) {
       if (this._futurballx < this._minX + (Game.default_radiusball + 1)) {
-       const distbar =
+        const distbar =
           this._futurballx - (this._minX + Game.default_radiusball);
         this._futurballx -= 2 * distbar;
       } else {
@@ -336,7 +336,6 @@ export class Game {
       username: 'none',
     });
 
-    
     this._user2.leave(this._id);
     this._user1.leave(this._id);
     this.clear();
