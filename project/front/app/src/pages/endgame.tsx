@@ -27,23 +27,23 @@ const EndGame = () => {
 		return () => {
 			console.log("unmount revenge : " + myrevenge);
 			if (!myrevengeRef.current)
-				socket.emit('game_finished', {rematch: false});
+				socket.emit('game_finished', {rematch: false, token: cookies.get('jwtAuthorization')});
 		};
 	}, [socket]);
 
 	const homebutton = () => {
-		socket.emit('game_finished', {rematch: false});
+		socket.emit('game_finished', {rematch: false, token: cookies.get('jwtAuthorization')});
 		navigate('/home');
 	}
 
 	const launchReplay = () => {
-		socket.emit('game_finished', {rematch: true});
+		socket.emit('game_finished', {rematch: true, token: cookies.get('jwtAuthorization')});
 	}
 
   
   const replaybutton = () => {
     myrevengeRef.current = true;
-    socket.emit('game_finished', {rematch : true})
+    socket.emit('game_finished', {rematch : true, token: cookies.get('jwtAuthorization')})
     if (!revenge)
       setMyrevenge(true);
   }
@@ -78,7 +78,7 @@ const EndGame = () => {
   useEffect(() => {
 
     if (finalStatus == null || finalStatus.adversary == null) {
-      socket.emit('leave_game')
+      socket.emit('leave_game', {token: cookies.get('jwtAuthorization')})
       navigate('/home');
     }
   } , [finalStatus, navigate]);

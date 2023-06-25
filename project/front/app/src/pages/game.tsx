@@ -114,7 +114,7 @@ const Game: React.FC<GameProps> = () => {
 	useEffect(() => {
 		let isCall = true;
 		if (gamestate != 2) {
-			socket.emit('leave_game');
+			socket.emit('leave_game', {token: cookies.get('jwtAuthorization')});
 			navigate('/home')
 		}
 		window.addEventListener("keydown", handleKeyPress);

@@ -6,6 +6,7 @@ import {Navigate, Outlet, useNavigate} from 'react-router-dom';
 import SocketSingleton from '../socket';
 import {setBeginStatus} from "../redux/game/beginToOption";
 import {useDispatch} from "react-redux";
+import { cookies } from '../App';
 
 
 const Template = () => {
@@ -35,7 +36,7 @@ const Template = () => {
 
 	const confirmFriend = () => {
 		console.log('confirm friend')
-		socket.emit('friend_request', {friend_id: friendId})
+		socket.emit('friend_request', {friend_id: friendId, token: cookies.get('jwtAuthorization')})
 	}
 
 	const rejectFriend = () => {
@@ -46,7 +47,7 @@ const Template = () => {
 
 	function confirmChallenge() {
 		console.log('confirm challenge')
-		socket.emit('challenge', {rival_id: rivalId})
+		socket.emit('challenge', {rival_id: rivalId, token: cookies.get('jwtAuthorization')})
 	}
 
 	function rejectChallenge() {
@@ -60,7 +61,7 @@ const Template = () => {
 				socket.on('game_found', (data) => {
 					console.log(data);
 					dispatch(setBeginStatus({decide: data.decide, playerstate: data.user, gameid: data.game_id, gamestate: 1}));
-					socket.emit('leave_matchmaking')
+					socket.emit('leave_matchmaking', {token: cookies.get('jwtAuthorization')})
 					navigate("/optiongame")
 					socket.off('game_found')
 				});
@@ -92,6 +93,8 @@ const Template = () => {
 		return () => {
 			socket.off('receive_challenge');
 			socket.off('connection_error');
+			socket.off('message');
+			socket.off('friend_request');
 		};
 	}, []);
 

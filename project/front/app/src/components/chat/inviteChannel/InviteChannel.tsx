@@ -65,7 +65,7 @@ const AddUserId = ({usersId, setUserId, channelId, channel}: AddUserIdProps) => 
 			}
 			return prevListId;
 		});
-		socket.emit('invite_channel', {receiver_id: id, channel_id: channelId});
+		socket.emit('invite_channel', {receiver_id: id, channel_id: channelId, token: cookies.get('jwtAuthorization')});
 	};
 
 	if (listUser == null || listUser.length == 0) {

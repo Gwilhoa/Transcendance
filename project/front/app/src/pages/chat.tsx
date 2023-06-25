@@ -93,7 +93,7 @@ const updateAvailableChannel = (input: string) => {
 	if (input === '') {
 		return;
 	}
-	socket.emit('research_channel', {search: input})
+	socket.emit('research_channel', {search: input, token: cookies.get('jwtAuthorization')})
 }
 ////////////////////////// CHAT ///////////////////////////////////////////////
 function Chat() {
@@ -252,10 +252,10 @@ function Chat() {
 		console.log('join_channel');
 		console.log(password.get(channel_id));
 		if (password.get(channel_id)) {
-			socket.emit('join_channel', {channel_id: channel_id, password: password.get(channel_id)});
+			socket.emit('join_channel', {channel_id: channel_id, password: password.get(channel_id), token: cookies.get('jwtAuthorization')});
 			return;
 		} else {
-			socket.emit('join_channel', {channel_id: channel_id});
+			socket.emit('join_channel', {channel_id: channel_id, token: cookies.get('jwtAuthorization')});
 		}
 	}
 

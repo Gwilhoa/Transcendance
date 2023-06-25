@@ -126,7 +126,7 @@ export default function Profil() {
 					})
 					.then((response) => {
 						console.log(response);
-						socket.emit('join_channel', {channel_id: response.data.id});
+						socket.emit('join_channel', {channel_id: response.data.id, token: cookies.get('jwtAuthorization')});
 					})
 					.catch((error) => {
 						console.error(error);
@@ -253,26 +253,17 @@ export default function Profil() {
 
 	const handleAddFriend = (id: string | null) => {
 		console.log('add friend ' + id);
-		socket.emit('friend_request', {friend_id: id});
+		socket.emit('friend_request', {friend_id: id, token: cookies.get('jwtAuthorization')});
 	};
 
 	const handleUnFriend = (id: string | null) => {
 		console.log('add friend ' + id);
-		socket.emit('unfriend_request', {friend_id: id});
+		socket.emit('unfriend_request', {friend_id: id, token: cookies.get('jwtAuthorization')});
 	};
 
 	const handlechallenge = (id: string | null) => {
 		console.log('challenge ' + id);
-		socket.emit('challenge', {rival_id: id});
-	}
-
-	const handleChangeBlocke = () => {
-		if (isUserBlocked) {
-			socket.emit('unblock_user', {unblock_id:id})
-		}
-		else {
-			socket.emit('block_user', {block_id:id})
-		}
+		socket.emit('challenge', {rival_id: id, token: cookies.get('jwtAuthorization')});
 	}
 
 	initialElement.push(
@@ -340,10 +331,10 @@ export default function Profil() {
 
 	function handleChangeBlock() {
 			if (isUserBlocked) {
-				socket.emit('unblock_user', {unblock_id:id})
+				socket.emit('unblock_user', {unblock_id: id, token: cookies.get('jwtAuthorization')})
 			}
 			else {
-				socket.emit('block_user', {block_id:id})
+				socket.emit('block_user', {block_id: id, token: cookies.get('jwtAuthorization')})
 			}
 	}
 
@@ -367,7 +358,7 @@ export default function Profil() {
 									Challenge
 								</button>
 								<br/>
-								<button onClick={() => handleChangeBlocke()}>
+								<button onClick={() => handleChangeBlock()}>
 									{
 										isUserBlocked ? (
 											'unblock'
