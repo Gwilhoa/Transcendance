@@ -166,24 +166,6 @@ export default function Profil() {
 			setIsMe(true);
 		}
 		refresh(id);
-
-		axios.get(process.env.REACT_APP_IP + ':3000/auth/2fa/is2FA', {
-			headers: {
-				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
-			},
-		})
-			.then((response) => {
-				if (response.data == false)
-					setChecked(false);
-				else
-					setChecked(true);
-			})
-			.catch((error) => {
-				setErrorLocalStorage('Error ' + error.response.status);
-				console.error(error);
-				navigate('/Error');
-				dispatch(closeModal());
-			});
 	}, [navigate, id, refresh, dispatch]);
 
 	const changeName = (str: string) => {

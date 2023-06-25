@@ -23,12 +23,11 @@ const BeginGame = () => {
   useEffect(() => {
     if (gamestate != 10)
         navigate("/home");
-      socket.emit('join_matchmaking', {token : cookies.get('jwtAuthorization')});
-      return () => {
-          console.log("oui")
-          socket.emit('leave_matchmaking')
-      };
-
+	socket.emit('join_matchmaking', {token : cookies.get('jwtAuthorization')});
+	return () => {
+		console.log("oui")
+		socket.emit('leave_matchmaking')
+	};
 	}, []);
 
 	useEffect(() => {
@@ -37,12 +36,12 @@ const BeginGame = () => {
 			console.log(data)
 			if (!gamefound.current)
 				return;
-			if (data["code"] === 0) {
+			if (data.code === 0) {
 				console.log('enter matchmaking successfull');
 				gamefound.current = true;
 			} else {
 				navigate("/home");
-				alert("Error, you are already in game");
+				alert(data.message);
 			}
 		});
 
@@ -55,7 +54,7 @@ const BeginGame = () => {
 
       return () => {
           socket.emit('leave_matchmaking');
-          /*socket.off('matchmaking_code');*/
+          socket.off('matchmaking_code');
           socket.off('game_found');
       };
     }, []);

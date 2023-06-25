@@ -78,8 +78,10 @@ export class EventsGateway
         this.logger.error('game not found');
         return;
       }
-      this.ingame.delete(id);
-      await this.games[game.id].remake();
+      const ingame = await this.games[game.id];
+      this.ingame.delete(ingame.getUser1().data.id);
+      this.ingame.delete(ingame.getUser2().data.id);
+      await ingame.remake();
       this.games.delete(game.id);
     }
     if (this.matchmaking.includes(client)) {
@@ -357,9 +359,7 @@ export class EventsGateway
     if (game != null) {
       if (!rematch) {
         this.games.delete(game_id);
-        console.log('b');
         game.getUser1().emit('rematch', { rematch: false });
-        console.log('b');
         game.getUser2().emit('rematch', { rematch: false });
         this.ingame.delete(game.getUser1().data.id);
         this.ingame.delete(game.getUser2().data.id);
@@ -371,11 +371,9 @@ export class EventsGateway
             rematch: true,
           };
           if (game.getUser1().id == client.id) {
-            console.log('a');
             game.getUser2().emit('rematch', send);
           }
           if (game.getUser2().id == client.id) {
-            console.log('a');
             game.getUser1().emit('rematch', send);
           }
         } else {
@@ -384,9 +382,7 @@ export class EventsGateway
           const send = {
             rematch: true,
           };
-          console.log('a');
           game.getUser1().emit('rematch', send);
-          console.log('a');
           game.getUser2().emit('rematch', send);
           this.ingame.delete(game.getUser1().data.id);
           this.ingame.delete(game.getUser2().data.id);
@@ -414,8 +410,9 @@ export class EventsGateway
         });
         socket.emit('receive_challenge', {
           message: 'challenge received',
-          rival: client.data,
+          rival: client.data.id,
           rival_name: user.username,
+          code: 2,
         });
       } else {
         if (rival_request == client.data.id) {
@@ -434,6 +431,7 @@ export class EventsGateway
     } else {
       client.emit('receive_challenge', {
         message: 'user is not connected',
+        code: 1,
       });
     }
   }

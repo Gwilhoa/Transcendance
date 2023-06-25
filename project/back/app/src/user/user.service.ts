@@ -158,10 +158,10 @@ export class UserService {
           'user.status',
           'user.enabled2FA',
         ])
-        .where('user.id = :id', { id })
+        .where('user.id = :id', { id: id })
         .getOne();
 
-      console.debug(userWithSecret);
+      console.log(userWithSecret);
       return userWithSecret;
     }
 
@@ -366,7 +366,7 @@ export class UserService {
     return user;
   }
 
-  public async setAvatar(id, buffer, extname) {
+  public async setAvatar(id: string, buffer: NodeJS.ArrayBufferView, extname) {
     const fs = require('fs');
     const path = require('path');
     const lastimage = await this.getPathImage(id);
