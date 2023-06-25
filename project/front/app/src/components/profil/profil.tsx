@@ -128,7 +128,7 @@ export default function Profil() {
 		})
 
 		socket.on('friend_code', (data: any) => {
-			console.log(data.code);
+			console.log(data);
 			if (data.code === 2 && !isFriend) {
 				axios.post(process.env.REACT_APP_IP + ':3000/channel/mp/create',
 					{

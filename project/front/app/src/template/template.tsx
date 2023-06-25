@@ -5,9 +5,11 @@ import Notification from '../components/notification/notification';
 import {Outlet, useNavigate} from 'react-router-dom';
 import SocketSingleton from '../socket';
 import {setBeginStatus} from "../redux/game/beginToOption";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import { cookies } from '../App';
 import { setErrorLocalStorage } from '../components/IfError';
+import axios from 'axios';
+import { RootState } from '../redux/store';
 
 
 const Template = () => {
@@ -16,6 +18,7 @@ const Template = () => {
 	const navigate = useNavigate();
 	const [notif, setNotif] = useState(<></>);
 	const [notifVisible, setNotifVisible] = useState(false);
+	const myId = useSelector((state: RootState) => state.id.id);
 
 	const dispatch = useDispatch();
 	const socketInstance = SocketSingleton.getInstance();
@@ -93,6 +96,31 @@ const Template = () => {
 			}
 		})
 
+		socket.on('friend_code', (data: any) => {
+			console.log(data.code);
+			let otherId = data.user1;
+			if (otherId == myId) {
+				otherId = data.user2;
+			}
+			if (data.code === 2) {
+				axios.post(process.env.REACT_APP_IP + ':3000/channel/mp/create',
+					{
+						user_id: '' + otherId,
+					},
+					{
+						headers: {
+							Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+						},
+					})
+					.then((response) => {
+						console.log(response);
+					})
+					.catch((error) => {
+						setErrorLocalStorage('Error ' + error?.response?.status);
+						navigate('/Error');
+					});
+			}
+		})
 		return () => {
 			socket.off('receive_challenge');
 			socket.off('connection_error');
