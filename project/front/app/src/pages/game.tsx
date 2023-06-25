@@ -193,7 +193,7 @@ const Game: React.FC<GameProps> = () => {
         socket.off('stop_game');
         socket.off('option_receive');
         socket.off('create_game');*/
-        leaveGame();
+        //leaveGame();
 
 		};
 	}, []);
