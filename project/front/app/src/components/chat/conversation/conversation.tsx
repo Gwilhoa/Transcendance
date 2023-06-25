@@ -7,6 +7,7 @@ import Messages from './message';
 import {useNavigate} from 'react-router-dom';
 import {setErrorLocalStorage} from '../../IfError';
 import ButtonListChannel from '../optionBar/button/ButtonListUserModal';
+import { parseChannelName } from '../Channel';
 
 export interface imageProfil {
 	id: string;
@@ -15,8 +16,9 @@ export interface imageProfil {
 
 
 function Conversation(
-	{listMessages, channel, errorGetMessage}:
-		{ listMessages: Array<Message>, channel: Channel, errorGetMessage: boolean }) {
+	{ listMessages, channel, errorGetMessage }:
+	{ listMessages: Array<Message>, channel: Channel, errorGetMessage: boolean })
+{
 	const [listImageProfil, setListImageProfil] = useState<Array<imageProfil>>([]);
 	const navigate = useNavigate();
 	const scrollRef = useRef(null);
@@ -68,7 +70,7 @@ function Conversation(
 					: 
 						<>
 							<p className='chat-conversation-channel-name'>
-								{channel.name}
+								{parseChannelName(channel)}
 							</p>
 							<ButtonListChannel/>
 						</>	

@@ -4,7 +4,7 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { UserService } from '../user/user.service';
+import { UserService } from './user.service';
 import { Logger } from '@nestjs/common';
 import { Socket } from 'socket.io';
 import { getSocketFromId, getSockets } from '../utils/socket.function';
@@ -32,6 +32,7 @@ export class UserGateway implements OnGatewayInit {
     const user_id = client.data.id;
     this.logger.log('research_name + ' + user_id);
     const users = await this.userService.getUserBySimilarNames(name, user_id);
+    console.log(users);
     client.emit('research_name', users);
   }
 
@@ -101,8 +102,8 @@ export class UserGateway implements OnGatewayInit {
     if (await this.userService.isfriend(user_id, friend_id)) {
       await this.userService.removeFriends(user_id, friend_id);
       const mpchannel = await this.channelService.getmpchannel(
-          user_id,
-          friend_id,
+        user_id,
+        friend_id,
       );
       await this.channelService.deletechannel(mpchannel.id);
       client.emit('friend_code', {
@@ -128,6 +129,7 @@ export class UserGateway implements OnGatewayInit {
     if (block_id == null) {
       client.emit('block_code', {
         message: 'block_id is null',
+        code: 1,
       });
       return;
     }
@@ -135,10 +137,12 @@ export class UserGateway implements OnGatewayInit {
       const user = await this.userService.addBlocked(user_id, block_id);
       client.emit('block_code', {
         message: 'ok',
+        code: 2,
       });
     } catch (e) {
       client.emit('block_code', {
         message: e.message,
+        code: 1,
       });
       return;
     }
@@ -148,14 +152,23 @@ export class UserGateway implements OnGatewayInit {
   async unblock_user(client: Socket, payload: any) {
     const user_id = client.data.id;
     const unblock_id = payload.unblock_id;
+    if (unblock_id == null) {
+      client.emit('block_code', {
+        message: 'unblock_id is null',
+        code: 1,
+      });
+      return;
+    }
     try {
       const user = await this.userService.removeBlocked(user_id, unblock_id);
       client.emit('block_code', {
-        message: 'ok',
+        message: 'reject',
+        code: 3,
       });
     } catch (e) {
       client.emit('block_code', {
         message: e.message,
+        code: 1,
       });
     }
   }

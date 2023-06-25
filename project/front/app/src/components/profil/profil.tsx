@@ -12,7 +12,7 @@ import {ProfilImage} from './ProfilImage';
 import axios from 'axios';
 import SocketSingleton from '../../socket';
 import {ProfilName} from './ProfilName';
-
+import { error } from 'console';
 const cookies = new Cookies();
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
@@ -30,6 +30,7 @@ export default function Profil() {
 	const [defeats, setDefeat] = useState<number>(0);
 	const [experience, setExperience] = useState<number>(0);
 	const [hasFriendRequest, setHasFriendRequest] = useState<number>(0);
+	const [isUserBlocked, setIsUserBlocked] = useState(false);
 	const id = useSelector((state: RootState) => state.modal.id);
 	const dispatch = useDispatch();
 
@@ -84,9 +85,33 @@ export default function Profil() {
 				}
 			}
 		});
+
+		axios.get(process.env.REACT_APP_IP + ':3000/user/friend/blocked', {
+			headers: {Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,},
+		}).then((Response) => {
+			console.log(Response.data);
+			for (const blocked of Response.data) {
+				if (blocked.id === id) {
+					setIsUserBlocked(true);
+					return;
+				}
+			}
+		})
 	}, [navigate, dispatch]);
 
 	useEffect(() => {
+		socket.on('block_code',(data) => {
+			console.log(data);
+			if (data.code == 2) {
+				setIsUserBlocked(true);
+			} else if (data.code == 3)
+			{
+				setIsUserBlocked(false);
+			}
+			else
+				console.log('error' + data.message);
+		})
+
 		socket.on('friend_code', (data: any) => {
 			console.log(data.code);
 			if (data.code === 2 && !isFriend) {
@@ -101,6 +126,7 @@ export default function Profil() {
 					})
 					.then((response) => {
 						console.log(response);
+						socket.emit('join_channel', {channel_id: response.data.id});
 					})
 					.catch((error) => {
 						console.error(error);
@@ -109,24 +135,28 @@ export default function Profil() {
 					});
 				setIsFriend(!isFriend);
 				return;
-			} else if (data.code === 5 || data.code === 7) {
+			}
+			else if (data.code === 5 || data.code === 7) {
 				setIsFriend(!isFriend);
 			}
-			return;
 		})
 
+
+
 		socket.on('friend_request', (data: any) => {
+			console.log('frend request :');
+			console.log(data);
 			console.log('friend request => ' + data.code);
 			if (data.id == id && (data.code == 2 || data.code == 7 || data.code == 5)) {
 				setIsFriend(!isFriend);
-				return;
 			}
-			return;
 		})
 
 		return () => {
 			socket.off('friend_request');
 			socket.off('friend_code');
+			socket.off('receive_challenge');
+			socket.off('block_code');
 		}
 	}, [isFriend]);
 
@@ -135,24 +165,6 @@ export default function Profil() {
 			setIsMe(true);
 		}
 		refresh(id);
-
-		axios.get(process.env.REACT_APP_IP + ':3000/auth/2fa/is2FA', {
-			headers: {
-				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
-			},
-		})
-			.then((response) => {
-				if (response.data == false)
-					setChecked(false);
-				else
-					setChecked(true);
-			})
-			.catch((error) => {
-				setErrorLocalStorage('Error ' + error.response.status);
-				console.error(error);
-				navigate('/Error');
-				dispatch(closeModal());
-			});
 	}, [navigate, id, refresh, dispatch]);
 
 	const changeName = (str: string) => {
@@ -179,6 +191,17 @@ export default function Profil() {
 				setErrorNameMessage(message.substring(19));
 			});
 	}
+
+	// useEffect(() => {
+	//
+	// 	socket.on('block_code',(data) => {
+	// 		console.log(data);
+	// 		if (data.code == 0)
+	// 			setIsUserBlocked(!isUserBlocked);
+	// 		else
+	// 			console.log('error' + data.message);
+	// 	});
+	// }, []);
 
 	const clicked = () => {
 		if (!checked) {
@@ -243,6 +266,15 @@ export default function Profil() {
 		socket.emit('challenge', {rival_id: id});
 	}
 
+	const handleChangeBlocke = () => {
+		if (isUserBlocked) {
+			socket.emit('unblock_user', {unblock_id:id})
+		}
+		else {
+			socket.emit('block_user', {block_id:id})
+		}
+	}
+
 	initialElement.push(
 		<div key='ProfilImage'>
 			<ProfilImage id={'' + id} OnClickOpenProfil={false} OverwriteClassName=''/>
@@ -261,8 +293,8 @@ export default function Profil() {
 					<span>{defeats}</span>
 				</p>
 				<p>
-					<span className='profil-game-info-title'>Ratio</span>
-					<span>{defeats === 0 ? (victories === 0 ? 0 : 1) : (victories / defeats).toFixed(2)}</span>
+				<span className='profil-game-info-title'>Ratio</span>
+				<span>{defeats === 0 ? (victories === 0 ? 0 : 1) : (victories / defeats).toFixed(2)}</span>
 				</p>
 			</div>
 			<p className='profil-experience'>{experience} XP</p>
@@ -306,6 +338,15 @@ export default function Profil() {
 		)
 	}
 
+	function handleChangeBlock() {
+			if (isUserBlocked) {
+				socket.emit('unblock_user', {unblock_id:id})
+			}
+			else {
+				socket.emit('block_user', {block_id:id})
+			}
+	}
+
 	return (
 		<div className='profil-modal'>
 			<div className='profil-title'>
@@ -325,6 +366,14 @@ export default function Profil() {
 								<button onClick={() => handlechallenge(id)}>
 									Challenge
 								</button>
+								<br/>
+								<button onClick={() => handleChangeBlocke()}>
+									{
+										isUserBlocked ? (
+											'unblock'
+										) : 'block'
+									}
+								</button>
 							</>
 						) : (
 							<>
@@ -332,7 +381,7 @@ export default function Profil() {
 									Unfriend
 								</button>
 								<br/>
-								<button>
+								<button onClick={() => handlechallenge(id)}>
 									Challenge
 								</button>
 							</>

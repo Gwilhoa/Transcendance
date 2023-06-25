@@ -11,7 +11,7 @@ import SocketSingleton from '../../../socket';
 import {setErrorLocalStorage} from '../../IfError';
 import {ProfilImage} from '../../profil/ProfilImage';
 import {ProfilName} from '../../profil/ProfilName';
-import {Search} from '../../search/userSearch';
+import Search from '../../search/userSearch';
 import {IUser} from '../../utils/interface';
 import {User} from '../../../pages/chat';
 
@@ -109,7 +109,11 @@ const InviteChannel = ({channel}: { channel: Channel }) => {
 							onClick={() => dispatch(switchChatModalInviteChannel())}
 						/>
 						<div className='chat-side-bar-invite-channel'>
-							<Search defaultAllUsers={true} OverwriteClassName={'chat-side-bar-invite-channel-input'}/>
+							<Search 
+								defaultAllUsers={true} 
+								OverwriteClassName={'chat-side-bar-invite-channel-input'}
+								id={localStorage.getItem('id')}
+							/>
 							<AddUserId
 								channel={channel}
 								usersId={usersId}

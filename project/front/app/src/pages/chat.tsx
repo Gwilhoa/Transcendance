@@ -281,7 +281,6 @@ function Chat() {
 				user: data.user,
 				date: data.date,
 			}
-			console.log(newItemMessage);
 			setMessages((prevListMessage) => {
 				if (prevListMessage.length === 0) {
 					return [newItemMessage];

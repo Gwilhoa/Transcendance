@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import {Inject, Injectable} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { addAdminDto } from 'src/dto/add-admin.dto';
 import { CreateChannelDto } from 'src/dto/create-channel.dto';
@@ -48,6 +48,7 @@ export class ChannelService {
       }
     }
     chan = await this.channelRepository.save(chan);
+    this.server.emit('newChannel', chan);
     return chan;
   }
 
@@ -222,10 +223,12 @@ export class ChannelService {
     }
     if (!f) throw new Error('User not in channel');
     if (chan.messages == null || chan.messages.length == 0) return null;
-    return chan.messages.filter(
-      async (m) =>
-        (await this.userService.isBlocked(user.id, m.user.id)) == false,
-    );
+    const ret = [];
+    for (const message of chan.messages) {
+      if (await this.userService.isBlocked(user.id, message.user.id) == false)
+        ret.push(message);
+    }
+    return ret;
   }
 
   public async sendMessage(body: sendMessageDTO, user_id) {
@@ -559,9 +562,5 @@ export class ChannelService {
     }
     channel.mutedUser = mutedUsers;
     return await this.channelRepository.save(channel);
-  }
-
-  async modifyChannel(user_id, channel_id, body) {
-    
   }
 }

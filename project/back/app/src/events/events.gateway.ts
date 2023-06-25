@@ -17,7 +17,10 @@ import { CreateGameDTO } from 'src/dto/create-game.dto';
 import { UserStatus } from 'src/utils/user.enum';
 import {
   disconnect,
-  getKeys, getSockets,
+  getdualrequest,
+  getKeys,
+  getSocketFromId,
+  getSockets,
   send_connection_server,
   wrongtoken,
 } from 'src/utils/socket.function';
@@ -69,13 +72,16 @@ export class EventsGateway
     }
     this.clients = disconnect(id, this.clients);
     if (getKeys(this.ingame).includes(id)) {
+      this.logger.debug('disconnect in game');
       const game = await this.gameService.remakeGame(this.ingame.get(id));
       if (game == null) {
         this.logger.error('game not found');
         return;
       }
-      this.ingame.delete(id);
-      await this.games[game.id].remake();
+      const ingame = await this.games[game.id];
+      this.ingame.delete(ingame.getUser1().data.id);
+      this.ingame.delete(ingame.getUser2().data.id);
+      await ingame.remake();
       this.games.delete(game.id);
     }
     if (this.matchmaking.includes(client)) {
@@ -291,8 +297,16 @@ export class EventsGateway
   @SubscribeMessage('option_send')
   async option_send(client: Socket, payload: any) {
     const user_id = client.data.id;
+
     const game_id = this.ingame.get(user_id);
+    if (game_id == null) {
+      return;
+    }
     const game: Game = this.games[game_id];
+    if (game == null) {
+      return;
+    }
+
     game.definePowerUp(payload.powerup);
     this.server.to(game_id).emit('will_started', { time: 3 });
     await sleep(1000);
@@ -337,6 +351,7 @@ export class EventsGateway
 
   @SubscribeMessage('game_finished')
   async game_finished(client: Socket, payload: any) {
+    console.log(payload);
     const rematch = payload.rematch;
     const id = client.data.id;
     const game_id = this.ingame.get(id);
@@ -382,35 +397,41 @@ export class EventsGateway
 
   @SubscribeMessage('challenge')
   async dual_request(client: Socket, payload: any) {
-    this.logger.debug('challenge');
     const rival_id = payload.rival_id;
-    const socket = this.server.sockets.sockets.get(rival_id);
+    const socket = getSocketFromId(rival_id, getSockets(this.server));
+    const user = await this.userService.getUserById(client.data.id);
     if (socket != null) {
-      if (this.dual.get(rival_id) != null) {
-        if (this.dual.get(rival_id) == client.data.id) {
-          this.dual.delete(rival_id);
-          socket.emit('receive_challenge', {
-            message: 'ok game will started soon',
-          });
-          client.emit('receive_challenge', {
-            message: 'ok game will started soon',
-          });
-          await this.play_game(client, socket);
-        } else {
-          client.emit('receive_challenge', {
-            message: 'user is in dual',
-          });
-          return;
-        }
-      } else {
+      const rival_request = getdualrequest(this.dual, rival_id);
+      if (rival_request == null) {
         this.dual.set(client.data.id, rival_id);
-        socket.emit('receive_challenge', {
-          rival: client.data.id,
+        client.emit('receive_challenge', {
+          message: 'challenge sent',
+          code: 0,
         });
+        socket.emit('receive_challenge', {
+          message: 'challenge received',
+          rival: client.data.id,
+          rival_name: user.username,
+          code: 2,
+        });
+      } else {
+        if (rival_request == client.data.id) {
+          this.dual.delete(rival_id);
+          client.emit('receive_challenge', {
+            message: 'challenge accepted',
+            code: 3,
+          });
+          socket.emit('receive_challenge', {
+            message: 'challenge accepted',
+            code: 3,
+          });
+          this.play_game(socket, client);
+        }
       }
     } else {
       client.emit('receive_challenge', {
         message: 'user is not connected',
+        code: 1,
       });
     }
   }

@@ -4,7 +4,7 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { ChannelService } from '../channel/channel.service';
+import { ChannelService } from './channel.service';
 import { Logger } from '@nestjs/common';
 import { Socket } from 'socket.io';
 import { ChannelCode, messageCode } from '../utils/requestcode.enum';
@@ -219,7 +219,16 @@ export class ChannelGateway implements OnGatewayInit {
         channel: msg.channel,
         date: msg.date,
       };
-      this.server.to(channel.id).emit('message', sendmsg);
+      const chan = await this.channelService.getChannelById(channel_id);
+      for (const User of chan.users) {
+        const socket = getSocketFromId(User.id, getSockets(this.server));
+        if (
+          socket != null &&
+          !(await this.userService.isBlocked(User.id, user_id))
+        ) {
+          socket.emit('message', sendmsg);
+        }
+      }
     }
     client.emit('message_code', send);
   }

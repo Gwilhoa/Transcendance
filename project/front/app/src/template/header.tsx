@@ -7,12 +7,14 @@ import {useDispatch} from 'react-redux';
 import {openModal} from '../redux/modal/modalSlice';
 import SocketSingleton from '../socket';
 import axios from 'axios';
+import {setBeginStatus} from "../redux/game/beginToOption";
 
 const cookies = new Cookies();
 
 const Head = () => {
 	const [id, setId] = useState<string | null>(null);
 	const navigate = useNavigate();
+	const dispatch = useDispatch();
 
 	const socketInstance = SocketSingleton.getInstance();
 	const socket = socketInstance.getSocket();
@@ -38,7 +40,11 @@ const Head = () => {
 				});
 	}, [navigate]);
 
-	const dispatch = useDispatch();
+	useEffect(() => {
+		if (localStorage.getItem('id') == null) {
+			window.location.reload();
+		}
+	}, []);
 
 	const handleOpenModal = (id: string | null) => {
 		dispatch(openModal(id));
@@ -54,6 +60,10 @@ const Head = () => {
 		window.location.reload();
 	};
 
+	const setData = () => {
+		dispatch(setBeginStatus({gamestate: 10}));
+	}
+
 	return (
 		<div className='navbar'>
 			<div className='navbar__link'>
@@ -62,10 +72,11 @@ const Head = () => {
 				</Link>
 			</div>
 			<div>
+
 				<button onClick={() => handleChat()} className='navbar__link'>
 					Chat
 				</button>
-				<Link to="/begingame" className="navbar__link">
+				<Link to="/begingame" className="navbar__link" onClick={setData}>
 					Game
 				</Link>
 				<button onClick={() => handleHisto()} className='navbar__link'>

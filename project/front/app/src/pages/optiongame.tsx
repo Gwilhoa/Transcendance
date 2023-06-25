@@ -6,7 +6,9 @@ import React, {useEffect, useState} from 'react';
 import SocketSingleton from '../socket';
 import {useNavigate} from 'react-router-dom';
 import {RootState} from '../redux/store';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
+import ErrorToken from '../components/IfError';
+import { setBeginStatus } from '../redux/game/beginToOption';
 
 import Ball1 from '../images/game/ball/Ball1.png';
 import Ball2 from '../images/game/ball/Ball2.webp';
@@ -22,24 +24,40 @@ const cookies = new Cookies();
 
 
 const OptionGame = () => {
+    
+    const spinnerAnimationBall = useSpring({
+        from: { transform: 'rotate(0deg)' },
+        to: { transform: 'rotate(360deg)' },
+        loop: true,
+        config: { duration: 4000 },
+    });
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const decide = useSelector((state: RootState) => state.beginToOption.decide);
+    const playerstats = useSelector((state: RootState) => state.beginToOption.playerstate);
+    const id = useSelector((state: RootState) => state.beginToOption.gameid);
+    const gamestate = useSelector((state: RootState) => state.beginToOption.gamestate)
+    console.log(gamestate);
+    useEffect(() => {
+        if (id == null || gamestate != 1)
+            navigate('/home');
+        dispatch(setBeginStatus({decide: decide, playerstate: playerstats, gameid: id ,gamestate: 2}));
 
-	const spinnerAnimationBall = useSpring({
-		from: {transform: 'rotate(0deg)'},
-		to: {transform: 'rotate(360deg)'},
-		loop: true,
-		config: {duration: 4000},
-	});
-	const navigate = useNavigate();
-	const decide = useSelector((state: RootState) => state.beginToOption.decide);
-	const playerstats = useSelector((state: RootState) => state.beginToOption.playerstate);
-	const hasproblem = useSelector((state: RootState) => state.beginToOption.gameid);
-	useEffect(() => {
-		if (hasproblem == null)
-			navigate('/home');
-		return () => {
-			socket.off('will_started');
-		}
-	}, [])
+        socket.on("finish_game", (data) => {
+            navigate('/home')
+        })
+
+		socket.on('will_started', (data) => {
+			console.log(data);
+			navigate('/game');
+		})
+
+        return () => {
+            socket.off('will_started');
+        }
+        
+    }, [socket])
+
 	console.log('playerstats ' + playerstats + '\ndecide ' + decide);
 
 	const [nbBall, setNbBall] = useState(Ball1);
@@ -49,11 +67,6 @@ const OptionGame = () => {
 	const enterGame = () => {
 		socket.emit('option_send', {ball: nbBall, map: nbMap, powerup: isPowerup})
 	}
-
-	socket.on('will_started', (data) => {
-		console.log(data);
-		navigate('/game');
-	})
 
 	const selectBall = (str: string) => {
 		setNbBall(str)
@@ -71,6 +84,7 @@ const OptionGame = () => {
 		<>
 			{!decide &&
                 <>
+                    <ErrorToken/>
                     <div className='game-waiting-settings'>
                         Waiting your opponent to choose settings...
                     </div>
@@ -79,6 +93,7 @@ const OptionGame = () => {
 
 			{decide &&
                 <>
+                    <ErrorToken/>
                     <div className='title-choice'>
                         choose ball
                     </div>
