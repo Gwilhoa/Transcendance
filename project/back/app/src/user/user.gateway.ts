@@ -129,6 +129,7 @@ export class UserGateway implements OnGatewayInit {
     if (block_id == null) {
       client.emit('block_code', {
         message: 'block_id is null',
+        code: 1,
       });
       return;
     }
@@ -136,10 +137,12 @@ export class UserGateway implements OnGatewayInit {
       const user = await this.userService.addBlocked(user_id, block_id);
       client.emit('block_code', {
         message: 'ok',
+        code: 2,
       });
     } catch (e) {
       client.emit('block_code', {
         message: e.message,
+        code: 1,
       });
       return;
     }
@@ -152,6 +155,7 @@ export class UserGateway implements OnGatewayInit {
     if (unblock_id == null) {
       client.emit('block_code', {
         message: 'unblock_id is null',
+        code: 1,
       });
       return;
     }
@@ -159,10 +163,12 @@ export class UserGateway implements OnGatewayInit {
       const user = await this.userService.removeBlocked(user_id, unblock_id);
       client.emit('block_code', {
         message: 'reject',
+        code: 3,
       });
     } catch (e) {
       client.emit('block_code', {
         message: e.message,
+        code: 1,
       });
     }
   }

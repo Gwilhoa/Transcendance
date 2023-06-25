@@ -8,7 +8,7 @@ import {IUser} from '../components/utils/interface';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../redux/store';
 import {openModal} from '../redux/modal/modalSlice';
-import {Search} from '../components/search/userSearch';
+import Search from '../components/search/userSearch';
 import axios from 'axios';
 import SocketSingleton from '../socket';
 import Profil from '../components/profil/profil';
@@ -143,7 +143,11 @@ const Home = () => {
 		<div className='home'>
 			<ErrorToken/>
 			<div className='scrollBlock'>
-				<Search defaultAllUsers={false} OverwriteClassName={''}/>
+				<Search 
+					defaultAllUsers={false}
+					OverwriteClassName={''}
+					id={localStorage.getItem('id')}
+				/>
 				<Add/>
 			</div>
 		</div>

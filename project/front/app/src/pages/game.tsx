@@ -1,5 +1,5 @@
 import './css/game.css'
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import Cookies from 'universal-cookie';
 import {useNavigate} from 'react-router-dom';
 import ErrorToken from '../components/IfError';
@@ -27,6 +27,7 @@ const Game: React.FC<GameProps> = () => {
 	const navigate = useNavigate();
 	const gameId = useSelector((state: RootState) => state.beginToOption.gameid);
 
+	const canPress = useRef(false);
 	const [ball, setBall] = useState({x: 50, y: 50});
 	const [paddle1, setPaddle1] = useState(42.5);
 	const [paddle2, setPaddle2] = useState(42.5);
@@ -57,6 +58,8 @@ const Game: React.FC<GameProps> = () => {
 	};
 
 	const handleKeyPress = (event: KeyboardEvent) => {
+		if (!canPress.current)
+			return;
 		switch (event.code) {
 			case 'KeyW':
 				socket.emit('input_game', {game_id: gameId, type: 0})
@@ -100,6 +103,7 @@ const Game: React.FC<GameProps> = () => {
 
 	socket.on('will_started', (data) => {
 		if (data.time == 0) {
+			canPress.current = true;
 			setStarted("0 | 0");
 		} else {
 			setStarted(data.time);
@@ -149,10 +153,10 @@ const Game: React.FC<GameProps> = () => {
 
 		socket.on('update_game', (data) => {
 			setStarted(data.score2 + " | " + data.score1)
+			console.log (data.ballx, data.bally);
 			data.ballx += 1;
 			if(data.ballx > 100) {
 				data.ballx = 100
-				console.log ("a");
 			}
 			setBall({x: (data.ballx), y: (data.bally)});
 			setPaddle2(data.rack2y)

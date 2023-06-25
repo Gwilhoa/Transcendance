@@ -223,10 +223,12 @@ export class ChannelService {
     }
     if (!f) throw new Error('User not in channel');
     if (chan.messages == null || chan.messages.length == 0) return null;
-    return chan.messages.filter(
-      async (m) =>
-        (await this.userService.isBlocked(user.id, m.user.id)) == false,
-    );
+    const ret = [];
+    for (const message of chan.messages) {
+      if (await this.userService.isBlocked(user.id, message.user.id) == false)
+        ret.push(message);
+    }
+    return ret;
   }
 
   public async sendMessage(body: sendMessageDTO, user_id) {

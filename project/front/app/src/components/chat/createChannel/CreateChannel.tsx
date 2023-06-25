@@ -6,7 +6,7 @@ import {Channel, User} from '../../../pages/chat';
 import {cookies} from '../../../App';
 import axios from 'axios';
 import SocketSingleton from '../../../socket';
-import {Search} from '../../search/userSearch';
+import Search from '../../search/userSearch';
 import {IUser} from '../../utils/interface';
 import {useNavigate} from 'react-router-dom';
 import {setErrorLocalStorage} from '../../IfError';
@@ -217,7 +217,11 @@ const CreateChannel = () => {
 					<>
 						<div className='chat-create-channel-find-user'>
 							<h3>Invite some people:</h3>
-							<Search defaultAllUsers={true} OverwriteClassName={'create-channel-invite-input'}/>
+							<Search 
+								defaultAllUsers={true} 
+								OverwriteClassName={'create-channel-invite-input'}
+								id={localStorage.getItem('id')}
+							/>
 							<AddUserId usersId={usersId} setUserId={setUserId}/>
 						</div>
 					</>

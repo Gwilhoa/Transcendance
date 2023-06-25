@@ -26,7 +26,6 @@ const EndGame = () => {
 	useEffect(() => {
 		return () => {
 			console.log("unmount revenge : " + myrevenge);
-
 			if (!myrevengeRef.current)
 				socket.emit('game_finished', {rematch: false});
 		};
@@ -45,10 +44,7 @@ const EndGame = () => {
   const replaybutton = () => {
     myrevengeRef.current = true;
     socket.emit('game_finished', {rematch : true})
-    if (revenge) {
-      launchReplay();
-    }
-    else
+    if (!revenge)
       setMyrevenge(true);
   }
 

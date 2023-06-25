@@ -85,22 +85,32 @@ export default function Profil() {
 				}
 			}
 		});
+
+		axios.get(process.env.REACT_APP_IP + ':3000/user/friend/blocked', {
+			headers: {Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,},
+		}).then((Response) => {
+			console.log(Response.data);
+			for (const blocked of Response.data) {
+				if (blocked.id === id) {
+					setIsUserBlocked(true);
+					return;
+				}
+			}
+		})
 	}, [navigate, dispatch]);
 
 	useEffect(() => {
 		socket.on('block_code',(data) => {
 			console.log(data);
-			if (data.message === 'ok')
+			if (data.code == 2) {
 				setIsUserBlocked(true);
-				if (data.message === 'reject')
-					setIsUserBlocked(false);
-				else
-					console.log(data.message);
-		});
-
-		socket.on('receive_challenge', (data: any) => {
-			console.log('receive_challenge');
-		});
+			} else if (data.code == 3)
+			{
+				setIsUserBlocked(false);
+			}
+			else
+				console.log('error' + data.message);
+		})
 
 		socket.on('friend_code', (data: any) => {
 			console.log(data.code);
@@ -155,24 +165,6 @@ export default function Profil() {
 			setIsMe(true);
 		}
 		refresh(id);
-
-		axios.get(process.env.REACT_APP_IP + ':3000/auth/2fa/is2FA', {
-			headers: {
-				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
-			},
-		})
-			.then((response) => {
-				if (response.data == false)
-					setChecked(false);
-				else
-					setChecked(true);
-			})
-			.catch((error) => {
-				setErrorLocalStorage('Error ' + error.response.status);
-				console.error(error);
-				navigate('/Error');
-				dispatch(closeModal());
-			});
 	}, [navigate, id, refresh, dispatch]);
 
 	const changeName = (str: string) => {
@@ -200,18 +192,16 @@ export default function Profil() {
 			});
 	}
 
-	useEffect(() => {
-
-		socket.on('block_code',(data) => {
-			console.log(data);
-			if (data.message === 'ok')
-			setIsUserBlocked(true);
-			if (data.message === 'reject')
-			setIsUserBlocked(false);
-			else
-			console.log(data.message);
-		});
-	}, []);
+	// useEffect(() => {
+	//
+	// 	socket.on('block_code',(data) => {
+	// 		console.log(data);
+	// 		if (data.code == 0)
+	// 			setIsUserBlocked(!isUserBlocked);
+	// 		else
+	// 			console.log('error' + data.message);
+	// 	});
+	// }, []);
 
 	const clicked = () => {
 		if (!checked) {
@@ -277,17 +267,11 @@ export default function Profil() {
 	}
 
 	const handleChangeBlocke = () => {
-		//await axios.get('/friend/blocked', {
-
-		//})
 		if (isUserBlocked) {
 			socket.emit('unblock_user', {unblock_id:id})
-			console.log('dd')
-		//	socket.emit('')block_id, block_code
 		}
 		else {
 			socket.emit('block_user', {block_id:id})
-			console.log('aa')
 		}
 	}
 
@@ -390,14 +374,6 @@ export default function Profil() {
 										) : 'block'
 									}
 								</button>
-								<button onClick={() => handleChangeBlock()}>
-									{
-										isUserBlocked ? (
-											'unblock'
-										) : 'block'
-									}
-								</button>
-
 							</>
 						) : (
 							<>
