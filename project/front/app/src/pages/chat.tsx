@@ -220,7 +220,7 @@ function Chat() {
 					setConversationId(data.channel.id);
 					return [...updatedListChannel, data.channel];
 				}
-			});		
+			});
 		}
 		setUpdateChannel((prevUpdateChannel) => prevUpdateChannel + 1);
 		if (updateChannel > 10) {
@@ -245,7 +245,7 @@ function Chat() {
 	}, []);
 
 	const handleMessage = useCallback((data: any) => {
-		if (data.channel == conversationId) {
+		if (data.channel.id == conversationId) {
 			const newItemMessage: Message = {
 				content: data.content,
 				id: data.id,
