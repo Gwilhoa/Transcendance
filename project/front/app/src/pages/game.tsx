@@ -217,24 +217,17 @@ const Game: React.FC<GameProps> = () => {
 				className="ball"
 				style={{...animatedBall, ...ballStyles}}/>
 			{stop &&
-                <div className="backgroundimg">
+                <div className="game-shadow">
 					{IamStoper &&
                         <button className='buttonResume' onClick={resumeGame}>
-                            <h1>
                                 resume
-                            </h1>
                         </button>
 					}
                     <button className='buttonLeave' onClick={leaveGame}>
-                        <h1>
                             Leave
-                        </h1>
                     </button>
                     <div className='textTime'>
-
-                        <h1>
 							{timeStop}
-                        </h1>
                     </div>
                 </div>}
 		</>
