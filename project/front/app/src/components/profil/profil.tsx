@@ -12,7 +12,6 @@ import {ProfilImage} from './ProfilImage';
 import axios from 'axios';
 import SocketSingleton from '../../socket';
 import {ProfilName} from './ProfilName';
-import { error } from 'console';
 const cookies = new Cookies();
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
@@ -22,6 +21,7 @@ export default function Profil() {
 	const initialElement = [];
 	const navigate = useNavigate();
 	const [isMe, setIsMe] = useState<boolean>(false);
+	const myId = useSelector((state: RootState) => state.id.id);
 	const [isFriend, setIsFriend] = useState<boolean>(false);
 	const [checked, setChecked] = useState(false);
 	const [errorName, setErrorName] = useState<boolean>(false);
@@ -79,7 +79,7 @@ export default function Profil() {
 					setHasFriendRequest(1);
 					return;
 				}
-				if (request.sender.id === localStorage.getItem('id') && request.receiver.id === id) {
+				if (request.sender.id === myId && request.receiver.id === id) {
 					setHasFriendRequest(2);
 					return;
 				}
@@ -126,7 +126,7 @@ export default function Profil() {
 					})
 					.then((response) => {
 						console.log(response);
-						socket.emit('join_channel', {channel_id: response.data.id});
+						socket.emit('join_channel', {channel_id: response.data.id, token: cookies.get('jwtAuthorization')});
 					})
 					.catch((error) => {
 						console.error(error);
@@ -161,7 +161,7 @@ export default function Profil() {
 	}, [isFriend]);
 
 	useEffect(() => {
-		if (id === localStorage.getItem('id')) {
+		if (id === myId) {
 			setIsMe(true);
 		}
 		refresh(id);
@@ -253,26 +253,17 @@ export default function Profil() {
 
 	const handleAddFriend = (id: string | null) => {
 		console.log('add friend ' + id);
-		socket.emit('friend_request', {friend_id: id});
+		socket.emit('friend_request', {friend_id: id, token: cookies.get('jwtAuthorization')});
 	};
 
 	const handleUnFriend = (id: string | null) => {
 		console.log('add friend ' + id);
-		socket.emit('unfriend_request', {friend_id: id});
+		socket.emit('unfriend_request', {friend_id: id, token: cookies.get('jwtAuthorization')});
 	};
 
 	const handlechallenge = (id: string | null) => {
 		console.log('challenge ' + id);
-		socket.emit('challenge', {rival_id: id});
-	}
-
-	const handleChangeBlocke = () => {
-		if (isUserBlocked) {
-			socket.emit('unblock_user', {unblock_id:id})
-		}
-		else {
-			socket.emit('block_user', {block_id:id})
-		}
+		socket.emit('challenge', {rival_id: id, token: cookies.get('jwtAuthorization')});
 	}
 
 	initialElement.push(
@@ -340,10 +331,10 @@ export default function Profil() {
 
 	function handleChangeBlock() {
 			if (isUserBlocked) {
-				socket.emit('unblock_user', {unblock_id:id})
+				socket.emit('unblock_user', {unblock_id: id, token: cookies.get('jwtAuthorization')})
 			}
 			else {
-				socket.emit('block_user', {block_id:id})
+				socket.emit('block_user', {block_id: id, token: cookies.get('jwtAuthorization')})
 			}
 	}
 
@@ -367,7 +358,7 @@ export default function Profil() {
 									Challenge
 								</button>
 								<br/>
-								<button onClick={() => handleChangeBlocke()}>
+								<button onClick={() => handleChangeBlock()}>
 									{
 										isUserBlocked ? (
 											'unblock'

@@ -1,11 +1,13 @@
 import './css/listUsers.css';
 import React from 'react';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {Channel, isAdmin, isMe, User} from '../../pages/chat';
 import {ProfilImage} from '../profil/ProfilImage';
 import {ProfilName} from '../profil/ProfilName';
 import {openModal} from '../../redux/modal/modalSlice';
 import SocketSingleton from '../../socket';
+import { RootState } from '../../redux/store';
+import { cookies } from '../../App';
 
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
@@ -22,7 +24,7 @@ type changeChannelProps = {
 const MakeAdmin = ({id, channel}: changeChannelProps) => {
 
 	const handleClickMakeAdmin = () => {
-		socket.emit('add_admin', {channel_id: channel.id, admin_id: id});
+		socket.emit('add_admin', {channel_id: channel.id, admin_id: id, token: cookies.get('jwtAuthorization')});
 		console.log('ON CLICK add admin');
 	};
 
@@ -36,7 +38,7 @@ const MakeAdmin = ({id, channel}: changeChannelProps) => {
 const DeleteAdmin = ({id, channel}: changeChannelProps) => {
 
 	const handleClickDeleteAdmin = () => {
-		socket.emit('remove_admin', {channel_id: channel.id, admin_id: id});
+		socket.emit('remove_admin', {channel_id: channel.id, admin_id: id, token: cookies.get('jwtAuthorization')});
 		console.log('ON CLICK Delete admin');
 	};
 
@@ -50,7 +52,7 @@ const DeleteAdmin = ({id, channel}: changeChannelProps) => {
 const BanHammer = ({id, channel}: changeChannelProps) => {
 
 	const handleClickBanHammer = () => {
-		socket.emit('ban_user', {channel_id: channel.id, ban_id: id});
+		socket.emit('ban_user', {channel_id: channel.id, ban_id: id, token: cookies.get('jwtAuthorization')});
 		console.log('ON CLICK ban user');
 	};
 
@@ -64,7 +66,7 @@ const BanHammer = ({id, channel}: changeChannelProps) => {
 const UnBanHammer = ({id, channel}: changeChannelProps) => {
 
 	const handleClickUnbanHammer = () => {
-		socket.emit('unban_user', {channel_id: channel.id, unban_id: id});
+		socket.emit('unban_user', {channel_id: channel.id, unban_id: id, token: cookies.get('jwtAuthorization')});
 		console.log('unban user');
 	};
 
@@ -78,7 +80,7 @@ const UnBanHammer = ({id, channel}: changeChannelProps) => {
 const MuteButton = ({id, channel}: changeChannelProps) => {
 
 	const handleClickMute = () => {
-		socket.emit('add_muted', {channel_id: channel.id, mute_id: id});
+		socket.emit('add_muted', {channel_id: channel.id, mute_id: id, token: cookies.get('jwtAuthorization')});
 		console.log('mute user');
 	};
 
@@ -92,7 +94,7 @@ const MuteButton = ({id, channel}: changeChannelProps) => {
 const UnMuteButton = ({id, channel}: changeChannelProps) => {
 
 	const handleClickMute = () => {
-		socket.emit('remove_muted', {channel_id: channel.id, mute_id: id});
+		socket.emit('remove_muted', {channel_id: channel.id, mute_id: id, token: cookies.get('jwtAuthorization')});
 		console.log('mute user');
 	};
 
@@ -106,6 +108,7 @@ const UnMuteButton = ({id, channel}: changeChannelProps) => {
 
 const ListAdmin = ({channel}: listUserProps) => {
 	const dispatch = useDispatch();
+	const myId = useSelector((state: RootState) => state.id.id);
 
 	return (
 		<>
@@ -123,12 +126,12 @@ const ListAdmin = ({channel}: listUserProps) => {
 								<ProfilName id={user.id}/>
 							</div>
 							<div className='chat-list-users-buttons-user'>
-								{ isAdmin(channel) && !isMe(user) ?
+								{ isAdmin(channel, '' + myId) && !isMe(user, '' + myId) ?
 									<DeleteAdmin id={user.id} channel={channel} />
 									:
 									null
 								}
-								{ channel.creator.id === '' + localStorage.getItem('id') ?
+								{ channel.creator.id === '' + myId ?
 									<BanHammer id={user.id} channel={channel} />
 									:
 									null
@@ -144,6 +147,7 @@ const ListAdmin = ({channel}: listUserProps) => {
 
 const ListUser = ({channel}: listUserProps) => {
 	const dispatch = useDispatch();
+	const myId = useSelector((state: RootState) => state.id.id);
 
 	const isMuted = (user: User, channel: Channel) => {
 		console.log(channel);
@@ -166,7 +170,7 @@ const ListUser = ({channel}: listUserProps) => {
 						<div className='chat-list-users-user-name' onClick={() => dispatch(openModal(user.id))}>
 							<ProfilName id={user.id}/>
 							</div>
-							{ isAdmin(channel) && !isMe(user) ?
+							{ isAdmin(channel, ''+myId) && !isMe(user, ''+myId) ?
 								<div className='chat-list-users-buttons-user'>
 									<MakeAdmin id={user.id} channel={channel} />
 									<BanHammer id={user.id} channel={channel} />
@@ -189,6 +193,7 @@ const ListUser = ({channel}: listUserProps) => {
 
 const ListBannedUser = ({channel}: listUserProps) => {
 	const dispatch = useDispatch();
+	const myId = useSelector((state: RootState) => state.id.id);
 
 	return (
 		<>
@@ -202,7 +207,7 @@ const ListBannedUser = ({channel}: listUserProps) => {
 						<div className='chat-list-users-user-name' onClick={() => dispatch(openModal(user.id))}>
 							<ProfilName id={user.id}/>
 						</div>
-						{ isAdmin(channel) && !isMe(user) ?
+						{ isAdmin(channel, ''+myId) && !isMe(user, ''+myId) ?
 							<div className='chat-list-users-buttons-user'>
 								<UnBanHammer id={user.id} channel={channel}/>
 							</div>

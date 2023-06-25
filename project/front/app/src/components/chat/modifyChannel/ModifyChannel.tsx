@@ -3,10 +3,8 @@ import React, {useState} from 'react'
 import {useDispatch} from 'react-redux';
 import {switchChatModalUpdateChannel} from '../../../redux/chat/modalChatSlice';
 import {Channel} from "../../../pages/chat";
-import SocketSingleton from "../../../socket";
-
-const socketInstance = SocketSingleton.getInstance();
-const socket = socketInstance.getSocket();
+import axios from 'axios';
+import { cookies } from '../../../App';
 
 const ModifyChannel = ({channel}: { channel: Channel }) => {
 	const dispatch = useDispatch();
@@ -15,13 +13,25 @@ const ModifyChannel = ({channel}: { channel: Channel }) => {
 	const [name, setName] = useState<string>('');
 
 	const updateChannel = () => {
-		socket.emit('update_channel', {
-			channel_id: channel.id,
+		axios.post(process.env.REACT_APP_IP + ':3000/channel/modifychannel/' + channel.id, 
+		{
 			name: name,
 			password: newPassword,
 			old_password: password
+		},
+		{
+					headers: {
+						Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+					},
+		}).then((response) => {
+			console.log('updatechannel');
+			console.log(response);
+
+			dispatch(switchChatModalUpdateChannel());
+		}).catch((error) => {
+			console.log('updatechannel');
+			console.error(error);
 		});
-		dispatch(switchChatModalUpdateChannel());
 	}
 
 	return (

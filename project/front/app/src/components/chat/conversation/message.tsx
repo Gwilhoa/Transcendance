@@ -1,9 +1,10 @@
 import '../css/chatMessage.css'
 import React, {useEffect, useState} from 'react'
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {Message} from '../../../pages/chat'
 import {openModal} from '../../../redux/modal/modalSlice';
 import {imageProfil} from './conversation';
+import { RootState } from '../../../redux/store';
 
 function Timer({dateString}: { dateString: string }) {
 	const [timeElipsed, setTimeElipsed] = useState<string>();
@@ -27,7 +28,8 @@ function Timer({dateString}: { dateString: string }) {
 }
 
 function Messages({message, listImage}: { message: Message, listImage: Array<imageProfil> }) {
-	const isMe: boolean = (message.user.id === localStorage.getItem('id'));
+	const myId = useSelector((state: RootState) => state.id.id);
+	const isMe: boolean = (message.user.id === myId);
 	const photo: string = listImage.find((image) => image.id === message.user.id)
 		?.image || '';
 

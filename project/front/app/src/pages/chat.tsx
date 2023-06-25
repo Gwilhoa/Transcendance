@@ -77,32 +77,23 @@ export const initialChannelState: Channel = {
 	mutedUser: [],
 }
 
-export const isAdmin = (channel: Channel) => {
-		if (channel.admins.some((admin) => admin.id === localStorage.getItem('id'))) {
-			return (true);
-		}
-		return (false);
+export const isAdmin = (channel: Channel, userId: string) => {
+		return (channel.admins.some((admin) => admin.id === userId));
 };
 
-export const isBan = (channel: Channel, user: User) => {
-		if (channel.bannedUsers.some((banned) => banned.id === user.id)) {
-			return (true);
-		}
-		return (false);
+export const isBan = (channel: Channel, userId: User) => {
+		return (channel.bannedUsers.some((banned) => banned.id === userId.id));
 };
 
-export const isMe = (user: User) => {
-	if (user.id === '' + localStorage.getItem('id')) {
-		return (true);
-	}
-	return (false);
+export const isMe = (user: User, myId: string) => {
+	return (user.id === myId);
 };
 
 const updateAvailableChannel = (input: string) => {
 	if (input === '') {
 		return;
 	}
-	socket.emit('research_channel', {search: input})
+	socket.emit('research_channel', {search: input, token: cookies.get('jwtAuthorization')})
 }
 ////////////////////////// CHAT ///////////////////////////////////////////////
 function Chat() {
@@ -261,10 +252,10 @@ function Chat() {
 		console.log('join_channel');
 		console.log(password.get(channel_id));
 		if (password.get(channel_id)) {
-			socket.emit('join_channel', {channel_id: channel_id, password: password.get(channel_id)});
+			socket.emit('join_channel', {channel_id: channel_id, password: password.get(channel_id), token: cookies.get('jwtAuthorization')});
 			return;
 		} else {
-			socket.emit('join_channel', {channel_id: channel_id});
+			socket.emit('join_channel', {channel_id: channel_id, token: cookies.get('jwtAuthorization')});
 		}
 	}
 
