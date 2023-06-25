@@ -171,8 +171,7 @@ const ListBlockScore = ({ userId, username }: { userId: string, username: string
 				setListGame(response.data);
 			})
 			.catch((error) => {
-				console.error(error);
-				setErrorLocalStorage(error.response.status);
+				setErrorLocalStorage(error?.response?.status);
 				navigate('/Error');
 			})
 	}, []);
@@ -218,13 +217,11 @@ const History = () => {
 					},
 				})
 					.then((response) => {
-						console.log(response);
 						setUsername(response.data.username);
 					})
 					.catch((error) => {
-						if (error.response.status == 401 || error.response.status == 500) {
-							setErrorLocalStorage('Error ' + error.response.status);
-							console.error(error);
+						if (error?.response?.status == 401 || error?.response?.status == 500) {
+							setErrorLocalStorage('Error ' + error?.response?.status);
 							navigate('/Error');
 						}
 						else (

@@ -11,6 +11,7 @@ const ModifyChannel = ({channel}: { channel: Channel }) => {
 	const [password, setPassword] = useState<string>('');
 	const [newPassword, setNewPassword] = useState<string>('');
 	const [name, setName] = useState<string>('');
+	const [errorMessage, setErrorMessage] = useState<string>('');
 
 	const updateChannel = () => {
 		axios.post(process.env.REACT_APP_IP + ':3000/channel/modifychannel/' + channel.id, 
@@ -26,11 +27,11 @@ const ModifyChannel = ({channel}: { channel: Channel }) => {
 		}).then((response) => {
 			console.log('updatechannel');
 			console.log(response);
-
 			dispatch(switchChatModalUpdateChannel());
 		}).catch((error) => {
 			console.log('updatechannel');
 			console.error(error);
+			setErrorMessage(error.message);
 		});
 	}
 
@@ -53,6 +54,7 @@ const ModifyChannel = ({channel}: { channel: Channel }) => {
 				{(channel?.type == 1 || channel?.type == 2) ?
 					<input className='chat-side-bar-close-modify-channel-password' type='text' placeholder='new password'
 					onChange={(e) => setNewPassword(e.target.value)}/> : <></>}
+					{errorMessage != '' && (<p>{errorMessage}</p>)}
 				<button className='chat-side-bar-modify-channel-button-update' onClick={updateChannel}>Update</button>
 			</div>
 		</div>
