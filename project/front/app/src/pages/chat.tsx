@@ -299,7 +299,7 @@ function Chat() {
 	const handleDeleteChannel = (data: any) => {
 		console.log('delete channel');
 		console.log(data);
-		if (conversationId == data.id) {
+		if (conversationId == data.channel.id) {
 			setConversationId('');
 			dispatch(closeChatModalListUser());
 		}

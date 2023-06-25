@@ -34,8 +34,7 @@ export const ProfilName = ({id}: { id: string | null }) => {
 				setUsername(data);
 			})
 			.catch((error) => {
-				setErrorLocalStorage('Error ' + error.response.status);
-				console.error(error);
+				setErrorLocalStorage('Error ' + error?.response?.status);
 				navigate('/Error');
 			});
 	}
@@ -61,8 +60,7 @@ export const ProfilName = ({id}: { id: string | null }) => {
 
 			})
 			.catch((error) => {
-				setErrorLocalStorage('Error ' + error.response.status);
-				console.error(error);
+				setErrorLocalStorage('Error ' + error?.response?.status);
 				navigate('/Error');
 			});
 

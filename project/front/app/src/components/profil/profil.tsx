@@ -43,14 +43,12 @@ export default function Profil() {
 			},
 		})
 			.then((response) => {
-				console.log(response.data);
 				setVictory(response.data.victories);
 				setDefeat(response.data.defeats);
 				setExperience(response.data.experience);
 			})
 			.catch((error) => {
-				setErrorLocalStorage('Error ' + error.response.status);
-				console.error(error);
+				setErrorLocalStorage('Error ' + error?.response?.status);
 				navigate('/Error');
 				dispatch(closeModal());
 			});
@@ -63,13 +61,14 @@ export default function Profil() {
 				setIsFriend(Response.data.isfriend);
 			})
 			.catch((error) => {
-				console.error(error);
-				if (error.response.status === 401 || error.response.status === 500) {
-					setErrorLocalStorage('Error ' + error.response.status);
+				if (error?.response?.status === 401 || error?.response?.status === 500) {
+					setErrorLocalStorage('Error ' + error?.response?.status);
 					navigate('/Error');
 					dispatch(closeModal());
 				}
-			})
+				navigate('/Error');
+				dispatch(closeModal());
+			});
 		axios.get(process.env.REACT_APP_IP + ':3000/user/friend/request', {
 			headers: {Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,},
 		}).then((Response) => {
@@ -84,6 +83,14 @@ export default function Profil() {
 					return;
 				}
 			}
+		}).catch((error) => {
+				if (error?.response?.status === 401 || error?.response?.status === 500) {
+					setErrorLocalStorage('Error ' + error?.response?.status);
+					navigate('/Error');
+					dispatch(closeModal());
+				}
+				navigate('/Error');
+				dispatch(closeModal());
 		});
 
 		axios.get(process.env.REACT_APP_IP + ':3000/user/friend/blocked', {
@@ -96,7 +103,15 @@ export default function Profil() {
 					return;
 				}
 			}
-		})
+		}).catch((error) => {
+				if (error?.response?.status === 401 || error?.response?.status === 500) {
+					setErrorLocalStorage('Error ' + error?.response?.status);
+					navigate('/Error');
+					dispatch(closeModal());
+				}
+				navigate('/Error');
+				dispatch(closeModal());
+		});
 	}, [navigate, dispatch]);
 
 	useEffect(() => {
@@ -129,8 +144,7 @@ export default function Profil() {
 						socket.emit('join_channel', {channel_id: response.data.id, token: cookies.get('jwtAuthorization')});
 					})
 					.catch((error) => {
-						console.error(error);
-						setErrorLocalStorage('Error ' + error.response.status);
+						setErrorLocalStorage('Error ' + error?.response?.status);
 						navigate('/Error');
 					});
 				setIsFriend(!isFriend);
@@ -179,15 +193,14 @@ export default function Profil() {
 				setErrorName(false);
 			})
 			.catch((error) => {
-				if (error.response.status == 401 
-					|| error.response.status == 500) {
-					setErrorLocalStorage('Error ' + error.response.status);
+				if (error?.response?.status == 401 
+					|| error?.response?.status == 500) {
+					setErrorLocalStorage('Error ' + error?.response?.status);
 					console.error(error);
 					navigate('/Error');
 				}
-				console.error(error);
 				setErrorName(true);
-				const message = '' + error.response.data;
+				const message = '' + error?.response?.data;
 				setErrorNameMessage(message.substring(19));
 			});
 	}
@@ -214,8 +227,7 @@ export default function Profil() {
 				},
 			})
 				.catch((error) => {
-					setErrorLocalStorage('Error ' + error.response.status);
-					console.error(error);
+					setErrorLocalStorage('Error ' + error?.response?.status);
 					navigate('/Error');
 				});
 			setChecked(false);
@@ -238,8 +250,7 @@ export default function Profil() {
 				data: formData,
 			})
 				.catch((error) => {
-					setErrorLocalStorage('Error ' + error.response.status);
-					console.error(error);
+					setErrorLocalStorage('Error ' + error?.response?.status);
 					navigate('/Error');
 				});
 		}
@@ -382,7 +393,7 @@ export default function Profil() {
 							history
 						</button>
 					</div>
-				) : (<></>)}
+				) : null}
 			</div>
 			<br/>
 		</div>

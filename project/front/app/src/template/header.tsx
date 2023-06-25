@@ -43,7 +43,7 @@ const Head = () => {
 					dispatch(setId(response.data.id));
 				})
 				.catch((error) => {
-					setErrorLocalStorage('Error ' + error.response.status);
+					setErrorLocalStorage('Error ' + error?.response?.status);
 					console.error(error);
 					navigate('/Error');
 				});

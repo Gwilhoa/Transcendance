@@ -41,8 +41,7 @@ export const ProfilImage = ({id, OnClickOpenProfil, OverwriteClassName}: {
 				setImage(data);
 			})
 			.catch((error) => {
-				setErrorLocalStorage('Error ' + error.response.status);
-				console.error(error);
+				setErrorLocalStorage('Error ' + error?.response?.status);
 				navigate('/Error');
 			});
 	}
@@ -67,8 +66,7 @@ export const ProfilImage = ({id, OnClickOpenProfil, OverwriteClassName}: {
 				}
 			})
 			.catch((error) => {
-				setErrorLocalStorage('Error ' + error.response.status);
-				console.error(error);
+				setErrorLocalStorage('Error ' + error?.response?.status);
 				navigate('/Error');
 			});
 
