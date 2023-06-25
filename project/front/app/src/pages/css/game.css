@@ -82,18 +82,16 @@
 
 .parentscore {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 2;
-    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
+    height: 100%;
+    width: 100%;
 }
 
 .score {
-    color: rgb(115, 121, 69);
+    color: var(--light-color);
+    opacity: 0.7;
     font-size: calc(5vw + 5vh);
     white-space: nowrap;
 }

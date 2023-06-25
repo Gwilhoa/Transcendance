@@ -10,6 +10,13 @@ import {useDispatch, useSelector} from 'react-redux';
 import ErrorToken from '../components/IfError';
 import { setBeginStatus } from '../redux/game/beginToOption';
 
+import Ball1 from '../images/game/ball/Ball1.png';
+import Ball2 from '../images/game/ball/Ball2.png';
+import Ball3 from '../images/game/ball/Ball3.png';
+
+import Map1 from '../images/game/map/Map1.png';
+import Map2 from '../images/game/map/Map2.png';
+import Map3 from '../images/game/map/Map3.png';
 
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
@@ -53,14 +60,6 @@ const OptionGame = () => {
 
 	console.log('playerstats ' + playerstats + '\ndecide ' + decide);
 
-	const Ball1 = "https://s2.qwant.com/thumbr/0x380/6/6/6f4c8d9426e69610d320350bc3fabc62de2332249a7491f1b39bdac0998bd0/soccer-ball-drawing-easy-39.png?u=http%3A%2F%2Fgetdrawings.com%2Fimages%2Fsoccer-ball-drawing-easy-39.png&q=0&b=1&p=0&a=0";
-	const Ball2 = "https://s2.qwant.com/thumbr/0x380/5/4/ba9cbaaa0553bca855a0ab68fe16a30ee10c0c4dc615f57d429e87bc25e88d/pngtree-cartoon-sheep-vector-design-png-image_3576531.jpg?u=https%3A%2F%2Fpng.pngtree.com%2Fpng-clipart%2F20190516%2Foriginal%2Fpngtree-cartoon-sheep-vector-design-png-image_3576531.jpg&q=0&b=1&p=0&a=0"
-	const Ball3 = "https://s2.qwant.com/thumbr/0x380/e/2/9078a58c5a46961b378e163c017b256eaf321459251b0bd15b85cc1370c874/Anonymous_Beach_ball.png?u=https%3A%2F%2Fpublicdomainvectors.org%2Fphotos%2FAnonymous_Beach_ball.png&q=0&b=1&p=0&a=0"
-
-	const Map1 = "https://s1.qwant.com/thumbr/0x380/a/b/e6e74cb56ea71ccd8f3d72a7e9651d524bc0577e65194bbeab2d698a458ee7/c713b5b38f5f6c84d144e2adff2e4efc.jpg?u=https%3A%2F%2Fi.pinimg.com%2Foriginals%2Fc7%2F13%2Fb5%2Fc713b5b38f5f6c84d144e2adff2e4efc.jpg&q=0&b=1&p=0&a=0";
-	const Map2 = "https://s2.qwant.com/thumbr/0x380/f/d/4aa7e3d157ea26514f10e46e10ad44ada6ab9a53de25c4fbbba4c33467acf8/pngtree-neon-error-404-page-png-image_943920.jpg?u=https%3A%2F%2Fpng.pngtree.com%2Fpng-clipart%2F20190419%2Fourlarge%2Fpngtree-neon-error-404-page-png-image_943920.jpg&q=0&b=1&p=0&a=0";
-	const Map3 = "https://s1.qwant.com/thumbr/0x380/a/2/d61274a02a570816fe863dcfdbdd9ac535f0f9ade18aed36a2bf7d6c79231e/karl-marx-portrait-billboard-1548-compressed.jpg?u=https%3A%2F%2Fstatic.billboard.com%2Ffiles%2Fmedia%2Fkarl-marx-portrait-billboard-1548-compressed.jpg&q=0&b=1&p=0&a=0";
-
 	const [nbBall, setNbBall] = useState(Ball1);
 	const [nbMap, setNbMap] = useState(Map1);
 	const [isPowerup, setIsPowerup] = useState(false);
@@ -82,93 +81,91 @@ const OptionGame = () => {
 	}
 
 	return (
-		<>
+		<div className='game-option-game-page'>
+            <ErrorToken/>
 			{!decide &&
-                <>
-                    <ErrorToken/>
-                    <div className='game-waiting-settings'>
-                        Waiting your opponent to choose settings...
-                    </div>
-                </>
+                <div className='game-waiting-settings'>
+                    Waiting your opponent to choose settings...
+                </div>
 			}
 
 			{decide &&
-                <>
-                    <ErrorToken/>
-                    <div className='title-choice'>
-                        choose ball
+                <div className='game-option-game-block'>
+                    <h1 className='game-option-game-title'>Game Option</h1>
+                    <div className='game-option-game-titles-option'>
+                        Ball
                     </div>
 
                     <div className="button-group">
                         <button
-                            className={`button ${nbBall === Ball1 ? 'selected' : ''}`}
+                            className={`button ${nbBall === Ball1 ? 'game-option-game-selected-button' : ''}`}
                             onClick={() => selectBall(Ball1)}>
                             Ball 1
                         </button>
                         <button
-                            className={`button ${nbBall === Ball2 ? 'selected' : ''}`}
+                            className={`button ${nbBall === Ball2 ? 'game-option-game-selected-button' : ''}`}
                             onClick={() => selectBall(Ball2)}>
                             Ball 2
                         </button>
                         <button
-                            className={`button ${nbBall === Ball3 ? 'selected' : ''}`}
+                            className={`button ${nbBall === Ball3 ? 'game-option-game-selected-button' : ''}`}
                             onClick={() => selectBall(Ball3)}>
                             Ball 3
                         </button>
                     </div>
-                    <div className='img'>
-                        <animated.img src={nbBall} className={"ball"} style={spinnerAnimationBall}></animated.img>
+                    <div className='game-option-game-ball'>
+                        <animated.img src={nbBall} className={'game-option-game-ball'} style={spinnerAnimationBall}></animated.img>
                     </div>
 
-                    <div className='title-choice'>
-                        choose map
+                    <div className='game-option-game-titles-option'>
+                        Map
                     </div>
 
                     <div className="button-group">
                         <button
-                            className={`button ${nbMap === Map1 ? 'selected' : ''}`}
+                            className={`button ${nbMap === Map1 ? 'game-option-game-selected-button' : ''}`}
                             onClick={() => selectMap(Map1)}>
                             Map 1
                         </button>
                         <button
-                            className={`button ${nbMap === Map2 ? 'selected' : ''}`}
+                            className={`button ${nbMap === Map2 ? 'game-option-game-selected-button' : ''}`}
                             onClick={() => selectMap(Map2)}>
                             Map 2
                         </button>
                         <button
-                            className={`button ${nbMap === Map3 ? 'selected' : ''}`}
+                            className={`button ${nbMap === Map3 ? 'game-option-game-selected-button' : ''}`}
                             onClick={() => selectMap(Map3)}>
                             Map 3
                         </button>
                     </div>
 
-                    <div className='img'>
+                    <div className='game-option-game-background'>
                         <img src={nbMap} width={300} height={200}/>
                     </div>
 
-                    <div className='title-choice'>
-                        choose if powerup
+                    <div className='game-option-game-titles-option'>
+                        Powerup
                     </div>
 
                     <div className="button-group">
                         <button
-                            className={`button ${isPowerup === false ? 'selected' : ''}`}
+                            className={`button ${isPowerup === false ? 'game-option-game-selected-button' : ''}`}
                             onClick={() => selectPowerUp(false)}>
                             no powerup
                         </button>
                         <button
-                            className={`button ${isPowerup === true ? 'selected' : ''}`}
+                            className={`button ${isPowerup === true ? 'game-option-game-selected-button' : ''}`}
                             onClick={() => selectPowerUp(true)}>
                             powerup
                         </button>
                     </div>
 
-                    <button className='enter' onClick={enterGame}>
+                    <button className='game-option-game-confirm-button' onClick={enterGame}>
                         confirm
                     </button>
-                </>
+                </div>
 			}
-		</>
+		</div>
 	);
 }
 
