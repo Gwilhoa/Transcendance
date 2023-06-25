@@ -2,11 +2,12 @@ import '../App.css'
 import React, {useEffect, useState} from 'react';
 import Head from './header';
 import Notification from '../components/notification/notification';
-import {Navigate, Outlet, useNavigate} from 'react-router-dom';
+import {Outlet, useNavigate} from 'react-router-dom';
 import SocketSingleton from '../socket';
 import {setBeginStatus} from "../redux/game/beginToOption";
 import {useDispatch} from "react-redux";
 import { cookies } from '../App';
+import { setErrorLocalStorage } from '../components/IfError';
 
 
 const Template = () => {
@@ -75,6 +76,8 @@ const Template = () => {
 
 		socket.on('connection_error', (data:any) => {
 			console.log(data);
+			setErrorLocalStorage('unauthorized')
+			navigate('/error');
 		});
 
 		socket.on('message', (data: any) => {
