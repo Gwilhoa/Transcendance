@@ -158,10 +158,10 @@ export class UserService {
           'user.status',
           'user.enabled2FA',
         ])
-        .where('user.id = :id', { id })
+        .where('user.id = :id', { id: id })
         .getOne();
 
-      console.debug(userWithSecret);
+      console.log(userWithSecret);
       return userWithSecret;
     }
 
