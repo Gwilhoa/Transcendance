@@ -7,11 +7,16 @@ import {
 import { UserService } from './user.service';
 import { Logger } from '@nestjs/common';
 import { Socket } from 'socket.io';
-import {getSocketFromId, getSockets, verifyToken, wrongtoken} from '../utils/socket.function';
+import {
+  getSocketFromId,
+  getSockets,
+  verifyToken,
+  wrongtoken,
+} from '../utils/socket.function';
 import { FriendCode } from '../utils/requestcode.enum';
 import { ChannelService } from '../channel/channel.service';
 import { addAdminDto } from '../dto/add-admin.dto';
-import {AuthService} from "../auth/auth.service";
+import { AuthService } from '../auth/auth.service';
 
 @WebSocketGateway()
 export class UserGateway implements OnGatewayInit {
@@ -120,10 +125,12 @@ export class UserGateway implements OnGatewayInit {
         friend_id,
       );
       await this.channelService.deletechannel(mpchannel.id);
+      client.emit('delete_channel', { id: mpchannel.id });
       client.emit('friend_code', {
         code: FriendCode.UNFRIEND_SUCCESS,
       });
       if (friend_socket != null) {
+        friend_socket.emit('delete_channel', { id: mpchannel.id });
         friend_socket.emit('friend_code', {
           code: FriendCode.NEW_UNFRIEND,
           id: user_id,

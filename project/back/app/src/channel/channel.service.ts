@@ -1,4 +1,4 @@
-import {Inject, Injectable} from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { addAdminDto } from 'src/dto/add-admin.dto';
 import { CreateChannelDto } from 'src/dto/create-channel.dto';
@@ -11,9 +11,13 @@ import { Message } from './message.entity';
 import { ChannelType } from 'src/utils/channel.enum';
 import { BanUserDto } from '../dto/ban-user.dto';
 import * as bcrypt from 'bcrypt';
-import { includeUser } from '../utils/socket.function';
-import {WebSocketServer} from "@nestjs/websockets";
-import {Server} from "socket.io";
+import {
+  getSocketFromId,
+  getSockets,
+  includeUser,
+} from '../utils/socket.function';
+import { WebSocketServer } from '@nestjs/websockets';
+import { Server } from 'socket.io';
 
 @Injectable()
 export class ChannelService {
@@ -73,9 +77,14 @@ export class ChannelService {
     chan.type = ChannelType.MP_CHANNEL;
     const user = await this.userService.getUserById(user_id);
     const user1 = await this.userService.getUserById(user_id1);
+    const socket_user1 = getSocketFromId(user.id, getSockets(this.server));
+    const socket_user2 = getSocketFromId(user1.id, getSockets(this.server));
     chan.users.push(user);
     chan.users.push(user1);
-    return await this.channelRepository.save(chan);
+    const ret = await this.channelRepository.save(chan);
+    socket_user1.emit('join_channel', { channel_id: ret.id });
+    socket_user2.emit('join_channel', { channel_id: ret.id });
+    return ret;
   }
 
   public async getChannelById(id) {
@@ -225,7 +234,7 @@ export class ChannelService {
     if (chan.messages == null || chan.messages.length == 0) return null;
     const ret = [];
     for (const message of chan.messages) {
-      if (await this.userService.isBlocked(user.id, message.user.id) == false)
+      if ((await this.userService.isBlocked(user.id, message.user.id)) == false)
         ret.push(message);
     }
     return ret;
