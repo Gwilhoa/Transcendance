@@ -13,7 +13,7 @@ export class Game {
     this.default_sizeMaxX / 2 - this.default_racklenght / 2;
   static default_rackwidth = 2;
   static default_radiusball = 1;
-  static default_speedBall = 0.5;
+  static default_speedBall = 0.25;
   static default_sizeMinX = 0;
   static default_sizeMinY = 0;
   static default_victorygoal = 3;
