@@ -97,7 +97,7 @@ const Template = () => {
 		})
 
 		socket.on('friend_code', (data: any) => {
-			console.log(data.code);
+			console.log(data);
 			let otherId = data.user1;
 			if (otherId == myId) {
 				otherId = data.user2;

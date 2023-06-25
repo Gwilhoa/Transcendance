@@ -97,7 +97,7 @@ const InviteChannel = ({channel}: { channel: Channel }) => {
 		channel.users.map((element: User) => {
 			setUserId((prevList) => [...prevList, element.id]);
 		});
-	}, []);
+	}, [channel]);
 
 	return (
 		<div className='page-shadow'>
