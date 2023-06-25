@@ -410,8 +410,9 @@ export class EventsGateway
         });
         socket.emit('receive_challenge', {
           message: 'challenge received',
-          rival: client.data,
+          rival: client.data.id,
           rival_name: user.username,
+          code: 2,
         });
       } else {
         if (rival_request == client.data.id) {
@@ -430,6 +431,7 @@ export class EventsGateway
     } else {
       client.emit('receive_challenge', {
         message: 'user is not connected',
+        code: 1,
       });
     }
   }

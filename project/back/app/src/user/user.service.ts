@@ -366,7 +366,7 @@ export class UserService {
     return user;
   }
 
-  public async setAvatar(id, buffer, extname) {
+  public async setAvatar(id: string, buffer: NodeJS.ArrayBufferView, extname) {
     const fs = require('fs');
     const path = require('path');
     const lastimage = await this.getPathImage(id);

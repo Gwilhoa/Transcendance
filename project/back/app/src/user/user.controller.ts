@@ -61,12 +61,10 @@ export class UserController {
     try {
       imagePath = await this.userService.getImageById(id);
     } catch (e) {
-      const request = await fetch(
-        'https://cdn.bitume2000.fr/achievement/0.png',
-      );
-      const buffer = await request.buffer();
+      const asyncReadFile = promisify(fs.readFile);
+      const image = await asyncReadFile(__dirname + '/../../src/utils/null.png');
       fs.mkdirSync(__dirname + '/../../../images', { recursive: true });
-      await this.userService.setAvatar(id, buffer, '.png');
+      await this.userService.setAvatar(id, image, '.png');
       imagePath = await this.userService.getImageById(id);
     }
     try {
@@ -88,12 +86,10 @@ export class UserController {
     try {
       imagePath = await this.userService.getImageById(id);
     } catch (e) {
-      const request = await fetch(
-        'https://cdn.bitume2000.fr/achievement/0.png',
-      );
-      const buffer = await request.buffer();
+      const asyncReadFile = promisify(fs.readFile);
+      const image = await asyncReadFile(__dirname + '/../../src/utils/null.png');
       fs.mkdirSync(__dirname + '/../../../images', { recursive: true });
-      await this.userService.setAvatar(id, buffer, '.png');
+      await this.userService.setAvatar(id, image, '.png');
       imagePath = await this.userService.getImageById(id);
     }
 
