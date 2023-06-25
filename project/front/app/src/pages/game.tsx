@@ -24,6 +24,8 @@ const Game: React.FC<GameProps> = () => {
 		config: { duration: 4000 },
 	});
 
+	let packageNumber = 0;
+
 	const navigate = useNavigate();
 	const gameId = useSelector((state: RootState) => state.beginToOption.gameid);
 
@@ -152,15 +154,18 @@ const Game: React.FC<GameProps> = () => {
 		})
 
 		socket.on('update_game', (data) => {
-			setStarted(data.score2 + " | " + data.score1)
-			console.log (data.ballx, data.bally);
-			data.ballx += 1;
-			if(data.ballx > 100) {
-				data.ballx = 100
+			if (data.package > packageNumber) {
+				setStarted(data.score2 + " | " + data.score1)
+				packageNumber = data.package;
+				console.log (data.ballx, data.bally);
+				data.ballx += 1;
+				if(data.ballx > 100) {
+					data.ballx = 100
+				}
+				setBall({x: (data.ballx), y: (data.bally)});
+				setPaddle2(data.rack2y)
+				setPaddle1(data.rack1y);
 			}
-			setBall({x: (data.ballx), y: (data.bally)});
-			setPaddle2(data.rack2y)
-			setPaddle1(data.rack1y);
 		});
 
 		socket.on('finish_game', (any) => {
