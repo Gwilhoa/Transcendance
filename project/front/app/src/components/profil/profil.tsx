@@ -12,7 +12,6 @@ import {ProfilImage} from './ProfilImage';
 import axios from 'axios';
 import SocketSingleton from '../../socket';
 import {ProfilName} from './ProfilName';
-import { error } from 'console';
 const cookies = new Cookies();
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();

@@ -485,6 +485,7 @@ export class ChannelService {
   }
 
   async updateChannel(channel_id: any, user_id: any, body: any) {
+	  console.log(channel_id);
     const channel = await this.channelRepository
       .createQueryBuilder('channel')
       .leftJoinAndSelect('channel.admins', 'admins')
@@ -507,6 +508,12 @@ export class ChannelService {
         channel.name = body.name;
       } else throw new Error('Name is too long');
       const ret = await this.channelRepository.save(channel);
+	  this.server.to(channel_id).emit('update_channel', {
+		code: 0,
+		channel_id: channel_id,
+		name: ret.name,
+		type: ret.type,
+	  });
       return { channel_id: ret.id, name: ret.name };
     } else {
       for (const admin of channel.admins) {

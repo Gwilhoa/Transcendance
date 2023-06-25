@@ -1,5 +1,5 @@
 import '../App.css'
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import Head from './header';
 import Notification from '../components/notification/notification';
 import {Navigate, Outlet, useNavigate} from 'react-router-dom';
@@ -42,17 +42,7 @@ const Template = () => {
 		console.log('reject friend')
 	}
 
-	socket.on('message', (data: any) => {
-		console.log(data)
-	})
-	socket.on('friend_request', (data: any) => {
-		if (data.code == 4) {
-			friendId = data.id;
-			setNotif(<Notification message={'New friend'} onConfirm={confirmFriend} onCancel={rejectFriend}
-				hasButton={true} setVisible={setNotifVisible}/>);
-			setNotifVisible(true)
-		}
-	})
+
 
 	function confirmChallenge() {
 		console.log('confirm challenge')
@@ -63,23 +53,47 @@ const Template = () => {
 		console.log('reject challenge')
 	}
 
-	socket.on('receive_challenge', (data: any) => {
-		console.log(data);
-		if (data.code == 3) {
-			socket.on('game_found', (data) => {
-				console.log(data);
-				dispatch(setBeginStatus({decide: data.decide, playerstate: data.user, gameid: data.game_id, gamestate: 1}));
-				socket.emit('leave_matchmaking')
-				navigate("/optiongame")
-			});
-			navigate('/optiongame');
-		} else if (data.code == 2) {
-			rivalId = data.rival;
-			setNotif(<Notification message={data.rival_name + ' wants battle'} onConfirm={confirmChallenge} onCancel={rejectChallenge} hasButton={true} setVisible={setNotifVisible}/>)
-			setNotifVisible(true);
-		}
-	});
+	useEffect(() => {	
+		socket.on('receive_challenge', (data: any) => {
+			console.log(data);
+			if (data.code == 3) {
+				socket.on('game_found', (data) => {
+					console.log(data);
+					dispatch(setBeginStatus({decide: data.decide, playerstate: data.user, gameid: data.game_id, gamestate: 1}));
+					socket.emit('leave_matchmaking')
+					navigate("/optiongame")
+					socket.off('game_found')
+				});
+				navigate('/optiongame');
+			} else if (data.code == 2) {
+				rivalId = data.rival;
+				setNotif(<Notification message={data.rival_name + ' wants battle'} onConfirm={confirmChallenge} onCancel={rejectChallenge} hasButton={true} setVisible={setNotifVisible}/>)
+				setNotifVisible(true);
+			}
+		});
 
+		socket.on('connection_error', (data:any) => {
+			console.log(data);
+		});
+
+		socket.on('message', (data: any) => {
+			console.log(data)
+		})
+
+		socket.on('friend_request', (data: any) => {
+			if (data.code == 4) {
+				friendId = data.id;
+				setNotif(<Notification message={'New friend'} onConfirm={confirmFriend} onCancel={rejectFriend}
+					hasButton={true} setVisible={setNotifVisible}/>);
+				setNotifVisible(true)
+			}
+		})
+
+		return () => {
+			socket.off('receive_challenge');
+			socket.off('connection_error');
+		};
+	}, []);
 
 	return (
 		<div className='page'>
