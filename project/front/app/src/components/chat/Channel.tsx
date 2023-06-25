@@ -38,7 +38,7 @@ const ChannelSideBar = ({channel}: { channel: Channel }) => {
 						<ButtonUpdateChannel/>
 					</>
 				) : null}
-				<ButtonLeaveChannel channelId={channel.id}/>
+				{channel.type != 3 && <ButtonLeaveChannel channelId={channel.id}/>}
 			</div>
 		</div>
 	);

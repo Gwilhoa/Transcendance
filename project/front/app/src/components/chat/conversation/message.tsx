@@ -18,7 +18,7 @@ function Timer({dateString}: { dateString: string }) {
 			.toString()
 			.padStart(2, '0')}h${date.getMinutes().toString().padStart(2, '0')}`;
 		setTimeElipsed(formattedDate);
-	}, []);
+	}, [dateString]);
 
 	return (
 		<>
