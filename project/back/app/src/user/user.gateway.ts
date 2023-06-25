@@ -35,7 +35,10 @@ export class UserGateway implements OnGatewayInit {
 
   @SubscribeMessage('research_name')
   async research_name(client: Socket, payload: any) {
-    if (payload.token == null || verifyToken(payload.token, this.authService)) {
+    if (
+      payload.token == null ||
+      !verifyToken(payload.token, this.authService)
+    ) {
       wrongtoken(client, 'research_name');
       return;
     }
@@ -49,7 +52,7 @@ export class UserGateway implements OnGatewayInit {
 
   @SubscribeMessage('friend_request') //reception d'une demande d'ami / accepter une demande d'ami
   async handleFriendRequest(client: Socket, payload: any) {
-    if (payload.token == null || verifyToken(payload.token, this.authService)) {
+    if (payload.token == null || !verifyToken(payload.token, this.authService)) {
       wrongtoken(client, 'friend_request');
       return;
     }
@@ -111,7 +114,7 @@ export class UserGateway implements OnGatewayInit {
 
   @SubscribeMessage('unfriend_request')
   async unfriend_request(client: Socket, payload: any) {
-    if (payload.token == null || verifyToken(payload.token, this.authService)) {
+    if (payload.token == null || !verifyToken(payload.token, this.authService)) {
       wrongtoken(client, 'unfriend_request');
       return;
     }
@@ -145,7 +148,7 @@ export class UserGateway implements OnGatewayInit {
 
   @SubscribeMessage('block_user')
   async block_user(client: Socket, payload: any) {
-    if (payload.token == null || verifyToken(payload.token, this.authService)) {
+    if (payload.token == null || !verifyToken(payload.token, this.authService)) {
       wrongtoken(client, 'block_user');
       return;
     }
@@ -175,7 +178,7 @@ export class UserGateway implements OnGatewayInit {
 
   @SubscribeMessage('unblock_user')
   async unblock_user(client: Socket, payload: any) {
-    if (payload.token == null || verifyToken(payload.token, this.authService)) {
+    if (payload.token == null || !verifyToken(payload.token, this.authService)) {
       wrongtoken(client, 'unblock_user');
       return;
     }

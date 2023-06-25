@@ -346,7 +346,7 @@ export class EventsGateway
 
   @SubscribeMessage('game_finished')
   async game_finished(client: Socket, payload: any) {
-    if (payload.token == null || verifyToken(payload.token, this.authService)) {
+    if (payload.token == null || !verifyToken(payload.token, this.authService)) {
       wrongtoken(client, 'game_finished');
       return;
     }
@@ -395,7 +395,7 @@ export class EventsGateway
 
   @SubscribeMessage('challenge')
   async dual_request(client: Socket, payload: any) {
-    if (payload.token == null || verifyToken(payload.token, this.authService)) {
+    if (payload.token == null || !verifyToken(payload.token, this.authService)) {
       wrongtoken(client, 'challenge');
       return;
     }
@@ -440,7 +440,7 @@ export class EventsGateway
 
   @SubscribeMessage('leave_game')
   async leave_game(client: Socket, payload: any) {
-    if (payload.token == null || verifyToken(payload.token, this.authService)) {
+    if (payload.token == null || !verifyToken(payload.token, this.authService)) {
       wrongtoken(client, 'leave_game');
       return;
     }

@@ -39,7 +39,7 @@ export class ChannelGateway implements OnGatewayInit {
 
   @SubscribeMessage('invite_channel')
   async invite_channel(client: Socket, payload: any) {
-    if (payload.token == null || verifyToken(payload.token, this.authService)) {
+    if (payload.token == null || !verifyToken(payload.token, this.authService)) {
       wrongtoken(client, 'invite_channel');
       return;
     }
@@ -119,7 +119,7 @@ export class ChannelGateway implements OnGatewayInit {
   }
   @SubscribeMessage('send_message')
   async handleMessage(client: Socket, payload: any) {
-    if (payload.token == null || verifyToken(payload.token, this.authService)) {
+    if (payload.token == null || !verifyToken(payload.token, this.authService)) {
       wrongtoken(client, 'send_message');
       return;
     }
@@ -243,7 +243,7 @@ export class ChannelGateway implements OnGatewayInit {
 
   @SubscribeMessage('leave_channel')
   async handleLeaveChannel(client: Socket, payload: any) {
-    if (payload.token == null || verifyToken(payload.token, this.authService)) {
+    if (payload.token == null || !verifyToken(payload.token, this.authService)) {
       wrongtoken(client, 'leave_channel');
       return;
     }
@@ -295,7 +295,7 @@ export class ChannelGateway implements OnGatewayInit {
 
   @SubscribeMessage('ban_user')
   async ban_user(client: Socket, payload: any) {
-    if (payload.token == null || verifyToken(payload.token, this.authService)) {
+    if (payload.token == null || !verifyToken(payload.token, this.authService)) {
       wrongtoken(client, 'ban_user');
       return;
     }
@@ -343,7 +343,7 @@ export class ChannelGateway implements OnGatewayInit {
 
   @SubscribeMessage('unban_user')
   async unban_user(client: Socket, payload: any) {
-    if (payload.token == null || verifyToken(payload.token, this.authService)) {
+    if (payload.token == null || !verifyToken(payload.token, this.authService)) {
       wrongtoken(client, 'unban_user');
       return;
     }
@@ -386,7 +386,7 @@ export class ChannelGateway implements OnGatewayInit {
 
   @SubscribeMessage('add_admin')
   async add_admin(client: Socket, payload: any) {
-    if (payload.token == null || verifyToken(payload.token, this.authService)) {
+    if (payload.token == null || !verifyToken(payload.token, this.authService)) {
       wrongtoken(client, 'add_admin');
       return;
     }
@@ -429,7 +429,7 @@ export class ChannelGateway implements OnGatewayInit {
 
   @SubscribeMessage('remove_admin')
   async remove_admin(client: Socket, payload: any) {
-    if (payload.token == null || verifyToken(payload.token, this.authService)) {
+    if (payload.token == null || !verifyToken(payload.token, this.authService)) {
       wrongtoken(client, 'remove_admin');
       return;
     }
@@ -472,7 +472,7 @@ export class ChannelGateway implements OnGatewayInit {
 
   @SubscribeMessage('research_channel')
   async research_channel(client: Socket, payload: any) {
-    if (payload.token == null || verifyToken(payload.token, this.authService)) {
+    if (payload.token == null || !verifyToken(payload.token, this.authService)) {
       wrongtoken(client, 'research_channel');
       return;
     }
@@ -528,7 +528,7 @@ export class ChannelGateway implements OnGatewayInit {
 
   @SubscribeMessage('remove_muted')
   async remove_muted(client: Socket, payload: any) {
-    if (payload.token == null || verifyToken(payload.token, this.authService)) {
+    if (payload.token == null || !verifyToken(payload.token, this.authService)) {
       wrongtoken(client, 'remove_muted');
       return;
     }
