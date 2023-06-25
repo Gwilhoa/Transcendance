@@ -321,7 +321,6 @@ export class Game {
     }
     this._ballx = this._futurballx;
     this._bally = this._futurbally;
-    console.log(this._ballx, this._bally);
 
     this._io.to(this._id).emit('update_game', this.getGameInfo());
   };
@@ -336,6 +335,8 @@ export class Game {
       status: 'remake',
       username: 'none',
     });
+
+    
     this._user2.leave(this._id);
     this._user1.leave(this._id);
     this.clear();
