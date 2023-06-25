@@ -106,6 +106,18 @@ export class Game {
     return this._user2;
   }
 
+
+  private beginStop = (userStop: Socket, userNoStop: Socket) => {
+    if (!this._stop) {
+      this._stop = true;
+      userStop.emit('is_stop_game', { stop: true, stoper: true });
+      userNoStop.emit('is_stop_game', { stop: true, stoper: false });
+      //clearInterval(this._loopid);
+      this._playerstop = userStop.id;
+      this._loop_stop = setInterval(this.delayStop, 1000);
+    }
+  }
+
   public updateRacket = (player: Socket, y: number) => {
     if (y == 2 && this._started) {
       console.log('enter');
@@ -114,30 +126,16 @@ export class Game {
       console.log(this._playerstop);
       if (this._stop && player.id == this._playerstop) {
         console.log('clearinterval');
-
-        clearInterval(this._loop_stop);
-        this._stop = false;
-        this._loopid = setInterval(this.gameLoop, Game.default_update);
-        this._user1.emit('is_stop_game', { stop: false, stoper: false });
-        this._user2.emit('is_stop_game', { stop: false, stoper: false });
+        this.endOfStop();
         return;
       }
       if (!this._stop) {
-        if (
-          (player.id === this._user1.id && this._time_stop_user1 > 0) ||
-          (player.id === this._user2.id && this._time_stop_user2 > 0)
-        ) {
-          this._stop = true;
-          clearInterval(this._loopid);
-          if (player.id == this._user1.id) {
-            this._user1.emit('is_stop_game', { stop: true, stoper: true });
-            this._user2.emit('is_stop_game', { stop: true, stoper: false });
-          } else {
-            this._user1.emit('is_stop_game', { stop: true, stoper: false });
-            this._user2.emit('is_stop_game', { stop: true, stoper: true });
+        if (player.id == this._user1.id && this._time_stop_user1 > 0) {
+          this.beginStop(this._user1, this._user2);
           }
-          this._playerstop = player.id;
-          this._loop_stop = setInterval(this.delayStop, 1000);
+        if (player.id == this._user2.id && this._time_stop_user2 > 0)
+        {
+          this.beginStop(this._user2, this._user1);
         }
       }
     }
@@ -240,6 +238,9 @@ export class Game {
   }
 
   public gameLoop = async () => {
+    if (this._stop) {
+      return;
+    }
     if (this._wait_ball > 0) {
       this._wait_ball -= 1;
       return;
@@ -336,41 +337,46 @@ export class Game {
       username: 'none',
     });
 
-    
+
     this._user2.leave(this._id);
     this._user1.leave(this._id);
     this.clear();
     return;
   }
 
-  public clear() {
+  public clear = () => {
     if (this._loopid != null) clearInterval(this._loopid);
     this._loopid = null;
   }
 
-  private delayStop = () => {
-    if (
-      (this._playerstop == this._user1.id && this._time_stop_user1 == 0) ||
-      (this._playerstop == this._user2.id && this._time_stop_user2 == 0)
-    ) {
+  private endOfStop = () => {
+    if (this._stop) {
       clearInterval(this._loop_stop);
-      this._stop = false;
-      this._loopid = setInterval(this.gameLoop, Game.default_update);
+      //this._loopid = setInterval(this.gameLoop, Game.default_update);
       this._user1.emit('is_stop_game', { stop: false, stoper: false });
       this._user2.emit('is_stop_game', { stop: false, stoper: false });
+      this._stop = false;
+    }
+  }
+
+  private delayStop = () => {
+    if (
+      (this._playerstop == this._user1.id && this._time_stop_user1 <= 0) ||
+      (this._playerstop == this._user2.id && this._time_stop_user2 <= 0)
+    ) {
+      this.endOfStop();
       return;
     }
 
     if (this._playerstop == this._user1.id) {
       this._user1.emit('stop_game', { time: this._time_stop_user1 });
       this._user2.emit('stop_game', { time: this._time_stop_user1 });
+      this._time_stop_user1 -= 1;
     } else {
       this._user1.emit('stop_game', { time: this._time_stop_user2 });
       this._user2.emit('stop_game', { time: this._time_stop_user2 });
+      this._time_stop_user2 -= 1;
     }
-
-    if (this._playerstop == this._user1.id) this._time_stop_user1 -= 1;
-    else this._time_stop_user2 -= 1;
   };
 
   private endWar = async (userWin: Socket, userDefeat: Socket, winuser) => {
