@@ -91,7 +91,7 @@ const OptionGame = () => {
 
 			{decide &&
                 <div className='game-option-game-block'>
-                    <h1 className='game-option-game-title'>Choose option for the next game</h1>
+                    <h1 className='game-option-game-title'>Game Option</h1>
                     <div className='game-option-game-titles-option'>
                         Ball
                     </div>
@@ -160,7 +160,7 @@ const OptionGame = () => {
                         </button>
                     </div>
 
-                    <button className='enter' onClick={enterGame}>
+                    <button className='game-option-game-confirm-button' onClick={enterGame}>
                         confirm
                     </button>
                 </div>

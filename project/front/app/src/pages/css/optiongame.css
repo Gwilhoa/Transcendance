@@ -2,20 +2,13 @@
     height: 100vh;
     width: 100vw;
     display: flex;
-    /* text-align: center; */
     justify-content: center;
     text-align: center;
+    align-items: center;
     color : var(--light-color);
 }
 
 .game-waiting-settings {
-    /* height: 100vh; */
-    /* display: flex;
-    flex-direction: column;
-    justify-content: center;
-    text-align: center;
-    color: var(--light-color);
-    margin-top: 3rem; */
     font-size: 2rem;
     height: 6rem;
 }
@@ -23,8 +16,7 @@
 .game-option-game-block{
     background-color: var(--box-color);
     border-radius: 20px;
-    width: 50rem;
-    height: 60rem;
+    width: 37rem;
 }
 
 .game-option-game-title{
@@ -61,8 +53,9 @@
 }
 
 .game-option-game-ball {
+    height: 1.5rem;
     margin-top: 1rem;
-    margin-bottom: 1rem;
+    margin-bottom: 2rem;
 }
 
 .game-option-game-background
@@ -70,15 +63,16 @@
     margin-top: 1rem;
 }
 
-.enter {
-    display: block;
-    margin: 2rem auto;
+.game-option-game-confirm-button {
+    margin: 3rem auto;
     padding: 1rem 2rem;
-    background-color: #ccc;
+    background-color: var(--primary-color);
+    color: var(--light-color);
     border: none;
-    border-radius: 5px;
+    border-radius: 17px;
     cursor: pointer;
     font-size: 2rem;
+    font-weight: bold;
 }
 
 @media screen and (max-width: 600px) {
@@ -96,7 +90,7 @@
         font-size: 0.8rem;
     }
 
-    .enter {
+    .game-option-game-confirm-button {
         margin: 1.5rem auto;
         padding: 0.8rem 1.6rem;
         font-size: 1.5rem;
