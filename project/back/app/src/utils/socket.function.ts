@@ -4,10 +4,11 @@ import { User } from '../user/user.entity';
 
 export function verifyToken(token: string, authService: AuthService) {
   try {
-    return authService.getIdFromToken(token);
+    authService.getIdFromToken(token);
   } catch (error) {
-    throw Error('Invalid token');
+    return false;
   }
+  return true;
 }
 
 export function getKeys(map: Map<any, any>) {

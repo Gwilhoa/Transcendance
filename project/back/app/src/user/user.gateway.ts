@@ -7,10 +7,11 @@ import {
 import { UserService } from './user.service';
 import { Logger } from '@nestjs/common';
 import { Socket } from 'socket.io';
-import { getSocketFromId, getSockets } from '../utils/socket.function';
+import {getSocketFromId, getSockets, verifyToken, wrongtoken} from '../utils/socket.function';
 import { FriendCode } from '../utils/requestcode.enum';
 import { ChannelService } from '../channel/channel.service';
 import { addAdminDto } from '../dto/add-admin.dto';
+import {AuthService} from "../auth/auth.service";
 
 @WebSocketGateway()
 export class UserGateway implements OnGatewayInit {
@@ -20,6 +21,7 @@ export class UserGateway implements OnGatewayInit {
   constructor(
     private userService: UserService,
     private channelService: ChannelService,
+    private authService: AuthService,
   ) {}
 
   afterInit() {
@@ -28,6 +30,10 @@ export class UserGateway implements OnGatewayInit {
 
   @SubscribeMessage('research_name')
   async research_name(client: Socket, payload: any) {
+    if (payload.token == null || verifyToken(payload.token, this.authService)) {
+      wrongtoken(client);
+      return;
+    }
     const name = payload.name;
     const user_id = client.data.id;
     this.logger.log('research_name + ' + user_id);
@@ -38,6 +44,10 @@ export class UserGateway implements OnGatewayInit {
 
   @SubscribeMessage('friend_request') //reception d'une demande d'ami / accepter une demande d'ami
   async handleFriendRequest(client: Socket, payload: any) {
+    if (payload.token == null || verifyToken(payload.token, this.authService)) {
+      wrongtoken(client);
+      return;
+    }
     let send;
     const friend_id = payload.friend_id;
     const user_id = client.data.id;
@@ -96,6 +106,10 @@ export class UserGateway implements OnGatewayInit {
 
   @SubscribeMessage('unfriend_request')
   async unfriend_request(client: Socket, payload: any) {
+    if (payload.token == null || verifyToken(payload.token, this.authService)) {
+      wrongtoken(client);
+      return;
+    }
     const friend_id = payload.friend_id;
     const user_id = client.data.id;
     const friend_socket = getSocketFromId(friend_id, getSockets(this.server));
@@ -124,6 +138,10 @@ export class UserGateway implements OnGatewayInit {
 
   @SubscribeMessage('block_user')
   async block_user(client: Socket, payload: any) {
+    if (payload.token == null || verifyToken(payload.token, this.authService)) {
+      wrongtoken(client);
+      return;
+    }
     const user_id = client.data.id;
     const block_id = payload.block_id;
     if (block_id == null) {
@@ -150,6 +168,10 @@ export class UserGateway implements OnGatewayInit {
 
   @SubscribeMessage('unblock_user')
   async unblock_user(client: Socket, payload: any) {
+    if (payload.token == null || verifyToken(payload.token, this.authService)) {
+      wrongtoken(client);
+      return;
+    }
     const user_id = client.data.id;
     const unblock_id = payload.unblock_id;
     if (unblock_id == null) {
