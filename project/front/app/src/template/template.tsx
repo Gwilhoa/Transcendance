@@ -8,6 +8,7 @@ import {setBeginStatus} from "../redux/game/beginToOption";
 import {useDispatch} from "react-redux";
 import { cookies } from '../App';
 import { setErrorLocalStorage } from '../components/IfError';
+import message from "../components/chat/conversation/message";
 
 
 const Template = () => {
@@ -81,7 +82,9 @@ const Template = () => {
 		});
 
 		socket.on('message', (data: any) => {
-			console.log(data);
+			const newmessage = data.user.username + ' : ' + data.content;
+			setNotif(<Notification message={newmessage} onConfirm={() => {null}} onCancel={() => {null}} hasButton={false} setVisible={setNotifVisible}/>)
+			setNotifVisible(true);
 		})
 
 		socket.on('friend_request', (data: any) => {
