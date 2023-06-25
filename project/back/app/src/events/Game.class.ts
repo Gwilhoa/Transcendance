@@ -308,8 +308,8 @@ export class Game {
       this._futurballx < this._minX + (Game.default_radiusball + 1) ||
       this._futurballx > this._maxX - (Game.default_radiusball + 1)
     ) {
-      if (this._futurballx < this._minX + Game.default_radiusball) {
-        const distbar =
+      if (this._futurballx < this._minX + (Game.default_radiusball + 1)) {
+       const distbar =
           this._futurballx - (this._minX + Game.default_radiusball);
         this._futurballx -= 2 * distbar;
       } else {
@@ -321,6 +321,7 @@ export class Game {
     }
     this._ballx = this._futurballx;
     this._bally = this._futurbally;
+    console.log(this._ballx, this._bally);
 
     this._io.to(this._id).emit('update_game', this.getGameInfo());
   };
