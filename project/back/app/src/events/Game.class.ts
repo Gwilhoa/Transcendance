@@ -42,7 +42,6 @@ export class Game {
   private _futurballx;
   private _futurbally;
   private _gameService: GameService;
-  private _finishCallback: Array<() => void> = [];
   private _package: number;
   private _isPowerUp: boolean;
   private _player1_reversey: number;
@@ -252,7 +251,7 @@ export class Game {
     const maxposition =
       this._maxY - Game.default_rackwidth - Game.default_radiusball;
 
-    if (this._futurbally <= minposition && this._futurbally > (minposition - 2)) {
+    if (this._futurbally <= minposition && this._futurbally > minposition - 2) {
       if (
         this._futurballx >= this._rack1y &&
         this._futurballx <= this._rack1y + Game.default_racklenght
@@ -266,7 +265,7 @@ export class Game {
       }
     }
 
-    if (this._futurbally >= maxposition && this._futurbally < (maxposition + 2)) {
+    if (this._futurbally >= maxposition && this._futurbally < maxposition + 2) {
       if (
         this._futurballx >= this._rack2y &&
         this._futurballx <= this._rack2y + Game.default_racklenght
@@ -306,8 +305,8 @@ export class Game {
     }
 
     if (
-      (this._futurballx < this._minX + (Game.default_radiusball + 1)) || (
-      this._futurballx > (this._maxX - (Game.default_radiusball + 1)))
+      this._futurballx < this._minX + (Game.default_radiusball + 1) ||
+      this._futurballx > this._maxX - (Game.default_radiusball + 1)
     ) {
       if (this._futurballx < this._minX + Game.default_radiusball) {
         const distbar =
@@ -326,12 +325,10 @@ export class Game {
     this._io.to(this._id).emit('update_game', this.getGameInfo());
   };
 
-  onFinish(callback) {
-    this._finishCallback.push(callback);
-  }
-
   public async remake() {
-    console.log("finish game for " + this._user1.data.id + ' ' + this._user2.data.id);
+    console.log(
+      'finish game for ' + this._user1.data.id + ' ' + this._user2.data.id,
+    );
     this._io.to(this._id).emit('finish_game', {
       score1: 0,
       score2: 0,

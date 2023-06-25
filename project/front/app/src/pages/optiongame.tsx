@@ -35,21 +35,21 @@ const OptionGame = () => {
         if (id == null || gamestate != 1)
             navigate('/home');
         dispatch(setBeginStatus({decide: decide, playerstate: playerstats, gameid: id ,gamestate: 2}));
-        
-        socket.on('will_started', (data) => {
-            console.log(data);
-            navigate('/game');
-        })
 
         socket.on("finish_game", (data) => {
             navigate('/home')
         })
 
+		socket.on('will_started', (data) => {
+			console.log(data);
+			navigate('/game');
+		})
+
         return () => {
-            //socket.off('will_started');
+            socket.off('will_started');
         }
         
-    }, [])
+    }, [socket])
 
 	console.log('playerstats ' + playerstats + '\ndecide ' + decide);
 
@@ -68,11 +68,6 @@ const OptionGame = () => {
 	const enterGame = () => {
 		socket.emit('option_send', {ball: nbBall, map: nbMap, powerup: isPowerup})
 	}
-
-	socket.on('will_started', (data) => {
-		console.log(data);
-		navigate('/game');
-	})
 
 	const selectBall = (str: string) => {
 		setNbBall(str)
