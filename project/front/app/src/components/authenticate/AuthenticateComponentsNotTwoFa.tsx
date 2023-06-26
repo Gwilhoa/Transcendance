@@ -14,7 +14,7 @@ function AuthenticateComponentsNotTwoFa() {
 		const url = process.env.REACT_APP_IP + ':3000/auth/authenticate';
 
 		const setCookieJwt = (jwtToken: string) => {
-			cookies.set('jwtAuthorization', jwtToken, {sameSite: 'strict', maxAge: 2 * 60 * 60});
+			cookies.set('jwtAuthorization', jwtToken, {sameSite: 'lax', maxAge: 2 * 60 * 60});
 		};
 
 		if (cookies.get('jwtAuthorization') != null) {
