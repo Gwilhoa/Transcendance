@@ -423,8 +423,8 @@ export class Game {
 
   private endBattle = (scoreWin: number): number => {
     scoreWin++;
+    this._started = false;
     if (scoreWin < Game.default_victorygoal) {
-      this._started = false;
       this._rack1y = Game.default_positionR;
       this._rack2y = Game.default_positionR;
       this._ballx = Game.default_positionBx;
