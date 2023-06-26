@@ -33,7 +33,7 @@ export const ProfilImage = ({id, OnClickOpenProfil, OverwriteClassName}: {
 	const changeImage = useCallback(() => {
 		axios.get(process.env.REACT_APP_IP + ':3000/user/image/' + id, {
 			headers: {
-				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+				Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 			},
 		})
 			.then((response) => {
@@ -51,7 +51,7 @@ export const ProfilImage = ({id, OnClickOpenProfil, OverwriteClassName}: {
 		changeImage();
 		axios.get(process.env.REACT_APP_IP + ':3000/user/id/' + id, {
 			headers: {
-				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+				Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 			},
 		})
 			.then((response) => {

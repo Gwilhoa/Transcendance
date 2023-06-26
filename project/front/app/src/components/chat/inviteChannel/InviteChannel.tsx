@@ -38,7 +38,7 @@ const AddUserId = ({usersId, setUserId, channelId, channel}: AddUserIdProps) => 
 	const refresh = useCallback(() => {
 		axios.get(process.env.REACT_APP_IP + ':3000/user/friend', {
 			headers: {
-				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+				Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 			},
 		})
 			.then((res) => {
@@ -65,7 +65,7 @@ const AddUserId = ({usersId, setUserId, channelId, channel}: AddUserIdProps) => 
 			}
 			return prevListId;
 		});
-		socket.emit('invite_channel', {receiver_id: id, channel_id: channelId, token: cookies.get('jwtAuthorization')});
+		socket.emit('invite_channel', {receiver_id: id, channel_id: channelId, token: localStorage.getItem('jwtAuthorization')});
 	};
 
 	if (listUser == null || listUser.length == 0) {

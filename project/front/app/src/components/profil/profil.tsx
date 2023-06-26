@@ -40,7 +40,7 @@ export default function Profil() {
 
 			axios.get(process.env.REACT_APP_IP + ':3000/auth/2fa/is2FA', {
 				headers: {
-					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+					Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 				},
 			})
 				.then((response) => {
@@ -54,7 +54,7 @@ export default function Profil() {
 
 		axios.get(process.env.REACT_APP_IP + ':3000/user/id/' + id, {
 			headers: {
-				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+				Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 			},
 		})
 			.then((response) => {
@@ -70,7 +70,7 @@ export default function Profil() {
 		axios.post(process.env.REACT_APP_IP + ':3000/user/isfriend',
 			{friend_id: id},
 			{
-				headers: {Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,},
+				headers: {Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,},
 			})
 			.then((Response) => {
 				setIsFriend(Response.data.isfriend);
@@ -85,7 +85,7 @@ export default function Profil() {
 				dispatch(closeModal());
 			});
 		axios.get(process.env.REACT_APP_IP + ':3000/user/friend/request', {
-			headers: {Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,},
+			headers: {Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,},
 		}).then((Response) => {
 			for (const request of Response.data) {
 				console.log(request);
@@ -109,7 +109,7 @@ export default function Profil() {
 		});
 
 		axios.get(process.env.REACT_APP_IP + ':3000/user/friend/blocked', {
-			headers: {Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,},
+			headers: {Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,},
 		}).then((Response) => {
 			console.log(Response.data);
 			for (const blocked of Response.data) {
@@ -183,7 +183,7 @@ export default function Profil() {
 			{name: str},
 			{
 				headers: {
-					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+					Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 				},
 			})
 			.then(() => {
@@ -209,7 +209,7 @@ export default function Profil() {
 		} else {
 			axios.get(process.env.REACT_APP_IP + ':3000/auth/2fa/disable', {
 				headers: {
-					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+					Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 				},
 			})
 				.catch((error) => {
@@ -232,7 +232,7 @@ export default function Profil() {
 				method: 'post',
 				url: process.env.REACT_APP_IP + ':3000/user/image',
 				headers: {
-					'Authorization': `Bearer ${cookies.get('jwtAuthorization')}`,
+					'Authorization': `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 					'Content-Type': 'multipart/form-data',
 				},
 				data: formData,
@@ -267,17 +267,17 @@ export default function Profil() {
 
 	const handleAddFriend = (id: string | null) => {
 		console.log('add friend ' + id);
-		socket.emit('friend_request', {friend_id: id, token: cookies.get('jwtAuthorization')});
+		socket.emit('friend_request', {friend_id: id, token: localStorage.getItem('jwtAuthorization')});
 	};
 
 	const handleUnFriend = (id: string | null) => {
 		console.log('add friend ' + id);
-		socket.emit('unfriend_request', {friend_id: id, token: cookies.get('jwtAuthorization')});
+		socket.emit('unfriend_request', {friend_id: id, token: localStorage.getItem('jwtAuthorization')});
 	};
 
 	const handlechallenge = (id: string | null) => {
 		console.log('challenge ' + id);
-		socket.emit('challenge', {rival_id: id, token: cookies.get('jwtAuthorization')});
+		socket.emit('challenge', {rival_id: id, token: localStorage.getItem('jwtAuthorization')});
 	}
 
 	initialElement.push(
@@ -346,10 +346,10 @@ export default function Profil() {
 
 	function handleChangeBlock() {
 			if (isUserBlocked) {
-				socket.emit('unblock_user', {unblock_id: id, token: cookies.get('jwtAuthorization')})
+				socket.emit('unblock_user', {unblock_id: id, token:localStorage.getItem('jwtAuthorization')})
 			}
 			else {
-				socket.emit('block_user', {block_id: id, token: cookies.get('jwtAuthorization')})
+				socket.emit('block_user', {block_id: id, token: localStorage.getItem('jwtAuthorization')})
 			}
 	}
 

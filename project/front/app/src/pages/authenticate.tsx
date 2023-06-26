@@ -9,8 +9,9 @@ const cookies = new Cookies();
 export function TokenPage() {
 	const urlParams = new URLSearchParams(window.location.search);
 	const token = urlParams.get('access_token');
-	cookies.set('tenMinToken', token, {maxAge: 5 * 60});
-
+	if (token != null) {
+		localStorage.setItem('tenMinToken', token);
+	}
 	const navigate = useNavigate();
 
 	axios.get(process.env.REACT_APP_IP + ':3000/auth/2fa/is2FA', {

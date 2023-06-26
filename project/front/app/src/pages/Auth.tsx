@@ -16,10 +16,10 @@ function Auth() {
 	localStorage.removeItem('Error');
 	dispatch(setId(null));
 	useEffect(() => {
-		if (cookies.get('jwtAuthorization') != null) {
+		if (localStorage.getItem('jwtAuthorization') != null) {
 			axios.get(process.env.REACT_APP_IP + ':3000/auth/2fa/is2FA', {
 				headers: {
-					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+					Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 				},
 			})
 				.then(() => {

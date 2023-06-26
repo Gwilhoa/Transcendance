@@ -21,7 +21,7 @@ const IsTwoFA = () => {
 	useEffect(() => {
 		axios.get(process.env.REACT_APP_IP + ':3000/auth/2fa/is2FA', {
 			headers: {
-				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+				Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 			},
 		})
 			.then((response) => {
@@ -59,7 +59,7 @@ const CreateTwoFaPage = () => {
 				},
 				{
 					headers: {
-						Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+						Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 					},
 				})
 				.then((response) => {
@@ -85,7 +85,7 @@ const CreateTwoFaPage = () => {
 	useEffect(() => {
 		axios.get(process.env.REACT_APP_IP + ':3000/auth/2fa/create', {
 			headers: {
-				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+				Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 			},
 		})
 			.then((response) => {

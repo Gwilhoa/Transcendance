@@ -23,7 +23,7 @@ const SendMessage = ({
 	const handleSendMessage = () => {
 		console.log('send message pls : ' + conversation);
 		socket.emit('send_message', {
-			token: cookies.get('jwtAuthorization'),
+			token: localStorage.getItem('jwtAuthorization'),
 			channel_id: conversation,
 			content: message
 		});

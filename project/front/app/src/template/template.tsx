@@ -23,7 +23,7 @@ const Template = () => {
 
 	const confirmFriend = () => {
 		console.log('confirm friend')
-		socket.emit('friend_request', {friend_id: friendId, token: cookies.get('jwtAuthorization')})
+		socket.emit('friend_request', {friend_id: friendId, token: localStorage.getItem('jwtAuthorization')})
 	}
 
 	const rejectFriend = () => {
@@ -34,7 +34,7 @@ const Template = () => {
 
 	function confirmChallenge() {
 		console.log('confirm challenge')
-		socket.emit('challenge', {rival_id: rivalId, token: cookies.get('jwtAuthorization')})
+		socket.emit('challenge', {rival_id: rivalId, token: localStorage.getItem('jwtAuthorization')})
 	}
 
 	function rejectChallenge() {
@@ -49,7 +49,7 @@ const Template = () => {
 				socket.on('game_found', (data) => {
 					console.log(data);
 					dispatch(setBeginStatus({decide: data.decide, playerstate: data.user, gameid: data.game_id, gamestate: 1}));
-					socket.emit('leave_matchmaking', {token: cookies.get('jwtAuthorization')})
+					socket.emit('leave_matchmaking', {token: localStorage.getItem('jwtAuthorization')})
 					navigate("/optiongame")
 					socket.off('game_found')
 				});

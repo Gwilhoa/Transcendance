@@ -10,10 +10,10 @@ class SocketSingleton {
 			transports: ['websocket']
 		});
 		this.socket.on('connect', async () => {
-			let jwtAuthorization = cookies.get('jwtAuthorization');
+			let jwtAuthorization =localStorage.getItem('jwtAuthorization');
 			while (!jwtAuthorization) {
 				await new Promise((resolve) => setTimeout(resolve, 100));
-				jwtAuthorization = cookies.get('jwtAuthorization');
+				jwtAuthorization = localStorage.getItem('jwtAuthorization');
 			}
 			this.socket.emit('connection', {token: jwtAuthorization});
 			console.log('connected');

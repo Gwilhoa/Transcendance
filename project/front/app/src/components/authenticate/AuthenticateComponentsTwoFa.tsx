@@ -16,10 +16,10 @@ function AuthenticateComponentsTwoFa() {
 	const AuthInputRef = useRef<AuthCodeRef>(null);
 
 	useEffect(() => {
-		if (cookies.get('jwtAuthorization') != null) {
+		if (localStorage.getItem('jwtAuthorization') != null) {
 			axios.get(process.env.REACT_APP_IP + ':3000/auth/2fa/is2FA', {
 				headers: {
-					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+					Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 				},
 			})
 				.then(() => {
@@ -36,7 +36,7 @@ function AuthenticateComponentsTwoFa() {
 	}, [navigate]);
 
 	const setCookieJwt = (jwtToken: string) => {
-		cookies.set('jwtAuthorization', jwtToken, {sameSite: 'none', maxAge: 2 * 60 * 60, secure: true});
+		localStorage.setItem('jwtAuthorization', jwtToken);
 	};
 
 	const handleOnChange = (res: string) => {
@@ -49,7 +49,7 @@ function AuthenticateComponentsTwoFa() {
 				},
 				{
 					headers: {
-						Authorization: `Bearer ${cookies.get('tenMinToken')}`,
+						Authorization: `Bearer ${localStorage.getItem('TenMinToken')}`,
 					},
 				})
 				.then((response) => {

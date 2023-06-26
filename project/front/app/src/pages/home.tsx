@@ -38,7 +38,7 @@ const Add = () => {
 	const refresh = useCallback(() => {
 		axios.get(process.env.REACT_APP_IP + ':3000/user/friend', {
 			headers: {
-				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+				Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 			},
 		})
 			.then((res) => {
@@ -96,7 +96,7 @@ const Add = () => {
 
 	const handlechallenge = (id: string | null) => {
 		console.log('challenge ' + id);
-		socket.emit('challenge', {rival_id: id, token: cookies.get('jwtAuthorization')});
+		socket.emit('challenge', {rival_id: id, token: localStorage.getItem('jwtAuthorization')});
 	}
 
 	return (

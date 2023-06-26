@@ -92,7 +92,7 @@ const OneScoreBlock = ({ game, playerId }: { game: Game, playerId: string }) => 
 	useEffect(() => {
 		axios.get(process.env.REACT_APP_IP + ':3000/user/image/' + playerId, {
 			headers: {
-				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+				Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 			},
 		})
 			.then((response) => {
@@ -114,7 +114,7 @@ const OneScoreBlock = ({ game, playerId }: { game: Game, playerId: string }) => 
 		}
 		axios.get(process.env.REACT_APP_IP + ':3000/user/image/' + image, {
 			headers: {
-				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+				Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 			},
 		})
 			.then((response) => {
@@ -162,7 +162,7 @@ const ListBlockScore = ({ userId, username }: { userId: string, username: string
 		console.log(process.env.REACT_APP_IP + ':3000/game/history/' + userId);
 		axios.get(process.env.REACT_APP_IP + ':3000/game/history/' + userId, {
 			headers: {
-				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+				Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 			},
 		})
 			.then((response) => {
@@ -213,7 +213,7 @@ const History = () => {
 				if (id != null) {
 				axios.get(process.env.REACT_APP_IP + ':3000/user/id/' + userId, {
 					headers: {
-						Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+						Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 					},
 				})
 					.then((response) => {

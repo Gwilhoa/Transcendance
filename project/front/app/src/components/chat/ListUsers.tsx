@@ -24,7 +24,7 @@ type changeChannelProps = {
 const MakeAdmin = ({id, channel}: changeChannelProps) => {
 
 	const handleClickMakeAdmin = () => {
-		socket.emit('add_admin', {channel_id: channel.id, admin_id: id, token: cookies.get('jwtAuthorization')});
+		socket.emit('add_admin', {channel_id: channel.id, admin_id: id, token: localStorage.getItem('jwtAuthorization')});
 		console.log('ON CLICK add admin');
 	};
 
@@ -38,7 +38,7 @@ const MakeAdmin = ({id, channel}: changeChannelProps) => {
 const DeleteAdmin = ({id, channel}: changeChannelProps) => {
 
 	const handleClickDeleteAdmin = () => {
-		socket.emit('remove_admin', {channel_id: channel.id, admin_id: id, token: cookies.get('jwtAuthorization')});
+		socket.emit('remove_admin', {channel_id: channel.id, admin_id: id, token: localStorage.getItem('jwtAuthorization')});
 		console.log('ON CLICK Delete admin');
 	};
 
@@ -52,7 +52,7 @@ const DeleteAdmin = ({id, channel}: changeChannelProps) => {
 const BanHammer = ({id, channel}: changeChannelProps) => {
 
 	const handleClickBanHammer = () => {
-		socket.emit('ban_user', {channel_id: channel.id, ban_id: id, token: cookies.get('jwtAuthorization')});
+		socket.emit('ban_user', {channel_id: channel.id, ban_id: id, token: localStorage.getItem('jwtAuthorization')});
 		console.log('ON CLICK ban user');
 	};
 
@@ -66,7 +66,7 @@ const BanHammer = ({id, channel}: changeChannelProps) => {
 const UnBanHammer = ({id, channel}: changeChannelProps) => {
 
 	const handleClickUnbanHammer = () => {
-		socket.emit('unban_user', {channel_id: channel.id, unban_id: id, token: cookies.get('jwtAuthorization')});
+		socket.emit('unban_user', {channel_id: channel.id, unban_id: id, token: localStorage.getItem('jwtAuthorization')});
 		console.log('unban user');
 	};
 
@@ -80,7 +80,7 @@ const UnBanHammer = ({id, channel}: changeChannelProps) => {
 const MuteButton = ({id, channel}: changeChannelProps) => {
 
 	const handleClickMute = () => {
-		socket.emit('add_muted', {channel_id: channel.id, mute_id: id, token: cookies.get('jwtAuthorization')});
+		socket.emit('add_muted', {channel_id: channel.id, mute_id: id, token: localStorage.getItem('jwtAuthorization')});
 		console.log('mute user');
 	};
 
@@ -94,7 +94,7 @@ const MuteButton = ({id, channel}: changeChannelProps) => {
 const UnMuteButton = ({id, channel}: changeChannelProps) => {
 
 	const handleClickMute = () => {
-		socket.emit('remove_muted', {channel_id: channel.id, mute_id: id, token: cookies.get('jwtAuthorization')});
+		socket.emit('remove_muted', {channel_id: channel.id, mute_id: id, token: localStorage.getItem('jwtAuthorization')});
 		console.log('mute user');
 	};
 

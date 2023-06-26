@@ -33,7 +33,7 @@ function Conversation(
 		if (add) {
 			axios.get(process.env.REACT_APP_IP + ':3000/user/image/' + id, {
 				headers: {
-					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+					Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 				},
 			})
 				.then((response) => {

@@ -116,7 +116,7 @@ const Game: React.FC<GameProps> = () => {
 	useEffect(() => {
 		let isCall = true;
 		if (gamestate != 2) {
-			socket.emit('leave_game', {token: cookies.get('jwtAuthorization')});
+			socket.emit('leave_game', {token: localStorage.getItem('jwtAuthorization')});
 			navigate('/home')
 		}
 		window.addEventListener("keydown", handleKeyPress);
@@ -135,7 +135,7 @@ const Game: React.FC<GameProps> = () => {
 		})
 
 		socket.on('game_start', () => {
-			socket.emit('input_game', {game_id: gameId, position: paddle1, token: cookies.get('jwtAuthorization')});
+			socket.emit('input_game', {game_id: gameId, position: paddle1, token: localStorage.getItem('jwtAuthorization')});
 		})
 
 		socket.on('stop_game', (any) => {

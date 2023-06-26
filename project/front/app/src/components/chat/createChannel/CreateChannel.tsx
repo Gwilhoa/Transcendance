@@ -58,7 +58,7 @@ const AddUserId = ({usersId, setUserId}: AddUserIdProps) => {
 	const refresh = useCallback(() => {
 		axios.get(process.env.REACT_APP_IP + ':3000/user/friend', {
 			headers: {
-				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+				Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 			},
 		})
 			.then((res) => {
@@ -156,13 +156,13 @@ const CreateChannel = () => {
 				password: channelParams.pwd,
 			},
 			{
-				headers: {Authorization: `bearer ${cookies.get('jwtAuthorization')}`,}
+				headers: {Authorization: `bearer ${localStorage.getItem('jwtAuthorization')}`,}
 			})
 			.then((response) => {
 				setErrorMessage('');
-				socket.emit('join_channel', {channel_id: response.data.id, token: cookies.get('jwtAuthorization')});
+				socket.emit('join_channel', {channel_id: response.data.id, token: localStorage.getItem('jwtAuthorization')});
 				usersId.map((userId) => {
-					socket.emit('invite_channel', {receiver_id: userId, channel_id: response.data.id, token: cookies.get('jwtAuthorization')});
+					socket.emit('invite_channel', {receiver_id: userId, channel_id: response.data.id, token: localStorage.getItem('jwtAuthorization')});
 				});
 				dispatch(switchChatModalCreateChannel());
 			})

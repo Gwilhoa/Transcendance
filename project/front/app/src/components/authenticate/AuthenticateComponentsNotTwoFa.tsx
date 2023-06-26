@@ -14,18 +14,18 @@ function AuthenticateComponentsNotTwoFa() {
 		const url = process.env.REACT_APP_IP + ':3000/auth/authenticate';
 
 		const setCookieJwt = (jwtToken: string) => {
-			cookies.set('jwtAuthorization', jwtToken, {sameSite: 'none', maxAge: 2 * 60 * 60, secure: true});
+			localStorage.setItem('jwtAuthorization', jwtToken);
 		};
 
-		if (cookies.get('jwtAuthorization') != null) {
+		if (localStorage.getItem('jwtAuthorization') != null) {
 			axios.get(process.env.REACT_APP_IP + ':3000/auth/2fa/is2FA', {
 				headers: {
-					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+					Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 				},
 			})
 				.then(() => {
 					setError(true);
-					cookies.remove('Error');
+					localStorage.removeItem('jwtAuthorization');
 					navigate('/home');
 				})
 				.catch((error) => {
@@ -39,7 +39,7 @@ function AuthenticateComponentsNotTwoFa() {
 		if (error === false) {
 			axios.post(url, {code: ''}, {
 				headers: {
-					Authorization: `Bearer ${cookies.get('tenMinToken')}`,
+					Authorization: `Bearer ${localStorage.getItem('tenMinToken')}`,
 				},
 			})
 				.then((response) => {

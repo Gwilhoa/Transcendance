@@ -22,7 +22,7 @@ const ModifyChannel = ({channel}: { channel: Channel }) => {
 		},
 		{
 					headers: {
-						Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+						Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 					},
 		}).then((response) => {
 			console.log('updatechannel');
