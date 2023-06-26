@@ -269,7 +269,7 @@ function Chat() {
 		console.log(data);
 		setSendMessage(false);
 		if (data.code == 3) {
-			setErrorPostMessage('Invalid Format');
+			setErrorPostMessage(data.message);
 		}
 		if (data.code == 0) {
 			setErrorPostMessage('');
@@ -359,7 +359,7 @@ function Chat() {
 			{isOpenCreateChannel && (<CreateChannel/>)}
 			{isOpenInviteChannel && (<InviteChannel channel={channel}/>)}
 			{isOpenUpdateChannel && (<ModifyChannel channel={channel}/>)}
-			{conversationId !== '' ? (
+			{conversationId != '' ? (
 			<div className='chat-right-page'>
 
 				<Conversation
