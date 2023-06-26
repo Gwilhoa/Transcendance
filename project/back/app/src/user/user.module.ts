@@ -12,6 +12,7 @@ import { UserGateway } from './user.gateway';
 import { ChannelService } from '../channel/channel.service';
 import { Channel } from '../channel/channel.entity';
 import { Message } from '../channel/message.entity';
+import {Mute} from "../channel/mute.entity";
 
 @Module({
   providers: [
@@ -30,6 +31,7 @@ import { Message } from '../channel/message.entity';
     TypeOrmModule.forFeature([RequestFriend]),
     TypeOrmModule.forFeature([Channel]),
     TypeOrmModule.forFeature([Message]),
+    TypeOrmModule.forFeature([Mute]),
   ],
 })
 export class UserModule {}

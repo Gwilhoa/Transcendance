@@ -160,16 +160,16 @@ export class ChannelGateway implements OnGatewayInit {
       message.content = payload.content;
       message.channel_id = payload.channel_id;
       let msg;
-      try {
+      // try {
         msg = await this.channelService.sendMessage(message, user.id);
-      } catch (error) {
-        send = {
-          code: messageCode.INVALID_FORMAT,
-          message: error.message,
-        };
-        client.emit('message_code', send);
-        return;
-      }
+      // } catch (error) {
+      //   send = {
+      //     code: messageCode.INVALID_FORMAT,
+      //     message: error.message,
+      //   };
+      //   client.emit('message_code', send);
+      //   return;
+      // }
       send = {
         code: messageCode.SUCCESS,
       };

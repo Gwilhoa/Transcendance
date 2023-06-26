@@ -39,7 +39,7 @@ export interface Channel {
 	users: Array<User>;
 	admins: Array<User>;
 	bannedUsers: Array<User>;
-	mutedUser: Array<User>;
+	mutedUser: Array<any>;
 }
 
 export interface Message {

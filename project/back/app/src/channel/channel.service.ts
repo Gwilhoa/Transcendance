@@ -18,6 +18,7 @@ import {
 } from '../utils/socket.function';
 import { WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server } from 'socket.io';
+import { Mute } from './mute.entity';
 
 @Injectable()
 @WebSocketGateway({
@@ -28,10 +29,20 @@ import { Server } from 'socket.io';
 export class ChannelService {
   @WebSocketServer() server: Server;
   constructor(
+    @InjectRepository(Mute) private muteRepository: Repository<Mute>,
     @InjectRepository(Channel) private channelRepository: Repository<Channel>,
     @InjectRepository(Message) private messageRepository: Repository<Message>,
     private readonly userService: UserService,
-  ) {}
+  ) {
+    setInterval(async () => {
+      const mutes = await this.muteRepository.find();
+      for (const mute of mutes) {
+        if (mute.date < new Date()) {
+          await this.muteRepository.delete(mute);
+        }
+      }
+    }, 1000);
+  }
 
   public async createChannel(body: CreateChannelDto) {
     const chan = new Channel();
@@ -59,6 +70,15 @@ export class ChannelService {
     const ret = await this.channelRepository.save(chan);
     this.server.emit('new_channel', ret);
     return chan;
+  }
+
+  public async getMutedUsers(channel_id) {
+    const chan = await this.getChannelById(channel_id);
+    const ret = [];
+    for (const Mute of chan.mutedUsers) {
+      ret.push(Mute.mutedUser);
+    }
+    return ret;
   }
 
   public async createMPChannel(user_id, user_id1) {
@@ -97,7 +117,8 @@ export class ChannelService {
       .leftJoinAndSelect('channel.bannedUsers', 'bannedUsers')
       .leftJoinAndSelect('channel.creator', 'creator')
       .leftJoinAndSelect('channel.users', 'users')
-      .leftJoinAndSelect('channel.mutedUser', 'mutedUser')
+      .leftJoinAndSelect('channel.mutedUsers', 'mutedUsers')
+      .leftJoinAndSelect('mutedUsers.mutedUser', 'mutedUser')
       .where('channel.id = :id', { id: id })
       .getOne();
   }
@@ -255,11 +276,13 @@ export class ChannelService {
       .createQueryBuilder('channel')
       .leftJoinAndSelect('channel.messages', 'messages')
       .leftJoinAndSelect('channel.users', 'users')
-      .leftJoinAndSelect('channel.mutedUser', 'mutedUser')
+      .leftJoinAndSelect('channel.mutedUsers', 'mutedUsers')
+      .leftJoinAndSelect('mutedUsers.mutedUser', 'mutedUser')
       .where('channel.id = :id', { id: body.channel_id })
       .getOne();
     if (channel == null) throw new Error('Channel not found');
-    if (includeUser(user, channel.mutedUser)) throw new Error('User is muted');
+    if (includeUser(user, await this.getMutedUsers(channel.id)))
+      throw new Error('User is muted');
     message.channel = channel;
     message.user = user;
     if (channel.messages == null) channel.messages = [];
@@ -326,7 +349,8 @@ export class ChannelService {
       .leftJoinAndSelect('channel.bannedUsers', 'bannedUsers')
       .leftJoinAndSelect('channel.admins', 'admins')
       .leftJoinAndSelect('channel.creator', 'creator')
-      .leftJoinAndSelect('channel.mutedUser', 'mutedUser')
+      .leftJoinAndSelect('channel.mutedUsers', 'mutedUsers')
+      .leftJoinAndSelect('mutedUsers.mutedUser', 'mutedUser')
       .getMany();
     const chan = [];
     if (channels == null) return null;
@@ -543,9 +567,13 @@ export class ChannelService {
     if (channel == null) throw new Error('Channel not found');
     if (!includeUser(user, channel.admins))
       throw new Error('User is not admin of this channel');
-    if (includeUser(target, channel.mutedUser))
+    if (includeUser(target, await this.getMutedUsers(channel.id)))
       throw new Error('User is already muted of this channel');
-    channel.mutedUser.push(target);
+    const mute: Mute = new Mute();
+    mute.mutedUser = target;
+    mute.date = new Date();
+    mute.date.setSeconds(mute.date.getSeconds() + 10);
+    channel.mutedUsers.push(mute);
     return await this.channelRepository.save(channel);
   }
 
@@ -562,13 +590,13 @@ export class ChannelService {
     if (channel == null) throw new Error('Channel not found');
     if (!includeUser(user, channel.admins))
       throw new Error('User is not admin of this channel');
-    if (!includeUser(target, channel.mutedUser))
+    if (!includeUser(target, await this.getMutedUsers(channel.id)))
       throw new Error('User is not muted of this channel');
     const mutedUsers = [];
-    for (const mutedUser of channel.mutedUser) {
-      if (mutedUser.id != target.id) mutedUsers.push(mutedUser);
+    for (const mutedUser of channel.mutedUsers) {
+      if (mutedUser.mutedUser.id != target.id) mutedUsers.push(mutedUser);
     }
-    channel.mutedUser = mutedUsers;
+    channel.mutedUsers = mutedUsers;
     return await this.channelRepository.save(channel);
   }
 }

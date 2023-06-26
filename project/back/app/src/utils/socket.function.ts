@@ -73,6 +73,7 @@ export function includeUser(user: User, list: User[]) {
   return ret;
 }
 
+
 export function disconnect(id: any, clients: string[]): string[] {
   const ret: string[] = [];
   for (const c_id of clients) {

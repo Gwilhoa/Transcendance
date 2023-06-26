@@ -1,7 +1,7 @@
 import { User } from 'src/user/user.entity';
 import {
   Column,
-  Entity,
+  Entity, JoinColumn,
   JoinTable,
   ManyToMany,
   ManyToOne,
@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { Message } from './message.entity';
 import { ChannelType } from 'src/utils/channel.enum';
+import {Mute} from "./mute.entity";
 
 @Entity('channels')
 export class Channel {
@@ -43,13 +44,8 @@ export class Channel {
   })
   bannedUsers: User[];
 
-  @ManyToMany((type) => User, (user) => user.mutedChannels)
-  @JoinTable({
-    name: 'channels_muted_users',
-    joinColumn: { name: 'channel_id' },
-    inverseJoinColumn: { name: 'user_id' },
-  })
-  mutedUser: User[];
+  @OneToMany((type) => Mute, (mute) => mute.mutedChannel)
+  mutedUsers: Mute[];
 
   @OneToMany((type) => Message, (message) => message.channel, {
     onDelete: 'CASCADE',

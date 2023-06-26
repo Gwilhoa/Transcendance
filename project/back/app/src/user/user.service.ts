@@ -275,7 +275,7 @@ export class UserService {
       .leftJoinAndSelect('channels.admins', 'admins')
       .leftJoinAndSelect('channels.creator', 'creator')
       .leftJoinAndSelect('channels.bannedUsers', 'bannedUsers')
-      .leftJoinAndSelect('channels.mutedUser', 'mutedUser')
+      .leftJoinAndSelect('channels.mutedUsers', 'mutedUsers')
       .where('user.id = :id', { id })
       .getOne();
     if (!user) {

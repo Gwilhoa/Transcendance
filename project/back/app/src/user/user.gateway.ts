@@ -15,10 +15,7 @@ import {
 } from '../utils/socket.function';
 import { FriendCode } from '../utils/requestcode.enum';
 import { ChannelService } from '../channel/channel.service';
-import { addAdminDto } from '../dto/add-admin.dto';
 import { AuthService } from '../auth/auth.service';
-import {MpCreateDto} from "../dto/mp-create.dto";
-import {CreateChannelDto} from "../dto/create-channel.dto";
 
 @WebSocketGateway()
 export class UserGateway implements OnGatewayInit {
