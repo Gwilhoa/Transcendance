@@ -92,13 +92,14 @@ export class UserGateway implements OnGatewayInit {
       }
       await this.userService.addFriend(user_id, friend_id);
       await this.userService.addFriend(friend_id, user_id);
-      const mpCreateDto = new MpCreateDto();
       const mpchannel = await this.channelService.createMPChannel(
         user_id,
         friend_id,
       );
+      ret = this.channelService.getChannelById(mpchannel.id);
       client.join(mpchannel.id);
       if (friend_socket != null) friend_socket.join(mpchannel.id);
+      this.server.emit('update_user_channel', ret);
       ret = {
         code: FriendCode.NEW_FRIEND,
       };
