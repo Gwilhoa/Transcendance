@@ -37,7 +37,6 @@ export default function Profil() {
 
 	console.log(id);
 	const refresh = useCallback((id: string | null) => {
-
 			axios.get(process.env.REACT_APP_IP + ':3000/auth/2fa/is2FA', {
 				headers: {
 					Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
@@ -203,25 +202,28 @@ export default function Profil() {
 	}
 
 	const clicked = () => {
+		console.log('change clicked');
 		if (!checked) {
 			navigate('/CreateTwoFa');
 			dispatch(closeModal());
 		} else {
+			console.log('change clicked');
 			axios.get(process.env.REACT_APP_IP + ':3000/auth/2fa/disable', {
 				headers: {
 					Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 				},
 			})
+				.then(() => {
+					setChecked(false);
+				})
 				.catch((error) => {
 					setErrorLocalStorage('Error ' + error?.response?.status);
 					navigate('/Error');
 				});
-			setChecked(false);
 		}
 	}
 
 	const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		console.log('image change');
 		let change = false;
 		const file = event.target.files && event.target.files[0];
 		if (file) {
