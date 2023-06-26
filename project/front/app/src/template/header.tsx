@@ -1,11 +1,10 @@
 import './template.css'
 import {Link, useNavigate} from 'react-router-dom';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import {setErrorLocalStorage} from '../components/IfError';
 import Cookies from 'universal-cookie';
 import {useDispatch, useSelector} from 'react-redux';
 import {openModal} from '../redux/modal/modalSlice';
-import SocketSingleton from '../socket';
 import axios from 'axios';
 import {setBeginStatus} from "../redux/game/beginToOption";
 import { setId } from '../redux/id/idSlice';
@@ -17,18 +16,6 @@ const Head = () => {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 	const id = useSelector((state: RootState) => state.id.id);
-
-	const socketInstance = SocketSingleton.getInstance();
-	const socket = socketInstance.getSocket();
-		useEffect(() => {
-		socket.on('message_code', (data: any) => {
-			console.log(data);
-		});
-
-		return () => {
-			socket.off('message_code');
-		};
-	}, []);
 
 	useEffect(() => {
 		if (id == null) {
@@ -48,7 +35,7 @@ const Head = () => {
 					navigate('/Error');
 				});
 	}
-	}, [navigate]);
+	}, [navigate, dispatch, id]);
 
 	const handleOpenModal = (id: string | null) => {
 		dispatch(openModal(id));

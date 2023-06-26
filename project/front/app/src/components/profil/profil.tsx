@@ -152,7 +152,6 @@ export default function Profil() {
 		return () => {
 			socket.off('friend_request');
 			socket.off('friend_code');
-			socket.off('receive_challenge');
 			socket.off('block_code');
 		}
 	}, [isFriend, id, navigate]);

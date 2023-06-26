@@ -28,8 +28,7 @@ function ErrorToken() {
 						setErrorLocalStorage("Couldn't connect to the server");
 						navigate('/Error');
 					} else {
-						setErrorLocalStorage('Error ' + error.response.status);
-						console.error(error);
+						setErrorLocalStorage('Error ' + error?.response?.status);
 						if (cookies.get('jwtAuthorization') != null)
 							cookies.remove('jwtAuthorization');
 						navigate('/Error');
