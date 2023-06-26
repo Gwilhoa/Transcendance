@@ -38,3 +38,24 @@
     font-size: 2.5rem;
     cursor: pointer;
 }
+
+/* Page 2FA enable */
+
+.auth-page-two-fa-enable{
+    display: flex;
+    padding: 3rem;
+    flex-direction: column;
+    align-items: center;
+    color: var(--light-color);
+    border-radius: 20px;
+    background-color: var(--box-color);
+    height: min(12rem, 80vh);
+    width: 25rem;
+    overflow: auto;
+}
+
+.auth-page-two-fa-enable > p{
+    font-size: 2rem;
+    margin-bottom: 3rem;
+    text-align: center;
+}
