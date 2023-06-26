@@ -20,7 +20,8 @@ const SendMessage = ({
 	const [timer, setTimer] = useState<boolean>(false);
 
 	const handleSendMessage = () => {
-		console.log('send message pls : ' + conversation);
+		if (message.length < 1)
+			return;
 		socket.emit('send_message', {
 			token: localStorage.getItem('jwtAuthorization'),
 			channel_id: conversation,

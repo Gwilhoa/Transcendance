@@ -45,7 +45,7 @@ function AuthenticateComponentsTwoFa() {
 				},
 				{
 					headers: {
-						Authorization: `Bearer ${localStorage.getItem('TenMinToken')}`,
+						Authorization: `Bearer ${localStorage.getItem('tenMinToken')}`,
 					},
 				})
 				.then((response) => {
@@ -55,6 +55,7 @@ function AuthenticateComponentsTwoFa() {
 					navigate('/authenticate/waiting');
 				})
 				.catch((error) => {
+					console.error(error);
 					if (error.response.status === 401) {
 						setErrorLocalStorage('unauthorized');
 						navigate('/Error');
