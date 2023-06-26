@@ -52,7 +52,7 @@ export class AuthController {
       user.email,
       false,
     );
-    res.redirect(ip + '/authenticate?access_token=' + code.access_token);
+    res.redirect(ip + ':8080/authenticate?access_token=' + code.access_token);
     return;
   }
 
