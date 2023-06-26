@@ -13,7 +13,6 @@ import { RootState } from '../redux/store';
 
 
 const Template = () => {
-	console.log('bonjour je suis le template');
 	let friendId = 0;
 	let rivalId = 0;
 	const navigate = useNavigate();
@@ -60,6 +59,7 @@ const Template = () => {
 	}
 
 	useEffect(() => {	
+		console.log('bonjour je suis le template');
 		socket.on('receive_challenge', (data: any) => {
 			console.log(data);
 			if (data.code == 3) {
@@ -94,6 +94,7 @@ const Template = () => {
 		})
 
 		socket.on('friend_request', (data: any) => {
+			console.count('friend_request');
 			if (data.code == 4) {
 				friendId = data.id;
 				setNotif(<Notification message={'New friend'} onConfirm={confirmFriend} onCancel={rejectFriend}
@@ -103,36 +104,19 @@ const Template = () => {
 		})
 
 		socket.on('friend_code', (data: any) => {
-			console.log(data);
-			let otherId = data.user1;
-			if (otherId == myId) {
-				otherId = data.user2;
-			}
-			if (data.code === 2) {
-				axios.post(process.env.REACT_APP_IP + ':3000/channel/mp/create',
-					{
-						user_id: '' + otherId,
-					},
-					{
-						headers: {
-							Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
-						},
-					})
-					.then((response) => {
-						console.log(response);
-					})
-					.catch((error) => {
-						setErrorLocalStorage('Error ' + error?.response?.status);
-						navigate('/Error');
-					});
+			if (data.code == 4) {
+				friendId = data.id;
+				setNotif(<Notification message={'New friend'} onConfirm={confirmFriend} onCancel={rejectFriend}
+					hasButton={true} setVisible={setNotifVisible}/>);
+				setNotifVisible(true)
 			}
 		})
-		// return () => {
-		// 	socket.off('receive_challenge');
-		// 	socket.off('connection_error');
-		// 	socket.off('message');
-		// 	socket.off('friend_request');
-		// };
+		return () => {
+			socket.off('receive_challenge');
+			socket.off('connection_error');
+			socket.off('message');
+			socket.off('friend_request');
+		};
 	}, [navigate]);
 
 	return (

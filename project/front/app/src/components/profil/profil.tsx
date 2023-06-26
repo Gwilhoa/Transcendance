@@ -130,23 +130,6 @@ export default function Profil() {
 		socket.on('friend_code', (data: any) => {
 			console.log(data);
 			if (data.code === 2 && !isFriend) {
-				axios.post(process.env.REACT_APP_IP + ':3000/channel/mp/create',
-					{
-						user_id: '' + id,
-					},
-					{
-						headers: {
-							Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
-						},
-					})
-					.then((response) => {
-						console.log(response);
-						socket.emit('join_channel', {channel_id: response.data.id, token: cookies.get('jwtAuthorization')});
-					})
-					.catch((error) => {
-						setErrorLocalStorage('Error ' + error?.response?.status);
-						navigate('/Error');
-					});
 				setIsFriend(!isFriend);
 				return;
 			}
