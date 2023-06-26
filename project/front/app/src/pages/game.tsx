@@ -147,7 +147,7 @@ const Game: React.FC<GameProps> = () => {
 		socket.on('is_stop_game', (any) => {
 			console.log(any);
 			setStop(any.stop);
-
+			setTimeStop(any.time);
 			setIamStoper(any.stoper);
 			console.log(any.stoper);
 			console.log(IamStoper);

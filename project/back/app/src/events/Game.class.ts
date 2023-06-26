@@ -1,6 +1,7 @@
 import { Server, Socket } from 'socket.io';
 import { GameService } from 'src/game/game.service';
 import { sleep } from '../utils/sleep';
+import { time } from 'console';
 
 export class Game {
   static default_sizeMaxX = 100;
@@ -107,11 +108,11 @@ export class Game {
   }
 
 
-  private beginStop = (userStop: Socket, userNoStop: Socket) => {
-    if (!this._stop) {
+  private beginStop = (userStop: Socket, userNoStop: Socket, time:number) => {
+    if (!this._stop && this._started) {
       this._stop = true;
-      userStop.emit('is_stop_game', { stop: true, stoper: true });
-      userNoStop.emit('is_stop_game', { stop: true, stoper: false });
+      userStop.emit('is_stop_game', { stop: true, stoper: true, time:time });
+      userNoStop.emit('is_stop_game', { stop: true, stoper: false, time:time });
       //clearInterval(this._loopid);
       this._playerstop = userStop.id;
       this._loop_stop = setInterval(this.delayStop, 1000);
@@ -119,7 +120,7 @@ export class Game {
   }
 
   public updateRacket = (player: Socket, y: number) => {
-    if (y == 2 && this._started) {
+    if (y == 2) {
       console.log('enter');
       console.log(this._stop);
       console.log(player.id);
@@ -131,11 +132,13 @@ export class Game {
       }
       if (!this._stop) {
         if (player.id == this._user1.id && this._time_stop_user1 > 0) {
-          this.beginStop(this._user1, this._user2);
+          this._time_stop_user1 -= 1;
+          this.beginStop(this._user1, this._user2, this._time_stop_user1);
           }
         if (player.id == this._user2.id && this._time_stop_user2 > 0)
         {
-          this.beginStop(this._user2, this._user1);
+          this._time_stop_user2 -= 1;
+          this.beginStop(this._user2, this._user1, this._time_stop_user2);
         }
       }
     }
@@ -224,7 +227,7 @@ export class Game {
 
   public async start() {
     console.log('power up ' + this._isPowerUp);
-    await sleep(3000);
+    await sleep(1000);
     while (
       Math.cos(this._angle) < 0.5 &&
       Math.cos(this._angle) > -0.5 &&
@@ -422,6 +425,7 @@ export class Game {
   private endBattle = (scoreWin: number): number => {
     scoreWin++;
     if (scoreWin < Game.default_victorygoal) {
+      this._started = false;
       this._rack1y = Game.default_positionR;
       this._rack2y = Game.default_positionR;
       this._ballx = Game.default_positionBx;
