@@ -21,12 +21,10 @@ const Head = () => {
 
 	const handleChat = () => {
 		navigate('/chat');
-		window.location.reload();
 	};
 
 	const handleHisto = () => {
 		navigate('/history/' + id);
-		window.location.reload();
 	};
 
 	const setData = () => {

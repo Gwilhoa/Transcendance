@@ -91,7 +91,7 @@ const Game: React.FC<GameProps> = () => {
 	};
 
 	const leaveGame = () => {
-		window.location.reload()
+		// window.location.reload()
 	}
 
 	const resumeGame = () => {
