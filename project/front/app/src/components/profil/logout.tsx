@@ -13,7 +13,6 @@ function LogoutButton() {
 
 	const handleOnClick = () => {
 
-		dispatch(setId(null));
 		dispatch(closeModal());
 		localStorage.removeItem('jwtAuthorization');
 		navigate('/');

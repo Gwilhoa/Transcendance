@@ -13,6 +13,7 @@ import {setErrorLocalStorage} from '../../IfError';
 import {RootState} from '../../../redux/store';
 import {ProfilImage} from '../../profil/ProfilImage';
 import {ProfilName} from '../../profil/ProfilName';
+import jwtDecode from 'jwt-decode';
 
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
@@ -116,7 +117,8 @@ const CreateChannel = () => {
 	const [usersId, setUserId] = useState<Array<string>>([]);
 	const [errorPwd, setErrorPwd] = useState<boolean>(false);
 	const [errorMessage, setErrorMessage] = useState<string>('');
-	const myId = useSelector((state: RootState) => state.id.id);
+	const jwt: string = jwtDecode(''+localStorage.getItem('jwtAuthorization')) ;
+	const [myId] = useState<string>(jwt.sub);
 
 	const onSubmitChannelName = (str: string) => {
 		setChannelParams((prevChannelParams) => ({

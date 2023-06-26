@@ -8,6 +8,7 @@ import {openModal} from '../redux/modal/modalSlice';
 import axios from 'axios';
 import { User } from './chat';
 import { RootState } from '../redux/store';
+import jwtDecode from 'jwt-decode';
 
 interface Game {
 	finished: string;
@@ -21,7 +22,8 @@ interface Game {
 const OneScoreBlock = ({ game, playerId }: { game: Game, playerId: string }) => {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
-	const myId = useSelector((state: RootState) => state.id.id);
+	const jwt: string = jwtDecode(''+localStorage.getItem('jwtAuthorization')) ;
+	const [myId] = useState<string>(jwt.sub);
 
 	const [leftImage, setLeftImage] = useState<string>('');
 	const [rightImage, setRightImage] = useState<string>('');
@@ -155,7 +157,8 @@ const OneScoreBlock = ({ game, playerId }: { game: Game, playerId: string }) => 
 
 const ListBlockScore = ({ userId, username }: { userId: string, username: string }) => {
 	const [listGame, setListGame] = useState<Array<Game>>([]);
-	const myId = useSelector((state: RootState) => state.id.id);
+	const jwt: string = jwtDecode(''+localStorage.getItem('jwtAuthorization')) ;
+	const [myId] = useState<string>(jwt.sub);
 
 	const navigate = useNavigate();
 	useEffect(() => {

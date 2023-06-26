@@ -1,10 +1,11 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {Channel, isAdmin} from '../../pages/chat';
 import ButtonInviteChannel from './optionBar/button/ButtonInviteChannelModal';
 import ButtonUpdateChannel from './optionBar/button/ButtonUpdateChannel';
 import ButtonLeaveChannel from './optionBar/button/ButtonLeaveChannel';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
+import jwtDecode from 'jwt-decode';
 
 export const parseChannelName = (channel: Channel, myId: string) => {
 		if (channel.type !== 3) {
@@ -17,7 +18,8 @@ export const parseChannelName = (channel: Channel, myId: string) => {
 	};
 
 const ChannelSideBar = ({channel}: { channel: Channel }) => {
-	const myId = useSelector((state: RootState) => state.id.id);
+	const jwt: string = jwtDecode(''+localStorage.getItem('jwtAuthorization')) ;
+	const [myId] = useState<string>(jwt.sub);
 
 	const troncChannelName = (channel: Channel) => {
 		let name = parseChannelName(channel, '' + myId);

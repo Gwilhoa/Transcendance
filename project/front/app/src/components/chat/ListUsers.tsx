@@ -1,5 +1,5 @@
 import './css/listUsers.css';
-import React from 'react';
+import React, { useState } from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {Channel, isAdmin, isMe, User} from '../../pages/chat';
 import {ProfilImage} from '../profil/ProfilImage';
@@ -8,6 +8,7 @@ import {openModal} from '../../redux/modal/modalSlice';
 import SocketSingleton from '../../socket';
 import { RootState } from '../../redux/store';
 import { cookies } from '../../App';
+import jwtDecode from 'jwt-decode';
 
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
@@ -108,7 +109,8 @@ const UnMuteButton = ({id, channel}: changeChannelProps) => {
 
 const ListAdmin = ({channel}: listUserProps) => {
 	const dispatch = useDispatch();
-	const myId = useSelector((state: RootState) => state.id.id);
+	const jwt: string = jwtDecode(''+localStorage.getItem('jwtAuthorization')) ;
+	const [myId] = useState<string>(jwt.sub);
 
 	return (
 		<>
@@ -142,7 +144,8 @@ const ListAdmin = ({channel}: listUserProps) => {
 
 const ListUser = ({channel}: listUserProps) => {
 	const dispatch = useDispatch();
-	const myId = useSelector((state: RootState) => state.id.id);
+	const jwt: string = jwtDecode(''+localStorage.getItem('jwtAuthorization')) ;
+	const [myId] = useState<string>(jwt.sub);
 
 	console.log('hey')
 	console.log (channel);
@@ -190,7 +193,8 @@ const ListUser = ({channel}: listUserProps) => {
 
 const ListBannedUser = ({channel}: listUserProps) => {
 	const dispatch = useDispatch();
-	const myId = useSelector((state: RootState) => state.id.id);
+	const jwt: string = jwtDecode(''+localStorage.getItem('jwtAuthorization')) ;
+	const [myId] = useState<string>(jwt.sub);
 
 	return (
 		<>
