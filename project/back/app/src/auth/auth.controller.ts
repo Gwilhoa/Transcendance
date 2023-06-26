@@ -174,7 +174,7 @@ export class AuthController {
       res.status(400).send('Bad User');
       return;
     }
-    if (user.enabled2FA == false) {
+    if (await this.userService.getSecret2fa(user.id) == null) {
       res
         .status(400)
         .send(
