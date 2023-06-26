@@ -6,7 +6,6 @@ import {Outlet, useNavigate} from 'react-router-dom';
 import SocketSingleton from '../socket';
 import {setBeginStatus} from "../redux/game/beginToOption";
 import {useDispatch} from "react-redux";
-import { cookies } from '../App';
 import { setErrorLocalStorage } from '../components/IfError';
 
 
@@ -67,7 +66,7 @@ const Template = () => {
 			navigate('/error');
 		});
 
-		socket.on('message', (data: any) => {
+		socket.on('notif_message', (data: any) => {
 			let newmessage = data.user.username + ' : ' + data.content;
 			if (data.content.length > 16) {
 				newmessage = data.user.username + ' : ' + data.content.substring(0, 16) + '...';
@@ -76,7 +75,7 @@ const Template = () => {
 			setNotifVisible(true);
 		})
 
-		socket.on('friend_request', (data: any) => {
+		socket.on('friend_notif', (data: any) => {
 			console.count('friend_request');
 			if (data.code == 4) {
 				friendId = data.id;
@@ -86,14 +85,6 @@ const Template = () => {
 			}
 		})
 
-		socket.on('friend_code', (data: any) => {
-			if (data.code == 4) {
-				friendId = data.id;
-				setNotif(<Notification message={'New friend'} onConfirm={confirmFriend} onCancel={rejectFriend}
-					hasButton={true} setVisible={setNotifVisible}/>);
-				setNotifVisible(true)
-			}
-		})
 		return () => {
 			socket.off('receive_challenge');
 			socket.off('connection_error');

@@ -1,7 +1,6 @@
 import '../css/sendMessageBar.css'
 import React, {Dispatch, SetStateAction, useState} from 'react'
 import SocketSingleton from '../../../socket';
-import {cookies} from '../../../App';
 
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();

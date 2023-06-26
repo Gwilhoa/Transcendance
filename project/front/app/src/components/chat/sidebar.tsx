@@ -3,11 +3,13 @@ import React from 'react'
 import {Channel} from '../../pages/chat';
 import ChannelSideBar from './Channel';
 
-function SideBarChat({listChannel, setConversationId}:
-							{
-								listChannel: Array<Channel>,
-								setConversationId: React.Dispatch<React.SetStateAction<string>>
-							}) {
+function SideBarChat(
+	{ listChannel, setConversationId }:
+	{
+		listChannel: Array<Channel>,
+		setConversationId: React.Dispatch<React.SetStateAction<string>>
+	}) 
+{
 
 	const handleSwitchChannel = (id: string) => {
 		setConversationId(id);

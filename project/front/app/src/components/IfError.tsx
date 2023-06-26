@@ -1,7 +1,6 @@
 import React, {useEffect} from 'react';
 import {useNavigate} from 'react-router-dom';
 import axios from 'axios';
-import {cookies} from '../App';
 
 export function setErrorLocalStorage(ErrorMessage: string) {
 	localStorage.setItem('Error', ErrorMessage);

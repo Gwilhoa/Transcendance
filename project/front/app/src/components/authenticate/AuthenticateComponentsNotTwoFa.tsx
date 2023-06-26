@@ -25,7 +25,6 @@ function AuthenticateComponentsNotTwoFa() {
 			})
 				.then(() => {
 					setError(true);
-					localStorage.removeItem('jwtAuthorization');
 					navigate('/home');
 				})
 				.catch((error) => {
@@ -45,7 +44,7 @@ function AuthenticateComponentsNotTwoFa() {
 				.then((response) => {
 					setCookieJwt(response.data.access_token);
 					localStorage.removeItem('tenMinToken');
-					navigate('/home');
+					navigate('/authenticate/waiting');
 				})
 				.catch((error) => {
 					localStorage.removeItem('tenMinToken');

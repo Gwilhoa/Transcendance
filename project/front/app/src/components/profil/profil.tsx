@@ -4,7 +4,6 @@ import {useNavigate} from 'react-router-dom';
 import {ButtonInputToggle} from '../utils/inputButton';
 import LogoutButton from './logout';
 import {setErrorLocalStorage} from '../IfError'
-import Cookies from 'universal-cookie';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../redux/store';
 import {closeModal} from '../../redux/modal/modalSlice';
@@ -12,7 +11,7 @@ import {ProfilImage} from './ProfilImage';
 import axios from 'axios';
 import SocketSingleton from '../../socket';
 import {ProfilName} from './ProfilName';
-const cookies = new Cookies();
+import jwtDecode from 'jwt-decode';
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
 
@@ -21,7 +20,9 @@ export default function Profil() {
 	const initialElement = [];
 	const navigate = useNavigate();
 	const [isMe, setIsMe] = useState<boolean>(false);
-	const myId = useSelector((state: RootState) => state.id.id);
+	const jwt: string = jwtDecode(''+localStorage.getItem('jwtAuthorization')) ;
+	const [myId] = useState<string>(jwt.sub);
+
 	const [isFriend, setIsFriend] = useState<boolean>(false);
 	const [checked, setChecked] = useState(false);
 	const [errorName, setErrorName] = useState<boolean>(false);
@@ -264,7 +265,6 @@ export default function Profil() {
 	const handleHistory = (id: string | null) => {
 		navigate('/history/' + id);
 		dispatch(closeModal());
-		window.location.reload();
 	};
 
 	const handleAddFriend = (id: string | null) => {

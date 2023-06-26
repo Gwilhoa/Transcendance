@@ -606,9 +606,6 @@ export class UserService {
     if (user == null || blocked_user == null) {
       throw new Error('User not found');
     }
-    if (includeUser(blocked_user, user.blockedUsers) == false) {
-      throw new Error('User not blocked');
-    }
     const blocks = [];
     for (const block of user.blockedUsers) {
       if (block.id != blocked_id) {
