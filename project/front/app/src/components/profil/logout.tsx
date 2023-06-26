@@ -15,7 +15,7 @@ function LogoutButton() {
 
 		dispatch(setId(null));
 		dispatch(closeModal());
-		cookies.remove('jwtAuthorization');
+		localStorage.removeItem('jwtAuthorization');
 		navigate('/');
 	};
 

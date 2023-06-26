@@ -23,11 +23,10 @@ function AuthenticateComponentsTwoFa() {
 				},
 			})
 				.then(() => {
-					cookies.remove('Error');
 					navigate('/home');
 				})
 				.catch((error) => {
-					cookies.remove('tenMinToken');
+					localStorage.removeItem('tenMinToken');
 					setErrorLocalStorage('Error ' + error.response.status);
 					console.error(error);
 					navigate('/Error');
@@ -55,7 +54,7 @@ function AuthenticateComponentsTwoFa() {
 				.then((response) => {
 					console.log(response);
 					setCookieJwt(response.data.access_token);
-					cookies.remove('tenMinToken');
+					localStorage.removeItem('tenMinToken');
 					navigate('/Home');
 				})
 				.catch((error) => {

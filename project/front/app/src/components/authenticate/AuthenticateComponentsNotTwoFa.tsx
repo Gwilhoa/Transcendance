@@ -29,7 +29,7 @@ function AuthenticateComponentsNotTwoFa() {
 					navigate('/home');
 				})
 				.catch((error) => {
-					cookies.remove('tenMinToken');
+					localStorage.removeItem('tenMinToken');
 					setErrorLocalStorage('Error ' + error.response.status);
 					console.error(error);
 					navigate('/Error');
@@ -44,11 +44,11 @@ function AuthenticateComponentsNotTwoFa() {
 			})
 				.then((response) => {
 					setCookieJwt(response.data.access_token);
-					cookies.remove('tenMinToken');
+					localStorage.removeItem('tenMinToken');
 					navigate('/home');
 				})
 				.catch((error) => {
-					cookies.remove('tenMinToken');
+					localStorage.removeItem('tenMinToken');
 					setErrorLocalStorage('Error ' + error.response.status);
 					console.error(error);
 					navigate('/Error');

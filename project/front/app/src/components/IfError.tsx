@@ -6,7 +6,7 @@ import {cookies} from '../App';
 export function setErrorLocalStorage(ErrorMessage: string) {
 	localStorage.setItem('Error', ErrorMessage);
 	localStorage.removeItem('id');
-	cookies.remove('jwtAuthorization');
+	localStorage.removeItem('jwtAuthorization');
 }
 
 function ErrorToken() {
@@ -31,7 +31,7 @@ function ErrorToken() {
 					} else {
 						setErrorLocalStorage('Error ' + error?.response?.status);
 						if (localStorage.getItem('jwtAuthorization') != null)
-							cookies.remove('jwtAuthorization');
+						localStorage.removeItem('jwtAuthorization');
 						navigate('/Error');
 					}
 				});
