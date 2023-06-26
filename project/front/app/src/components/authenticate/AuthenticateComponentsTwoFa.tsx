@@ -45,7 +45,7 @@ function AuthenticateComponentsTwoFa() {
 				},
 				{
 					headers: {
-						Authorization: `Bearer ${localStorage.getItem('TenMinToken')}`,
+						Authorization: `Bearer ${localStorage.getItem('tenMinToken')}`,
 					},
 				})
 				.then((response) => {
@@ -55,6 +55,7 @@ function AuthenticateComponentsTwoFa() {
 					navigate('/authenticate/waiting');
 				})
 				.catch((error) => {
+					console.error(error);
 					if (error.response.status === 401) {
 						setErrorLocalStorage('unauthorized');
 						navigate('/Error');
@@ -72,16 +73,18 @@ function AuthenticateComponentsTwoFa() {
 
 
 	return (
-		<div>
-			<p>TwoFa enable</p>
-			<div>
-				<AuthCode
-					allowedCharacters='numeric'
-					onChange={handleOnChange}
-					inputClassName='input'
-					ref={AuthInputRef}
-				/>
-				{Error == true ? (<ErrorInput/>) : (<></>)}
+		<div className='center-auth'>
+			<div className='auth-page-two-fa-enable'>
+				<p>Two factor authentication enable</p>
+				<div>
+					<AuthCode
+						allowedCharacters='numeric'
+						onChange={handleOnChange}
+						inputClassName='input'
+						ref={AuthInputRef}
+						/>
+					{Error == true ? (<ErrorInput/>) : (<></>)}
+				</div>
 			</div>
 		</div>
 	);

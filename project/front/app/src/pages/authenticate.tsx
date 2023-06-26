@@ -26,7 +26,7 @@ export function TokenPage() {
 							navigate('/authenticate/TwoFa');
 					})
 					.catch((error) => {
-						setErrorLocalStorage('Error ' + error.response.status);
+						setErrorLocalStorage('Error ' + error?.response?.status);
 						console.error(error);
 						navigate('/Error');
 					});
@@ -36,7 +36,7 @@ export function TokenPage() {
 		return () => {
 			clearInterval(interval);		
 		};
-	}, []);
+	}, [navigate]);
 
 	return (
 		<>
