@@ -85,7 +85,10 @@ const Template = () => {
 		});
 
 		socket.on('message', (data: any) => {
-			const newmessage = data.user.username + ' : ' + data.content;
+			let newmessage = data.user.username + ' : ' + data.content;
+			if (data.content.length > 16) {
+				newmessage = data.user.username + ' : ' + data.content.substring(0, 16) + '...';
+			}
 			setNotif(<Notification message={newmessage} onConfirm={() => {null}} onCancel={() => {null}} hasButton={false} setVisible={setNotifVisible}/>)
 			setNotifVisible(true);
 		})
