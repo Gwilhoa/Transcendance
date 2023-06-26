@@ -8,6 +8,8 @@ import {setErrorLocalStorage} from '../../IfError';
 import ButtonListChannel from '../optionBar/button/ButtonListUserModal';
 import { parseChannelName } from '../Channel';
 import jwtDecode from 'jwt-decode';
+import {useDispatch} from "react-redux";
+
 
 export interface imageProfil {
 	id: string;

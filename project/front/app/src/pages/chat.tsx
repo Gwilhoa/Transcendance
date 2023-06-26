@@ -16,6 +16,7 @@ import axios from 'axios';
 import {cookies} from '../App';
 import {useNavigate} from 'react-router-dom';
 import { closeChatModalListUser, switchChatModalListUser } from '../redux/chat/modalChatSlice';
+import {setChannelId} from "../redux/conversationId/conversationId";
 
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
@@ -350,6 +351,11 @@ function Chat() {
 		handleMessageCode
 	]);
 
+	useEffect(() => {
+		console.log('change conversation ' + conversationId);
+		setChannelId(conversationId);
+	}, [conversationId, dispatch]);
+
 	return (
 		<>
 
@@ -387,7 +393,7 @@ function Chat() {
 							<div className='chat-page-channels-channel' key={itemChannel.id}>
 								<p>{itemChannel.name}</p>
 								{itemChannel.type == 2 ? (
-									<input className='chat-page-channel-password-input' placeholder='Password' onChange={event => password.set(itemChannel.id, event.target.value)}/>
+									<input className='chat-page-channel-password-input' type='password' placeholder='Password' onChange={event => password.set(itemChannel.id, event.target.value)}/>
 								) : null
 								}
 								<button onClick={() => handleJoinChannel(itemChannel.id)}>Join</button>

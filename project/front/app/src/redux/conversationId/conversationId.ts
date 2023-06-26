@@ -12,12 +12,12 @@ const conversationIdSlice = createSlice({
 	name: 'id',
 	initialState,
 	reducers: {
-		setConversationId: (state, action: PayloadAction<string | null>) => {
+		setChannelId: (state, action: PayloadAction<string | null>) => {
 			state.id = action.payload;
 		},
 	},
 });
 
-export const {setConversationId} = conversationIdSlice.actions;
+export const {setChannelId} = conversationIdSlice.actions;
 
 export default conversationIdSlice.reducer;

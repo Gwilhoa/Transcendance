@@ -5,8 +5,9 @@ import Notification from '../components/notification/notification';
 import {Outlet, useNavigate} from 'react-router-dom';
 import SocketSingleton from '../socket';
 import {setBeginStatus} from "../redux/game/beginToOption";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import { setErrorLocalStorage } from '../components/IfError';
+import {RootState} from "../redux/store";
 
 
 const Template = () => {
@@ -19,6 +20,8 @@ const Template = () => {
 	const dispatch = useDispatch();
 	const socketInstance = SocketSingleton.getInstance();
 	const socket = socketInstance.getSocket();
+	const conversationId  = useSelector((state: RootState) => state.conversationId);
+
 
 	const confirmFriend = () => {
 		console.log('confirm friend')
@@ -67,6 +70,12 @@ const Template = () => {
 		});
 
 		socket.on('notif_message', (data: any) => {
+			console.log(conversationId.id);
+			console.log(data.channel.id);
+			console.log(data);
+			console.log(conversationId.id == data.channel.id);
+			if (conversationId.id == data.channel.id)
+				return;
 			let newmessage = data.user.username + ' : ' + data.content;
 			if (data.content.length > 16) {
 				newmessage = data.user.username + ' : ' + data.content.substring(0, 16) + '...';
