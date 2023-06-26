@@ -177,21 +177,21 @@ export class ChannelController {
     return resp.status(200).send(ret);
   }
 
-  @Post('/mp/create')
-  async createMp(
-    @Body() body: MpCreateDto,
-    @GetUser('sub') id: string,
-    @Res() resp,
-  ) {
-    let ret;
-    try {
-      ret = await this.channelService.createMPChannel(id, body.user_id);
-    } catch (e) {
-      resp.status(400).send(e.message);
-      return;
-    }
-    return resp.status(200).send(ret);
-  }
+  // @Post('/mp/create')
+  // async createMp(
+  //   @Body() body: MpCreateDto,
+  //   @GetUser('sub') id: string,
+  //   @Res() resp,
+  // ) {
+  //   let ret;
+  //   try {
+  //     ret = await this.channelService.createMPChannel(id, body.user_id);
+  //   } catch (e) {
+  //     resp.status(400).send(e.message);
+  //     return;
+  //   }
+  //   return resp.status(200).send(ret);
+  // }
 
   @Get('/name/:name')
   async getChannelsByName(@Param('name') name: string, @Res() resp) {

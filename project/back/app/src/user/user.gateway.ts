@@ -17,6 +17,8 @@ import { FriendCode } from '../utils/requestcode.enum';
 import { ChannelService } from '../channel/channel.service';
 import { addAdminDto } from '../dto/add-admin.dto';
 import { AuthService } from '../auth/auth.service';
+import {MpCreateDto} from "../dto/mp-create.dto";
+import {CreateChannelDto} from "../dto/create-channel.dto";
 
 @WebSocketGateway()
 export class UserGateway implements OnGatewayInit {
@@ -90,6 +92,13 @@ export class UserGateway implements OnGatewayInit {
       }
       await this.userService.addFriend(user_id, friend_id);
       await this.userService.addFriend(friend_id, user_id);
+      const mpCreateDto = new MpCreateDto();
+      const mpchannel = await this.channelService.createMPChannel(
+        user_id,
+        friend_id,
+      );
+      client.join(mpchannel.id);
+      if (friend_socket != null) friend_socket.join(mpchannel.id);
       ret = {
         code: FriendCode.NEW_FRIEND,
       };
