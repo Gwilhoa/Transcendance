@@ -20,7 +20,7 @@ const Template = () => {
 	const dispatch = useDispatch();
 	const socketInstance = SocketSingleton.getInstance();
 	const socket = socketInstance.getSocket();
-	const conversationId  = useSelector((state: RootState) => state.conversationId);
+	const conversationId  = useSelector((state: RootState) => state.conversationId.id);
 
 
 	const confirmFriend = () => {
@@ -70,11 +70,11 @@ const Template = () => {
 		});
 
 		socket.on('notif_message', (data: any) => {
-			console.log(conversationId.id);
+			console.log(conversationId);
 			console.log(data.channel.id);
 			console.log(data);
-			console.log(conversationId.id == data.channel.id);
-			if (conversationId.id == data.channel.id)
+			console.log(conversationId == data.channel.id);
+			if (conversationId == data.channel.id)
 				return;
 			let newmessage = data.user.username + ' : ' + data.content;
 			if (data.content.length > 16) {
@@ -100,7 +100,7 @@ const Template = () => {
 			socket.off('message');
 			socket.off('friend_request');
 		};
-	}, [navigate]);
+	}, [navigate, conversationId]);
 
 	return (
 		<div className='page'>
