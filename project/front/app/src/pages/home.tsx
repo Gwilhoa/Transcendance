@@ -11,7 +11,6 @@ import {openModal} from '../redux/modal/modalSlice';
 import Search from '../components/search/userSearch';
 import axios from 'axios';
 import SocketSingleton from '../socket';
-import Profil from '../components/profil/profil';
 import { ProfilImage } from '../components/profil/ProfilImage';
 
 const socketInstance = SocketSingleton.getInstance();
@@ -83,7 +82,7 @@ const Add = () => {
 				socket.off('friend_request');
 			}
 		};
-	}, [listUser, refresh, socket]);
+	}, [listUser, refresh]);
 
 	if (listUser == null || listUser.length == 0) {
 		return (

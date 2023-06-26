@@ -11,8 +11,8 @@ import { setErrorLocalStorage } from '../components/IfError';
 
 
 const Template = () => {
-	let friendId = 0;
-	let rivalId = 0;
+	let friendId = '';
+	let rivalId = '';
 	const navigate = useNavigate();
 	const [notif, setNotif] = useState(<></>);
 	const [notifVisible, setNotifVisible] = useState(false);
