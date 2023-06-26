@@ -6,7 +6,6 @@ import {Outlet, useNavigate} from 'react-router-dom';
 import SocketSingleton from '../socket';
 import {setBeginStatus} from "../redux/game/beginToOption";
 import {useDispatch} from "react-redux";
-import { cookies } from '../App';
 import { setErrorLocalStorage } from '../components/IfError';
 
 

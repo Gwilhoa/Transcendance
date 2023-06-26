@@ -3,7 +3,6 @@ import axios from 'axios';
 import React, {useCallback, useEffect, useState} from 'react'
 import {useDispatch, useSelector} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
-import {cookies} from '../../../App';
 import {Channel, isBan} from '../../../pages/chat';
 import {switchChatModalInviteChannel} from '../../../redux/chat/modalChatSlice';
 import {RootState} from '../../../redux/store';
@@ -14,6 +13,7 @@ import {ProfilName} from '../../profil/ProfilName';
 import Search from '../../search/userSearch';
 import {IUser} from '../../utils/interface';
 import {User} from '../../../pages/chat';
+import jwtDecode from 'jwt-decode';
 
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
@@ -91,7 +91,8 @@ const AddUserId = ({usersId, setUserId, channelId, channel}: AddUserIdProps) => 
 const InviteChannel = ({channel}: { channel: Channel }) => {
 	const dispatch = useDispatch();
 	const [usersId, setUserId] = useState<Array<string>>([]);
-	const myId = useSelector((state: RootState) => state.id.id);
+	const jwt: string = jwtDecode(''+localStorage.getItem('jwtAuthorization')) ;
+	const [myId] = useState<string>(jwt.sub);
 
 	useEffect(() => {
 		channel.users.map((element: User) => {

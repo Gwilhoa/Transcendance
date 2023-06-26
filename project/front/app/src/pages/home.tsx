@@ -12,6 +12,7 @@ import Search from '../components/search/userSearch';
 import axios from 'axios';
 import SocketSingleton from '../socket';
 import { ProfilImage } from '../components/profil/ProfilImage';
+import jwtDecode from 'jwt-decode';
 
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
@@ -138,7 +139,8 @@ const Add = () => {
 
 const Home = () => {
 	console.log('start home');
-	const myId = useSelector((state: RootState) => state.id.id);
+	const jwt: string = jwtDecode(''+localStorage.getItem('jwtAuthorization')) ;
+	const [myId] = useState<string>(jwt.sub);
 
 	return (
 		<div className='home'>
