@@ -131,11 +131,6 @@ const ListAdmin = ({channel}: listUserProps) => {
 									:
 									null
 								}
-								{ channel.creator.id === '' + myId ?
-									<BanHammer id={user.id} channel={channel} />
-									:
-									null
-								}
 							</div>
 						</div>
 					</div>
@@ -149,6 +144,8 @@ const ListUser = ({channel}: listUserProps) => {
 	const dispatch = useDispatch();
 	const myId = useSelector((state: RootState) => state.id.id);
 
+	console.log('hey')
+	console.log (channel);
 	const isMuted = (user: User, channel: Channel) => {
 		console.log(channel);
 		return channel.mutedUser.some((banned) => banned.id === user.id);
@@ -174,11 +171,11 @@ const ListUser = ({channel}: listUserProps) => {
 								<div className='chat-list-users-buttons-user'>
 									<MakeAdmin id={user.id} channel={channel} />
 									<BanHammer id={user.id} channel={channel} />
-									{ isMuted(user, channel) ?
+									{ isMuted(user, channel) ? (
 										<UnMuteButton id={user.id} channel={channel} />
-										:
+									) : (
 										<MuteButton id={user.id} channel={channel} />
-									}
+									)}
 								</div>
 							:
 							null

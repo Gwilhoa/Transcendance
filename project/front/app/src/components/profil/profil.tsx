@@ -112,7 +112,7 @@ export default function Profil() {
 				navigate('/Error');
 				dispatch(closeModal());
 		});
-	}, [navigate, dispatch]);
+	}, [navigate, dispatch, myId]);
 
 	useEffect(() => {
 		socket.on('block_code',(data) => {
@@ -128,25 +128,8 @@ export default function Profil() {
 		})
 
 		socket.on('friend_code', (data: any) => {
-			console.log(data.code);
+			console.log(data);
 			if (data.code === 2 && !isFriend) {
-				axios.post(process.env.REACT_APP_IP + ':3000/channel/mp/create',
-					{
-						user_id: '' + id,
-					},
-					{
-						headers: {
-							Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
-						},
-					})
-					.then((response) => {
-						console.log(response);
-						socket.emit('join_channel', {channel_id: response.data.id, token: cookies.get('jwtAuthorization')});
-					})
-					.catch((error) => {
-						setErrorLocalStorage('Error ' + error?.response?.status);
-						navigate('/Error');
-					});
 				setIsFriend(!isFriend);
 				return;
 			}
@@ -172,14 +155,14 @@ export default function Profil() {
 			socket.off('receive_challenge');
 			socket.off('block_code');
 		}
-	}, [isFriend]);
+	}, [isFriend, id, navigate]);
 
 	useEffect(() => {
 		if (id === myId) {
 			setIsMe(true);
 		}
 		refresh(id);
-	}, [navigate, id, refresh, dispatch]);
+	}, [navigate, id, refresh, dispatch, myId]);
 
 	const changeName = (str: string) => {
 		axios.post(process.env.REACT_APP_IP + ':3000/user/name',

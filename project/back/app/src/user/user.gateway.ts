@@ -17,6 +17,8 @@ import { FriendCode } from '../utils/requestcode.enum';
 import { ChannelService } from '../channel/channel.service';
 import { addAdminDto } from '../dto/add-admin.dto';
 import { AuthService } from '../auth/auth.service';
+import {MpCreateDto} from "../dto/mp-create.dto";
+import {CreateChannelDto} from "../dto/create-channel.dto";
 
 @WebSocketGateway()
 export class UserGateway implements OnGatewayInit {
@@ -90,14 +92,20 @@ export class UserGateway implements OnGatewayInit {
       }
       await this.userService.addFriend(user_id, friend_id);
       await this.userService.addFriend(friend_id, user_id);
+      const mpchannel = await this.channelService.createMPChannel(
+        user_id,
+        friend_id,
+      );
+      ret = this.channelService.getChannelById(mpchannel.id);
+      client.join(mpchannel.id);
+      if (friend_socket != null) friend_socket.join(mpchannel.id);
+      this.server.emit('update_user_channel', ret);
       ret = {
         code: FriendCode.NEW_FRIEND,
       };
     } else {
       ret = {
         code: FriendCode.FRIEND_REQUEST_SENT,
-        user1: user_id,
-        user2: friend_id,
       };
       const requestFriend = await this.userService.addFriendRequest(
         user_id,
@@ -139,22 +147,17 @@ export class UserGateway implements OnGatewayInit {
       client.emit('delete_channel', { id: mpchannel.id });
       client.emit('friend_code', {
         code: FriendCode.UNFRIEND_SUCCESS,
-        user1: user_id,
-        user2: friend_id,
       });
       if (friend_socket != null) {
         friend_socket.emit('delete_channel', { id: mpchannel.id });
         friend_socket.emit('friend_code', {
           code: FriendCode.NEW_UNFRIEND,
-          user1: user_id,
-          user2: friend_id,
+          id: user_id,
         });
       }
     } else {
       client.emit('friend_code', {
         code: FriendCode.UNEXISTING_FRIEND,
-        user1: user_id,
-        user2: friend_id,
       });
     }
   }

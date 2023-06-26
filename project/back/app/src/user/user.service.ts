@@ -19,7 +19,7 @@ import { includeUser } from '../utils/socket.function';
 })
 @Injectable()
 export class UserService {
-  @WebSocketServer() server: Server;
+  @WebSocketServer() private server: Server;
 
   constructor(
     private jwt: JwtService,

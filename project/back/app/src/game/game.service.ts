@@ -60,6 +60,8 @@ export class GameService {
       .where('game.id = :id', { id: id })
       .getOne();
     if (game == null) throw new Error('Game not found');
+    if (game.finished == GameStatus.FINISHED)
+      return await this.gameRepository.save(game);
     game.finished = GameStatus.REMAKE;
     return await this.gameRepository.save(game);
   }

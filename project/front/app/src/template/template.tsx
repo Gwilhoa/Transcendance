@@ -5,9 +5,11 @@ import Notification from '../components/notification/notification';
 import {Outlet, useNavigate} from 'react-router-dom';
 import SocketSingleton from '../socket';
 import {setBeginStatus} from "../redux/game/beginToOption";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import { cookies } from '../App';
 import { setErrorLocalStorage } from '../components/IfError';
+import axios from 'axios';
+import { RootState } from '../redux/store';
 
 
 const Template = () => {
@@ -16,6 +18,7 @@ const Template = () => {
 	const navigate = useNavigate();
 	const [notif, setNotif] = useState(<></>);
 	const [notifVisible, setNotifVisible] = useState(false);
+	const myId = useSelector((state: RootState) => state.id.id);
 
 	const dispatch = useDispatch();
 	const socketInstance = SocketSingleton.getInstance();
@@ -56,6 +59,7 @@ const Template = () => {
 	}
 
 	useEffect(() => {	
+		console.log('bonjour je suis le template');
 		socket.on('receive_challenge', (data: any) => {
 			console.log(data);
 			if (data.code == 3) {
@@ -81,10 +85,16 @@ const Template = () => {
 		});
 
 		socket.on('message', (data: any) => {
-			console.log(data)
+			let newmessage = data.user.username + ' : ' + data.content;
+			if (data.content.length > 16) {
+				newmessage = data.user.username + ' : ' + data.content.substring(0, 16) + '...';
+			}
+			setNotif(<Notification message={newmessage} onConfirm={() => {null}} onCancel={() => {null}} hasButton={false} setVisible={setNotifVisible}/>)
+			setNotifVisible(true);
 		})
 
 		socket.on('friend_request', (data: any) => {
+			console.count('friend_request');
 			if (data.code == 4) {
 				friendId = data.id;
 				setNotif(<Notification message={'New friend'} onConfirm={confirmFriend} onCancel={rejectFriend}
@@ -93,13 +103,21 @@ const Template = () => {
 			}
 		})
 
+		socket.on('friend_code', (data: any) => {
+			if (data.code == 4) {
+				friendId = data.id;
+				setNotif(<Notification message={'New friend'} onConfirm={confirmFriend} onCancel={rejectFriend}
+					hasButton={true} setVisible={setNotifVisible}/>);
+				setNotifVisible(true)
+			}
+		})
 		return () => {
 			socket.off('receive_challenge');
 			socket.off('connection_error');
 			socket.off('message');
 			socket.off('friend_request');
 		};
-	}, []);
+	}, [navigate]);
 
 	return (
 		<div className='page'>

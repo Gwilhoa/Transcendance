@@ -139,7 +139,6 @@ export class ChannelGateway implements OnGatewayInit {
     ) {
       client.emit('message_code', messageCode.INVALID_FORMAT);
     }
-    const token = payload.token;
     const channel_id = payload.channel_id;
     let message = payload.content;
     let send;
@@ -512,7 +511,7 @@ export class ChannelGateway implements OnGatewayInit {
 
   @SubscribeMessage('add_muted')
   async add_muted(client: Socket, payload: any) {
-    if (payload.token == null || verifyToken(payload.token, this.authService)) {
+    if (payload.token == null || !verifyToken(payload.token, this.authService)) {
       wrongtoken(client, 'add_muted');
       return;
     }

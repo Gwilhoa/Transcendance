@@ -99,7 +99,7 @@ export class ChannelService {
       .leftJoinAndSelect('channel.bannedUsers', 'bannedUsers')
       .leftJoinAndSelect('channel.creator', 'creator')
       .leftJoinAndSelect('channel.users', 'users')
-      .leftJoinAndSelect('channel.mutedUser', 'mutedUsers')
+      .leftJoinAndSelect('channel.mutedUser', 'mutedUser')
       .where('channel.id = :id', { id: id })
       .getOne();
   }
@@ -269,8 +269,7 @@ export class ChannelService {
     channel.messages.push(message);
     await this.channelRepository.save(channel);
     const ret: any = await this.messageRepository.save(message);
-    console.log(ret.content);
-    ret.channel = channel.id;
+    ret.channel = await this.getChannelById(body.channel_id);
     return ret;
   }
 
@@ -469,14 +468,7 @@ export class ChannelService {
   }
 
   async inviteChannel(sender_id: any, receiver_id: any, channel_id: any) {
-    const channel = await this.channelRepository
-      .createQueryBuilder('channel')
-      .leftJoinAndSelect('channel.users', 'users')
-      .leftJoinAndSelect('channel.admins', 'admins')
-      .leftJoinAndSelect('channel.creator', 'creator')
-      .leftJoinAndSelect('channel.bannedUsers', 'bannedUsers')
-      .where('channel.id = :id', { id: channel_id })
-      .getOne();
+    const channel = await this.getChannelById(channel_id);
     if (channel.type == ChannelType.MP_CHANNEL)
       throw new Error('Channel is private');
 
