@@ -66,26 +66,26 @@ const Game: React.FC<GameProps> = () => {
 			case 'KeyW':
 				socket.emit('input_game', {game_id: gameId, type: 0})
 				break;
-				case 'KeyS':
-					socket.emit('input_game', {game_id: gameId, type: 1})
-					break;
-					case 'ArrowUp':
-						socket.emit('input_game', {game_id: gameId, type: 0})
-						break;
-						case "ArrowDown":
-							socket.emit("input_game", {game_id: gameId, type: 1})
-							break;
-							case "Escape":
-								socket.emit("input_game", {game_id: gameId, type: 2})
-								break;
-								case "KeyA":
-									socket.emit("input_game", {game_id: gameId, type: 3})
-									break;
-									case "KeyQ":
+			case 'KeyS':
+				socket.emit('input_game', {game_id: gameId, type: 1})
+				break;
+			case 'ArrowUp':
+				socket.emit('input_game', {game_id: gameId, type: 0})
+				break;
+			case "ArrowDown":
+				socket.emit("input_game", {game_id: gameId, type: 1})
+				break;
+			case "Escape":
+				socket.emit("input_game", {game_id: gameId, type: 2})
+				break;
+			case "KeyA":
+				socket.emit("input_game", {game_id: gameId, type: 3})
+				break;
+			case "KeyQ":
 				socket.emit("input_game", {game_id: gameId, type: 4})
 				break;
-				case "KeyF":
-					socket.emit("input_game", {game_id: gameId, type: 5})
+			case "KeyF":
+				socket.emit("input_game", {game_id: gameId, type: 5})
 				break;
 		}
 	};
@@ -106,7 +106,7 @@ const Game: React.FC<GameProps> = () => {
 	socket.on('will_started', (data) => {
 		if (data.time == 0) {
 			canPress.current = true;
-			setStarted("0 | 0");
+			setStarted("0  0");
 		} else {
 			setStarted(data.time);
 		}
@@ -116,7 +116,7 @@ const Game: React.FC<GameProps> = () => {
 	useEffect(() => {
 		let isCall = true;
 		if (gamestate != 2) {
-			socket.emit('leave_game');
+			socket.emit('leave_game', {token: cookies.get('jwtAuthorization')});
 			navigate('/home')
 		}
 		window.addEventListener("keydown", handleKeyPress);
@@ -155,7 +155,7 @@ const Game: React.FC<GameProps> = () => {
 
 		socket.on('update_game', (data) => {
 			if (data.package > packageNumber) {
-				setStarted(data.score2 + " | " + data.score1)
+				setStarted(data.score2 + "  " + data.score1)
 				packageNumber = data.package;
 				console.log (data.ballx, data.bally);
 				data.ballx += 1;
@@ -217,25 +217,38 @@ const Game: React.FC<GameProps> = () => {
 				className="ball"
 				style={{...animatedBall, ...ballStyles}}/>
 			{stop &&
-                <div className="backgroundimg">
-					{IamStoper &&
-                        <button className='buttonResume' onClick={resumeGame}>
-                            <h1>
-                                resume
-                            </h1>
-                        </button>
-					}
-                    <button className='buttonLeave' onClick={leaveGame}>
-                        <h1>
-                            Leave
-                        </h1>
-                    </button>
-                    <div className='textTime'>
+                <div className="game-shadow">
+					<div className='game-pause-page'>
+						<div className='game-pause-page-text-time'>
+							Time before restart :
+							<p>
+								{timeStop}
+							</p>
+						</div>
+						<div className='game-pause-menu-buttons'>
+							<button className='game-pause-menu-buttons-template game-pause-menu-leave-button' onClick={leaveGame}>
+									Leave
+							</button>
+							{IamStoper &&
+								<button className='game-pause-menu-buttons-template game-pause-menu-resume-button' onClick={resumeGame}>
+										resume
+								</button>
+							}
+						</div>
 
-                        <h1>
-							{timeStop}
-                        </h1>
-                    </div>
+						<div>
+							{isPowerup &&
+								<div className='game-pause-page-powerups'>
+									<h3 className='game-pause-page-powerups-title'>You have a powerup :</h3>
+									<div>
+										<p>A : bounce the ball</p>
+										<p>Q : </p>
+										<p>F : freeze ball for a limited moment</p>
+									</div>
+									</div>
+							}
+						</div>
+					</div>
                 </div>}
 		</>
 

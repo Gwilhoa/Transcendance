@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import axios from 'axios';
 import {setErrorLocalStorage} from '../IfError';
@@ -30,7 +30,7 @@ export const ProfilImage = ({id, OnClickOpenProfil, OverwriteClassName}: {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 
-	const changeImage = () => {
+	const changeImage = useCallback(() => {
 		axios.get(process.env.REACT_APP_IP + ':3000/user/image/' + id, {
 			headers: {
 				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
@@ -41,11 +41,10 @@ export const ProfilImage = ({id, OnClickOpenProfil, OverwriteClassName}: {
 				setImage(data);
 			})
 			.catch((error) => {
-				setErrorLocalStorage('Error ' + error.response.status);
-				console.error(error);
+				setErrorLocalStorage('Error ' + error?.response?.status);
 				navigate('/Error');
 			});
-	}
+	}, [id, navigate])
 
 	useEffect(() => {
 		setUserStatus('profil-status-disconnected');
@@ -67,8 +66,7 @@ export const ProfilImage = ({id, OnClickOpenProfil, OverwriteClassName}: {
 				}
 			})
 			.catch((error) => {
-				setErrorLocalStorage('Error ' + error.response.status);
-				console.error(error);
+				setErrorLocalStorage('Error ' + error?.response?.status);
 				navigate('/Error');
 			});
 
@@ -101,7 +99,7 @@ export const ProfilImage = ({id, OnClickOpenProfil, OverwriteClassName}: {
 			socket.off('update_profil');
 			socket.off('connection_server');
 		};
-	}, [navigate, socket])
+	}, [navigate, id, changeImage]);
 
 	return (
 		<div key={'image'} className={'profil-image' + ' ' + OverwriteClassName}

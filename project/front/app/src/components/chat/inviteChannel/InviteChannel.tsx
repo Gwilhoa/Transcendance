@@ -65,7 +65,7 @@ const AddUserId = ({usersId, setUserId, channelId, channel}: AddUserIdProps) => 
 			}
 			return prevListId;
 		});
-		socket.emit('invite_channel', {receiver_id: id, channel_id: channelId});
+		socket.emit('invite_channel', {receiver_id: id, channel_id: channelId, token: cookies.get('jwtAuthorization')});
 	};
 
 	if (listUser == null || listUser.length == 0) {
@@ -91,12 +91,13 @@ const AddUserId = ({usersId, setUserId, channelId, channel}: AddUserIdProps) => 
 const InviteChannel = ({channel}: { channel: Channel }) => {
 	const dispatch = useDispatch();
 	const [usersId, setUserId] = useState<Array<string>>([]);
+	const myId = useSelector((state: RootState) => state.id.id);
 
 	useEffect(() => {
 		channel.users.map((element: User) => {
 			setUserId((prevList) => [...prevList, element.id]);
 		});
-	}, []);
+	}, [channel]);
 
 	return (
 		<div className='page-shadow'>
@@ -112,7 +113,7 @@ const InviteChannel = ({channel}: { channel: Channel }) => {
 							<Search 
 								defaultAllUsers={true} 
 								OverwriteClassName={'chat-side-bar-invite-channel-input'}
-								id={localStorage.getItem('id')}
+								id={myId}
 							/>
 							<AddUserId
 								channel={channel}

@@ -39,6 +39,13 @@ export class ChannelGateway implements OnGatewayInit {
 
   @SubscribeMessage('invite_channel')
   async invite_channel(client: Socket, payload: any) {
+    if (
+      payload.token == null ||
+      !verifyToken(payload.token, this.authService)
+    ) {
+      wrongtoken(client, 'invite_channel');
+      return;
+    }
     const channel_id = payload.channel_id;
     const receiver_id = payload.receiver_id;
     const sender_id = client.data.id;
@@ -113,52 +120,15 @@ export class ChannelGateway implements OnGatewayInit {
       return;
     }
   }
-
-  @SubscribeMessage('update_channel')
-  async update_channel(client: Socket, payload: any) {
-    const channel_id = payload.channel_id;
-    const user_id = client.data.id;
-    const channel = await this.channelService.getChannelById(channel_id);
-    let ret = null;
-    try {
-      ret = await this.channelService.updateChannel(
-        channel_id,
-        user_id,
-        payload,
-      );
-    } catch (e) {
-      client.emit('update_channel', {
-        code: 1,
-        channel: channel,
-        message: e.message,
-        sender_id: user_id,
-      });
-    }
-    if (ret == null) {
-      client.emit('update_channel', {
-        code: 1,
-        channel: channel,
-        message: 'channel not found',
-        sender_id: user_id,
-      });
-      return;
-    }
-    client.emit('update_channel', {
-      code: 0,
-      channel_id: channel_id,
-      name: ret.name,
-      type: ret.type,
-    });
-    this.server.to(channel_id).emit('update_channel', {
-      code: 0,
-      channel_id: channel_id,
-      name: ret.name,
-      type: ret.type,
-    });
-  }
-
   @SubscribeMessage('send_message')
   async handleMessage(client: Socket, payload: any) {
+    if (
+      payload.token == null ||
+      !verifyToken(payload.token, this.authService)
+    ) {
+      wrongtoken(client, 'send_message');
+      return;
+    }
     this.logger.debug('send_message');
     this.logger.debug(payload.content);
     if (
@@ -169,17 +139,10 @@ export class ChannelGateway implements OnGatewayInit {
     ) {
       client.emit('message_code', messageCode.INVALID_FORMAT);
     }
-    const token = payload.token;
     const channel_id = payload.channel_id;
     let message = payload.content;
     let send;
     const user_id = client.data.id;
-    try {
-      verifyToken(token, this.authService);
-    } catch (error) {
-      wrongtoken(client);
-      return;
-    }
     const user = await this.userService.getUserById(user_id);
     const channel = await this.channelService.getChannelById(channel_id);
     if (user == null) {
@@ -235,6 +198,13 @@ export class ChannelGateway implements OnGatewayInit {
 
   @SubscribeMessage('join_channel')
   async handleJoinChannel(client: Socket, payload: any) {
+    if (
+      payload.token == null ||
+      !verifyToken(payload.token, this.authService)
+    ) {
+      wrongtoken(client, 'join_channel');
+      return;
+    }
     const channel_id = payload.channel_id;
     const user_id = client.data.id;
     const user = await this.userService.getUserById(user_id);
@@ -281,16 +251,16 @@ export class ChannelGateway implements OnGatewayInit {
 
   @SubscribeMessage('leave_channel')
   async handleLeaveChannel(client: Socket, payload: any) {
-    const token = payload.token;
+    if (
+      payload.token == null ||
+      !verifyToken(payload.token, this.authService)
+    ) {
+      wrongtoken(client, 'leave_channel');
+      return;
+    }
     const channel_id = payload.channel_id;
     const channel = await this.channelService.getChannelById(channel_id);
     const user_id = client.data.id;
-    try {
-      verifyToken(token, this.authService);
-    } catch (error) {
-      wrongtoken(client);
-      return;
-    }
     const send = {
       code: 0,
       channel: channel,
@@ -336,6 +306,13 @@ export class ChannelGateway implements OnGatewayInit {
 
   @SubscribeMessage('ban_user')
   async ban_user(client: Socket, payload: any) {
+    if (
+      payload.token == null ||
+      !verifyToken(payload.token, this.authService)
+    ) {
+      wrongtoken(client, 'ban_user');
+      return;
+    }
     const user_id = client.data.id;
     const channel_id = payload.channel_id;
     const ban_id = payload.ban_id;
@@ -380,6 +357,13 @@ export class ChannelGateway implements OnGatewayInit {
 
   @SubscribeMessage('unban_user')
   async unban_user(client: Socket, payload: any) {
+    if (
+      payload.token == null ||
+      !verifyToken(payload.token, this.authService)
+    ) {
+      wrongtoken(client, 'unban_user');
+      return;
+    }
     const user_id = client.data.id;
     const channel_id = payload.channel_id;
     const ban_id = payload.unban_id;
@@ -419,6 +403,13 @@ export class ChannelGateway implements OnGatewayInit {
 
   @SubscribeMessage('add_admin')
   async add_admin(client: Socket, payload: any) {
+    if (
+      payload.token == null ||
+      !verifyToken(payload.token, this.authService)
+    ) {
+      wrongtoken(client, 'add_admin');
+      return;
+    }
     const user_id = client.data.id;
     const channel_id = payload.channel_id;
     const channel = await this.channelService.getChannelById(channel_id);
@@ -458,6 +449,13 @@ export class ChannelGateway implements OnGatewayInit {
 
   @SubscribeMessage('remove_admin')
   async remove_admin(client: Socket, payload: any) {
+    if (
+      payload.token == null ||
+      !verifyToken(payload.token, this.authService)
+    ) {
+      wrongtoken(client, 'remove_admin');
+      return;
+    }
     const user_id = client.data.id;
     const channel_id = payload.channel_id;
     const channel = await this.channelService.getChannelById(channel_id);
@@ -497,6 +495,13 @@ export class ChannelGateway implements OnGatewayInit {
 
   @SubscribeMessage('research_channel')
   async research_channel(client: Socket, payload: any) {
+    if (
+      payload.token == null ||
+      !verifyToken(payload.token, this.authService)
+    ) {
+      wrongtoken(client, 'research_channel');
+      return;
+    }
     const ch = await this.channelService.researchAvailableChannels(
       client.data.id,
       payload.search,
@@ -506,6 +511,10 @@ export class ChannelGateway implements OnGatewayInit {
 
   @SubscribeMessage('add_muted')
   async add_muted(client: Socket, payload: any) {
+    if (payload.token == null || !verifyToken(payload.token, this.authService)) {
+      wrongtoken(client, 'add_muted');
+      return;
+    }
     const user_id = client.data.id;
     const channel_id = payload.channel_id;
     const muted_id = payload.mute_id;
@@ -545,6 +554,13 @@ export class ChannelGateway implements OnGatewayInit {
 
   @SubscribeMessage('remove_muted')
   async remove_muted(client: Socket, payload: any) {
+    if (
+      payload.token == null ||
+      !verifyToken(payload.token, this.authService)
+    ) {
+      wrongtoken(client, 'remove_muted');
+      return;
+    }
     const user_id = client.data.id;
     const channel_id = payload.channel_id;
     const muted_id = payload.mute_id;

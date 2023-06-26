@@ -27,23 +27,23 @@ const EndGame = () => {
 		return () => {
 			console.log("unmount revenge : " + myrevenge);
 			if (!myrevengeRef.current)
-				socket.emit('game_finished', {rematch: false});
+				socket.emit('game_finished', {rematch: false, token: cookies.get('jwtAuthorization')});
 		};
-	}, [socket]);
+	}, [myrevenge, socket]);
 
 	const homebutton = () => {
-		socket.emit('game_finished', {rematch: false});
+		socket.emit('game_finished', {rematch: false, token: cookies.get('jwtAuthorization')});
 		navigate('/home');
 	}
 
 	const launchReplay = () => {
-		socket.emit('game_finished', {rematch: true});
+		socket.emit('game_finished', {rematch: true, token: cookies.get('jwtAuthorization')});
 	}
 
   
   const replaybutton = () => {
     myrevengeRef.current = true;
-    socket.emit('game_finished', {rematch : true})
+    socket.emit('game_finished', {rematch : true, token: cookies.get('jwtAuthorization')})
     if (!revenge)
       setMyrevenge(true);
   }
@@ -74,12 +74,11 @@ const EndGame = () => {
     socket.off('rematch')
     /*socket.off('game_found')*/
   }
-  }, [])
+  }, [dispatch, launchReplay, myrevenge, navigate])
   useEffect(() => {
 
     if (finalStatus == null || finalStatus.adversary == null) {
-      socket.emit('leave_game');
-      console.log("A GNAGNAGNA JE PASSE ICI")
+      socket.emit('leave_game', {token: cookies.get('jwtAuthorization')})
       navigate('/home');
       window.location.reload()
     }

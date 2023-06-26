@@ -1,5 +1,5 @@
 import './css/chat.css'
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import Conversation from '../components/chat/conversation/conversation';
 import CreateChannel from '../components/chat/createChannel/CreateChannel';
@@ -15,8 +15,7 @@ import ListUserChannel from '../components/chat/ListUsers';
 import axios from 'axios';
 import {cookies} from '../App';
 import {useNavigate} from 'react-router-dom';
-import { closeChatModalListUser, switchChatModalListUser, switchChatModalUpdateChannel } from '../redux/chat/modalChatSlice';
-import {it} from "node:test";
+import { closeChatModalListUser, switchChatModalListUser } from '../redux/chat/modalChatSlice';
 
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
@@ -77,32 +76,23 @@ export const initialChannelState: Channel = {
 	mutedUser: [],
 }
 
-export const isAdmin = (channel: Channel) => {
-		if (channel.admins.some((admin) => admin.id === localStorage.getItem('id'))) {
-			return (true);
-		}
-		return (false);
+export const isAdmin = (channel: Channel, userId: string) => {
+		return (channel.admins.some((admin) => admin.id === userId));
 };
 
-export const isBan = (channel: Channel, user: User) => {
-		if (channel.bannedUsers.some((banned) => banned.id === user.id)) {
-			return (true);
-		}
-		return (false);
+export const isBan = (channel: Channel, userId: User) => {
+		return (channel.bannedUsers.some((banned) => banned.id === userId.id));
 };
 
-export const isMe = (user: User) => {
-	if (user.id === '' + localStorage.getItem('id')) {
-		return (true);
-	}
-	return (false);
+export const isMe = (user: User, myId: string) => {
+	return (user.id === myId);
 };
 
 const updateAvailableChannel = (input: string) => {
 	if (input === '') {
 		return;
 	}
-	socket.emit('research_channel', {search: input})
+	socket.emit('research_channel', {search: input, token: cookies.get('jwtAuthorization')})
 }
 ////////////////////////// CHAT ///////////////////////////////////////////////
 function Chat() {
@@ -121,7 +111,6 @@ function Chat() {
 
 	const [conversationId, setConversationId] = useState<string>('');
 	const [updateChannel, setUpdateChannel] = useState<number>(0);
-	const [errorUpdateChannel, setErrorUpdateChannel] = useState<string>('');
 
 	const [messages, setMessages] = useState<Array<Message>>([]);
 	const [errorGetMessage, setErrorGetMessage] = useState<boolean>(false);
@@ -143,7 +132,7 @@ function Chat() {
 			console.error(error);
 		}
 	}
-	const fetchListChannel = async () => {
+	const fetchListChannel = useCallback( async () => {
 		try {
 			const response = await axios.get(process.env.REACT_APP_IP + ':3000/user/channels', {
 				headers: {
@@ -155,9 +144,9 @@ function Chat() {
 		} catch (error) {
 			console.error(error);
 		}
-	};
+	}, []);
 
-	const fetchListMessage = async () => {
+	const fetchListMessage = useCallback(async () => {
 		if (conversationId === '') {
 			return;
 		}
@@ -182,9 +171,9 @@ function Chat() {
 			}
 			setErrorGetMessage(true);
 		}
-	};
+	}, [conversationId, navigate]);
 
-	const findChannel = () => {
+	const findChannel = useCallback(() => {
 		if (listChannel.length == 0) {
 			setChannel(initialChannelState);
 			if (isOpenListUserChannel) {
@@ -197,35 +186,17 @@ function Chat() {
 				setChannel({...itemChannel});
 			}
 		});
-	};
+	}, [isOpenListUserChannel, dispatch, conversationId, listChannel]);
 
-////////////////////////// SOCKET /////////////////////////////////////////////
-
-	useEffect(() => {
-		fetchListChannel();
-		fetchAvailableChannel();
-
-		socket.on('update_user_channel', handleUpdateUserChannel);
-		socket.on('user_join', handleUserCode);
-		socket.on('research_channel', handleResearchChannel);
-
-		return () => {
-			socket.off('update_user_channel');
-			socket.off('user_join');
-			socket.off('research_channel');
-		}
-	}, []);
-
-////////////////////////// HANDLE SOCKET //////////////////////////////////////
-
-	const handleResearchChannel = (data: any) => {
+	const handleResearchChannel = useCallback((data: any) => {
 		console.log('research_channel');
 		console.log(data);
 		if (!data.channels || data.channels.length == 0)
 			return;
 		setListAvailableChannel(data.channels);
-	}
-	const handleUpdateUserChannel = (data: any) => {
+	}, []);
+
+	const handleUpdateUserChannel = useCallback((data: any) => {
 		console.log('user_update');
 		console.log(data);
 		if (data.code === 0) {
@@ -249,32 +220,32 @@ function Chat() {
 					setConversationId(data.channel.id);
 					return [...updatedListChannel, data.channel];
 				}
-			});		
+			});
 		}
 		setUpdateChannel((prevUpdateChannel) => prevUpdateChannel + 1);
 		if (updateChannel > 10) {
 			setUpdateChannel(0);
 		}
-	};
+	}, [updateChannel]);
 
-	const handleJoinChannel = (channel_id: string) => {
+	const handleJoinChannel = useCallback((channel_id: string) => {
 		console.log('join_channel');
 		console.log(password.get(channel_id));
 		if (password.get(channel_id)) {
-			socket.emit('join_channel', {channel_id: channel_id, password: password.get(channel_id)});
+			socket.emit('join_channel', {channel_id: channel_id, password: password.get(channel_id), token: cookies.get('jwtAuthorization')});
 			return;
 		} else {
-			socket.emit('join_channel', {channel_id: channel_id});
+			socket.emit('join_channel', {channel_id: channel_id, token: cookies.get('jwtAuthorization')});
 		}
-	}
+	}, [password]);
 
-	const handleUserCode = (data: any) => {
+	const handleUserCode = useCallback((data: any) => {
 		console.log('user_join');
 		console.log(data);
-	};
+	}, []);
 
-	const handleMessage = (data: any) => {
-		if (data.channel == conversationId) {
+	const handleMessage = useCallback((data: any) => {
+		if (data.channel.id == conversationId) {
 			const newItemMessage: Message = {
 				content: data.content,
 				id: data.id,
@@ -292,20 +263,20 @@ function Chat() {
 			});
 		}
 		return;
-	};
+	}, [conversationId]);
 
-	const handleMessageCode = (data: any) => {
+	const handleMessageCode = useCallback((data: any) => {
 		console.log(data);
 		setSendMessage(false);
 		if (data.code == 3) {
-			setErrorPostMessage('Invalid Format');
+			setErrorPostMessage(data.message);
 		}
 		if (data.code == 0) {
 			setErrorPostMessage('');
 		}
-	};
+	}, []);
 
-	const handleDeleteChannel = (data: any) => {
+	const handleDeleteChannel = useCallback((data: any) => {
 		console.log('delete channel');
 		console.log(data);
 		if (conversationId == data.id) {
@@ -315,9 +286,9 @@ function Chat() {
 		setListChannel((prevListChannel) =>
 			prevListChannel.filter((itemChannel) => itemChannel.id !== data.id)
 		);
-	};
+	}, [conversationId, dispatch]);
 
-	const handleUpdateChannel = (data: any) => {
+	const handleUpdateChannel = useCallback((data: any) => {
 		console.log('update_channel');
 		console.log(data);
 		if (data.code == 0) {
@@ -334,8 +305,22 @@ function Chat() {
 				setChannel((prevChannel) => ({...prevChannel, name: data.name, type: data.type}));
 			}
 		}
-	};
+	}, [conversationId]);
 
+	useEffect(() => {
+		fetchListChannel();
+		fetchAvailableChannel();
+
+		socket.on('update_user_channel', handleUpdateUserChannel);
+		socket.on('user_join', handleUserCode);
+		socket.on('research_channel', handleResearchChannel);
+
+		return () => {
+			socket.off('update_user_channel');
+			socket.off('user_join');
+			socket.off('research_channel');
+		}
+	}, [fetchListChannel, handleUpdateUserChannel, handleUserCode, handleResearchChannel]);
 	useEffect(() => {
 		fetchListMessage();
 		findChannel();
@@ -355,7 +340,11 @@ function Chat() {
 			socket.off('message_code');
 			setErrorPostMessage('');
 		};
-	},[conversationId, updateChannel]);
+	},[conversationId, updateChannel, fetchListChannel, listChannel, 
+		handleJoinChannel, handleMessage, handleDeleteChannel, 
+		findChannel, fetchListMessage, handleUpdateChannel,
+		handleMessageCode
+	]);
 
 	return (
 		<>
@@ -370,7 +359,7 @@ function Chat() {
 			{isOpenCreateChannel && (<CreateChannel/>)}
 			{isOpenInviteChannel && (<InviteChannel channel={channel}/>)}
 			{isOpenUpdateChannel && (<ModifyChannel channel={channel}/>)}
-			{conversationId !== '' ? (
+			{conversationId != '' ? (
 			<div className='chat-right-page'>
 
 				<Conversation
@@ -378,7 +367,6 @@ function Chat() {
 					channel={channel}
 					errorGetMessage={errorGetMessage}
 				/>
-				{ errorUpdateChannel != '' ? <p>errorUpdateChannel</p> : null}
 				<SendMessage
 					conversation={conversationId}
 					errorPostMessage={errorPostMessage}
@@ -398,7 +386,7 @@ function Chat() {
 									<input className='chat-page-channel-password-input' placeholder='Password' onChange={event => password.set(itemChannel.id, event.target.value)}/>
 								) : null
 								}
-								<button onClick={(e) => handleJoinChannel(itemChannel.id)}>Join</button>
+								<button onClick={() => handleJoinChannel(itemChannel.id)}>Join</button>
 							</div>
 						))
 					) : null

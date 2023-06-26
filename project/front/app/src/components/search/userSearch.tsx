@@ -4,6 +4,7 @@ import {IUser} from '../utils/interface';
 import {useDispatch} from 'react-redux';
 import {addUser, setUsers, setUsersNull} from '../../redux/search/searchSlice';
 import SocketSingleton from '../../socket';
+import { cookies } from '../../App';
 
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
@@ -31,7 +32,7 @@ const Search = (
 		} else {
 			console.log('handleOnChange');
 			console.log('emit: ' + res);
-			socket.emit('research_name', {name: res});
+			socket.emit('research_name', {name: res, token: cookies.get('jwtAuthorization')});
 		}
 	};
 	

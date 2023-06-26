@@ -95,17 +95,18 @@ const Add = () => {
 		navigate('/history/' + id);
 	};
 
-	const handleChallenge = (id: string | null) => {
-		console.log('here we need to implement the channel');
-	};
+	const handlechallenge = (id: string | null) => {
+		console.log('challenge ' + id);
+		socket.emit('challenge', {rival_id: id, token: cookies.get('jwtAuthorization')});
+	}
 
 	return (
 		<div className='home-users-list'>
 			{listUser.map((user) => (
-				<div className='home-users-list-user' key={user.id} onClick={() => dispatch(openModal(user.id))}>
+				<div className='home-users-list-user' key={user.id}>
 					<div className='home-users-list-user-info'>
 						<ProfilImage id={user.id} OnClickOpenProfil={true} OverwriteClassName='home-users-list-user-image-profil' />
-						<p className='name'>{user.username}</p>
+						<p className='home-users-list-user-info-name' onClick={() => dispatch(openModal(user.id))}>{user.username} </p>
 						<p className='xp'>{user.experience}XP</p>
 						<p>{user.victories + '/' + user.defeats}</p>
 						<p>
@@ -118,7 +119,7 @@ const Add = () => {
 					</div>
 					<div className='home-users-list-user-buttons'>
 						<button 
-							onClick={() => handleChallenge(user.id)}
+							onClick={() => handlechallenge(user.id)}
 							className='home-users-list-user-buttons-challenge-button'
 						> 
 							Challenge 
@@ -138,6 +139,7 @@ const Add = () => {
 
 const Home = () => {
 	console.log('start home');
+	const myId = useSelector((state: RootState) => state.id.id);
 
 	return (
 		<div className='home'>
@@ -146,7 +148,7 @@ const Home = () => {
 				<Search 
 					defaultAllUsers={false}
 					OverwriteClassName={''}
-					id={localStorage.getItem('id')}
+					id={myId}
 				/>
 				<Add/>
 			</div>
