@@ -123,13 +123,12 @@ export class UserController {
         ) {
           return callback(
             new HttpException(
-              'Only images are allowed',
+              'Only image files are allowed!',
               HttpStatus.BAD_REQUEST,
             ),
             false,
           );
         }
-        callback(null, true);
       },
     }),
   )
@@ -139,13 +138,10 @@ export class UserController {
     @UploadedFile() file,
   ) {
     if (!file) {
-      throw new HttpException('No file uploaded', HttpStatus.BAD_REQUEST);
+      return response.status(HttpStatus.BAD_REQUEST).send('No file uploaded');
     }
     if (file.size > 1024 * 1024 * 5) {
-      throw new HttpException(
-        'File is too large (max 5mb)',
-        HttpStatus.BAD_REQUEST,
-      );
+      return response.status(HttpStatus.BAD_REQUEST).send('File too large');
     }
     if (file.buffer.length === 0) {
       throw new HttpException('Empty file', HttpStatus.BAD_REQUEST);
