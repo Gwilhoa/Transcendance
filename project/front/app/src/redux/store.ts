@@ -6,6 +6,7 @@ import finalGameStat from './game/gameSlice';
 import searchReducer from './search/searchSlice';
 import beginToOption from "./game/beginToOption";
 import idReducer from './id/idSlice';
+import conversationId from './conversationId/conversationId';
 
 const store = configureStore({
 	reducer: {
@@ -15,7 +16,8 @@ const store = configureStore({
 		finalGame: finalGameStat,
 		searchUser: searchReducer,
 		beginToOption: beginToOption,
-		id:				idReducer
+		id:				idReducer,
+		conversationId: conversationId,
 	},
 });
 
