@@ -4,24 +4,21 @@ import {IUser} from '../utils/interface';
 import {useDispatch} from 'react-redux';
 import {addUser, setUsers, setUsersNull} from '../../redux/search/searchSlice';
 import SocketSingleton from '../../socket';
-import { cookies } from '../../App';
 
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
 
 
 const Search = (
-	{ defaultAllUsers, OverwriteClassName, id }: 
-	{
-		defaultAllUsers: boolean,
-		OverwriteClassName: string,
-		id: string | null,
-		}) => 
-{
+	{defaultAllUsers, OverwriteClassName, id}:
+		{
+			defaultAllUsers: boolean,
+			OverwriteClassName: string,
+			id: string | null,
+		}) => {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 	const [myId] = useState<string | null>(id);
-	
 
 
 	const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,7 +32,7 @@ const Search = (
 			socket.emit('research_name', {name: res, token: localStorage.getItem('jwtAuthorization')});
 		}
 	};
-	
+
 	useEffect(() => {
 		socket.on('research_name', (data: any) => {
 			console.log('research_name received my_id : ' + myId + 'user_id : ' + data.id);
@@ -58,7 +55,7 @@ const Search = (
 
 	return (
 		<input type='search' placeholder='Search' className={'search-bar' + ' ' + OverwriteClassName}
-			onChange={handleOnChange}></input>
+			   onChange={handleOnChange}></input>
 	);
 }
 

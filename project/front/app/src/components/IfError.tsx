@@ -30,7 +30,7 @@ function ErrorToken() {
 					} else {
 						setErrorLocalStorage('Error ' + error?.response?.status);
 						if (localStorage.getItem('jwtAuthorization') != null)
-						localStorage.removeItem('jwtAuthorization');
+							localStorage.removeItem('jwtAuthorization');
 						navigate('/Error');
 					}
 				});

@@ -1,23 +1,21 @@
 import './template.css'
 import {Link, useNavigate} from 'react-router-dom';
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {useDispatch} from 'react-redux';
 import {openModal} from '../redux/modal/modalSlice';
 import {setBeginStatus} from "../redux/game/beginToOption";
 import jwtDecode from 'jwt-decode';
-import { setErrorLocalStorage } from '../components/IfError';
 
 
 const Head = () => {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 	const [id, setId] = useState<string>('');
-	useEffect(() =>{
+	useEffect(() => {
 		if (localStorage.getItem('jwtAuthorization') != null) {
-			const jwt: string = jwtDecode(''+localStorage.getItem('jwtAuthorization')) ;
+			const jwt: string = jwtDecode('' + localStorage.getItem('jwtAuthorization'));
 			setId(jwt.sub);
-		}
-		else {
+		} else {
 			navigate('/error');
 		}
 	}, [navigate]);

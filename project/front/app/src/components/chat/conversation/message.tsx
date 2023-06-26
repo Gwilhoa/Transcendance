@@ -28,7 +28,7 @@ function Timer({dateString}: { dateString: string }) {
 }
 
 function Messages({message, listImage}: { message: Message, listImage: Array<imageProfil> }) {
-	const jwt: string = jwtDecode(''+localStorage.getItem('jwtAuthorization')) ;
+	const jwt: string = jwtDecode('' + localStorage.getItem('jwtAuthorization'));
 	const [myId] = useState<string>(jwt.sub);
 	const isMe: boolean = (message.user.id === myId);
 	const photo: string = listImage.find((image) => image.id === message.user.id)
@@ -51,7 +51,7 @@ function Messages({message, listImage}: { message: Message, listImage: Array<ima
 						<Timer dateString={message.date}/>
 					</div>
 				</div>
-					<pre  className='chat-content-message'>
+				<pre className='chat-content-message'>
 							{message.content}
 					</pre>
 			</div>

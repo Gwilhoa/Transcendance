@@ -1,7 +1,7 @@
-import React, { Dispatch, SetStateAction } from 'react'
-import { ReactComponent as Home } from '../../../../images/chat/home.svg'
+import React, {Dispatch, SetStateAction} from 'react'
+import {ReactComponent as Home} from '../../../../images/chat/home.svg'
 
-const ButtonResetConversationId = ({setId}: {setId: Dispatch<SetStateAction<string>>}) => {
+const ButtonResetConversationId = ({setId}: { setId: Dispatch<SetStateAction<string>> }) => {
 
 	const handleOnClick = () => {
 		setId('');

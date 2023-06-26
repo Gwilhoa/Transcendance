@@ -2,11 +2,9 @@ import './css/CreateTwoFa.css';
 import axios from 'axios';
 import React, {useEffect, useRef, useState} from 'react';
 import AuthCode, {AuthCodeRef} from 'react-auth-code-input';
-import Cookies from 'universal-cookie';
 import ErrorToken, {setErrorLocalStorage} from '../components/IfError';
 import {useNavigate} from 'react-router-dom';
 
-const cookies = new Cookies();
 
 export const ErrorInput = () => {
 

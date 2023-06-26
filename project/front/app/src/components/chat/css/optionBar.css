@@ -47,9 +47,9 @@
     cursor: pointer;
 }
 
-.chat-add-channel-button-image{
+.chat-add-channel-button-image {
     height: 4rem;
-    fill : var(--primary-color);
+    fill: var(--primary-color);
 }
 
 /* home button */
@@ -66,7 +66,7 @@
     color: var(--primary-color);
 }
 
-.chat-option-bar-home-button{
+.chat-option-bar-home-button {
     background: var(--box-color);
     display: flex;
     justify-content: center;
@@ -80,7 +80,7 @@
     margin-bottom: 0.5rem;
 }
 
-.chat-option-bar-home-button-image{
+.chat-option-bar-home-button-image {
     height: 3rem;
-    fill : var(--primary-color);
+    fill: var(--primary-color);
 }

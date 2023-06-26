@@ -2,12 +2,10 @@ import './css/history.css'
 import React, {useCallback, useEffect, useState} from 'react';
 import ErrorToken, {setErrorLocalStorage} from '../components/IfError';
 import {useNavigate, useParams} from 'react-router-dom';
-import {cookies} from '../App'
-import {useDispatch, useSelector} from 'react-redux';
+import {useDispatch} from 'react-redux';
 import {openModal} from '../redux/modal/modalSlice';
 import axios from 'axios';
-import { User } from './chat';
-import { RootState } from '../redux/store';
+import {User} from './chat';
 import jwtDecode from 'jwt-decode';
 
 interface Game {
@@ -19,10 +17,10 @@ interface Game {
 	user2: User;
 }
 
-const OneScoreBlock = ({ game, playerId }: { game: Game, playerId: string }) => {
+const OneScoreBlock = ({game, playerId}: { game: Game, playerId: string }) => {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
-	const jwt: string = jwtDecode(''+localStorage.getItem('jwtAuthorization')) ;
+	const jwt: string = jwtDecode('' + localStorage.getItem('jwtAuthorization'));
 	const [myId] = useState<string>(jwt.sub);
 
 	const [leftImage, setLeftImage] = useState<string>('');
@@ -36,7 +34,7 @@ const OneScoreBlock = ({ game, playerId }: { game: Game, playerId: string }) => 
 
 	const [userWinner, setUserWinner] = useState<number>(1);
 
-	
+
 	const [messageWinner, setMessageWinner] = useState<string>('');
 
 
@@ -53,21 +51,17 @@ const OneScoreBlock = ({ game, playerId }: { game: Game, playerId: string }) => 
 				setRightScore(game.score1);
 				if (userWinner == 2) {
 					setMessageWinner('You won');
-				}
-				else {
+				} else {
 					setMessageWinner('You loose');
 				}
-			}
-			else {
+			} else {
 				if (userWinner == 1) {
 					setMessageWinner('You won');
-				}
-				else {
+				} else {
 					setMessageWinner('You loose');
 				}
 			}
-		}
-		else {
+		} else {
 			if (game.user2.id == playerId) {
 				setLeftUser(game.user2);
 				setLeftScore(game.score2)
@@ -75,16 +69,13 @@ const OneScoreBlock = ({ game, playerId }: { game: Game, playerId: string }) => 
 				setRightScore(game.score1);
 				if (userWinner == 2) {
 					setMessageWinner(game.user2.username + ' won');
-				}
-				else {
+				} else {
 					setMessageWinner(game.user2.username + ' loose');
 				}
-			}
-			else {
+			} else {
 				if (userWinner == 1) {
 					setMessageWinner(game.user1.username + ' won');
-				}
-				else {
+				} else {
 					setMessageWinner(game.user1.username + ' loose');
 				}
 			}
@@ -110,8 +101,7 @@ const OneScoreBlock = ({ game, playerId }: { game: Game, playerId: string }) => 
 		let image;
 		if (game.user1.id == playerId) {
 			image = game.user2.id;
-		}
-		else {
+		} else {
 			image = game.user1.id;
 		}
 		axios.get(process.env.REACT_APP_IP + ':3000/user/image/' + image, {
@@ -155,9 +145,9 @@ const OneScoreBlock = ({ game, playerId }: { game: Game, playerId: string }) => 
 	);
 };
 
-const ListBlockScore = ({ userId, username }: { userId: string, username: string }) => {
+const ListBlockScore = ({userId, username}: { userId: string, username: string }) => {
 	const [listGame, setListGame] = useState<Array<Game>>([]);
-	const jwt: string = jwtDecode(''+localStorage.getItem('jwtAuthorization')) ;
+	const jwt: string = jwtDecode('' + localStorage.getItem('jwtAuthorization'));
 	const [myId] = useState<string>(jwt.sub);
 
 	const navigate = useNavigate();
@@ -182,9 +172,8 @@ const ListBlockScore = ({ userId, username }: { userId: string, username: string
 	if (listGame == null || listGame.length == 0) {
 		if (userId == myId) {
 			return (<p className='no-game-played'>{"You don't have played a game yet!"}</p>);
-		}
-		else {
-			return (<p className='no-game-played'>{ username + " has never yet played a game"}</p>);
+		} else {
+			return (<p className='no-game-played'>{username + " has never yet played a game"}</p>);
 		}
 	}
 
@@ -201,7 +190,7 @@ const ListBlockScore = ({ userId, username }: { userId: string, username: string
 						</div>
 					) : (
 						<div key={itemGame.id}></div>)
-					))
+				))
 			}
 		</div>
 	);
@@ -210,32 +199,30 @@ const ListBlockScore = ({ userId, username }: { userId: string, username: string
 const History = () => {
 	const navigate = useNavigate();
 	const [username, setUsername] = useState<string>('');
-	const { id } = useParams();
+	const {id} = useParams();
 
-		const fetchDataUser = useCallback((userId: string) => {
-				if (id != null) {
-				axios.get(process.env.REACT_APP_IP + ':3000/user/id/' + userId, {
-					headers: {
-						Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
-					},
+	const fetchDataUser = useCallback((userId: string) => {
+		if (id != null) {
+			axios.get(process.env.REACT_APP_IP + ':3000/user/id/' + userId, {
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
+				},
+			})
+				.then((response) => {
+					setUsername(response.data.username);
 				})
-					.then((response) => {
-						setUsername(response.data.username);
-					})
-					.catch((error) => {
-						if (error?.response?.status == 401 || error?.response?.status == 500) {
-							setErrorLocalStorage('Error ' + error?.response?.status);
-							navigate('/Error');
-						}
-						else (
-							navigate('/home')
-						)
-					});
-			}
-			else {
-				navigate('/home');
-			}
-		}, [navigate, id]);
+				.catch((error) => {
+					if (error?.response?.status == 401 || error?.response?.status == 500) {
+						setErrorLocalStorage('Error ' + error?.response?.status);
+						navigate('/Error');
+					} else (
+						navigate('/home')
+					)
+				});
+		} else {
+			navigate('/home');
+		}
+	}, [navigate, id]);
 
 	useEffect(() => {
 		console.log(id);
@@ -256,7 +243,7 @@ const History = () => {
 				</div>
 			</header>
 			<div className='scrollBlock'>
-				<ListBlockScore userId={id} username={username} />
+				<ListBlockScore userId={id} username={username}/>
 			</div>
 		</div>
 	);

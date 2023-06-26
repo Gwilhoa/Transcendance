@@ -2,10 +2,8 @@ import React, {useCallback, useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import axios from 'axios';
 import {setErrorLocalStorage} from '../IfError';
-import Cookies from 'universal-cookie';
 import SocketSingleton from '../../socket';
 
-const cookies = new Cookies();
 
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
@@ -50,11 +48,9 @@ export const ProfilName = ({id}: { id: string | null }) => {
 			.then((response) => {
 				if (response.data.status == UserStatus.IN_GAME) {
 					setUserStatus('profil-status-in-game');
-				}
-				else if (response.data.status == UserStatus.CONNECTED) {
+				} else if (response.data.status == UserStatus.CONNECTED) {
 					setUserStatus('profil-status-connected');
-				}
-				else {
+				} else {
 					setUserStatus('profil-status-disconnected');
 				}
 

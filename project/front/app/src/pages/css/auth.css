@@ -41,7 +41,7 @@
 
 /* Page 2FA enable */
 
-.auth-page-two-fa-enable{
+.auth-page-two-fa-enable {
     display: flex;
     padding: 3rem;
     flex-direction: column;
@@ -54,7 +54,7 @@
     overflow: auto;
 }
 
-.auth-page-two-fa-enable > p{
+.auth-page-two-fa-enable > p {
     font-size: 2rem;
     margin-bottom: 3rem;
     text-align: center;

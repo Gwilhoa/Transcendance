@@ -1,16 +1,16 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 
 interface GameState {
-	decide:boolean;
-    playerstate:number;
-	gamestate:number;
+	decide: boolean;
+	playerstate: number;
+	gamestate: number;
 	gameid: string | null;
 }
 
 const initialState: GameState = {
-	gamestate:0,
-    decide:false,
-    playerstate:0,
+	gamestate: 0,
+	decide: false,
+	playerstate: 0,
 	gameid: null,
 };
 

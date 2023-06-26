@@ -3,7 +3,7 @@ import axios from 'axios';
 import React, {useCallback, useEffect, useState} from 'react'
 import {useDispatch, useSelector} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
-import {Channel, isBan} from '../../../pages/chat';
+import {Channel, isBan, User} from '../../../pages/chat';
 import {switchChatModalInviteChannel} from '../../../redux/chat/modalChatSlice';
 import {RootState} from '../../../redux/store';
 import SocketSingleton from '../../../socket';
@@ -12,7 +12,6 @@ import {ProfilImage} from '../../profil/ProfilImage';
 import {ProfilName} from '../../profil/ProfilName';
 import Search from '../../search/userSearch';
 import {IUser} from '../../utils/interface';
-import {User} from '../../../pages/chat';
 import jwtDecode from 'jwt-decode';
 
 const socketInstance = SocketSingleton.getInstance();
@@ -65,7 +64,11 @@ const AddUserId = ({usersId, setUserId, channelId, channel}: AddUserIdProps) => 
 			}
 			return prevListId;
 		});
-		socket.emit('invite_channel', {receiver_id: id, channel_id: channelId, token: localStorage.getItem('jwtAuthorization')});
+		socket.emit('invite_channel', {
+			receiver_id: id,
+			channel_id: channelId,
+			token: localStorage.getItem('jwtAuthorization')
+		});
 	};
 
 	if (listUser == null || listUser.length == 0) {
@@ -78,7 +81,7 @@ const AddUserId = ({usersId, setUserId, channelId, channel}: AddUserIdProps) => 
 				!usersId.includes(user.id) && !isBan(channel, user) ? (
 					<div className='chat-invite-people-user' key={user.id} onClick={() => handleOnClick(user.id)}>
 						<ProfilImage id={user.id} OnClickOpenProfil={false}
-							OverwriteClassName='chat-small-user-image'/>
+									 OverwriteClassName='chat-small-user-image'/>
 						<ProfilName id={user.id}/>
 					</div>
 				) : <div key="notUser"></div>
@@ -91,7 +94,7 @@ const AddUserId = ({usersId, setUserId, channelId, channel}: AddUserIdProps) => 
 const InviteChannel = ({channel}: { channel: Channel }) => {
 	const dispatch = useDispatch();
 	const [usersId, setUserId] = useState<Array<string>>([]);
-	const jwt: string = jwtDecode(''+localStorage.getItem('jwtAuthorization')) ;
+	const jwt: string = jwtDecode('' + localStorage.getItem('jwtAuthorization'));
 	const [myId] = useState<string>(jwt.sub);
 
 	useEffect(() => {
@@ -111,8 +114,8 @@ const InviteChannel = ({channel}: { channel: Channel }) => {
 							onClick={() => dispatch(switchChatModalInviteChannel())}
 						/>
 						<div className='chat-side-bar-invite-channel'>
-							<Search 
-								defaultAllUsers={true} 
+							<Search
+								defaultAllUsers={true}
 								OverwriteClassName={'chat-side-bar-invite-channel-input'}
 								id={myId}
 							/>

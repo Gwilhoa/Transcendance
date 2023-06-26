@@ -3,7 +3,6 @@ import '../components/notification/notification.css'
 import React, {useCallback, useEffect, useState} from 'react';
 import ErrorToken, {setErrorLocalStorage} from '../components/IfError';
 import {useNavigate} from 'react-router-dom';
-import {cookies} from '../App';
 import {IUser} from '../components/utils/interface';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../redux/store';
@@ -11,7 +10,7 @@ import {openModal} from '../redux/modal/modalSlice';
 import Search from '../components/search/userSearch';
 import axios from 'axios';
 import SocketSingleton from '../socket';
-import { ProfilImage } from '../components/profil/ProfilImage';
+import {ProfilImage} from '../components/profil/ProfilImage';
 import jwtDecode from 'jwt-decode';
 
 const socketInstance = SocketSingleton.getInstance();
@@ -87,7 +86,8 @@ const Add = () => {
 
 	if (listUser == null || listUser.length == 0) {
 		return (
-			<p className='home-no-friend'>Knowing how to enjoy your own company is an art. <span>Natasha Adamo</span></p>);
+			<p className='home-no-friend'>Knowing how to enjoy your own company is an art. <span>Natasha Adamo</span>
+			</p>);
 	}
 	console.log(listUser);
 
@@ -113,22 +113,22 @@ const Add = () => {
 							{user.defeats + user.victories === 0 ? (
 								null
 							) : (
-								'WR: ' + 
+								'WR: ' +
 								((user.victories / (user.defeats + user.victories) * 100).toFixed(2)) + '%'
 							)}</p>
 					</div>
 					<div className='home-users-list-user-buttons'>
-						<button 
+						<button
 							onClick={() => handlechallenge(user.id)}
 							className='home-users-list-user-buttons-challenge-button'
-						> 
-							Challenge 
+						>
+							Challenge
 						</button>
-						<button 
+						<button
 							onClick={() => handleHistory(user.id)}
 							className='home-users-list-user-buttons-hsitory-button'
-						> 
-							history 
+						>
+							history
 						</button>
 					</div>
 				</div>
@@ -139,14 +139,14 @@ const Add = () => {
 
 const Home = () => {
 	console.log('start home');
-	const jwt: string = jwtDecode(''+localStorage.getItem('jwtAuthorization')) ;
+	const jwt: string = jwtDecode('' + localStorage.getItem('jwtAuthorization'));
 	const [myId] = useState<string>(jwt.sub);
 
 	return (
 		<div className='home'>
 			<ErrorToken/>
 			<div className='scrollBlock'>
-				<Search 
+				<Search
 					defaultAllUsers={false}
 					OverwriteClassName={''}
 					id={myId}

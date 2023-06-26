@@ -12,6 +12,7 @@ import axios from 'axios';
 import SocketSingleton from '../../socket';
 import {ProfilName} from './ProfilName';
 import jwtDecode from 'jwt-decode';
+
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
 
@@ -20,7 +21,7 @@ export default function Profil() {
 	const initialElement = [];
 	const navigate = useNavigate();
 	const [isMe, setIsMe] = useState<boolean>(false);
-	const jwt: string = jwtDecode(''+localStorage.getItem('jwtAuthorization')) ;
+	const jwt: string = jwtDecode('' + localStorage.getItem('jwtAuthorization'));
 	const [myId] = useState<string>(jwt.sub);
 
 	const [isFriend, setIsFriend] = useState<boolean>(false);
@@ -38,19 +39,19 @@ export default function Profil() {
 
 	console.log(id);
 	const refresh = useCallback((id: string | null) => {
-			axios.get(process.env.REACT_APP_IP + ':3000/auth/2fa/is2FA', {
-				headers: {
-					Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
-				},
+		axios.get(process.env.REACT_APP_IP + ':3000/auth/2fa/is2FA', {
+			headers: {
+				Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
+			},
+		})
+			.then((response) => {
+				setChecked(response.data);
 			})
-				.then((response) => {
-					setChecked(response.data);
-				})
-				.catch((error) => {
-					setErrorLocalStorage('Error ' + error?.response?.status);
-					navigate('/Error');
-					dispatch(closeModal());
-				});
+			.catch((error) => {
+				setErrorLocalStorage('Error ' + error?.response?.status);
+				navigate('/Error');
+				dispatch(closeModal());
+			});
 
 		axios.get(process.env.REACT_APP_IP + ':3000/user/id/' + id, {
 			headers: {
@@ -99,13 +100,13 @@ export default function Profil() {
 				}
 			}
 		}).catch((error) => {
-				if (error?.response?.status === 401 || error?.response?.status === 500) {
-					setErrorLocalStorage('Error ' + error?.response?.status);
-					navigate('/Error');
-					dispatch(closeModal());
-				}
+			if (error?.response?.status === 401 || error?.response?.status === 500) {
+				setErrorLocalStorage('Error ' + error?.response?.status);
 				navigate('/Error');
 				dispatch(closeModal());
+			}
+			navigate('/Error');
+			dispatch(closeModal());
 		});
 
 		axios.get(process.env.REACT_APP_IP + ':3000/user/friend/blocked', {
@@ -119,26 +120,24 @@ export default function Profil() {
 				}
 			}
 		}).catch((error) => {
-				if (error?.response?.status === 401 || error?.response?.status === 500) {
-					setErrorLocalStorage('Error ' + error?.response?.status);
-					navigate('/Error');
-					dispatch(closeModal());
-				}
+			if (error?.response?.status === 401 || error?.response?.status === 500) {
+				setErrorLocalStorage('Error ' + error?.response?.status);
 				navigate('/Error');
 				dispatch(closeModal());
+			}
+			navigate('/Error');
+			dispatch(closeModal());
 		});
 	}, [navigate, dispatch, myId]);
 
 	useEffect(() => {
-		socket.on('block_code',(data) => {
+		socket.on('block_code', (data) => {
 			console.log(data);
 			if (data.code == 2) {
 				setIsUserBlocked(true);
-			} else if (data.code == 3)
-			{
+			} else if (data.code == 3) {
 				setIsUserBlocked(false);
-			}
-			else
+			} else
 				console.log('error' + data.message);
 		})
 
@@ -147,12 +146,10 @@ export default function Profil() {
 			if (data.code === 2 && !isFriend) {
 				setIsFriend(!isFriend);
 				return;
-			}
-			else if (data.code === 5 || data.code === 7) {
+			} else if (data.code === 5 || data.code === 7) {
 				setIsFriend(!isFriend);
 			}
 		})
-
 
 
 		socket.on('friend_request', (data: any) => {
@@ -190,7 +187,7 @@ export default function Profil() {
 				setErrorName(false);
 			})
 			.catch((error) => {
-				if (error?.response?.status == 401 
+				if (error?.response?.status == 401
 					|| error?.response?.status == 500) {
 					setErrorLocalStorage('Error ' + error?.response?.status);
 					console.error(error);
@@ -247,7 +244,7 @@ export default function Profil() {
 				})
 				.catch((error) => {
 					console.log('err image')
-					if (error?.response?.status == 401 
+					if (error?.response?.status == 401
 						|| error?.response?.status == 500) {
 						setErrorLocalStorage('Error ' + error?.response?.status);
 						navigate('/Error');
@@ -257,7 +254,7 @@ export default function Profil() {
 					setErrorImageMessage(error?.response?.data?.message);
 				});
 			if (change === false) {
-				setErrorImageMessage('Bad format');		
+				setErrorImageMessage('Bad format');
 			}
 		}
 	};
@@ -300,8 +297,8 @@ export default function Profil() {
 					<span>{defeats}</span>
 				</p>
 				<p>
-				<span className='profil-game-info-title'>Ratio</span>
-				<span>{defeats === 0 ? (victories === 0 ? 0 : 1) : (victories / defeats).toFixed(2)}</span>
+					<span className='profil-game-info-title'>Ratio</span>
+					<span>{defeats === 0 ? (victories === 0 ? 0 : 1) : (victories / defeats).toFixed(2)}</span>
 				</p>
 			</div>
 			<p className='profil-experience'>{experience} XP</p>
@@ -347,12 +344,11 @@ export default function Profil() {
 	}
 
 	function handleChangeBlock() {
-			if (isUserBlocked) {
-				socket.emit('unblock_user', {unblock_id: id, token:localStorage.getItem('jwtAuthorization')})
-			}
-			else {
-				socket.emit('block_user', {block_id: id, token: localStorage.getItem('jwtAuthorization')})
-			}
+		if (isUserBlocked) {
+			socket.emit('unblock_user', {unblock_id: id, token: localStorage.getItem('jwtAuthorization')})
+		} else {
+			socket.emit('block_user', {block_id: id, token: localStorage.getItem('jwtAuthorization')})
+		}
 	}
 
 	return (
@@ -379,8 +375,8 @@ export default function Profil() {
 									{
 										isUserBlocked ? (
 											'unblock'
-											) : 'block'
-										}
+										) : 'block'
+									}
 								</button>
 							</>
 						) : (
@@ -394,7 +390,7 @@ export default function Profil() {
 								</button>
 							</>
 						)}
-						<br />
+						<br/>
 						<button onClick={() => handleHistory(id)}>
 							history
 						</button>

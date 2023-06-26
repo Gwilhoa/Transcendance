@@ -16,11 +16,11 @@
     margin-top: 2rem;
     padding: 1rem;
     outline: none;
-}    
+}
 
 .home-no-friend {
     color: var(--light-color);
-}    
+}
 
 .home-no-friend > span {
     font-size: 1rem;
@@ -33,26 +33,26 @@
     margin-top: 1rem;
     display: flex;
     justify-content: space-between;
-}    
+}
 
-.home-users-list-user-info{
+.home-users-list-user-info {
     display: flex;
     align-items: center;
-}  
+}
 
 .home-users-list-user-info > p {
-    margin-top : 0;
+    margin-top: 0;
     margin-left: 1rem;
     margin-right: 1rem;
     font-size: 1.5rem;
     color: var(--light-color);
 }
 
-.home-users-list-user-info-name{
+.home-users-list-user-info-name {
     cursor: pointer;
 }
 
-.home-users-list-user-buttons{
+.home-users-list-user-buttons {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -70,12 +70,12 @@
     cursor: pointer;
 }
 
-.home-users-list-user-buttons-challenge-button{
+.home-users-list-user-buttons-challenge-button {
     background-color: rgb(238, 135, 0);
     border: 0.25rem solid rgb(235, 110, 0);
 }
 
-.home-users-list-user-buttons-hsitory-button{
+.home-users-list-user-buttons-hsitory-button {
     background-color: rgb(0, 157, 255);
     border: 0.25rem solid rgb(5, 99, 176);
 }

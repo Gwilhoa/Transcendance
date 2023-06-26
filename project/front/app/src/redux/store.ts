@@ -16,7 +16,7 @@ const store = configureStore({
 		finalGame: finalGameStat,
 		searchUser: searchReducer,
 		beginToOption: beginToOption,
-		id:				idReducer,
+		id: idReducer,
 		conversationId: conversationId,
 	},
 });

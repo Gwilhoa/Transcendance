@@ -1,10 +1,8 @@
 import React, {useEffect, useState} from 'react';
-import Cookies from 'universal-cookie';
 import axios from 'axios';
 import {useNavigate} from 'react-router-dom';
 import {setErrorLocalStorage} from '../IfError';
 
-const cookies = new Cookies();
 
 function AuthenticateComponentsNotTwoFa() {
 	const navigate = useNavigate();

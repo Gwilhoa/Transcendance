@@ -1,6 +1,5 @@
 import './css/game.css'
 import React, {useEffect, useRef, useState} from "react";
-import Cookies from 'universal-cookie';
 import {useNavigate} from 'react-router-dom';
 import ErrorToken from '../components/IfError';
 import {useDispatch, useSelector} from 'react-redux';
@@ -9,8 +8,6 @@ import {RootState} from "../redux/store";
 import SocketSingleton from "../socket";
 import {animated, useSpring} from 'react-spring';
 
-const cookies = new Cookies();
-
 
 interface GameProps {
 	gameId: number;
@@ -18,10 +15,10 @@ interface GameProps {
 
 const Game: React.FC<GameProps> = () => {
 	const animatedBall = useSpring({
-		from: { transform: 'rotate(0deg)' },
-		to: { transform: 'rotate(360deg)' },
+		from: {transform: 'rotate(0deg)'},
+		to: {transform: 'rotate(360deg)'},
 		loop: true,
-		config: { duration: 4000 },
+		config: {duration: 4000},
 	});
 
 	let packageNumber = 0;
@@ -135,7 +132,11 @@ const Game: React.FC<GameProps> = () => {
 		})
 
 		socket.on('game_start', () => {
-			socket.emit('input_game', {game_id: gameId, position: paddle1, token: localStorage.getItem('jwtAuthorization')});
+			socket.emit('input_game', {
+				game_id: gameId,
+				position: paddle1,
+				token: localStorage.getItem('jwtAuthorization')
+			});
 		})
 
 		socket.on('stop_game', (any) => {
@@ -157,9 +158,9 @@ const Game: React.FC<GameProps> = () => {
 			if (data.package > packageNumber) {
 				setStarted(data.score2 + "  " + data.score1)
 				packageNumber = data.package;
-				console.log (data.ballx, data.bally);
+				console.log(data.ballx, data.bally);
 				data.ballx += 1;
-				if(data.ballx > 100) {
+				if (data.ballx > 100) {
 					data.ballx = 100
 				}
 				setBall({x: (data.ballx), y: (data.bally)});
@@ -186,14 +187,14 @@ const Game: React.FC<GameProps> = () => {
 		});
 
 
-			return () => {
-        socket.off('update_game');
-        socket.off('game_start');
-        socket.off('is_stop_game');
-        socket.off('stop_game');
-        socket.off('option_receive');
-        socket.off('create_game');
-        //leaveGame();
+		return () => {
+			socket.off('update_game');
+			socket.off('game_start');
+			socket.off('is_stop_game');
+			socket.off('stop_game');
+			socket.off('option_receive');
+			socket.off('create_game');
+			//leaveGame();
 
 		};
 	}, []);
@@ -218,37 +219,39 @@ const Game: React.FC<GameProps> = () => {
 				style={{...animatedBall, ...ballStyles}}/>
 			{stop &&
                 <div className="game-shadow">
-					<div className='game-pause-page'>
-						<div className='game-pause-page-text-time'>
-							Time before restart :
-							<p>
+                    <div className='game-pause-page'>
+                        <div className='game-pause-page-text-time'>
+                            Time before restart :
+                            <p>
 								{timeStop}
-							</p>
-						</div>
-						<div className='game-pause-menu-buttons'>
-							<button className='game-pause-menu-buttons-template game-pause-menu-leave-button' onClick={leaveGame}>
-									Leave
-							</button>
+                            </p>
+                        </div>
+                        <div className='game-pause-menu-buttons'>
+                            <button className='game-pause-menu-buttons-template game-pause-menu-leave-button'
+                                    onClick={leaveGame}>
+                                Leave
+                            </button>
 							{IamStoper &&
-								<button className='game-pause-menu-buttons-template game-pause-menu-resume-button' onClick={resumeGame}>
-										resume
-								</button>
+                                <button className='game-pause-menu-buttons-template game-pause-menu-resume-button'
+                                        onClick={resumeGame}>
+                                    resume
+                                </button>
 							}
-						</div>
+                        </div>
 
-						<div>
+                        <div>
 							{isPowerup &&
-								<div className='game-pause-page-powerups'>
-									<h3 className='game-pause-page-powerups-title'>You have a powerup :</h3>
-									<div>
-										<p>A : bounce the ball</p>
-										<p>Q : </p>
-										<p>F : freeze ball for a limited moment</p>
-									</div>
-									</div>
+                                <div className='game-pause-page-powerups'>
+                                    <h3 className='game-pause-page-powerups-title'>You have a powerup :</h3>
+                                    <div>
+                                        <p>A : bounce the ball</p>
+                                        <p>Q : </p>
+                                        <p>F : freeze ball for a limited moment</p>
+                                    </div>
+                                </div>
 							}
-						</div>
-					</div>
+                        </div>
+                    </div>
                 </div>}
 		</>
 

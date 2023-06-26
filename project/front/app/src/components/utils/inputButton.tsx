@@ -33,13 +33,13 @@ export function ButtonInputToggle({onInputSubmit, textInButton, placeHolder, cla
 		<>
 			{showInput ? (
 				<input className={classInput}
-					maxLength={10}
-					type='text'
-					onKeyDown={handleInputKeyPress}
-					value={inputValue}
-					onChange={handleInputChange}
-					placeholder={placeHolder}
-					autoFocus
+					   maxLength={10}
+					   type='text'
+					   onKeyDown={handleInputKeyPress}
+					   value={inputValue}
+					   onChange={handleInputChange}
+					   placeholder={placeHolder}
+					   autoFocus
 				>
 
 				</input>

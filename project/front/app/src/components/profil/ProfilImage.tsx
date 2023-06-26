@@ -2,12 +2,10 @@ import React, {useCallback, useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import axios from 'axios';
 import {setErrorLocalStorage} from '../IfError';
-import Cookies from 'universal-cookie';
 import SocketSingleton from '../../socket';
 import {useDispatch} from 'react-redux';
 import {openModal} from '../../redux/modal/modalSlice';
 
-const cookies = new Cookies();
 
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
@@ -57,11 +55,9 @@ export const ProfilImage = ({id, OnClickOpenProfil, OverwriteClassName}: {
 			.then((response) => {
 				if (response.data.status === UserStatus.IN_GAME) {
 					setUserStatus('profil-status-in-game');
-				}
-				else if (response.data.status === UserStatus.CONNECTED) {
+				} else if (response.data.status === UserStatus.CONNECTED) {
 					setUserStatus('profil-status-connected');
-				}
-				else {
+				} else {
 					setUserStatus('profil-status-disconnected');
 				}
 			})
@@ -72,13 +68,12 @@ export const ProfilImage = ({id, OnClickOpenProfil, OverwriteClassName}: {
 
 		socket.on('connection_server', (data: any) => {
 			console.log(data);
-			for (const ingame_id of data.ingame)
-			{
+			for (const ingame_id of data.ingame) {
 				if (ingame_id == id) {
 					setUserStatus('profil-status-in-game');
 					return;
 				}
-		}
+			}
 			for (const connected_id of data.connected) {
 				console.log(connected_id + ' ' + id);
 				if (connected_id == id) {
@@ -103,7 +98,7 @@ export const ProfilImage = ({id, OnClickOpenProfil, OverwriteClassName}: {
 
 	return (
 		<div key={'image'} className={'profil-image' + ' ' + OverwriteClassName}
-				onClick={OnClickOpenProfil === true ? () => dispatch(openModal(id)) : undefined}>
+			 onClick={OnClickOpenProfil === true ? () => dispatch(openModal(id)) : undefined}>
 			<img className='circle-image' src={image} alt='selected'/>
 			<div className={'profil-status' + ' ' + userStatus}></div>
 		</div>

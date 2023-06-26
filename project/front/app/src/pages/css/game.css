@@ -76,14 +76,14 @@
     height: 100%;
     object-fit: cover;
     z-index: 4;
-    
+
     background-color: rgba(0, 0, 0, 0.5);
     display: flex;
     justify-content: center;
 
 }
 
-.game-pause-page{
+.game-pause-page {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -93,13 +93,13 @@
     color: var(--light-color);
 }
 
-.game-pause-page-text-time, .game-pause-page-text-time > p{
+.game-pause-page-text-time, .game-pause-page-text-time > p {
     text-align: center;
     font-size: 2.5rem;
     margin-top: 1rem;
 }
 
-.game-pause-menu-buttons{
+.game-pause-menu-buttons {
     display: flex;
     flex-direction: column;
 }
@@ -107,14 +107,14 @@
 .game-pause-menu-buttons-template {
     background-color: var(--box-color);
     border: none;
-    height :5rem;
+    height: 5rem;
     width: 15rem;
     border-radius: 100vw;
     font-size: 2rem;
     color: var(--light-color);
 }
 
-.game-pause-menu-leave-button{
+.game-pause-menu-leave-button {
     margin-top: 15%;
     margin-bottom: 15%;
 }
@@ -124,7 +124,7 @@
     background-color: var(--primary-color);
 }
 
-.game-pause-page-powerups{
+.game-pause-page-powerups {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -133,7 +133,7 @@
     opacity: 0.7;
 }
 
-.game-pause-page-powerups-title{
+.game-pause-page-powerups-title {
     font-size: 2rem;
     margin-bottom: 1rem;
 }

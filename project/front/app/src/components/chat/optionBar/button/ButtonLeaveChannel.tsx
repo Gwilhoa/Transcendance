@@ -1,6 +1,5 @@
 import React from "react";
 import SocketSingleton from "../../../../socket";
-import {cookies} from "../../../../App";
 
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();

@@ -36,11 +36,11 @@
     cursor: pointer;
 }
 
-.chat-list-users-buttons-user{
+.chat-list-users-buttons-user {
     display: flex;
 }
 
-.chat-list-users-button-making-admin, .chat-list-users-button-deleting-admin{
+.chat-list-users-button-making-admin, .chat-list-users-button-deleting-admin {
     background-color: rgb(230, 128, 26);
     border: 0.25rem solid rgb(222, 102, 22);
     border-radius: 6px;
@@ -48,7 +48,7 @@
     padding: 0 0.3rem;
 }
 
-.chat-list-users-button-ban-hammer, .chat-list-users-button-unban-hammer{
+.chat-list-users-button-ban-hammer, .chat-list-users-button-unban-hammer {
     background-color: rgb(230, 26, 26);
     border: 0.25rem solid rgb(194, 0, 0);
     border-radius: 6px;
@@ -56,7 +56,7 @@
     padding: 0 0.3rem;
 }
 
-.chat-list-users-button-mute, .chat-list-users-button-unmute{
+.chat-list-users-button-mute, .chat-list-users-button-unmute {
     background-color: rgb(123, 202, 255);
     border: 0.25rem solid rgb(82, 186, 255);
     border-radius: 6px;

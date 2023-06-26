@@ -1,5 +1,4 @@
 import io from 'socket.io-client';
-import {cookies} from './App';
 
 class SocketSingleton {
 	private static instance: SocketSingleton;

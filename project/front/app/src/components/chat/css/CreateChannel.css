@@ -76,13 +76,13 @@
     border: 0.2rem solid var(--primary-color);
 }
 
-.create-channel-invite-input{
+.create-channel-invite-input {
     background-color: var(--background-color);
     margin-top: 0;
     width: 75%;
 }
 
-.chat-users-list-add-user-by-id{
+.chat-users-list-add-user-by-id {
     margin-top: 2rem;
     overflow-y: auto;
     display: flex;
@@ -91,17 +91,17 @@
     min-height: 4.5rem;
 }
 
-.chat-add-user-by-id{
+.chat-add-user-by-id {
     display: flex;
 }
 
-.chat-add-user-by-id > div{
+.chat-add-user-by-id > div {
     display: flex;
     align-items: center;
     margin-right: 0.7rem;
 }
 
-.chat-create-channel-find-user{
+.chat-create-channel-find-user {
     margin: 1rem;
 }
 
@@ -117,7 +117,7 @@
     cursor: pointer;
 }
 
-.chat-create-channel-error-message{
-    color : var(--error-color);
+.chat-create-channel-error-message {
+    color: var(--error-color);
     font-size: 1.125rem;
 }

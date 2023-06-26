@@ -82,7 +82,7 @@ function AuthenticateComponentsTwoFa() {
 						onChange={handleOnChange}
 						inputClassName='input'
 						ref={AuthInputRef}
-						/>
+					/>
 					{Error == true ? (<ErrorInput/>) : (<></>)}
 				</div>
 			</div>
