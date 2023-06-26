@@ -182,14 +182,6 @@ export class AuthController {
         );
       return;
     }
-    if (user.secret2FA == null) {
-      res
-        .status(400)
-        .send(
-          "Bad Request : You don't have the two factor authentication enabled",
-        );
-      return;
-    }
     await this.userService.disabled2FA(id);
     res.status(200).send(true);
     return;
