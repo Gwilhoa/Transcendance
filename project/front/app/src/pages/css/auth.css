@@ -49,7 +49,7 @@
     color: var(--light-color);
     border-radius: 20px;
     background-color: var(--box-color);
-    height: min(10rem, 80vh);
+    height: min(12rem, 80vh);
     width: 25rem;
     overflow: auto;
 }
