@@ -1,7 +1,6 @@
 import '../css/sendMessageBar.css'
 import React, {Dispatch, SetStateAction, useState} from 'react'
 import SocketSingleton from '../../../socket';
-import {cookies} from '../../../App';
 
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
@@ -23,7 +22,7 @@ const SendMessage = ({
 	const handleSendMessage = () => {
 		console.log('send message pls : ' + conversation);
 		socket.emit('send_message', {
-			token: cookies.get('jwtAuthorization'),
+			token: localStorage.getItem('jwtAuthorization'),
 			channel_id: conversation,
 			content: message
 		});

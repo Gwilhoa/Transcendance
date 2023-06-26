@@ -4,7 +4,6 @@ import {useNavigate} from 'react-router-dom';
 import {ButtonInputToggle} from '../utils/inputButton';
 import LogoutButton from './logout';
 import {setErrorLocalStorage} from '../IfError'
-import Cookies from 'universal-cookie';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../redux/store';
 import {closeModal} from '../../redux/modal/modalSlice';
@@ -12,7 +11,7 @@ import {ProfilImage} from './ProfilImage';
 import axios from 'axios';
 import SocketSingleton from '../../socket';
 import {ProfilName} from './ProfilName';
-const cookies = new Cookies();
+import jwtDecode from 'jwt-decode';
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
 
@@ -21,11 +20,14 @@ export default function Profil() {
 	const initialElement = [];
 	const navigate = useNavigate();
 	const [isMe, setIsMe] = useState<boolean>(false);
-	const myId = useSelector((state: RootState) => state.id.id);
+	const jwt: string = jwtDecode(''+localStorage.getItem('jwtAuthorization')) ;
+	const [myId] = useState<string>(jwt.sub);
+
 	const [isFriend, setIsFriend] = useState<boolean>(false);
 	const [checked, setChecked] = useState(false);
 	const [errorName, setErrorName] = useState<boolean>(false);
 	const [errorNameMessage, setErrorNameMessage] = useState<string>('');
+	const [errorImageMessage, setErrorImageMessage] = useState<string>('');
 	const [victories, setVictory] = useState<number>(0);
 	const [defeats, setDefeat] = useState<number>(0);
 	const [experience, setExperience] = useState<number>(0);
@@ -36,10 +38,23 @@ export default function Profil() {
 
 	console.log(id);
 	const refresh = useCallback((id: string | null) => {
+			axios.get(process.env.REACT_APP_IP + ':3000/auth/2fa/is2FA', {
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
+				},
+			})
+				.then((response) => {
+					setChecked(response.data);
+				})
+				.catch((error) => {
+					setErrorLocalStorage('Error ' + error?.response?.status);
+					navigate('/Error');
+					dispatch(closeModal());
+				});
 
 		axios.get(process.env.REACT_APP_IP + ':3000/user/id/' + id, {
 			headers: {
-				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+				Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 			},
 		})
 			.then((response) => {
@@ -55,7 +70,7 @@ export default function Profil() {
 		axios.post(process.env.REACT_APP_IP + ':3000/user/isfriend',
 			{friend_id: id},
 			{
-				headers: {Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,},
+				headers: {Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,},
 			})
 			.then((Response) => {
 				setIsFriend(Response.data.isfriend);
@@ -70,7 +85,7 @@ export default function Profil() {
 				dispatch(closeModal());
 			});
 		axios.get(process.env.REACT_APP_IP + ':3000/user/friend/request', {
-			headers: {Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,},
+			headers: {Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,},
 		}).then((Response) => {
 			for (const request of Response.data) {
 				console.log(request);
@@ -94,7 +109,7 @@ export default function Profil() {
 		});
 
 		axios.get(process.env.REACT_APP_IP + ':3000/user/friend/blocked', {
-			headers: {Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,},
+			headers: {Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,},
 		}).then((Response) => {
 			console.log(Response.data);
 			for (const blocked of Response.data) {
@@ -152,7 +167,6 @@ export default function Profil() {
 		return () => {
 			socket.off('friend_request');
 			socket.off('friend_code');
-			socket.off('receive_challenge');
 			socket.off('block_code');
 		}
 	}, [isFriend, id, navigate]);
@@ -169,7 +183,7 @@ export default function Profil() {
 			{name: str},
 			{
 				headers: {
-					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+					Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 				},
 			})
 			.then(() => {
@@ -188,36 +202,30 @@ export default function Profil() {
 			});
 	}
 
-	// useEffect(() => {
-	//
-	// 	socket.on('block_code',(data) => {
-	// 		console.log(data);
-	// 		if (data.code == 0)
-	// 			setIsUserBlocked(!isUserBlocked);
-	// 		else
-	// 			console.log('error' + data.message);
-	// 	});
-	// }, []);
-
 	const clicked = () => {
+		console.log('change clicked');
 		if (!checked) {
 			navigate('/CreateTwoFa');
 			dispatch(closeModal());
 		} else {
+			console.log('change clicked');
 			axios.get(process.env.REACT_APP_IP + ':3000/auth/2fa/disable', {
 				headers: {
-					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+					Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 				},
 			})
+				.then(() => {
+					setChecked(false);
+				})
 				.catch((error) => {
 					setErrorLocalStorage('Error ' + error?.response?.status);
 					navigate('/Error');
 				});
-			setChecked(false);
 		}
 	}
 
 	const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		let change = false;
 		const file = event.target.files && event.target.files[0];
 		if (file) {
 			const formData = new FormData();
@@ -227,37 +235,51 @@ export default function Profil() {
 				method: 'post',
 				url: process.env.REACT_APP_IP + ':3000/user/image',
 				headers: {
-					'Authorization': `Bearer ${cookies.get('jwtAuthorization')}`,
+					'Authorization': `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 					'Content-Type': 'multipart/form-data',
 				},
 				data: formData,
 			})
+				.then((response) => {
+					console.log(response);
+					change = true;
+					setErrorImageMessage('');
+				})
 				.catch((error) => {
-					setErrorLocalStorage('Error ' + error?.response?.status);
-					navigate('/Error');
+					console.log('err image')
+					if (error?.response?.status == 401 
+						|| error?.response?.status == 500) {
+						setErrorLocalStorage('Error ' + error?.response?.status);
+						navigate('/Error');
+					}
+					console.error(error);
+					change = true;
+					setErrorImageMessage(error?.response?.data?.message);
 				});
+			if (change === false) {
+				setErrorImageMessage('Bad format');		
+			}
 		}
 	};
 
 	const handleHistory = (id: string | null) => {
 		navigate('/history/' + id);
 		dispatch(closeModal());
-		window.location.reload();
 	};
 
 	const handleAddFriend = (id: string | null) => {
 		console.log('add friend ' + id);
-		socket.emit('friend_request', {friend_id: id, token: cookies.get('jwtAuthorization')});
+		socket.emit('friend_request', {friend_id: id, token: localStorage.getItem('jwtAuthorization')});
 	};
 
 	const handleUnFriend = (id: string | null) => {
 		console.log('add friend ' + id);
-		socket.emit('unfriend_request', {friend_id: id, token: cookies.get('jwtAuthorization')});
+		socket.emit('unfriend_request', {friend_id: id, token: localStorage.getItem('jwtAuthorization')});
 	};
 
 	const handlechallenge = (id: string | null) => {
 		console.log('challenge ' + id);
-		socket.emit('challenge', {rival_id: id, token: cookies.get('jwtAuthorization')});
+		socket.emit('challenge', {rival_id: id, token: localStorage.getItem('jwtAuthorization')});
 	}
 
 	initialElement.push(
@@ -291,6 +313,7 @@ export default function Profil() {
 			<div className='browse-file' key='changeImage'>
 				<input type='file' onChange={handleImageChange} id='files'/>
 				<label htmlFor='files' className='profil-button'>Change image</label>
+				{errorImageMessage != '' && (<p>{errorImageMessage}</p>)}
 			</div>
 		)
 
@@ -325,10 +348,10 @@ export default function Profil() {
 
 	function handleChangeBlock() {
 			if (isUserBlocked) {
-				socket.emit('unblock_user', {unblock_id: id, token: cookies.get('jwtAuthorization')})
+				socket.emit('unblock_user', {unblock_id: id, token:localStorage.getItem('jwtAuthorization')})
 			}
 			else {
-				socket.emit('block_user', {block_id: id, token: cookies.get('jwtAuthorization')})
+				socket.emit('block_user', {block_id: id, token: localStorage.getItem('jwtAuthorization')})
 			}
 	}
 
@@ -356,8 +379,8 @@ export default function Profil() {
 									{
 										isUserBlocked ? (
 											'unblock'
-										) : 'block'
-									}
+											) : 'block'
+										}
 								</button>
 							</>
 						) : (

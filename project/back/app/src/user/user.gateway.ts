@@ -88,6 +88,7 @@ export class UserGateway implements OnGatewayInit {
           code: FriendCode.NEW_FRIEND,
           id: user_id,
         };
+        friend_socket.emit('friend_notif', send);
         friend_socket.emit('friend_request', send);
       }
       await this.userService.addFriend(user_id, friend_id);
@@ -118,6 +119,7 @@ export class UserGateway implements OnGatewayInit {
           id: user.id,
           request: requestFriend.id,
         };
+        friend_socket.emit('friend_notif', send);
         friend_socket.emit('friend_request', send);
       }
     }

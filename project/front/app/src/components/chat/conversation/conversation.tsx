@@ -1,15 +1,13 @@
 import '../css/chatMessage.css'
 import axios from 'axios';
 import React, {useCallback, useEffect, useRef, useState} from 'react'
-import {cookies} from '../../../App';
 import {Channel, Message} from '../../../pages/chat'
 import Messages from './message';
 import {useNavigate} from 'react-router-dom';
 import {setErrorLocalStorage} from '../../IfError';
 import ButtonListChannel from '../optionBar/button/ButtonListUserModal';
 import { parseChannelName } from '../Channel';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../../redux/store';
+import jwtDecode from 'jwt-decode';
 
 export interface imageProfil {
 	id: string;
@@ -24,7 +22,8 @@ function Conversation(
 	const [listImageProfil, setListImageProfil] = useState<Array<imageProfil>>([]);
 	const navigate = useNavigate();
 	const scrollRef = useRef(null);
-	const myId = useSelector((state: RootState) => state.id.id);
+	const jwt: string = jwtDecode(''+localStorage.getItem('jwtAuthorization')) ;
+	const [myId] = useState<string>(jwt.sub);
 
 	const addImageProfil = useCallback((id: string) => {
 		let add = true;
@@ -33,7 +32,7 @@ function Conversation(
 		if (add) {
 			axios.get(process.env.REACT_APP_IP + ':3000/user/image/' + id, {
 				headers: {
-					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+					Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 				},
 			})
 				.then((response) => {

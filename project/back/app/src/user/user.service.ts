@@ -187,6 +187,8 @@ export class UserService {
       .leftJoinAndSelect('user.friends', 'friends')
       .where('user.id = :id', { id: friend_id })
       .getOne();
+    await this.removeBlocked(id, friend_id);
+    await this.removeBlocked(friend_id, id);
     if (user == null || friend == null) {
       throw new Error('User not found');
     }
@@ -603,9 +605,6 @@ export class UserService {
       .getOne();
     if (user == null || blocked_user == null) {
       throw new Error('User not found');
-    }
-    if (includeUser(blocked_user, user.blockedUsers) == false) {
-      throw new Error('User not blocked');
     }
     const blocks = [];
     for (const block of user.blockedUsers) {

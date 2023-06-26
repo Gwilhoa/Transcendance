@@ -25,18 +25,6 @@ services:
     networks:
       - transnet
 
-  nginx:
-    networks:
-      - transnet
-    container_name: nginx
-    build:
-      context: ./project/nginx
-    ports:
-      - "80:80"
-    restart: unless-stopped
-    depends_on:
-      - front
-
   back:
     init: true
     container_name: back
@@ -73,6 +61,8 @@ services:
     networks:
       - transnet
     restart: unless-stopped
+    ports:
+      - "8080:8080"
 
 volumes:
   temp:

@@ -24,9 +24,9 @@ const BeginGame = () => {
   useEffect(() => {
     if (gamestate != 10)
         navigate("/home");
-	socket.emit('join_matchmaking', {token : cookies.get('jwtAuthorization')});
+	socket.emit('join_matchmaking', {token : localStorage.getItem('jwtAuthorization')});
 	return () => {
-		socket.emit('leave_matchmaking', {token : cookies.get('jwtAuthorization')})
+		socket.emit('leave_matchmaking', {token : localStorage.getItem('jwtAuthorization')})
 	};
 	}, []);
 

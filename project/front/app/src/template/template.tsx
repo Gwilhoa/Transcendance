@@ -5,42 +5,24 @@ import Notification from '../components/notification/notification';
 import {Outlet, useNavigate} from 'react-router-dom';
 import SocketSingleton from '../socket';
 import {setBeginStatus} from "../redux/game/beginToOption";
-import {useDispatch, useSelector} from "react-redux";
-import { cookies } from '../App';
+import {useDispatch} from "react-redux";
 import { setErrorLocalStorage } from '../components/IfError';
-import axios from 'axios';
-import { RootState } from '../redux/store';
 
 
 const Template = () => {
-	let friendId = 0;
-	let rivalId = 0;
+	let friendId = '';
+	let rivalId = '';
 	const navigate = useNavigate();
 	const [notif, setNotif] = useState(<></>);
 	const [notifVisible, setNotifVisible] = useState(false);
-	const myId = useSelector((state: RootState) => state.id.id);
 
 	const dispatch = useDispatch();
 	const socketInstance = SocketSingleton.getInstance();
 	const socket = socketInstance.getSocket();
-	socket.on('message_code', (data: any) => {
-		console.log(data);
-	});
-
-	//const location = useLocation();
-
-	//useEffect(() => {
-	//if (location.pathname === '/') {
-	//  window.location.reload();
-	//}
-	//socket = io(process.env.REACT_APP_IP + ':3000', {
-	//  transports: ['websocket']
-	//});
-	//}, []);
 
 	const confirmFriend = () => {
 		console.log('confirm friend')
-		socket.emit('friend_request', {friend_id: friendId, token: cookies.get('jwtAuthorization')})
+		socket.emit('friend_request', {friend_id: friendId, token: localStorage.getItem('jwtAuthorization')})
 	}
 
 	const rejectFriend = () => {
@@ -51,7 +33,7 @@ const Template = () => {
 
 	function confirmChallenge() {
 		console.log('confirm challenge')
-		socket.emit('challenge', {rival_id: rivalId, token: cookies.get('jwtAuthorization')})
+		socket.emit('challenge', {rival_id: rivalId, token: localStorage.getItem('jwtAuthorization')})
 	}
 
 	function rejectChallenge() {
@@ -66,7 +48,7 @@ const Template = () => {
 				socket.on('game_found', (data) => {
 					console.log(data);
 					dispatch(setBeginStatus({decide: data.decide, playerstate: data.user, gameid: data.game_id, gamestate: 1}));
-					socket.emit('leave_matchmaking', {token: cookies.get('jwtAuthorization')})
+					socket.emit('leave_matchmaking', {token: localStorage.getItem('jwtAuthorization')})
 					navigate("/optiongame")
 					socket.off('game_found')
 				});
@@ -84,7 +66,7 @@ const Template = () => {
 			navigate('/error');
 		});
 
-		socket.on('message', (data: any) => {
+		socket.on('notif_message', (data: any) => {
 			let newmessage = data.user.username + ' : ' + data.content;
 			if (data.content.length > 16) {
 				newmessage = data.user.username + ' : ' + data.content.substring(0, 16) + '...';
@@ -93,7 +75,7 @@ const Template = () => {
 			setNotifVisible(true);
 		})
 
-		socket.on('friend_request', (data: any) => {
+		socket.on('friend_notif', (data: any) => {
 			console.count('friend_request');
 			if (data.code == 4) {
 				friendId = data.id;
@@ -103,14 +85,6 @@ const Template = () => {
 			}
 		})
 
-		socket.on('friend_code', (data: any) => {
-			if (data.code == 4) {
-				friendId = data.id;
-				setNotif(<Notification message={'New friend'} onConfirm={confirmFriend} onCancel={rejectFriend}
-					hasButton={true} setVisible={setNotifVisible}/>);
-				setNotifVisible(true)
-			}
-		})
 		return () => {
 			socket.off('receive_challenge');
 			socket.off('connection_error');

@@ -4,7 +4,6 @@ import {useDispatch} from 'react-redux';
 import {switchChatModalUpdateChannel} from '../../../redux/chat/modalChatSlice';
 import {Channel} from "../../../pages/chat";
 import axios from 'axios';
-import { cookies } from '../../../App';
 
 const ModifyChannel = ({channel}: { channel: Channel }) => {
 	const dispatch = useDispatch();
@@ -22,7 +21,7 @@ const ModifyChannel = ({channel}: { channel: Channel }) => {
 		},
 		{
 					headers: {
-						Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+						Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 					},
 		}).then((response) => {
 			console.log('updatechannel');
