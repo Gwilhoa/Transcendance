@@ -379,8 +379,8 @@ export default function Profil() {
 									{
 										isUserBlocked ? (
 											'unblock'
-										) : 'block'
-									}
+											) : 'block'
+										}
 								</button>
 							</>
 						) : (
