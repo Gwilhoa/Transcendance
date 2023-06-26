@@ -13,6 +13,7 @@ import { RootState } from '../redux/store';
 
 
 const Template = () => {
+	console.log('bonjour je suis le template');
 	let friendId = 0;
 	let rivalId = 0;
 	const navigate = useNavigate();
@@ -129,7 +130,7 @@ const Template = () => {
 			socket.off('message');
 			socket.off('friend_request');
 		};
-	}, []);
+	}, [navigate]);
 
 	return (
 		<div className='page'>
