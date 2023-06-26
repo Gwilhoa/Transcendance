@@ -11,7 +11,6 @@ import {
 import { Message } from './message.entity';
 import { ChannelType } from 'src/utils/channel.enum';
 import {Mute} from "./mute.entity";
-
 @Entity('channels')
 export class Channel {
   @PrimaryGeneratedColumn('uuid')

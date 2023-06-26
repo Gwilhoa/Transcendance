@@ -7,7 +7,7 @@ export class Mute {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @OneToMany((type) => User, (mute) => mute.mutedChannels)
+  @ManyToOne((type) => User, (user) => user.mutedChannels)
   mutedUser: User;
 
   @ManyToOne((type) => Channel, (channel) => channel.mutedUsers)

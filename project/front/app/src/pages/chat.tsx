@@ -39,7 +39,7 @@ export interface Channel {
 	users: Array<User>;
 	admins: Array<User>;
 	bannedUsers: Array<User>;
-	mutedUser: Array<any>;
+	mutedUsers: Array<any>;
 }
 
 export interface Message {
@@ -73,7 +73,7 @@ export const initialChannelState: Channel = {
 	creator: initialUserState,
 	admins: [],
 	bannedUsers: [],
-	mutedUser: [],
+	mutedUsers: [],
 }
 
 export const isAdmin = (channel: Channel, userId: string) => {

@@ -35,10 +35,17 @@ export class ChannelService {
     private readonly userService: UserService,
   ) {
     setInterval(async () => {
-      const mutes = await this.muteRepository.find();
+      const mutes = await this.muteRepository
+        .createQueryBuilder('mute')
+        .leftJoinAndSelect('mute.mutedUser', 'mutedUser')
+        .leftJoinAndSelect('mute.mutedChannel', 'mutedChannel')
+        .getMany();
       for (const mute of mutes) {
         if (mute.date < new Date()) {
           await this.muteRepository.delete(mute);
+          this.server
+            .to(mute.mutedChannel.id)
+            .emit('unmute', mute.mutedUser.id);
         }
       }
     }, 1000);
@@ -569,12 +576,20 @@ export class ChannelService {
       throw new Error('User is not admin of this channel');
     if (includeUser(target, await this.getMutedUsers(channel.id)))
       throw new Error('User is already muted of this channel');
-    const mute: Mute = new Mute();
-    mute.mutedUser = target;
-    mute.date = new Date();
-    mute.date.setSeconds(mute.date.getSeconds() + 10);
-    channel.mutedUsers.push(mute);
-    return await this.channelRepository.save(channel);
+    try {
+      const mute: Mute = new Mute();
+      mute.mutedUser = target;
+      mute.date = new Date();
+      mute.date.setHours(mute.date.getHours() + 1);
+      channel.mutedUsers.push(mute);
+      await this.muteRepository.save(mute);
+      await this.channelRepository.save(channel);
+
+      return channel;
+    } catch (error) {
+      console.error('Error saving Mute:', error.message);
+      throw error;
+    }
   }
 
   async removeMutedUser(
@@ -595,6 +610,7 @@ export class ChannelService {
     const mutedUsers = [];
     for (const mutedUser of channel.mutedUsers) {
       if (mutedUser.mutedUser.id != target.id) mutedUsers.push(mutedUser);
+      else await this.muteRepository.delete(mutedUser);
     }
     channel.mutedUsers = mutedUsers;
     return await this.channelRepository.save(channel);
