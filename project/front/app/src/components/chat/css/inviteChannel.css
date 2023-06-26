@@ -12,6 +12,7 @@
     width: 30rem;
     overflow: auto;
     background-color: var(--box-color);
+    max-height: 80vh;
     color: var(--light-color);
     border-radius: 20px;
 }
