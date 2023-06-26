@@ -124,12 +124,12 @@ const Template = () => {
 					});
 			}
 		})
-		return () => {
-			socket.off('receive_challenge');
-			socket.off('connection_error');
-			socket.off('message');
-			socket.off('friend_request');
-		};
+		// return () => {
+		// 	socket.off('receive_challenge');
+		// 	socket.off('connection_error');
+		// 	socket.off('message');
+		// 	socket.off('friend_request');
+		// };
 	}, [navigate]);
 
 	return (
