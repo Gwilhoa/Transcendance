@@ -1,10 +1,7 @@
 import React from 'react';
-import Cookies from 'universal-cookie';
 import axios from 'axios';
 import {setErrorLocalStorage} from '../components/IfError'
 import {useNavigate} from 'react-router-dom';
-
-const cookies = new Cookies();
 
 export function TokenPage() {
 	const urlParams = new URLSearchParams(window.location.search);

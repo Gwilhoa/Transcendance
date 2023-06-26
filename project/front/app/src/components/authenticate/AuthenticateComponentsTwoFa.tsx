@@ -1,13 +1,10 @@
 import '../../pages/css/CreateTwoFa.css';
 import React, {useEffect, useRef, useState} from 'react';
-import Cookies from 'universal-cookie';
 import axios from 'axios';
 import {useNavigate} from 'react-router-dom';
 import AuthCode, {AuthCodeRef} from 'react-auth-code-input';
 import {setErrorLocalStorage} from '../IfError';
 import {ErrorInput} from '../../pages/CreateTwoFa';
-
-const cookies = new Cookies();
 
 function AuthenticateComponentsTwoFa() {
 	const [, setResult] = useState<string>('');
@@ -55,7 +52,7 @@ function AuthenticateComponentsTwoFa() {
 					console.log(response);
 					setCookieJwt(response.data.access_token);
 					localStorage.removeItem('tenMinToken');
-					navigate('/Home');
+					navigate('/authenticate/waiting');
 				})
 				.catch((error) => {
 					if (error.response.status === 401) {
