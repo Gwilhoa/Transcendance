@@ -235,6 +235,19 @@ const Game: React.FC<GameProps> = () => {
 								</button>
 							}
 						</div>
+
+						<div>
+							{isPowerup &&
+								<div className='game-pause-page-powerups'>
+									<h3 className='game-pause-page-powerups-title'>You have a powerup :</h3>
+									<div>
+										<p>A : bounce the ball</p>
+										<p>Q : </p>
+										<p>F : freeze ball for a limited moment</p>
+									</div>
+									</div>
+							}
+						</div>
 					</div>
                 </div>}
 		</>
