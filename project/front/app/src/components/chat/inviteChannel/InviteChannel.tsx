@@ -80,8 +80,7 @@ const AddUserId = ({usersId, setUserId, channelId, channel}: AddUserIdProps) => 
 			{listUser.slice(0, 6).map((user) => (
 				!usersId.includes(user.id) && !isBan(channel, user) ? (
 					<div className='chat-invite-people-user' key={user.id} onClick={() => handleOnClick(user.id)}>
-						<ProfilImage id={user.id} OnClickOpenProfil={false}
-									 OverwriteClassName='chat-small-user-image'/>
+						<ProfilImage id={user.id} OnClickOpenProfil={false} OverwriteClassName='chat-small-user-image'/>
 						<ProfilName id={user.id}/>
 					</div>
 				) : <div key="notUser"></div>

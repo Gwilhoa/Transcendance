@@ -74,7 +74,6 @@ export class EventsGateway
     }
     this.clients = disconnect(id, this.clients);
     if (getKeys(this.ingame).includes(id)) {
-      this.logger.debug('disconnect in game');
       const game = await this.gameService.remakeGame(this.ingame.get(id));
       if (game == null) {
         this.logger.error('game not found');
@@ -96,7 +95,6 @@ export class EventsGateway
   async handleConnection(client: Socket) {
     client.setMaxListeners(20);
     let id;
-    this.logger.debug('New connexion');
     await client.on('connection', async (data) => {
       try {
         id = this.authService.getIdFromToken(data.token);
@@ -110,7 +108,6 @@ export class EventsGateway
         wrongtoken(client, 'connection');
         return;
       }
-      this.logger.debug(`Client connected: ${id} for ${client.id}`);
       client.data.id = id;
       this.sendconnected();
       let channels = null;
@@ -328,10 +325,6 @@ export class EventsGateway
 
   @SubscribeMessage('leave_matchmaking')
   async leave_matchmaking(client: Socket, payload: any) {
-    if (payload.token == null || !verifyToken(payload.token, this.authService)) {
-      wrongtoken(client, 'leave_matchmaking');
-      return;
-    }
     const tempmatchmaking = [];
     let send = {
       code: 1,
@@ -368,7 +361,6 @@ export class EventsGateway
         game.getUser2().emit('rematch', { rematch: false });
         this.ingame.delete(game.getUser1().data.id);
         this.ingame.delete(game.getUser2().data.id);
-        this.logger.debug('game ' + game_id + ' finished');
       } else {
         if (this.rematch.get(game_id) == null) {
           this.rematch.set(game_id, true);
@@ -383,7 +375,6 @@ export class EventsGateway
           }
         } else {
           this.rematch.delete(game_id);
-          this.logger.debug('rematch');
           const send = {
             rematch: true,
           };
@@ -392,7 +383,6 @@ export class EventsGateway
           this.ingame.delete(game.getUser1().data.id);
           this.ingame.delete(game.getUser2().data.id);
           this.rematch.delete(game_id);
-          this.logger.debug('game ' + game_id + ' finished and rematch');
           this.play_game(game.getUser1(), game.getUser2());
           return;
         }
@@ -410,6 +400,13 @@ export class EventsGateway
       return;
     }
     const rival_id = payload.rival_id;
+    if (await this.userService.OneOfTwoBlocked(client.data.id, rival_id)) {
+      client.emit('receive_challenge', {
+        message: 'you are blocked',
+        code: 1,
+      });
+      return;
+    }
     const socket = getSocketFromId(rival_id, getSockets(this.server));
     const user = await this.userService.getUserById(client.data.id);
     if (socket != null) {

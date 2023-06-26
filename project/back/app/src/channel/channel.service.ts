@@ -63,7 +63,6 @@ export class ChannelService {
 
   public async createMPChannel(user_id, user_id1) {
     const channels = await this.channelRepository.find();
-    console.log(channels);
     for (const chan of channels) {
       if (chan.type == ChannelType.MP_CHANNEL) {
         if (
@@ -74,7 +73,6 @@ export class ChannelService {
       }
     }
     const chan = new Channel();
-    console.log('create mp channel ' + user_id + ' ' + user_id1);
     chan.name = user_id + ' - ' + user_id1;
     chan.admins = [];
     chan.bannedUsers = [];
@@ -246,7 +244,6 @@ export class ChannelService {
   }
 
   public async sendMessage(body: sendMessageDTO, user_id) {
-    console.log(body.content);
     if (body.content.length > 4242 || body.content.length <= 0)
       throw new Error('Message too long (max 4242) or empty');
     const message = new Message();
@@ -455,7 +452,6 @@ export class ChannelService {
   }
 
   async deletechannel(id) {
-    console.log('delete channel id : ', id);
     const channel = await this.channelRepository.findOneBy({ id: id });
     if (channel == null) throw new Error('Channel not found');
     const messages = await this.getMessage(channel.id, null);
@@ -491,7 +487,6 @@ export class ChannelService {
   }
 
   async updateChannel(channel_id: any, user_id: any, body: any) {
-    console.log(channel_id);
     const channel = await this.channelRepository
       .createQueryBuilder('channel')
       .leftJoinAndSelect('channel.admins', 'admins')

@@ -69,8 +69,7 @@ const BeginGame = () => {
 		<div className='center-page'>
 			<ErrorToken/>
 			<h2 style={{color: 'white'}}> Searching players... </h2>
-			<animated.img src={loading} className={"gameimg"}
-						  style={spinnerAnimation}></animated.img>
+			<animated.img src={loading} className={"gameimg"} style={spinnerAnimation}></animated.img>
 		</div>
 	);
 }

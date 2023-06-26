@@ -390,16 +390,13 @@ function Chat() {
 				) : (
 					<div className='chat-page-channel'>
 						<h1>Channels disponible</h1>
-						<input className='chat-page-channels-input' placeholder='Search channel'
-							   onChange={(e) => updateAvailableChannel(e.target.value)}/>
+						<input className='chat-page-channels-input' placeholder='Search channel' onChange={(e) => updateAvailableChannel(e.target.value)}/>
 						{listAvailableChannel.length > 0 ? (
 							listAvailableChannel.map((itemChannel) => (
 								<div className='chat-page-channels-channel' key={itemChannel.id}>
 									<p>{itemChannel.name}</p>
 									{itemChannel.type == 2 ? (
-										<input className='chat-page-channel-password-input' type='password'
-											   placeholder='Password'
-											   onChange={event => password.set(itemChannel.id, event.target.value)}/>
+										<input className='chat-page-channel-password-input' type='password' placeholder='Password' onChange={event => password.set(itemChannel.id, event.target.value)}/>
 									) : null
 									}
 									<button onClick={() => handleJoinChannel(itemChannel.id)}>Join</button>

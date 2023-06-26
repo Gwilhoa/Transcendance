@@ -160,8 +160,6 @@ export class UserService {
         ])
         .where('user.id = :id', { id: id })
         .getOne();
-
-      console.log(userWithSecret);
       return userWithSecret;
     }
 

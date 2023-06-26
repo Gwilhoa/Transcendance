@@ -121,12 +121,7 @@ export class Game {
 
   public updateRacket = (player: Socket, y: number) => {
     if (y == 2) {
-      console.log('enter');
-      console.log(this._stop);
-      console.log(player.id);
-      console.log(this._playerstop);
       if (this._stop && player.id == this._playerstop) {
-        console.log('clearinterval');
         this.endOfStop();
         return;
       }
@@ -226,7 +221,6 @@ export class Game {
   }
 
   public async start() {
-    console.log('power up ' + this._isPowerUp);
     await sleep(1000);
     while (
       Math.cos(this._angle) < 0.5 &&
@@ -330,9 +324,6 @@ export class Game {
   };
 
   public async remake() {
-    console.log(
-      'finish game for ' + this._user1.data.id + ' ' + this._user2.data.id,
-    );
     this._io.to(this._id).emit('finish_game', {
       score1: 0,
       score2: 0,
@@ -386,7 +377,6 @@ export class Game {
     this._endgame = true;
     this._time_stop_user1 = Game.default_maxtimestop;
     this._time_stop_user2 = Game.default_maxtimestop;
-    console.log('game finish ' + this._id);
     this._user1.leave(this._id);
     this._user2.leave(this._id);
     const g = await this._gameService.finishGame(
@@ -403,7 +393,6 @@ export class Game {
       losename = g.user2.username;
       winname = g.user1.username;
     }
-    console.log('game finish ' + winname + ' ' + losename);
     this._user2.leave(this._id);
     this._user1.leave(this._id);
     userWin.emit('finish_game', {

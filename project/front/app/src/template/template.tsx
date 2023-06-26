@@ -96,7 +96,7 @@ const Template = () => {
 			console.count('friend_request');
 			if (data.code == 4) {
 				friendId = data.id;
-				setNotif(<Notification message={'New friend'} onConfirm={confirmFriend} onCancel={rejectFriend} hasButton={true} setVisible={setNotifVisible}/>);
+				setNotif(<Notification message={data.username + ' wants to be your friend'} onConfirm={confirmFriend} onCancel={rejectFriend} hasButton={true} setVisible={setNotifVisible}/>);
 				setNotifVisible(true)
 			}
 		})

@@ -54,8 +54,7 @@ const Search = (
 	}, [navigate, dispatch, myId]);
 
 	return (
-		<input type='search' placeholder='Search' className={'search-bar' + ' ' + OverwriteClassName}
-			   onChange={handleOnChange}></input>
+		<input type='search' placeholder='Search' className={'search-bar' + ' ' + OverwriteClassName} onChange={handleOnChange}></input>
 	);
 }
 

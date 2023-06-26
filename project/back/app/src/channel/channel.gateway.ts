@@ -129,8 +129,6 @@ export class ChannelGateway implements OnGatewayInit {
       wrongtoken(client, 'send_message');
       return;
     }
-    this.logger.debug('send_message');
-    this.logger.debug(payload.content);
     if (
       payload.token == null ||
       payload.channel_id == null ||
