@@ -1,5 +1,5 @@
 import './css/history.css'
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import ErrorToken, {setErrorLocalStorage} from '../components/IfError';
 import {useNavigate, useParams} from 'react-router-dom';
 import {cookies} from '../App'
@@ -87,7 +87,7 @@ const OneScoreBlock = ({ game, playerId }: { game: Game, playerId: string }) => 
 				}
 			}
 		}
-	}, [playerId, game]);
+	}, [playerId, game, myId, userWinner]);
 
 	useEffect(() => {
 		axios.get(process.env.REACT_APP_IP + ':3000/user/image/' + playerId, {
@@ -174,7 +174,7 @@ const ListBlockScore = ({ userId, username }: { userId: string, username: string
 				setErrorLocalStorage(error?.response?.status);
 				navigate('/Error');
 			})
-	}, []);
+	}, [navigate, userId]);
 
 	if (listGame == null || listGame.length == 0) {
 		if (userId == myId) {
@@ -209,7 +209,7 @@ const History = () => {
 	const [username, setUsername] = useState<string>('');
 	const { id } = useParams();
 
-		const fetchDataUser = (userId: string) => {
+		const fetchDataUser = useCallback((userId: string) => {
 				if (id != null) {
 				axios.get(process.env.REACT_APP_IP + ':3000/user/id/' + userId, {
 					headers: {
@@ -232,14 +232,14 @@ const History = () => {
 			else {
 				navigate('/home');
 			}
-		};
+		}, [navigate, id]);
 
 	useEffect(() => {
 		console.log(id);
 		if (id != null) {
 			fetchDataUser(id);
 		}
-	}, [id, navigate]);
+	}, [id, navigate, fetchDataUser]);
 
 	if (id == '' || id == null) {
 		return (null);

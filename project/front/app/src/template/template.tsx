@@ -5,38 +5,21 @@ import Notification from '../components/notification/notification';
 import {Outlet, useNavigate} from 'react-router-dom';
 import SocketSingleton from '../socket';
 import {setBeginStatus} from "../redux/game/beginToOption";
-import {useDispatch, useSelector} from "react-redux";
+import {useDispatch} from "react-redux";
 import { cookies } from '../App';
 import { setErrorLocalStorage } from '../components/IfError';
-import axios from 'axios';
-import { RootState } from '../redux/store';
 
 
 const Template = () => {
-	let friendId = 0;
-	let rivalId = 0;
+	let friendId = '';
+	let rivalId = '';
 	const navigate = useNavigate();
 	const [notif, setNotif] = useState(<></>);
 	const [notifVisible, setNotifVisible] = useState(false);
-	const myId = useSelector((state: RootState) => state.id.id);
 
 	const dispatch = useDispatch();
 	const socketInstance = SocketSingleton.getInstance();
 	const socket = socketInstance.getSocket();
-	socket.on('message_code', (data: any) => {
-		console.log(data);
-	});
-
-	//const location = useLocation();
-
-	//useEffect(() => {
-	//if (location.pathname === '/') {
-	//  window.location.reload();
-	//}
-	//socket = io(process.env.REACT_APP_IP + ':3000', {
-	//  transports: ['websocket']
-	//});
-	//}, []);
 
 	const confirmFriend = () => {
 		console.log('confirm friend')
