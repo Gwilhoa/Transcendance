@@ -92,7 +92,7 @@ const updateAvailableChannel = (input: string) => {
 	if (input === '') {
 		return;
 	}
-	socket.emit('research_channel', {search: input, token: cookies.get('jwtAuthorization')})
+	socket.emit('research_channel', {search: input, token: localStorage.getItem('jwtAuthorization')})
 }
 ////////////////////////// CHAT ///////////////////////////////////////////////
 function Chat() {
@@ -123,20 +123,24 @@ function Chat() {
 		try {
 			const response = await axios.get(process.env.REACT_APP_IP + ':3000/channel/available', {
 				headers: {
-					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+					Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 				},
 			});
 			console.log(response.data);
 			setListAvailableChannel(response.data);
-		} catch (error) {
+		} catch (error: any) {
 			console.error(error);
+			if (error?.response?.status === 401 || error?.response?.status === 500) {
+				setErrorLocalStorage('Error ' + error?.response?.status);
+				navigate('/Error');
+			}
 		}
 	}
 	const fetchListChannel = useCallback( async () => {
 		try {
 			const response = await axios.get(process.env.REACT_APP_IP + ':3000/user/channels', {
 				headers: {
-					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+					Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 				},
 			});
 			console.log(response);
@@ -153,7 +157,7 @@ function Chat() {
 		try {
 			const response = await axios.get(process.env.REACT_APP_IP + ':3000/channel/message/' + conversationId, {
 				headers: {
-					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+					Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 				},
 			});
 			console.log(response);
@@ -232,10 +236,10 @@ function Chat() {
 		console.log('join_channel');
 		console.log(password.get(channel_id));
 		if (password.get(channel_id)) {
-			socket.emit('join_channel', {channel_id: channel_id, password: password.get(channel_id), token: cookies.get('jwtAuthorization')});
+			socket.emit('join_channel', {channel_id: channel_id, password: password.get(channel_id), token: localStorage.getItem('jwtAuthorization')});
 			return;
 		} else {
-			socket.emit('join_channel', {channel_id: channel_id, token: cookies.get('jwtAuthorization')});
+			socket.emit('join_channel', {channel_id: channel_id, token: localStorage.getItem('jwtAuthorization')});
 		}
 	}, [password]);
 

@@ -4,22 +4,18 @@ import React, {useEffect} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import Cookies from 'universal-cookie';
 import logo from '../images/pegi18.png'
-import { setId } from '../redux/id/idSlice';
-import { useDispatch } from 'react-redux';
 
 const cookies = new Cookies();
 
 function Auth() {
 	const navigate = useNavigate();
-	const dispatch = useDispatch();
 
 	localStorage.removeItem('Error');
-	dispatch(setId(null));
 	useEffect(() => {
-		if (cookies.get('jwtAuthorization') != null) {
+		if (localStorage.getItem('jwtAuthorization') != null) {
 			axios.get(process.env.REACT_APP_IP + ':3000/auth/2fa/is2FA', {
 				headers: {
-					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+					Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 				},
 			})
 				.then(() => {

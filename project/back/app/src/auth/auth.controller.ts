@@ -40,7 +40,7 @@ export class AuthController {
   async getLogin(@Query() id, @Res() res) {
     const ip = process.env.IP;
     if (id.code == null) {
-      return res.redirect(ip + '/error');
+      return res.redirect(ip + ':8080/error');
     }
 
     const user = await this.userService.createUsers(id.code);
@@ -52,7 +52,7 @@ export class AuthController {
       user.email,
       false,
     );
-    res.redirect(ip + '/authenticate?access_token=' + code.access_token);
+    res.redirect(ip + ':8080/authenticate?access_token=' + code.access_token);
     return;
   }
 
@@ -174,15 +174,7 @@ export class AuthController {
       res.status(400).send('Bad User');
       return;
     }
-    if (user.enabled2FA == false) {
-      res
-        .status(400)
-        .send(
-          "Bad Request : You don't have the two factor authentication enabled",
-        );
-      return;
-    }
-    if (user.secret2FA == null) {
+    if ((await this.userService.getSecret2fa(user.id)) == null) {
       res
         .status(400)
         .send(

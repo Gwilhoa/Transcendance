@@ -5,7 +5,11 @@ function Reconnect() {
 	return (
 		<div className='Error-page'>
 			<p className='Error-description'>{localStorage.getItem('Error') != 'Error undefined' ? (
-				localStorage.getItem('Error') 
+				localStorage.getItem('Error') == null || localStorage.getItem('Error') == '' ? (
+					"can't acces to api"
+				) : (
+					localStorage.getItem('Error')
+				)
 			) : (
 				"can't access to back"
 			)}

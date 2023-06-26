@@ -1,13 +1,10 @@
 import '../../pages/css/CreateTwoFa.css';
 import React, {useEffect, useRef, useState} from 'react';
-import Cookies from 'universal-cookie';
 import axios from 'axios';
 import {useNavigate} from 'react-router-dom';
 import AuthCode, {AuthCodeRef} from 'react-auth-code-input';
 import {setErrorLocalStorage} from '../IfError';
 import {ErrorInput} from '../../pages/CreateTwoFa';
-
-const cookies = new Cookies();
 
 function AuthenticateComponentsTwoFa() {
 	const [, setResult] = useState<string>('');
@@ -16,18 +13,17 @@ function AuthenticateComponentsTwoFa() {
 	const AuthInputRef = useRef<AuthCodeRef>(null);
 
 	useEffect(() => {
-		if (cookies.get('jwtAuthorization') != null) {
+		if (localStorage.getItem('jwtAuthorization') != null) {
 			axios.get(process.env.REACT_APP_IP + ':3000/auth/2fa/is2FA', {
 				headers: {
-					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+					Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 				},
 			})
 				.then(() => {
-					cookies.remove('Error');
 					navigate('/home');
 				})
 				.catch((error) => {
-					cookies.remove('tenMinToken');
+					localStorage.removeItem('tenMinToken');
 					setErrorLocalStorage('Error ' + error.response.status);
 					console.error(error);
 					navigate('/Error');
@@ -36,7 +32,7 @@ function AuthenticateComponentsTwoFa() {
 	}, [navigate]);
 
 	const setCookieJwt = (jwtToken: string) => {
-		cookies.set('jwtAuthorization', jwtToken, {sameSite: 'lax', maxAge: 2 * 60 * 60});
+		localStorage.setItem('jwtAuthorization', jwtToken);
 	};
 
 	const handleOnChange = (res: string) => {
@@ -49,14 +45,14 @@ function AuthenticateComponentsTwoFa() {
 				},
 				{
 					headers: {
-						Authorization: `Bearer ${cookies.get('tenMinToken')}`,
+						Authorization: `Bearer ${localStorage.getItem('TenMinToken')}`,
 					},
 				})
 				.then((response) => {
 					console.log(response);
 					setCookieJwt(response.data.access_token);
-					cookies.remove('tenMinToken');
-					navigate('/Home');
+					localStorage.removeItem('tenMinToken');
+					navigate('/authenticate/waiting');
 				})
 				.catch((error) => {
 					if (error.response.status === 401) {
@@ -76,16 +72,18 @@ function AuthenticateComponentsTwoFa() {
 
 
 	return (
-		<div>
-			<p>TwoFa enable</p>
-			<div>
-				<AuthCode
-					allowedCharacters='numeric'
-					onChange={handleOnChange}
-					inputClassName='input'
-					ref={AuthInputRef}
-				/>
-				{Error == true ? (<ErrorInput/>) : (<></>)}
+		<div className='center-auth'>
+			<div className='auth-page-two-fa-enable'>
+				<p>Two factor authentication enable</p>
+				<div>
+					<AuthCode
+						allowedCharacters='numeric'
+						onChange={handleOnChange}
+						inputClassName='input'
+						ref={AuthInputRef}
+						/>
+					{Error == true ? (<ErrorInput/>) : (<></>)}
+				</div>
 			</div>
 		</div>
 	);

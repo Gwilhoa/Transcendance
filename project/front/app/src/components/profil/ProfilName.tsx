@@ -26,7 +26,7 @@ export const ProfilName = ({id}: { id: string | null }) => {
 	const changeName = useCallback(() => {
 		axios.get(process.env.REACT_APP_IP + ':3000/user/id/' + id, {
 			headers: {
-				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+				Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 			},
 		})
 			.then((response) => {
@@ -44,7 +44,7 @@ export const ProfilName = ({id}: { id: string | null }) => {
 		changeName();
 		axios.get(process.env.REACT_APP_IP + ':3000/user/id/' + id, {
 			headers: {
-				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+				Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 			},
 		})
 			.then((response) => {

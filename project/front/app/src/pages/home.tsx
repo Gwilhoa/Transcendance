@@ -11,8 +11,8 @@ import {openModal} from '../redux/modal/modalSlice';
 import Search from '../components/search/userSearch';
 import axios from 'axios';
 import SocketSingleton from '../socket';
-import Profil from '../components/profil/profil';
 import { ProfilImage } from '../components/profil/ProfilImage';
+import jwtDecode from 'jwt-decode';
 
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
@@ -39,7 +39,7 @@ const Add = () => {
 	const refresh = useCallback(() => {
 		axios.get(process.env.REACT_APP_IP + ':3000/user/friend', {
 			headers: {
-				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+				Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 			},
 		})
 			.then((res) => {
@@ -83,7 +83,7 @@ const Add = () => {
 				socket.off('friend_request');
 			}
 		};
-	}, [listUser, refresh, socket]);
+	}, [listUser, refresh]);
 
 	if (listUser == null || listUser.length == 0) {
 		return (
@@ -97,7 +97,7 @@ const Add = () => {
 
 	const handlechallenge = (id: string | null) => {
 		console.log('challenge ' + id);
-		socket.emit('challenge', {rival_id: id, token: cookies.get('jwtAuthorization')});
+		socket.emit('challenge', {rival_id: id, token: localStorage.getItem('jwtAuthorization')});
 	}
 
 	return (
@@ -139,7 +139,8 @@ const Add = () => {
 
 const Home = () => {
 	console.log('start home');
-	const myId = useSelector((state: RootState) => state.id.id);
+	const jwt: string = jwtDecode(''+localStorage.getItem('jwtAuthorization')) ;
+	const [myId] = useState<string>(jwt.sub);
 
 	return (
 		<div className='home'>

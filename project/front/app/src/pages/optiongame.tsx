@@ -65,7 +65,7 @@ const OptionGame = () => {
 	const [isPowerup, setIsPowerup] = useState(false);
 
 	const enterGame = () => {
-		socket.emit('option_send', {ball: nbBall, map: nbMap, powerup: isPowerup, token: cookies.get('jwtAuthorization')})
+		socket.emit('option_send', {ball: nbBall, map: nbMap, powerup: isPowerup, token: localStorage.getItem('jwtAuthorization')})
 	}
 
 	const selectBall = (str: string) => {

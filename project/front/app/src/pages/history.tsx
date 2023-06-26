@@ -1,5 +1,5 @@
 import './css/history.css'
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import ErrorToken, {setErrorLocalStorage} from '../components/IfError';
 import {useNavigate, useParams} from 'react-router-dom';
 import {cookies} from '../App'
@@ -8,6 +8,7 @@ import {openModal} from '../redux/modal/modalSlice';
 import axios from 'axios';
 import { User } from './chat';
 import { RootState } from '../redux/store';
+import jwtDecode from 'jwt-decode';
 
 interface Game {
 	finished: string;
@@ -21,7 +22,8 @@ interface Game {
 const OneScoreBlock = ({ game, playerId }: { game: Game, playerId: string }) => {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
-	const myId = useSelector((state: RootState) => state.id.id);
+	const jwt: string = jwtDecode(''+localStorage.getItem('jwtAuthorization')) ;
+	const [myId] = useState<string>(jwt.sub);
 
 	const [leftImage, setLeftImage] = useState<string>('');
 	const [rightImage, setRightImage] = useState<string>('');
@@ -87,12 +89,12 @@ const OneScoreBlock = ({ game, playerId }: { game: Game, playerId: string }) => 
 				}
 			}
 		}
-	}, [playerId, game]);
+	}, [playerId, game, myId, userWinner]);
 
 	useEffect(() => {
 		axios.get(process.env.REACT_APP_IP + ':3000/user/image/' + playerId, {
 			headers: {
-				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+				Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 			},
 		})
 			.then((response) => {
@@ -114,7 +116,7 @@ const OneScoreBlock = ({ game, playerId }: { game: Game, playerId: string }) => 
 		}
 		axios.get(process.env.REACT_APP_IP + ':3000/user/image/' + image, {
 			headers: {
-				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+				Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 			},
 		})
 			.then((response) => {
@@ -155,14 +157,15 @@ const OneScoreBlock = ({ game, playerId }: { game: Game, playerId: string }) => 
 
 const ListBlockScore = ({ userId, username }: { userId: string, username: string }) => {
 	const [listGame, setListGame] = useState<Array<Game>>([]);
-	const myId = useSelector((state: RootState) => state.id.id);
+	const jwt: string = jwtDecode(''+localStorage.getItem('jwtAuthorization')) ;
+	const [myId] = useState<string>(jwt.sub);
 
 	const navigate = useNavigate();
 	useEffect(() => {
 		console.log(process.env.REACT_APP_IP + ':3000/game/history/' + userId);
 		axios.get(process.env.REACT_APP_IP + ':3000/game/history/' + userId, {
 			headers: {
-				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+				Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 			},
 		})
 			.then((response) => {
@@ -174,7 +177,7 @@ const ListBlockScore = ({ userId, username }: { userId: string, username: string
 				setErrorLocalStorage(error?.response?.status);
 				navigate('/Error');
 			})
-	}, []);
+	}, [navigate, userId]);
 
 	if (listGame == null || listGame.length == 0) {
 		if (userId == myId) {
@@ -209,11 +212,11 @@ const History = () => {
 	const [username, setUsername] = useState<string>('');
 	const { id } = useParams();
 
-		const fetchDataUser = (userId: string) => {
+		const fetchDataUser = useCallback((userId: string) => {
 				if (id != null) {
 				axios.get(process.env.REACT_APP_IP + ':3000/user/id/' + userId, {
 					headers: {
-						Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+						Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 					},
 				})
 					.then((response) => {
@@ -232,14 +235,14 @@ const History = () => {
 			else {
 				navigate('/home');
 			}
-		};
+		}, [navigate, id]);
 
 	useEffect(() => {
 		console.log(id);
 		if (id != null) {
 			fetchDataUser(id);
 		}
-	}, [id, navigate]);
+	}, [id, navigate, fetchDataUser]);
 
 	if (id == '' || id == null) {
 		return (null);

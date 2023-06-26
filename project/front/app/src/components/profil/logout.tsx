@@ -13,11 +13,9 @@ function LogoutButton() {
 
 	const handleOnClick = () => {
 
-		navigate('/');
-		dispatch(setId(null));
 		dispatch(closeModal());
-		cookies.remove('jwtAuthorization');
-		localStorage.removeItem('id');
+		localStorage.removeItem('jwtAuthorization');
+		navigate('/');
 	};
 
 	return (

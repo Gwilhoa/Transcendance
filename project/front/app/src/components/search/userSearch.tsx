@@ -32,7 +32,7 @@ const Search = (
 		} else {
 			console.log('handleOnChange');
 			console.log('emit: ' + res);
-			socket.emit('research_name', {name: res, token: cookies.get('jwtAuthorization')});
+			socket.emit('research_name', {name: res, token: localStorage.getItem('jwtAuthorization')});
 		}
 	};
 	

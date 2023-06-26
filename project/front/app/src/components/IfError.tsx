@@ -1,11 +1,11 @@
 import React, {useEffect} from 'react';
 import {useNavigate} from 'react-router-dom';
 import axios from 'axios';
-import {cookies} from '../App';
 
 export function setErrorLocalStorage(ErrorMessage: string) {
 	localStorage.setItem('Error', ErrorMessage);
 	localStorage.removeItem('id');
+	localStorage.removeItem('jwtAuthorization');
 }
 
 function ErrorToken() {
@@ -13,14 +13,14 @@ function ErrorToken() {
 
 	useEffect(() => {
 		try {
-			if (cookies.get('jwtAuthorization') == null) {
+			if (localStorage.getItem('jwtAuthorization') == null) {
 				setErrorLocalStorage('you\'r connexion time out');
 				navigate('/Error');
 			}
 
 			axios.get(process.env.REACT_APP_IP + ':3000/user/id', {
 				headers: {
-					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+					Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 				},
 			})
 				.catch((error) => {
@@ -28,10 +28,9 @@ function ErrorToken() {
 						setErrorLocalStorage("Couldn't connect to the server");
 						navigate('/Error');
 					} else {
-						setErrorLocalStorage('Error ' + error.response.status);
-						console.error(error);
-						if (cookies.get('jwtAuthorization') != null)
-							cookies.remove('jwtAuthorization');
+						setErrorLocalStorage('Error ' + error?.response?.status);
+						if (localStorage.getItem('jwtAuthorization') != null)
+						localStorage.removeItem('jwtAuthorization');
 						navigate('/Error');
 					}
 				});

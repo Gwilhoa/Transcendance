@@ -139,13 +139,10 @@ export class UserController {
     @UploadedFile() file,
   ) {
     if (!file) {
-      throw new HttpException('No file uploaded', HttpStatus.BAD_REQUEST);
+      return response.status(HttpStatus.BAD_REQUEST).send('No file uploaded');
     }
     if (file.size > 1024 * 1024 * 5) {
-      throw new HttpException(
-        'File is too large (max 5mb)',
-        HttpStatus.BAD_REQUEST,
-      );
+      return response.status(HttpStatus.BAD_REQUEST).send('File too large');
     }
     if (file.buffer.length === 0) {
       throw new HttpException('Empty file', HttpStatus.BAD_REQUEST);

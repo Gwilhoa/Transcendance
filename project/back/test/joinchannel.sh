@@ -1,1 +1,0 @@
-curl -X POST -H "authorization: bearer $ACCESS_TOKEN" -d "channel_id=$1&password=$2" http://localhost:3000/channel/join
