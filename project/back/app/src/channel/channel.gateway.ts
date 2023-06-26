@@ -511,7 +511,7 @@ export class ChannelGateway implements OnGatewayInit {
 
   @SubscribeMessage('add_muted')
   async add_muted(client: Socket, payload: any) {
-    if (payload.token == null || verifyToken(payload.token, this.authService)) {
+    if (payload.token == null || !verifyToken(payload.token, this.authService)) {
       wrongtoken(client, 'add_muted');
       return;
     }
