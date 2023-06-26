@@ -95,7 +95,7 @@ const EndGame = () => {
 					{revenge &&
                         <p>your opponent wants revenge</p>}
 
-					{myrevenge &&
+					{myrevenge && replay &&
                         <p>request taken</p>}
 
 					{replay && !myrevenge &&
