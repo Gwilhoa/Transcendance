@@ -123,12 +123,13 @@ export class UserController {
         ) {
           return callback(
             new HttpException(
-              'Only image files are allowed!',
+              'Only images are allowed',
               HttpStatus.BAD_REQUEST,
             ),
             false,
           );
         }
+        callback(null, true);
       },
     }),
   )
