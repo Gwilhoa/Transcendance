@@ -141,6 +141,15 @@ export class UserController {
     if (!file) {
       throw new HttpException('No file uploaded', HttpStatus.BAD_REQUEST);
     }
+    if (file.size > 1024 * 1024 * 5) {
+      throw new HttpException(
+        'File is too large (max 5mb)',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    if (file.buffer.length === 0) {
+      throw new HttpException('Empty file', HttpStatus.BAD_REQUEST);
+    }
 
     const ret = await this.userService.setAvatar(
       id,
