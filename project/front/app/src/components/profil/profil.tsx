@@ -26,6 +26,7 @@ export default function Profil() {
 	const [checked, setChecked] = useState(false);
 	const [errorName, setErrorName] = useState<boolean>(false);
 	const [errorNameMessage, setErrorNameMessage] = useState<string>('');
+	const [errorImageMessage, setErrorImageMessage] = useState<string>('');
 	const [victories, setVictory] = useState<number>(0);
 	const [defeats, setDefeat] = useState<number>(0);
 	const [experience, setExperience] = useState<number>(0);
@@ -36,6 +37,20 @@ export default function Profil() {
 
 	console.log(id);
 	const refresh = useCallback((id: string | null) => {
+
+			axios.get(process.env.REACT_APP_IP + ':3000/auth/2fa/is2FA', {
+				headers: {
+					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+				},
+			})
+				.then((response) => {
+					setChecked(response.data);
+				})
+				.catch((error) => {
+					setErrorLocalStorage('Error ' + error?.response?.status);
+					navigate('/Error');
+					dispatch(closeModal());
+				});
 
 		axios.get(process.env.REACT_APP_IP + ':3000/user/id/' + id, {
 			headers: {
@@ -217,6 +232,8 @@ export default function Profil() {
 	}
 
 	const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		console.log('image change');
+		let change = false;
 		const file = event.target.files && event.target.files[0];
 		if (file) {
 			const formData = new FormData();
@@ -231,10 +248,25 @@ export default function Profil() {
 				},
 				data: formData,
 			})
+				.then((response) => {
+					console.log(response);
+					change = true;
+					setErrorImageMessage('');
+				})
 				.catch((error) => {
-					setErrorLocalStorage('Error ' + error?.response?.status);
-					navigate('/Error');
+					console.log('err image')
+					if (error?.response?.status == 401 
+						|| error?.response?.status == 500) {
+						setErrorLocalStorage('Error ' + error?.response?.status);
+						navigate('/Error');
+					}
+					console.error(error);
+					change = true;
+					setErrorImageMessage(error?.response?.data?.message);
 				});
+			if (change === false) {
+				setErrorImageMessage('Bad format');		
+			}
 		}
 	};
 
@@ -290,6 +322,7 @@ export default function Profil() {
 			<div className='browse-file' key='changeImage'>
 				<input type='file' onChange={handleImageChange} id='files'/>
 				<label htmlFor='files' className='profil-button'>Change image</label>
+				{errorImageMessage != '' && (<p>{errorImageMessage}</p>)}
 			</div>
 		)
 

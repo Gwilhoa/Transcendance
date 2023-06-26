@@ -6,6 +6,7 @@ import {cookies} from '../App';
 export function setErrorLocalStorage(ErrorMessage: string) {
 	localStorage.setItem('Error', ErrorMessage);
 	localStorage.removeItem('id');
+	cookies.remove('jwtAuthorization');
 }
 
 function ErrorToken() {
