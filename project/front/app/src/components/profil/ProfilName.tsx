@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import axios from 'axios';
 import {setErrorLocalStorage} from '../IfError';
@@ -23,7 +23,7 @@ export const ProfilName = ({id}: { id: string | null }) => {
 	const navigate = useNavigate();
 	const [username, setUsername] = useState<string>('');
 
-	const changeName = () => {
+	const changeName = useCallback(() => {
 		axios.get(process.env.REACT_APP_IP + ':3000/user/id/' + id, {
 			headers: {
 				Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
@@ -34,11 +34,10 @@ export const ProfilName = ({id}: { id: string | null }) => {
 				setUsername(data);
 			})
 			.catch((error) => {
-				setErrorLocalStorage('Error ' + error.response.status);
-				console.error(error);
+				setErrorLocalStorage('Error ' + error?.response?.status);
 				navigate('/Error');
 			});
-	}
+	}, [id, navigate]);
 
 	useEffect(() => {
 		setUserStatus('profil-status-disconnected');
@@ -61,8 +60,7 @@ export const ProfilName = ({id}: { id: string | null }) => {
 
 			})
 			.catch((error) => {
-				setErrorLocalStorage('Error ' + error.response.status);
-				console.error(error);
+				setErrorLocalStorage('Error ' + error?.response?.status);
 				navigate('/Error');
 			});
 
@@ -91,7 +89,7 @@ export const ProfilName = ({id}: { id: string | null }) => {
 			socket.off('update_profil');
 			socket.off('connection_server');
 		};
-	}, [navigate, socket])
+	}, [navigate, changeName, id])
 
 	return (
 		<div> {username} </div>

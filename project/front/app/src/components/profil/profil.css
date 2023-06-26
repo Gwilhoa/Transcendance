@@ -2,7 +2,7 @@
     position: absolute;
     bottom: 0;
     text-align: center;
-    position: fixed;
+    /* position: fixed; */
     z-index: 2;
     left: 50%;
     top: 50%;

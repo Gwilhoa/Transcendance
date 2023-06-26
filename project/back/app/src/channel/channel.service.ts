@@ -1,4 +1,4 @@
-import {Inject, Injectable} from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { addAdminDto } from 'src/dto/add-admin.dto';
 import { CreateChannelDto } from 'src/dto/create-channel.dto';
@@ -11,11 +11,20 @@ import { Message } from './message.entity';
 import { ChannelType } from 'src/utils/channel.enum';
 import { BanUserDto } from '../dto/ban-user.dto';
 import * as bcrypt from 'bcrypt';
-import { includeUser } from '../utils/socket.function';
-import {WebSocketServer} from "@nestjs/websockets";
-import {Server} from "socket.io";
+import {
+  getSocketFromId,
+  getSockets,
+  includeUser,
+} from '../utils/socket.function';
+import { WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { Server } from 'socket.io';
 
 @Injectable()
+@WebSocketGateway({
+  cors: {
+    origin: '*',
+  },
+})
 export class ChannelService {
   @WebSocketServer() server: Server;
   constructor(
@@ -25,7 +34,7 @@ export class ChannelService {
   ) {}
 
   public async createChannel(body: CreateChannelDto) {
-    let chan = new Channel();
+    const chan = new Channel();
     if (body.name.length > 20)
       throw new Error('Channel name must be less than 12 characters');
     chan.name = body.name;
@@ -47,8 +56,8 @@ export class ChannelService {
         throw new Error('Can not hash password');
       }
     }
-    chan = await this.channelRepository.save(chan);
-    this.server.emit('newChannel', chan);
+    const ret = await this.channelRepository.save(chan);
+    this.server.emit('new_channel', ret);
     return chan;
   }
 
@@ -73,9 +82,14 @@ export class ChannelService {
     chan.type = ChannelType.MP_CHANNEL;
     const user = await this.userService.getUserById(user_id);
     const user1 = await this.userService.getUserById(user_id1);
+    const socket_user1 = getSocketFromId(user.id, getSockets(this.server));
+    const socket_user2 = getSocketFromId(user1.id, getSockets(this.server));
     chan.users.push(user);
     chan.users.push(user1);
-    return await this.channelRepository.save(chan);
+    const ret = await this.channelRepository.save(chan);
+    socket_user1.emit('join_channel', { channel_id: ret.id });
+    socket_user2.emit('join_channel', { channel_id: ret.id });
+    return ret;
   }
 
   public async getChannelById(id) {
@@ -85,7 +99,7 @@ export class ChannelService {
       .leftJoinAndSelect('channel.bannedUsers', 'bannedUsers')
       .leftJoinAndSelect('channel.creator', 'creator')
       .leftJoinAndSelect('channel.users', 'users')
-      .leftJoinAndSelect('channel.mutedUser', 'mutedUsers')
+      .leftJoinAndSelect('channel.mutedUser', 'mutedUser')
       .where('channel.id = :id', { id: id })
       .getOne();
   }
@@ -123,8 +137,8 @@ export class ChannelService {
       if (isvalid == false)
         throw new Error('Password is not valid for this channel');
     }
-    if (chan.bannedUsers != null && chan.bannedUsers.includes(user))
-      throw new Error('User is banned');
+    if (includeUser(user, chan.bannedUsers))
+      throw new Error('User is banned from this channel');
     chan.users.push(user);
     chan = await this.channelRepository.save(chan);
     return chan;
@@ -225,7 +239,7 @@ export class ChannelService {
     if (chan.messages == null || chan.messages.length == 0) return null;
     const ret = [];
     for (const message of chan.messages) {
-      if (await this.userService.isBlocked(user.id, message.user.id) == false)
+      if ((await this.userService.isBlocked(user.id, message.user.id)) == false)
         ret.push(message);
     }
     return ret;
@@ -255,8 +269,7 @@ export class ChannelService {
     channel.messages.push(message);
     await this.channelRepository.save(channel);
     const ret: any = await this.messageRepository.save(message);
-    console.log(ret.content);
-    ret.channel = channel.id;
+    ret.channel = await this.getChannelById(body.channel_id);
     return ret;
   }
 
@@ -455,14 +468,7 @@ export class ChannelService {
   }
 
   async inviteChannel(sender_id: any, receiver_id: any, channel_id: any) {
-    const channel = await this.channelRepository
-      .createQueryBuilder('channel')
-      .leftJoinAndSelect('channel.users', 'users')
-      .leftJoinAndSelect('channel.admins', 'admins')
-      .leftJoinAndSelect('channel.creator', 'creator')
-      .leftJoinAndSelect('channel.bannedUsers', 'bannedUsers')
-      .where('channel.id = :id', { id: channel_id })
-      .getOne();
+    const channel = await this.getChannelById(channel_id);
     if (channel.type == ChannelType.MP_CHANNEL)
       throw new Error('Channel is private');
 
@@ -485,6 +491,7 @@ export class ChannelService {
   }
 
   async updateChannel(channel_id: any, user_id: any, body: any) {
+    console.log(channel_id);
     const channel = await this.channelRepository
       .createQueryBuilder('channel')
       .leftJoinAndSelect('channel.admins', 'admins')
@@ -503,10 +510,16 @@ export class ChannelService {
           throw new Error('Wrong password');
         channel.pwd = await bcrypt.hash(body.password, 10);
       }
-      if (body.name != '' && body.name.length < 20) {
-        channel.name = body.name;
+      if (body.name.length < 20) {
+        if (body.name.length > 0) channel.name = body.name;
       } else throw new Error('Name is too long');
       const ret = await this.channelRepository.save(channel);
+      this.server.to(channel_id).emit('update_channel', {
+        code: 0,
+        channel_id: channel_id,
+        name: ret.name,
+        type: ret.type,
+      });
       return { channel_id: ret.id, name: ret.name };
     } else {
       for (const admin of channel.admins) {

@@ -3,10 +3,11 @@ import React, {useEffect, useState} from 'react';
 import ErrorToken, {setErrorLocalStorage} from '../components/IfError';
 import {useNavigate, useParams} from 'react-router-dom';
 import {cookies} from '../App'
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {openModal} from '../redux/modal/modalSlice';
 import axios from 'axios';
 import { User } from './chat';
+import { RootState } from '../redux/store';
 
 interface Game {
 	finished: string;
@@ -20,6 +21,7 @@ interface Game {
 const OneScoreBlock = ({ game, playerId }: { game: Game, playerId: string }) => {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
+	const myId = useSelector((state: RootState) => state.id.id);
 
 	const [leftImage, setLeftImage] = useState<string>('');
 	const [rightImage, setRightImage] = useState<string>('');
@@ -41,8 +43,8 @@ const OneScoreBlock = ({ game, playerId }: { game: Game, playerId: string }) => 
 		if (game.score2 > game.score1) {
 			setUserWinner(2);
 		}
-		if (playerId == localStorage.getItem('id')) {
-			if (game.user2.id == '' + localStorage.getItem('id')) {
+		if (playerId == myId) {
+			if (game.user2.id == myId) {
 				setLeftUser(game.user2);
 				setLeftScore(game.score2)
 				setRightUser(game.user1);
@@ -153,6 +155,7 @@ const OneScoreBlock = ({ game, playerId }: { game: Game, playerId: string }) => 
 
 const ListBlockScore = ({ userId, username }: { userId: string, username: string }) => {
 	const [listGame, setListGame] = useState<Array<Game>>([]);
+	const myId = useSelector((state: RootState) => state.id.id);
 
 	const navigate = useNavigate();
 	useEffect(() => {
@@ -168,14 +171,13 @@ const ListBlockScore = ({ userId, username }: { userId: string, username: string
 				setListGame(response.data);
 			})
 			.catch((error) => {
-				console.error(error);
-				setErrorLocalStorage(error.response.status);
+				setErrorLocalStorage(error?.response?.status);
 				navigate('/Error');
 			})
 	}, []);
 
 	if (listGame == null || listGame.length == 0) {
-		if (userId == '' + localStorage.getItem('id')) {
+		if (userId == myId) {
 			return (<p className='no-game-played'>{"You don't have played a game yet!"}</p>);
 		}
 		else {
@@ -195,8 +197,8 @@ const ListBlockScore = ({ userId, username }: { userId: string, username: string
 							/>
 						</div>
 					) : (
-						<div key={itemGame.id}></div>
-					)))
+						<div key={itemGame.id}></div>)
+					))
 			}
 		</div>
 	);
@@ -215,13 +217,11 @@ const History = () => {
 					},
 				})
 					.then((response) => {
-						console.log(response);
 						setUsername(response.data.username);
 					})
 					.catch((error) => {
-						if (error.response.status == 401 || error.response.status == 500) {
-							setErrorLocalStorage('Error ' + error.response.status);
-							console.error(error);
+						if (error?.response?.status == 401 || error?.response?.status == 500) {
+							setErrorLocalStorage('Error ' + error?.response?.status);
 							navigate('/Error');
 						}
 						else (

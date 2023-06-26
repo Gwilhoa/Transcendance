@@ -38,7 +38,7 @@
     font-size: 1.125rem;
     width: 45%;
     height: 0.5rem;
-    margin: 0.75rem 0 1.5rem;
+    margin: 0.75rem 0 0rem;
     padding: 1rem;
     outline: none;
 }
@@ -56,12 +56,17 @@
     outline: none;
 }
 
+.chat-side-bar-modify-channel-error-message{
+    color : var(--error-color);
+    font-size: 1.125rem;
+}
+
 .chat-side-bar-modify-channel-button-update {
     border: 0;
     font-size: 1.75rem;
     border-radius: 1rem;
     padding: 0.75rem;
-    margin-top: 1.5rem;
+    margin-top: 2.5rem;
     margin-bottom: 2.5rem;
     background-color: var(--primary-color);
     color: var(--light-color);

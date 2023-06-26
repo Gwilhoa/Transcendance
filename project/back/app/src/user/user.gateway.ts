@@ -7,10 +7,18 @@ import {
 import { UserService } from './user.service';
 import { Logger } from '@nestjs/common';
 import { Socket } from 'socket.io';
-import { getSocketFromId, getSockets } from '../utils/socket.function';
+import {
+  getSocketFromId,
+  getSockets,
+  verifyToken,
+  wrongtoken,
+} from '../utils/socket.function';
 import { FriendCode } from '../utils/requestcode.enum';
 import { ChannelService } from '../channel/channel.service';
 import { addAdminDto } from '../dto/add-admin.dto';
+import { AuthService } from '../auth/auth.service';
+import {MpCreateDto} from "../dto/mp-create.dto";
+import {CreateChannelDto} from "../dto/create-channel.dto";
 
 @WebSocketGateway()
 export class UserGateway implements OnGatewayInit {
@@ -20,6 +28,7 @@ export class UserGateway implements OnGatewayInit {
   constructor(
     private userService: UserService,
     private channelService: ChannelService,
+    private authService: AuthService,
   ) {}
 
   afterInit() {
@@ -28,6 +37,13 @@ export class UserGateway implements OnGatewayInit {
 
   @SubscribeMessage('research_name')
   async research_name(client: Socket, payload: any) {
+    if (
+      payload.token == null ||
+      !verifyToken(payload.token, this.authService)
+    ) {
+      wrongtoken(client, 'research_name');
+      return;
+    }
     const name = payload.name;
     const user_id = client.data.id;
     this.logger.log('research_name + ' + user_id);
@@ -38,6 +54,13 @@ export class UserGateway implements OnGatewayInit {
 
   @SubscribeMessage('friend_request') //reception d'une demande d'ami / accepter une demande d'ami
   async handleFriendRequest(client: Socket, payload: any) {
+    if (
+      payload.token == null ||
+      !verifyToken(payload.token, this.authService)
+    ) {
+      wrongtoken(client, 'friend_request');
+      return;
+    }
     let send;
     const friend_id = payload.friend_id;
     const user_id = client.data.id;
@@ -69,6 +92,14 @@ export class UserGateway implements OnGatewayInit {
       }
       await this.userService.addFriend(user_id, friend_id);
       await this.userService.addFriend(friend_id, user_id);
+      const mpchannel = await this.channelService.createMPChannel(
+        user_id,
+        friend_id,
+      );
+      ret = this.channelService.getChannelById(mpchannel.id);
+      client.join(mpchannel.id);
+      if (friend_socket != null) friend_socket.join(mpchannel.id);
+      this.server.emit('update_user_channel', ret);
       ret = {
         code: FriendCode.NEW_FRIEND,
       };
@@ -96,6 +127,13 @@ export class UserGateway implements OnGatewayInit {
 
   @SubscribeMessage('unfriend_request')
   async unfriend_request(client: Socket, payload: any) {
+    if (
+      payload.token == null ||
+      !verifyToken(payload.token, this.authService)
+    ) {
+      wrongtoken(client, 'unfriend_request');
+      return;
+    }
     const friend_id = payload.friend_id;
     const user_id = client.data.id;
     const friend_socket = getSocketFromId(friend_id, getSockets(this.server));
@@ -106,10 +144,12 @@ export class UserGateway implements OnGatewayInit {
         friend_id,
       );
       await this.channelService.deletechannel(mpchannel.id);
+      client.emit('delete_channel', { id: mpchannel.id });
       client.emit('friend_code', {
         code: FriendCode.UNFRIEND_SUCCESS,
       });
       if (friend_socket != null) {
+        friend_socket.emit('delete_channel', { id: mpchannel.id });
         friend_socket.emit('friend_code', {
           code: FriendCode.NEW_UNFRIEND,
           id: user_id,
@@ -124,6 +164,13 @@ export class UserGateway implements OnGatewayInit {
 
   @SubscribeMessage('block_user')
   async block_user(client: Socket, payload: any) {
+    if (
+      payload.token == null ||
+      !verifyToken(payload.token, this.authService)
+    ) {
+      wrongtoken(client, 'block_user');
+      return;
+    }
     const user_id = client.data.id;
     const block_id = payload.block_id;
     if (block_id == null) {
@@ -150,6 +197,13 @@ export class UserGateway implements OnGatewayInit {
 
   @SubscribeMessage('unblock_user')
   async unblock_user(client: Socket, payload: any) {
+    if (
+      payload.token == null ||
+      !verifyToken(payload.token, this.authService)
+    ) {
+      wrongtoken(client, 'unblock_user');
+      return;
+    }
     const user_id = client.data.id;
     const unblock_id = payload.unblock_id;
     if (unblock_id == null) {

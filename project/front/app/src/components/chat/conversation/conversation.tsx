@@ -1,6 +1,6 @@
 import '../css/chatMessage.css'
 import axios from 'axios';
-import React, {useEffect, useRef, useState} from 'react'
+import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {cookies} from '../../../App';
 import {Channel, Message} from '../../../pages/chat'
 import Messages from './message';
@@ -8,6 +8,8 @@ import {useNavigate} from 'react-router-dom';
 import {setErrorLocalStorage} from '../../IfError';
 import ButtonListChannel from '../optionBar/button/ButtonListUserModal';
 import { parseChannelName } from '../Channel';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../redux/store';
 
 export interface imageProfil {
 	id: string;
@@ -22,19 +24,9 @@ function Conversation(
 	const [listImageProfil, setListImageProfil] = useState<Array<imageProfil>>([]);
 	const navigate = useNavigate();
 	const scrollRef = useRef(null);
+	const myId = useSelector((state: RootState) => state.id.id);
 
-	useEffect(() => {
-		listMessages.map((itemMessage) => addImageProfil(itemMessage.user.id));
-		scrollToBottom();
-	}, [listMessages]);
-
-	const scrollToBottom = () => {
-		if (scrollRef.current) {
-			(scrollRef.current as HTMLElement).scrollIntoView({ behavior: 'smooth', block: 'end' });
-		}
-	};
-
-	const addImageProfil = (id: string) => {
+	const addImageProfil = useCallback((id: string) => {
 		let add = true;
 
 		listImageProfil.map((img) => img.id === id ? (add = false) : null)
@@ -58,6 +50,17 @@ function Conversation(
 					navigate('/Error');
 				});
 		}
+	}, [listImageProfil, navigate]);
+
+	useEffect(() => {
+		listMessages.map((itemMessage) => addImageProfil(itemMessage.user.id));
+		scrollToBottom();
+	}, [listMessages, addImageProfil]);
+
+	const scrollToBottom = () => {
+		if (scrollRef.current) {
+			(scrollRef.current as HTMLElement).scrollIntoView({ behavior: 'smooth', block: 'end' });
+		}
 	};
 
 	return (
@@ -70,7 +73,7 @@ function Conversation(
 					: 
 						<>
 							<p className='chat-conversation-channel-name'>
-								{parseChannelName(channel)}
+								{parseChannelName(channel, '' + myId)}
 							</p>
 							<ButtonListChannel/>
 						</>	

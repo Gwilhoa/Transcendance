@@ -16,6 +16,11 @@
     cursor: pointer;
 }
 
+.profil-image.chat-list-user-image > img {
+    width: 4rem;
+    height: 4rem;
+}
+
 .profil-image.chat-list-user-image > .profil-status {
     border: 0.25rem solid var(--box-color);
 }
