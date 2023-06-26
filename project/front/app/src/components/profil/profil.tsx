@@ -264,7 +264,6 @@ export default function Profil() {
 	const handleHistory = (id: string | null) => {
 		navigate('/history/' + id);
 		dispatch(closeModal());
-		window.location.reload();
 	};
 
 	const handleAddFriend = (id: string | null) => {

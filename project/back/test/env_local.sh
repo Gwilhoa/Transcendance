@@ -1,9 +1,0 @@
-export POSTGRES_PASSWORD="Ouloulou"
-export POSTGRES_USER="Traaaannncendaannce"
-export POSTGRES_DB="BestDB"
-export POSTGRES_HOST="localhost"
-export POSTGRES_PORT="5432"
-export APP_ID="u-s4t2ud-429c6fba8f8262b957353e8b23183e7cbc8e353150e050c06d540c0a8e84677a"
-export APP_SECRET="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"
-export APP_REDIRECT_URI="http://localhost:3000/auth/callback"
-export JWT_SECRET='Ceci est un sercret, lol'

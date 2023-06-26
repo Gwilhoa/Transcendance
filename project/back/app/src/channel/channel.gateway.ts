@@ -189,6 +189,7 @@ export class ChannelGateway implements OnGatewayInit {
           socket != null &&
           !(await this.userService.isBlocked(User.id, user_id))
         ) {
+          if (socket.data.id != user_id) socket.emit('notif_message', sendmsg);
           socket.emit('message', sendmsg);
         }
       }
