@@ -43,9 +43,12 @@ export class ChannelService {
       for (const mute of mutes) {
         if (mute.date < new Date()) {
           await this.muteRepository.delete(mute);
-          this.server
-            .to(mute.mutedChannel.id)
-            .emit('unmute', mute.mutedUser.id);
+          this.server.to(mute.mutedChannel.id).emit('update_user_channel', {
+            code: 0,
+            channel: mute.mutedChannel,
+            sender_id: mute.mutedUser.id,
+            message: 'ok',
+          });
         }
       }
     }, 1000);
