@@ -128,8 +128,12 @@ function Chat() {
 			});
 			console.log(response.data);
 			setListAvailableChannel(response.data);
-		} catch (error) {
+		} catch (error: any) {
 			console.error(error);
+			if (error?.response?.status === 401 || error?.response?.status === 500) {
+				setErrorLocalStorage('Error ' + error?.response?.status);
+				navigate('/Error');
+			}
 		}
 	}
 	const fetchListChannel = useCallback( async () => {

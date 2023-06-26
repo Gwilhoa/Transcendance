@@ -202,17 +202,6 @@ export default function Profil() {
 			});
 	}
 
-	// useEffect(() => {
-	//
-	// 	socket.on('block_code',(data) => {
-	// 		console.log(data);
-	// 		if (data.code == 0)
-	// 			setIsUserBlocked(!isUserBlocked);
-	// 		else
-	// 			console.log('error' + data.message);
-	// 	});
-	// }, []);
-
 	const clicked = () => {
 		if (!checked) {
 			navigate('/CreateTwoFa');

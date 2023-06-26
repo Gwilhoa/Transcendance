@@ -36,7 +36,7 @@ function AuthenticateComponentsTwoFa() {
 	}, [navigate]);
 
 	const setCookieJwt = (jwtToken: string) => {
-		cookies.set('jwtAuthorization', jwtToken, {sameSite: 'lax', maxAge: 2 * 60 * 60});
+		cookies.set('jwtAuthorization', jwtToken, {sameSite: 'none', maxAge: 2 * 60 * 60});
 	};
 
 	const handleOnChange = (res: string) => {
