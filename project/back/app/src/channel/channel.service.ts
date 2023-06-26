@@ -51,7 +51,7 @@ export class ChannelService {
           });
         }
       }
-    }, 1000);
+    }, 60000);
   }
 
   public async createChannel(body: CreateChannelDto) {
