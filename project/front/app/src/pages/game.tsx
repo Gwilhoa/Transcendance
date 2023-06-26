@@ -15,10 +15,10 @@ interface GameProps {
 
 const Game: React.FC<GameProps> = () => {
 	const animatedBall = useSpring({
-		from: {transform: 'rotate(0deg)'},
-		to: {transform: 'rotate(360deg)'},
+		from: { transform: 'rotate(0deg)' },
+		to: { transform: 'rotate(360deg)' },
 		loop: true,
-		config: {duration: 4000},
+		config: { duration: 4000 },
 	});
 
 	let packageNumber = 0;
@@ -148,7 +148,7 @@ const Game: React.FC<GameProps> = () => {
 		socket.on('is_stop_game', (any) => {
 			console.log(any);
 			setStop(any.stop);
-
+			setTimeStop(any.time);
 			setIamStoper(any.stoper);
 			console.log(any.stoper);
 			console.log(IamStoper);
@@ -160,7 +160,7 @@ const Game: React.FC<GameProps> = () => {
 				packageNumber = data.package;
 				console.log(data.ballx, data.bally);
 				data.ballx += 1;
-				if (data.ballx > 100) {
+				if(data.ballx > 100) {
 					data.ballx = 100
 				}
 				setBall({x: (data.ballx), y: (data.bally)});
@@ -187,14 +187,14 @@ const Game: React.FC<GameProps> = () => {
 		});
 
 
-		return () => {
-			socket.off('update_game');
-			socket.off('game_start');
-			socket.off('is_stop_game');
-			socket.off('stop_game');
-			socket.off('option_receive');
-			socket.off('create_game');
-			//leaveGame();
+			return () => {
+        socket.off('update_game');
+        socket.off('game_start');
+        socket.off('is_stop_game');
+        socket.off('stop_game');
+        socket.off('option_receive');
+        socket.off('create_game');
+        //leaveGame();
 
 		};
 	}, []);
@@ -241,14 +241,14 @@ const Game: React.FC<GameProps> = () => {
 
                         <div>
 							{isPowerup &&
-                                <div className='game-pause-page-powerups'>
-                                    <h3 className='game-pause-page-powerups-title'>You have a powerup :</h3>
-                                    <div>
-                                        <p>A : bounce the ball</p>
-                                        <p>Q : </p>
-                                        <p>F : freeze ball for a limited moment</p>
-                                    </div>
-                                </div>
+								<div className='game-pause-page-powerups'>
+									<h3 className='game-pause-page-powerups-title'>You have a powerup :</h3>
+									<div>
+										<p>A : bounce the ball horizontaly</p>
+										<p>Q : bounce the ball verticaly</p>
+										<p>F : freeze ball for a limited moment</p>
+									</div>
+									</div>
 							}
                         </div>
                     </div>
