@@ -75,16 +75,18 @@ function AuthenticateComponentsTwoFa() {
 
 
 	return (
-		<div>
-			<p>TwoFa enable</p>
-			<div>
-				<AuthCode
-					allowedCharacters='numeric'
-					onChange={handleOnChange}
-					inputClassName='input'
-					ref={AuthInputRef}
-				/>
-				{Error == true ? (<ErrorInput/>) : (<></>)}
+		<div className='center-auth'>
+			<div className='auth-page-two-fa-enable'>
+				<p>Two factor authentication enable</p>
+				<div>
+					<AuthCode
+						allowedCharacters='numeric'
+						onChange={handleOnChange}
+						inputClassName='input'
+						ref={AuthInputRef}
+						/>
+					{Error == true ? (<ErrorInput/>) : (<></>)}
+				</div>
 			</div>
 		</div>
 	);
