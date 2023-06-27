@@ -67,11 +67,6 @@ export class EventsGateway
       return;
     }
     this.logger.log(`Client disconnected: ${id}`);
-    if ((await this.userService.changeStatus(id, UserStatus.OFFLINE)) == null) {
-      wrongtoken(client, 'connection');
-      this.clients = disconnect(id, this.clients);
-      this.sendconnected();
-    }
     this.clients = disconnect(id, this.clients);
     if (getKeys(this.ingame).includes(id)) {
       const game = await this.gameService.remakeGame(this.ingame.get(id));
@@ -84,6 +79,11 @@ export class EventsGateway
       this.ingame.delete(ingame.getUser2().data.id);
       await ingame.remake();
       this.games.delete(game.id);
+    }
+    if ((await this.userService.changeStatus(id, UserStatus.OFFLINE)) == null) {
+      wrongtoken(client, 'connection');
+      this.clients = disconnect(id, this.clients);
+      this.sendconnected();
     }
     if (this.matchmaking.includes(client)) {
       this.matchmaking.splice(this.matchmaking.indexOf(client), 1);

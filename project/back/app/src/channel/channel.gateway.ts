@@ -52,6 +52,9 @@ export class ChannelGateway implements OnGatewayInit {
     const receiver = await this.userService.getUserById(receiver_id);
     const sender = await this.userService.getUserById(sender_id);
     const channel = await this.channelService.getChannelById(channel_id);
+    if (channel == null) {
+      return;
+    }
     if (receiver == null || sender == null) {
       client.emit('update_user_channel', {
         code: 1,
@@ -289,10 +292,16 @@ export class ChannelGateway implements OnGatewayInit {
     } else {
       if (channel.creator.id == user_id) {
         this.server.to(channel_id).emit('delete_channel', send);
+        for (const User of channel.users) {
+          const socket = getSocketFromId(User.id, getSockets(this.server));
+          if (socket != null) {
+            socket.emit('leave_channel', send);
+            socket.leave(channel_id);
+          }
+        }
         await this.channelService.deletechannel(channel_id);
         return;
       }
-      client.leave(channel_id);
       send.channel = await this.channelService.leaveChannel(
         user_id,
         channel.id,
@@ -330,7 +339,7 @@ export class ChannelGateway implements OnGatewayInit {
           socket.leave(channel_id);
           socket.emit('delete_channel', { id: channel_id });
         }
-        this.server.to(chan.id).emit('update_user_channel', {
+        this.server.to(channel_id).emit('update_user_channel', {
           channel: chan,
           sender_id: user_id,
           code: 0,
@@ -343,7 +352,7 @@ export class ChannelGateway implements OnGatewayInit {
         });
       }
     } catch (e) {
-      this.server.to(channel.id).emit('update_user_channel', {
+      this.server.to(channel_id).emit('update_user_channel', {
         channel: channel,
         sender_id: user_id,
         code: 1,
@@ -381,7 +390,7 @@ export class ChannelGateway implements OnGatewayInit {
           socket.leave(channel_id);
           socket.emit('delete_channel', { id: channel_id });
         }
-        this.server.to(chan.id).emit('update_user_channel', {
+        this.server.to(channel_id).emit('update_user_channel', {
           channel: chan,
           sender_id: user_id,
           code: 0,
@@ -473,7 +482,7 @@ export class ChannelGateway implements OnGatewayInit {
     try {
       const chan = await this.channelService.addAdmin(addAdmin, user_id);
       if (chan != null) {
-        this.server.to(chan.id).emit('update_user_channel', {
+        this.server.to(channel_id).emit('update_user_channel', {
           channel: chan,
           code: 0,
           sender_id: user_id,
@@ -486,7 +495,7 @@ export class ChannelGateway implements OnGatewayInit {
         });
       }
     } catch (e) {
-      this.server.to(channel.id).emit('update_user_channel', {
+      this.server.to(channel_id).emit('update_user_channel', {
         channel: channel,
         code: 1,
         sender_id: user_id,
@@ -532,7 +541,7 @@ export class ChannelGateway implements OnGatewayInit {
         });
       }
     } catch (e) {
-      this.server.to(channel.id).emit('update_user_channel', {
+      this.server.to(channel_id).emit('update_user_channel', {
         channel: channel,
         code: 1,
         sender_id: user_id,

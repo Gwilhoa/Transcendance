@@ -121,6 +121,7 @@ export class ChannelService {
   }
 
   public async getChannelById(id) {
+    if (id == '') return null;
     return await this.channelRepository
       .createQueryBuilder('channel')
       .leftJoinAndSelect('channel.admins', 'admins')
