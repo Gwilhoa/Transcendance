@@ -50,6 +50,7 @@
     border-radius: 6px;
     margin: 0.5rem 0 0.5rem 0.5rem;
     padding: 0 0.3rem;
+    cursor: pointer;
 }
 
 .chat-list-users-button-ban-hammer, .chat-list-users-button-unban-hammer {
@@ -58,6 +59,7 @@
     border-radius: 6px;
     margin: 0.5rem 0 0.5rem 0.5rem;
     padding: 0 0.3rem;
+    cursor: pointer;
 }
 
 .chat-list-users-button-mute, .chat-list-users-button-unmute {
@@ -66,6 +68,7 @@
     border-radius: 6px;
     margin: 0.5rem 0 0.5rem 0.5rem;
     padding: 0 0.3rem;
+    cursor: pointer;
 }
 
 .chat-list-users-button-kick-user{
@@ -74,4 +77,5 @@
     border-radius: 6px;
     margin: 0 0 0.5rem 0.5rem;
     padding: 0 0.3rem;
+    cursor: pointer;
 }
