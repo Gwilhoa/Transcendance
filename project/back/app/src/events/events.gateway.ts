@@ -478,7 +478,7 @@ export class EventsGateway
         UserStatus.CONNECTED,
       );
       await this.userService.changeStatus(
-        game.getUser1().data.id,
+        game.getUser2().data.id,
         UserStatus.CONNECTED,
       );
       this.sendconnected();
