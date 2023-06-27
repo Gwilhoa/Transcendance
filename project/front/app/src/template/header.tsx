@@ -31,10 +31,11 @@ const Head = () => {
 		navigate('/history/' + myId);
 	};
 
-	const setData = () => {
+	const handleGame = () => {
 		dispatch(closeModal());
 		dispatch(setBeginStatus({gamestate: 10}));
-	}
+		navigate('/begingame')
+	};
 
 	return (
 		<div className='navbar'>
@@ -48,9 +49,9 @@ const Head = () => {
 				<button onClick={() => handleChat()} className='navbar__link'>
 					Chat
 				</button>
-				<Link to="/begingame" className="navbar__link" onClick={setData}>
+				<button className='navbar__link' onClick={() => handleGame}>
 					Game
-				</Link>
+				</button>
 				<button onClick={() => handleHisto()} className='navbar__link'>
 					History
 				</button>

@@ -5,12 +5,27 @@ import {useNavigate} from 'react-router-dom';
 import AuthCode, {AuthCodeRef} from 'react-auth-code-input';
 import {setErrorLocalStorage} from '../IfError';
 import {ErrorInput} from '../../pages/CreateTwoFa';
+import SocketSingleton from '../../socket';
 
 function AuthenticateComponentsTwoFa() {
 	const [, setResult] = useState<string>('');
 	const [Error, setError] = useState<boolean>(false);
 	const navigate = useNavigate();
 	const AuthInputRef = useRef<AuthCodeRef>(null);
+
+	const socketInstance = SocketSingleton.getInstance();
+	const socket = socketInstance.getSocket();
+
+	useEffect(() => {
+		socket.on('connection_error', () => {
+			setErrorLocalStorage('unauthorized')
+			navigate('/error');
+		});
+
+		return () => {
+			socket.off('connection_error');
+		};
+	}, [navigate]);
 
 	useEffect(() => {
 		if (localStorage.getItem('jwtAuthorization') != null) {

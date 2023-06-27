@@ -71,8 +71,6 @@ const Template = () => {
 			if (conversationId == data.channel.id)
 			{
 				setNotifVisible(false);
-
-				// return;
 			}
 			else
 			{
@@ -88,7 +86,6 @@ const Template = () => {
 			}} onCancel={() => {
 				null
 			}} hasButton={false} setVisible={setNotifVisible}/>)
-			// setNotifVisible(true);
 		})
 
 		socket.on('friend_notif', (data: any) => {

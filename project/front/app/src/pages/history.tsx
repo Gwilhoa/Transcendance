@@ -87,7 +87,8 @@ const OneScoreBlock = ({game, playerId}: { game: Game, playerId: string }) => {
 				}
 			}
 		}
-	}, [playerId, game, myId, userWinner, leftImage, rightImage, navigate]);
+	}, [playerId, game, myId, userWinner, leftImage, rightImage, navigate,
+		leftScore, rightScore]);
 
 	useEffect(() => {
 		axios.get(process.env.REACT_APP_IP + ':3000/user/image/' + playerId, {
@@ -126,7 +127,8 @@ const OneScoreBlock = ({game, playerId}: { game: Game, playerId: string }) => {
 				navigate('/Error');
 				return;
 			});
-	}, [leftUser, rightUser, navigate, playerId, game]);
+	}, [leftUser, rightUser, navigate, playerId, game, leftScore,
+		rightScore]);
 
 	if (messageWinner == '') {
 		return null;
@@ -193,16 +195,16 @@ const ListBlockScore = ({userId, username}: { userId: string, username: string }
 	return (
 		<div className='score-board'>
 			{
-				listGame.map((itemGame) => (
+				listGame.map((itemGame, index) => (
 					itemGame.finished == 'FINISHED' ? (
-						<div key={itemGame.id}>
+						<div key={index + itemGame.id}>
 							<OneScoreBlock
 								game={itemGame}
 								playerId={userId}
 							/>
 						</div>
 					) : (
-						<div key={itemGame.id}></div>)
+						<div key={index + itemGame.id}></div>)
 				))
 			}
 		</div>
@@ -213,6 +215,8 @@ const History = () => {
 	const navigate = useNavigate();
 	const [username, setUsername] = useState<string>('');
 	const [userId, setUserId] = useState<string>('');
+	const {id} = useParams();
+
 
 	const fetchDataUser = useCallback((userId: string) => {
 		if (userId != null) {
@@ -235,17 +239,15 @@ const History = () => {
 		} else {
 			navigate('/home');
 		}
-	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [navigate, userId]);
+	}, [navigate, userId, id]);
 
-	const {id} = useParams();
 	useEffect(() => {
 		if (id != null) {
 			fetchDataUser(id);
 			setUserId(id);
 		}
-	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [navigate, fetchDataUser, id, location.pathname, userId]);
+	}, [navigate, fetchDataUser, id, userId]);
+
 
 	if (userId == '' || userId == null) {
 		return (null);
