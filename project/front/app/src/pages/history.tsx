@@ -247,7 +247,7 @@ const History = () => {
 			fetchDataUser(id);
 			setUserId(id);
 		}
-	}, [userId, navigate, fetchDataUser, id]);
+	}, [userId, navigate, fetchDataUser, id, location.pathname]);
 
 	if (userId == '' || userId == null) {
 		return (null);
