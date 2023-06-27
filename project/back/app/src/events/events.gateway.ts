@@ -104,6 +104,7 @@ export class EventsGateway
       }
       if (id == null || getSocketFromId(id, getSockets(this.server)) != null) {
         wrongtoken(client, 'connection');
+        return;
       }
       if (
         (await this.userService.changeStatus(id, UserStatus.CONNECTED)) == null
