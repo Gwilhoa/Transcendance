@@ -469,6 +469,14 @@ export class EventsGateway
     if (game != null) {
       this.ingame.delete(client.data.id);
       this.ingame.delete(client.data.id);
+      await this.userService.changeStatus(
+        game.getUser1().data.id,
+        UserStatus.CONNECTED,
+      );
+      await this.userService.changeStatus(
+        game.getUser1().data.id,
+        UserStatus.CONNECTED,
+      );
       game.remake();
     } else {
       this.ingame.delete(id);
