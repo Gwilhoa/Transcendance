@@ -235,6 +235,7 @@ const History = () => {
 		} else {
 			navigate('/home');
 		}
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [navigate, userId]);
 
 	const {id} = useParams();
@@ -243,7 +244,8 @@ const History = () => {
 			fetchDataUser(id);
 			setUserId(id);
 		}
-	}, [userId, navigate, fetchDataUser, id, location.pathname]);
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [navigate, fetchDataUser, id, location.pathname, userId]);
 
 	if (userId == '' || userId == null) {
 		return (null);

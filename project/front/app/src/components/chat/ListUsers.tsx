@@ -126,7 +126,7 @@ const KickUser = ({id, channel}: changeChannelProps) => {
 	};
 	
 	return (
-		<div className='chat-list-users-button-ban-hammer' onClick={handleClickKicUser}>
+		<div className='chat-list-users-button-kick-user' onClick={handleClickKicUser}>
 			Kick
 		</div>
 	);
@@ -206,8 +206,11 @@ const ListUser = ({channel}: listUserProps) => {
 						<ProfilImage OnClickOpenProfil={true} id={user.id} OverwriteClassName='chat-list-user-image'/>
 
 						<div className='chat-list-users-user-text'>
-							<div className='chat-list-users-user-name' onClick={() => dispatch(openModal(user.id))}>
-								<ProfilName id={user.id}/>
+							<div className='chat-list-users-name-kick'>
+								<div className='chat-list-users-user-name' onClick={() => dispatch(openModal(user.id))}>
+									<ProfilName id={user.id}/>
+								</div>
+								<KickUser id={user.id} channel={channel}/>
 							</div>
 							{isAdmin(channel, '' + myId) && !isMe(user, '' + myId) ?
 								<div className='chat-list-users-buttons-user'>
@@ -218,7 +221,6 @@ const ListUser = ({channel}: listUserProps) => {
 									) : (
 										<MuteButton id={user.id} channel={channel}/>
 									)}
-									<KickUser id={user.id} channel={channel}/>
 								</div>
 								:
 								null

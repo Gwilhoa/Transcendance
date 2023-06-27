@@ -1,5 +1,5 @@
 import './css/endgame.css'
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../redux/store";
@@ -31,9 +31,9 @@ const EndGame = () => {
 		navigate('/home');
 	}
 
-	const launchReplay = () => {
+	const launchReplay = useCallback(() => {
 		socket.emit('game_finished', {rematch: true, token: localStorage.getItem('jwtAuthorization')});
-	}
+	}, [socket]);
 
 
 	const replaybutton = () => {
@@ -65,14 +65,14 @@ const EndGame = () => {
 			socket.off('rematch')
 			/*socket.off('game_found')*/
 		}
-	}, [dispatch, launchReplay, myrevenge, navigate])
+	}, [dispatch, launchReplay, myrevenge, navigate, socket])
 	useEffect(() => {
 
 		if (finalStatus == null || finalStatus.adversary == null) {
 			socket.emit('leave_game', {token: localStorage.getItem('jwtAuthorization')})
 			navigate('/home');
 		}
-	}, [finalStatus, navigate]);
+	}, [finalStatus, navigate, socket]);
 
 
 	return (

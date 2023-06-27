@@ -120,7 +120,7 @@ function Chat() {
 
 	const [password] = useState<Map<string, string>>(new Map());
 ////////////////////////// FETCH DATA /////////////////////////////////////////
-	const fetchAvailableChannel = async () => {
+	const fetchAvailableChannel = useCallback(async () => {
 		try {
 			const response = await axios.get(process.env.REACT_APP_IP + ':3000/channel/available', {
 				headers: {
@@ -135,7 +135,7 @@ function Chat() {
 				navigate('/Error');
 			}
 		}
-	}
+	}, [navigate]);
 	const fetchListChannel = useCallback(async () => {
 		try {
 			const response = await axios.get(process.env.REACT_APP_IP + ':3000/user/channels', {
@@ -303,10 +303,9 @@ function Chat() {
 
 		return () => {
 			socket.off('update_user_channel');
-			socket.off('user_join');
 			socket.off('research_channel');
 		}
-	}, [fetchListChannel, handleUpdateUserChannel, handleResearchChannel]);
+	}, [fetchListChannel, handleUpdateUserChannel, handleResearchChannel, fetchAvailableChannel]);
 	useEffect(() => {
 		fetchListMessage();
 		findChannel();
@@ -331,7 +330,7 @@ function Chat() {
 	}, [conversationId, updateChannel, fetchListChannel, listChannel,
 		handleJoinChannel, handleMessage, handleDeleteChannel,
 		findChannel, fetchListMessage, handleUpdateChannel,
-		handleMessageCode
+		handleMessageCode, dispatch
 	]);
 
 	useEffect(() => {
