@@ -32,8 +32,8 @@ const Head = () => {
 	};
 
 	const handleGame = () => {
-		navigate('/begingame')
 		dispatch(closeModal());
+		navigate('/begingame')
 		dispatch(setBeginStatus({gamestate: 10}));
 	};
 
