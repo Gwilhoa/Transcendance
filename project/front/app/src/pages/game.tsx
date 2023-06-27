@@ -1,5 +1,6 @@
 import './css/game.css'
 import React, {useEffect, useRef, useState} from "react";
+import Cookies from 'universal-cookie';
 import {useNavigate} from 'react-router-dom';
 import ErrorToken from '../components/IfError';
 import {useDispatch, useSelector} from 'react-redux';
@@ -7,6 +8,8 @@ import {setFinalStatus} from "../redux/game/gameSlice";
 import {RootState} from "../redux/store";
 import SocketSingleton from "../socket";
 import {animated, useSpring} from 'react-spring';
+
+const cookies = new Cookies();
 
 
 interface GameProps {
@@ -44,6 +47,7 @@ const Game: React.FC<GameProps> = () => {
 	const [stop, setStop] = useState(false);
 	const [timeStop, setTimeStop] = useState(60);
 	const dispatch = useDispatch();
+	const finalStatus = useSelector((state: RootState) => state.finalGame.finalStatus);
 	const [IamStoper, setIamStoper] = useState(false);
 
 	const socketInstance = SocketSingleton.getInstance();
@@ -87,12 +91,19 @@ const Game: React.FC<GameProps> = () => {
 	};
 
 	const leaveGame = () => {
+		socket.emit("leave_game", {token: localStorage.getItem('jwtAuthorization')})
 		// window.location.reload()
+		navigate('/home');
 	}
 
 	const resumeGame = () => {
 		socket.emit("input_game", {game_id: gameId, type: 2})
 	}
+
+	socket.on('create_game', (any) => {
+		console.log('WESH')
+		console.log(any);
+	})
 
 	socket.on('will_started', (data) => {
 		if (data.time == 0) {
@@ -122,30 +133,32 @@ const Game: React.FC<GameProps> = () => {
 			setNbBall(data.ball);
 			setNbMap(data.map);
 			setIsPowerup(data.powerup);
+			console.log(data)
 		})
 
 		socket.on('game_start', () => {
-			socket.emit('input_game', {
-				game_id: gameId,
-				position: paddle1,
-				token: localStorage.getItem('jwtAuthorization')
-			});
+			socket.emit('input_game', {game_id: gameId, position: paddle1, token: localStorage.getItem('jwtAuthorization')});
 		})
 
 		socket.on('stop_game', (any) => {
+			console.log(any);
 			setTimeStop(any.time);
 		})
 
 		socket.on('is_stop_game', (any) => {
+			console.log(any);
 			setStop(any.stop);
 			setTimeStop(any.time);
 			setIamStoper(any.stoper);
+			console.log(any.stoper);
+			console.log(IamStoper);
 		})
 
 		socket.on('update_game', (data) => {
 			if (data.package > packageNumber) {
 				setStarted(data.score2 + "  " + data.score1)
 				packageNumber = data.package;
+				console.log (data.ballx, data.bally);
 				data.ballx += 1;
 				if(data.ballx > 100) {
 					data.ballx = 100
@@ -157,6 +170,7 @@ const Game: React.FC<GameProps> = () => {
 		});
 
 		socket.on('finish_game', (any) => {
+			console.log(any)
 			if (isCall) {
 				const content = {
 					status: any.status,
@@ -205,27 +219,25 @@ const Game: React.FC<GameProps> = () => {
 				style={{...animatedBall, ...ballStyles}}/>
 			{stop &&
                 <div className="game-shadow">
-                    <div className='game-pause-page'>
-                        <div className='game-pause-page-text-time'>
-                            Time before restart :
-                            <p>
+					<div className='game-pause-page'>
+						<div className='game-pause-page-text-time'>
+							Time before restart :
+							<p>
 								{timeStop}
-                            </p>
-                        </div>
-                        <div className='game-pause-menu-buttons'>
-                            <button className='game-pause-menu-buttons-template game-pause-menu-leave-button'
-                                    onClick={leaveGame}>
-                                Leave
-                            </button>
+							</p>
+						</div>
+						<div className='game-pause-menu-buttons'>
+							<button className='game-pause-menu-buttons-template game-pause-menu-leave-button' onClick={leaveGame}>
+									Leave
+							</button>
 							{IamStoper &&
-                                <button className='game-pause-menu-buttons-template game-pause-menu-resume-button'
-                                        onClick={resumeGame}>
-                                    resume
-                                </button>
+								<button className='game-pause-menu-buttons-template game-pause-menu-resume-button' onClick={resumeGame}>
+										resume
+								</button>
 							}
-                        </div>
+						</div>
 
-                        <div>
+						<div>
 							{isPowerup &&
 								<div className='game-pause-page-powerups'>
 									<h3 className='game-pause-page-powerups-title'>You have a powerup :</h3>
@@ -236,8 +248,8 @@ const Game: React.FC<GameProps> = () => {
 									</div>
 									</div>
 							}
-                        </div>
-                    </div>
+						</div>
+					</div>
                 </div>}
 		</>
 
