@@ -260,7 +260,6 @@ const ListBannedUser = ({channel}: listUserProps) => {
 						{isAdmin(channel, '' + myId) && !isMe(user, '' + myId) ?
 							<div className='chat-list-users-buttons-user'>
 								<UnBanHammer id={user.id} channel={channel}/>
-								<KickUser id={user.id} channel={channel}/>
 							</div>
 							:
 							null}
