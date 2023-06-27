@@ -291,11 +291,11 @@ export class ChannelGateway implements OnGatewayInit {
       return;
     } else {
       if (channel.creator.id == user_id) {
-        this.server.to(channel_id).emit('delete_channel', send);
+        this.server.to(channel_id).emit('delete_channel', { id: channel_id });
         for (const User of channel.users) {
           const socket = getSocketFromId(User.id, getSockets(this.server));
           if (socket != null) {
-            socket.emit('delete_channel', send);
+            socket.emit('delete_channel', { id: channel_id });
             socket.leave(channel_id);
           }
         }
