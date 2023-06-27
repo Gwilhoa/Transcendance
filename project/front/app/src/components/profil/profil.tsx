@@ -306,7 +306,6 @@ export default function Profil() {
 			<div className='browse-file' key='changeImage'>
 				<input type='file' onChange={handleImageChange} id='files'/>
 				<label htmlFor='files' className='profil-button'>Change image</label>
-				{errorImageMessage != '' && (<p>{errorImageMessage}</p>)}
 			</div>
 		)
 
@@ -319,7 +318,6 @@ export default function Profil() {
 					classInput='profil-button'
 					classButton='profil-button'
 				/>
-				{errorName ? <p className='Error-msg'>{errorNameMessage}</p> : <></>}
 			</div>
 		)
 
@@ -333,8 +331,12 @@ export default function Profil() {
 			</div>
 		)
 		initialElement.push(
-			<div key='logout' className='logout'>
-				<LogoutButton/>
+			<div key='logout'>
+				{errorName && <p className='Error-msg'>{'* ' + errorNameMessage}</p>}
+				{errorImageMessage != '' && (<p className='Error-msg'>{'* ' + errorImageMessage}</p>)}
+				<div className='logout'>
+					<LogoutButton/>
+				</div>
 			</div>
 		)
 	}

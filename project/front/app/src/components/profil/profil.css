@@ -115,7 +115,7 @@
     border: 0.2rem solid var(--primary-color);
     border-radius: 1rem;
     background-color: var(--box-color);
-    padding: 0.1rem;
+    padding: 0.2rem;
     color: var(--light-color);
     font-size: 1rem;
     width: 8rem;
@@ -203,7 +203,7 @@ input:checked + .slider:before {
 }
 
 .Error-msg {
-    font-size: 0.75rem;
+    font-size: 0.8rem;
 }
 
 
