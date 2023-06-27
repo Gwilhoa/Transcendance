@@ -193,6 +193,7 @@ export class ChannelService {
     for (const admin of chan.admins) {
       if (admin.id == user.id) f = true;
     }
+    if (user.id == chan.creator.id) f = true;
     if (!f) throw new Error('User is not admin of this channel');
     for (const admin of chan.admins) {
       if (admin.id == target.id)
@@ -215,8 +216,10 @@ export class ChannelService {
     if (user == null || target == null) throw new Error('User not found');
     const chan = await this.getChannelById(body.channel_id);
     if (chan == null) throw new Error('Channel not found');
-    if (!includeUser(user, chan.admins) || chan.creator.id != user.id)
-      throw new Error('User is not admin of this channel');
+    if (user.id != chan.creator.id) {
+      if (!includeUser(user, chan.admins))
+        throw new Error('User is not admin of this channel');
+    }
     if (!includeUser(target, chan.users))
       throw new Error('User is not in this channel');
     if (includeUser(target, chan.admins) || chan.creator.id == target.id)
@@ -235,8 +238,10 @@ export class ChannelService {
     if (user == null || target == null) throw new Error('User not found');
     const chan = await this.getChannelById(body.channel_id);
     if (chan == null) throw new Error('Channel not found');
-    if (!includeUser(user, chan.admins) || chan.creator.id != user.id)
-      throw new Error('User is not admin of this channel');
+    if (user.id != chan.creator.id) {
+      if (!includeUser(user, chan.admins))
+        throw new Error('User is not admin of this channel');
+    }
     if (!includeUser(target, chan.users))
       throw new Error('User is not in this channel');
     if (includeUser(target, chan.admins) || chan.creator.id == target.id)
