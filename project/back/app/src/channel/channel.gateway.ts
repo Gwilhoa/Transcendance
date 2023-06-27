@@ -295,7 +295,7 @@ export class ChannelGateway implements OnGatewayInit {
         for (const User of channel.users) {
           const socket = getSocketFromId(User.id, getSockets(this.server));
           if (socket != null) {
-            socket.emit('leave_channel', send);
+            socket.emit('delete_channel', send);
             socket.leave(channel_id);
           }
         }
