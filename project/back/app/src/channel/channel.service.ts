@@ -329,10 +329,12 @@ export class ChannelService {
     if (user == null) throw new Error('User not found');
     const channels = await this.channelRepository
       .createQueryBuilder('channel')
-      .leftJoinAndSelect('channel.users', 'users')
-      .leftJoinAndSelect('channel.bannedUsers', 'bannedUsers')
       .leftJoinAndSelect('channel.admins', 'admins')
+      .leftJoinAndSelect('channel.bannedUsers', 'bannedUsers')
       .leftJoinAndSelect('channel.creator', 'creator')
+      .leftJoinAndSelect('channel.users', 'users')
+      .leftJoinAndSelect('channel.mutedUsers', 'mutedUsers')
+      .leftJoinAndSelect('mutedUsers.mutedUser', 'mutedUser')
       .where('channel.name LIKE :name', { name: `%${name}%` })
       .getMany();
     const chan = [];
@@ -355,10 +357,10 @@ export class ChannelService {
     if (user == null) throw new Error('User not found');
     const channels = await this.channelRepository
       .createQueryBuilder('channel')
-      .leftJoinAndSelect('channel.users', 'users')
-      .leftJoinAndSelect('channel.bannedUsers', 'bannedUsers')
       .leftJoinAndSelect('channel.admins', 'admins')
+      .leftJoinAndSelect('channel.bannedUsers', 'bannedUsers')
       .leftJoinAndSelect('channel.creator', 'creator')
+      .leftJoinAndSelect('channel.users', 'users')
       .leftJoinAndSelect('channel.mutedUsers', 'mutedUsers')
       .leftJoinAndSelect('mutedUsers.mutedUser', 'mutedUser')
       .getMany();

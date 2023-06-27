@@ -197,6 +197,7 @@ function Chat() {
 	}, []);
 
 	const handleUpdateUserChannel = useCallback((data: any) => {
+		console.log(data);
 		if (data.code === 0) {
 			setListChannel((prevListChannel) => {
 				let channelExists = false;

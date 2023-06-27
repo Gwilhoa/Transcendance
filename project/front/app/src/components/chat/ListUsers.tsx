@@ -178,8 +178,8 @@ const ListUser = ({channel}: listUserProps) => {
 		}
 	}, [navigate]);
 
-	const isMuted = (user: User, channel: Channel) => {
-		return channel.mutedUsers.some((banned) => banned.mutedUsers.id === user.id);
+	const isMuted = (id: string, channel: Channel) => {
+		return channel.mutedUsers.some((banned) => banned.mutedUser);
 	}
 
 	return (
@@ -201,7 +201,7 @@ const ListUser = ({channel}: listUserProps) => {
 								<div className='chat-list-users-buttons-user'>
 									<MakeAdmin id={user.id} channel={channel}/>
 									<BanHammer id={user.id} channel={channel}/>
-									{isMuted(user, channel) ? (
+									{isMuted(user.id, channel) ? (
 										<UnMuteButton id={user.id} channel={channel}/>
 									) : (
 										<MuteButton id={user.id} channel={channel}/>
