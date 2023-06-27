@@ -201,9 +201,9 @@ const CreateChannel = () => {
 					onChange={(e) => onSubmitChannelName(e.target.value)}/>
 				<div className='ButtonChangeTypeChannel'>
 					<h3>Channel Type</h3>
-					<button className='channel-type-button' onClick={() => handleChannelTypeChange(0)}>Private</button>
-					<button className='channel-type-button' onClick={() => handleChannelTypeChange(1)}>Public</button>
-					<button className='channel-type-button' onClick={() => handleChannelTypeChange(2)}>Protected
+					<button className={'channel-type-button' + ' ' + (channelParams.type === 0 ? 'channel-type-button-selected' : '')} onClick={() => handleChannelTypeChange(0)}>Private</button>
+					<button className={'channel-type-button' + ' ' + (channelParams.type === 1 ? 'channel-type-button-selected' : '')} onClick={() => handleChannelTypeChange(1)}>Public</button>
+					<button className={'channel-type-button' + ' ' + (channelParams.type === 2 ? 'channel-type-button-selected' : '')} onClick={() => handleChannelTypeChange(2)}>Protected
 					</button>
 				</div>
 				{channelParams.type === 2 ? (

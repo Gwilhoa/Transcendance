@@ -72,7 +72,7 @@
     border: none;
 }
 
-.channel-type-button:focus {
+.channel-type-button-selected {
     border: 0.2rem solid var(--primary-color);
 }
 
