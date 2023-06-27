@@ -310,7 +310,7 @@ function Chat() {
 	useEffect(() => {
 		fetchListMessage();
 		findChannel();
-		dispatch(setChannelId(conversationId));
+		// dispatch(setChannelId(conversationId));
 
 		socket.on('join_channel', handleJoinChannel);
 		socket.on('message', handleMessage);
