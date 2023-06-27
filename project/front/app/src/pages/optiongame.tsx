@@ -52,7 +52,7 @@ const OptionGame = () => {
 			socket.off('will_started');
 		}
 
-	}, [id, gamestate, playerstats, decide, navigate, dispatch])
+	}, [socket])
 
 	const [nbBall, setNbBall] = useState(Ball1);
 	const [nbMap, setNbMap] = useState(Map1);

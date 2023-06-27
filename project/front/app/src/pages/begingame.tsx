@@ -27,7 +27,7 @@ const BeginGame = () => {
 		return () => {
 			socket.emit('leave_matchmaking', {token: localStorage.getItem('jwtAuthorization')})
 		};
-	}, [navigate, dispatch]);
+	}, [navigate]);
 
 	useEffect(() => {
 
