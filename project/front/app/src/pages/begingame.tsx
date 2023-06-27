@@ -8,6 +8,7 @@ import {setBeginStatus} from '../redux/game/beginToOption';
 import ErrorToken from '../components/IfError';
 import {RootState} from '../redux/store';
 import loading from '../images/game/loading/loading.png';
+import {closeModal} from "../redux/modal/modalSlice";
 
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
@@ -42,6 +43,7 @@ const BeginGame = () => {
 		});
 
 		socket.on('game_found', (data) => {
+			dispatch(closeModal());
 			dispatch(setBeginStatus({decide: data.decide, playerstate: data.user, gameid: data.game_id, gamestate: 1}));
 			socket.emit('leave_matchmaking')
 			navigate("/optiongame")
