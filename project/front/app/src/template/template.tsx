@@ -1,5 +1,5 @@
 import '../App.css'
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import Head from './header';
 import Notification from '../components/notification/notification';
 import {Outlet, useNavigate} from 'react-router-dom';
@@ -11,8 +11,8 @@ import {RootState} from "../redux/store";
 
 
 const Template = () => {
-	let friendId = '';
-	let rivalId = '';
+	const [friendId, setFriendId] = useState('');
+	const [rivalId, setRivalId] = useState('');
 	const navigate = useNavigate();
 	const [notif, setNotif] = useState(<></>);
 	const [notifVisible, setNotifVisible] = useState(false);
@@ -23,18 +23,18 @@ const Template = () => {
 	const conversationId = useSelector((state: RootState) => state.conversationId.id);
 
 
-	const confirmFriend = () => {
+	const confirmFriend = useCallback(() => {
 		socket.emit('friend_request', {friend_id: friendId, token: localStorage.getItem('jwtAuthorization')})
-	}
+	}, [socket, friendId]);
 
 	const rejectFriend = () => {
 		null
 	}
 
 
-	function confirmChallenge() {
+	const confirmChallenge = useCallback(() => {
 		socket.emit('challenge', {rival_id: rivalId, token: localStorage.getItem('jwtAuthorization')})
-	}
+	}, [socket, rivalId]);
 
 	function rejectChallenge() {
 		null
@@ -56,7 +56,7 @@ const Template = () => {
 				});
 				navigate('/optiongame');
 			} else if (data.code == 2) {
-				rivalId = data.rival;
+				setRivalId(data.rival);
 				setNotif(<Notification message={data.rival_name + ' wants battle'} onConfirm={confirmChallenge} onCancel={rejectChallenge} hasButton={true} setVisible={setNotifVisible}/>)
 				setNotifVisible(true);
 			}
@@ -90,7 +90,7 @@ const Template = () => {
 
 		socket.on('friend_notif', (data: any) => {
 			if (data.code == 4) {
-				friendId = data.id;
+				setFriendId(data.id);
 				setNotif(<Notification message={data.username + ' wants to be your friend'} onConfirm={confirmFriend} onCancel={rejectFriend} hasButton={true} setVisible={setNotifVisible}/>);
 				setNotifVisible(true)
 			}
@@ -102,7 +102,7 @@ const Template = () => {
 			socket.off('message');
 			socket.off('friend_request');
 		};
-	}, [navigate, conversationId]);
+	}, [navigate, conversationId, socket, dispatch, confirmChallenge, confirmFriend]);
 
 	return (
 		<div className='page'>
