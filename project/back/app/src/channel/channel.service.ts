@@ -213,20 +213,13 @@ export class ChannelService {
     const user = await this.userService.getUserById(user_id);
 
     if (user == null || target == null) throw new Error('User not found');
-    const chan = await this.channelRepository
-      .createQueryBuilder('channel')
-      .leftJoinAndSelect('channel.admins', 'admins')
-      .leftJoinAndSelect('channel.bannedUsers', 'bannedUsers')
-      .leftJoinAndSelect('channel.creator', 'creator')
-      .leftJoinAndSelect('channel.users', 'users')
-      .where('channel.id = :id', { id: body.channel_id })
-      .getOne();
+    const chan = await this.getChannelById(body.channel_id);
     if (chan == null) throw new Error('Channel not found');
-    if (!includeUser(user, chan.admins))
+    if (!includeUser(user, chan.admins) || chan.creator.id != user.id)
       throw new Error('User is not admin of this channel');
     if (!includeUser(target, chan.users))
       throw new Error('User is not in this channel');
-    if (includeUser(target, chan.admins))
+    if (includeUser(target, chan.admins) || chan.creator.id == target.id)
       throw new Error('User is admin of this channel');
     const ret = [];
     for (const u of chan.users) {
@@ -239,22 +232,14 @@ export class ChannelService {
   public async banUser(body: BanUserDto, user_id) {
     const target = await this.userService.getUserById(body.user_id);
     const user = await this.userService.getUserById(user_id);
-
     if (user == null || target == null) throw new Error('User not found');
-    const chan = await this.channelRepository
-      .createQueryBuilder('channel')
-      .leftJoinAndSelect('channel.admins', 'admins')
-      .leftJoinAndSelect('channel.bannedUsers', 'bannedUsers')
-      .leftJoinAndSelect('channel.creator', 'creator')
-      .leftJoinAndSelect('channel.users', 'users')
-      .where('channel.id = :id', { id: body.channel_id })
-      .getOne();
+    const chan = await this.getChannelById(body.channel_id);
     if (chan == null) throw new Error('Channel not found');
-    if (!includeUser(user, chan.admins))
+    if (!includeUser(user, chan.admins) || chan.creator.id != user.id)
       throw new Error('User is not admin of this channel');
     if (!includeUser(target, chan.users))
       throw new Error('User is not in this channel');
-    if (includeUser(target, chan.admins))
+    if (includeUser(target, chan.admins) || chan.creator.id == target.id)
       throw new Error('User is admin of this channel');
     chan.bannedUsers.push(target);
     const ret = [];
