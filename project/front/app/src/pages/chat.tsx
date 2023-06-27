@@ -310,7 +310,6 @@ function Chat() {
 	useEffect(() => {
 		fetchListMessage();
 		findChannel();
-		// dispatch(setChannelId(conversationId));
 
 		socket.on('join_channel', handleJoinChannel);
 		socket.on('message', handleMessage);
@@ -329,9 +328,12 @@ function Chat() {
 	}, [conversationId, updateChannel, fetchListChannel, listChannel,
 		handleJoinChannel, handleMessage, handleDeleteChannel,
 		findChannel, fetchListMessage, handleUpdateChannel,
-		handleMessageCode, dispatch
+		handleMessageCode
 	]);
 
+	useEffect(() => {
+		dispatch(setChannelId(conversationId));
+	}, [conversationId, dispatch])
 
 	return (
 		<>
