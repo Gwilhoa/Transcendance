@@ -54,7 +54,7 @@ function AuthenticateComponentsTwoFa() {
 					navigate('/authenticate/waiting');
 				})
 				.catch((error) => {
-					if (error.response.status === 401) {
+					if (error?.response?.status === 401) {
 						setErrorLocalStorage('unauthorized');
 						navigate('/Error');
 					} else {
