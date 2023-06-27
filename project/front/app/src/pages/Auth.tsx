@@ -19,8 +19,8 @@ function Auth() {
 				.then(() => {
 					navigate('/home');
 				})
-				.catch((error) => {
-					console.error(error.status)
+				.catch(() => {
+					null
 				});
 		}
 	}, [navigate]);

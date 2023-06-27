@@ -27,7 +27,7 @@ function AuthenticateComponentsNotTwoFa() {
 				})
 				.catch((error) => {
 					localStorage.removeItem('tenMinToken');
-					setErrorLocalStorage('Error ' + error.response.status);
+					setErrorLocalStorage('Error ' + error?.response?.status);
 					console.error(error);
 					navigate('/Error');
 				});
@@ -46,7 +46,7 @@ function AuthenticateComponentsNotTwoFa() {
 				})
 				.catch((error) => {
 					localStorage.removeItem('tenMinToken');
-					setErrorLocalStorage('Error ' + error.response.status);
+					setErrorLocalStorage('Error ' + error?.response?.status);
 					console.error(error);
 					navigate('/Error');
 				});
