@@ -11,7 +11,6 @@ function LogoutButton() {
 	const socket = SocketSingleton.getInstance().getSocket();
 
 	const handleOnClick = () => {
-
 		dispatch(closeModal());
 		localStorage.removeItem('jwtAuthorization');
 		socket.emit('logout');
