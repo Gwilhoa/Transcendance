@@ -449,6 +449,11 @@ export class EventsGateway
     }
   }
 
+  @SubscribeMessage('disconnect_socket')
+  async disconnect_socket(client: Socket, payload: any) {
+    client.disconnect();
+  }
+
   @SubscribeMessage('leave_game')
   async leave_game(client: Socket, payload: any) {
     if (
