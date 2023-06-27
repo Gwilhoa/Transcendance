@@ -91,7 +91,9 @@ const Game: React.FC<GameProps> = () => {
 	};
 
 	const leaveGame = () => {
+		socket.emit("leave_game", {token: localStorage.getItem('jwtAuthorization')})
 		// window.location.reload()
+		navigate('/home');
 	}
 
 	const resumeGame = () => {
@@ -139,7 +141,6 @@ const Game: React.FC<GameProps> = () => {
 		})
 
 		socket.on('stop_game', (any) => {
-
 			console.log(any);
 			setTimeStop(any.time);
 		})
