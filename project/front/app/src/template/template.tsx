@@ -41,6 +41,7 @@ const Template = () => {
 	}
 
 	useEffect(() => {
+		console.log('template id : ' + conversationId);
 		socket.on('receive_challenge', (data: any) => {
 			if (data.code == 3) {
 				socket.on('game_found', (data) => {
@@ -62,7 +63,7 @@ const Template = () => {
 			}
 		});
 
-		socket.on('connection_error', (data: any) => {
+		socket.on('connection_error', () => {
 			setErrorLocalStorage('unauthorized')
 			navigate('/error');
 		});
