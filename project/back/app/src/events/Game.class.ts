@@ -107,17 +107,19 @@ export class Game {
     return this._user2;
   }
 
-
-  private beginStop = (userStop: Socket, userNoStop: Socket, time:number) => {
+  private beginStop = (userStop: Socket, userNoStop: Socket, time: number) => {
     if (!this._stop && this._started) {
       this._stop = true;
-      userStop.emit('is_stop_game', { stop: true, stoper: true, time:time });
-      userNoStop.emit('is_stop_game', { stop: true, stoper: false, time:time });
-      //clearInterval(this._loopid);
+      userStop.emit('is_stop_game', { stop: true, stoper: true, time: time });
+      userNoStop.emit('is_stop_game', {
+        stop: true,
+        stoper: false,
+        time: time,
+      });
       this._playerstop = userStop.id;
       this._loop_stop = setInterval(this.delayStop, 1000);
     }
-  }
+  };
 
   public updateRacket = (player: Socket, y: number) => {
     if (y == 2) {
@@ -129,9 +131,8 @@ export class Game {
         if (player.id == this._user1.id && this._time_stop_user1 > 0) {
           this._time_stop_user1 -= 1;
           this.beginStop(this._user1, this._user2, this._time_stop_user1);
-          }
-        if (player.id == this._user2.id && this._time_stop_user2 > 0)
-        {
+        }
+        if (player.id == this._user2.id && this._time_stop_user2 > 0) {
           this._time_stop_user2 -= 1;
           this.beginStop(this._user2, this._user1, this._time_stop_user2);
         }
@@ -340,17 +341,16 @@ export class Game {
   public clear = () => {
     if (this._loopid != null) clearInterval(this._loopid);
     this._loopid = null;
-  }
+  };
 
   private endOfStop = () => {
     if (this._stop) {
       clearInterval(this._loop_stop);
-      //this._loopid = setInterval(this.gameLoop, Game.default_update);
       this._user1.emit('is_stop_game', { stop: false, stoper: false });
       this._user2.emit('is_stop_game', { stop: false, stoper: false });
       this._stop = false;
     }
-  }
+  };
 
   private delayStop = () => {
     if (

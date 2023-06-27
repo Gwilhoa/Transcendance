@@ -101,6 +101,7 @@ export class EventsGateway
         id = this.authService.getIdFromToken(data.token);
       } catch (error) {
         wrongtoken(client, 'connection');
+        data.id = null;
         return;
       }
       if (id == null || getSocketFromId(id, getSockets(this.server)) != null) {
