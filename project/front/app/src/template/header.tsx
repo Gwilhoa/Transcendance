@@ -5,6 +5,7 @@ import {useDispatch} from 'react-redux';
 import {closeModal, openModal} from '../redux/modal/modalSlice';
 import {setBeginStatus} from "../redux/game/beginToOption";
 import jwtDecode from 'jwt-decode';
+import {setChannelId} from "../redux/conversationId/conversationId";
 
 
 const Head = () => {
@@ -28,17 +29,19 @@ const Head = () => {
 	};
 
 	const handleHisto = () => {
+		dispatch(setChannelId(''));
 		navigate('/history/' + myId);
 	};
 
 	const setData = () => {
+		dispatch(setChannelId(''));
 		dispatch(setBeginStatus({gamestate: 10}));
 	}
 
 	return (
 		<div className='navbar'>
 			<div className='navbar__link'>
-				<Link to='/home' className='transcendance-link'>
+				<Link to='/home' className='transcendance-link' onClick={() => dispatch(setChannelId(''))}>
 					Transcendence
 				</Link>
 			</div>
