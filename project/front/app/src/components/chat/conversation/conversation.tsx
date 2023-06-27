@@ -22,8 +22,16 @@ function Conversation(
 	const [listImageProfil, setListImageProfil] = useState<Array<imageProfil>>([]);
 	const navigate = useNavigate();
 	const scrollRef = useRef(null);
-	const jwt: string = jwtDecode('' + localStorage.getItem('jwtAuthorization'));
-	const [myId] = useState<string>(jwt.sub);
+	const [myId, setMyId] = useState<string>('');
+
+	useEffect(() => {
+		if (localStorage.getItem('jwtAuthorization') != null) {
+			const jwt_decode : any = jwtDecode('' + localStorage.getItem('jwtAuthorization'));
+			setMyId(jwt_decode.sub);
+		} else {
+			navigate('/error');
+		}
+	}, [navigate]);
 
 	const addImageProfil = useCallback((id: string) => {
 		let add = true;

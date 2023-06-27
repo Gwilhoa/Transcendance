@@ -114,8 +114,16 @@ const CreateChannel = () => {
 	const [usersId, setUserId] = useState<Array<string>>([]);
 	const [errorPwd, setErrorPwd] = useState<boolean>(false);
 	const [errorMessage, setErrorMessage] = useState<string>('');
-	const jwt: string = jwtDecode('' + localStorage.getItem('jwtAuthorization'));
-	const [myId] = useState<string>(jwt.sub);
+	const [myId, setMyId] = useState<string>('');
+
+	useEffect(() => {
+		if (localStorage.getItem('jwtAuthorization') != null) {
+			const jwt_decode : any = jwtDecode('' + localStorage.getItem('jwtAuthorization'));
+			setMyId(jwt_decode.sub);
+		} else {
+			navigate('/error');
+		}
+	}, [navigate]);
 
 	const onSubmitChannelName = (str: string) => {
 		setChannelParams((prevChannelParams) => ({

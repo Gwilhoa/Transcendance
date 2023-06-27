@@ -5,6 +5,7 @@ import {Message} from '../../../pages/chat'
 import {openModal} from '../../../redux/modal/modalSlice';
 import {imageProfil} from './conversation';
 import jwtDecode from 'jwt-decode';
+import {useNavigate} from 'react-router-dom';
 
 function Timer({dateString}: { dateString: string }) {
 	const [timeElipsed, setTimeElipsed] = useState<string>();
@@ -28,8 +29,17 @@ function Timer({dateString}: { dateString: string }) {
 }
 
 function Messages({message, listImage}: { message: Message, listImage: Array<imageProfil> }) {
-	const jwt: string = jwtDecode('' + localStorage.getItem('jwtAuthorization'));
-	const [myId] = useState<string>(jwt.sub);
+	const navigate = useNavigate();
+	const [myId, setMyId] = useState<string>('');
+
+	useEffect(() => {
+		if (localStorage.getItem('jwtAuthorization') != null) {
+			const jwt_decode : any = jwtDecode('' + localStorage.getItem('jwtAuthorization'));
+			setMyId(jwt_decode.sub);
+		} else {
+			navigate('/error');
+		}
+	}, [navigate]);
 	const isMe: boolean = (message.user.id === myId);
 	const photo: string = listImage.find((image) => image.id === message.user.id)
 		?.image || '';

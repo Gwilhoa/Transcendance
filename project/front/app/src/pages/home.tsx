@@ -139,8 +139,19 @@ const Add = () => {
 
 const Home = () => {
 	console.log('start home');
-	const jwt: string = jwtDecode('' + localStorage.getItem('jwtAuthorization'));
-	const [myId] = useState<string>(jwt.sub);
+
+	const navigate = useNavigate();
+	const [myId, setMyId] = useState<string>('');
+
+	useEffect(() => {
+		if (localStorage.getItem('jwtAuthorization') != null) {
+			const jwt_decode : any = jwtDecode('' + localStorage.getItem('jwtAuthorization'));
+			setMyId(jwt_decode.sub);
+		} else {
+			navigate('/error');
+		}
+	}, [navigate]);
+	
 
 	return (
 		<div className='home'>

@@ -93,8 +93,17 @@ const AddUserId = ({usersId, setUserId, channelId, channel}: AddUserIdProps) => 
 const InviteChannel = ({channel}: { channel: Channel }) => {
 	const dispatch = useDispatch();
 	const [usersId, setUserId] = useState<Array<string>>([]);
-	const jwt: string = jwtDecode('' + localStorage.getItem('jwtAuthorization'));
-	const [myId] = useState<string>(jwt.sub);
+	const navigate = useNavigate();
+	const [myId, setMyId] = useState<string>('');
+
+	useEffect(() => {
+		if (localStorage.getItem('jwtAuthorization') != null) {
+			const jwt_decode : any = jwtDecode('' + localStorage.getItem('jwtAuthorization'));
+			setMyId(jwt_decode.sub);
+		} else {
+			navigate('/error');
+		}
+	}, [navigate]);
 
 	useEffect(() => {
 		channel.users.map((element: User) => {
