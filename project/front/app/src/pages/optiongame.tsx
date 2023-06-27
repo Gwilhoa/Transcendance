@@ -35,18 +35,16 @@ const OptionGame = () => {
 	const playerstats = useSelector((state: RootState) => state.beginToOption.playerstate);
 	const id = useSelector((state: RootState) => state.beginToOption.gameid);
 	const gamestate = useSelector((state: RootState) => state.beginToOption.gamestate)
-	console.log(gamestate);
 	useEffect(() => {
 		if (id == null || gamestate != 1)
 			navigate('/home');
 		dispatch(setBeginStatus({decide: decide, playerstate: playerstats, gameid: id, gamestate: 2}));
 
-		socket.on("finish_game", (data) => {
+		socket.on("finish_game", () => {
 			navigate('/home')
 		})
 
-		socket.on('will_started', (data) => {
-			console.log(data);
+		socket.on('will_started', () => {
 			navigate('/game');
 		})
 
@@ -55,8 +53,6 @@ const OptionGame = () => {
 		}
 
 	}, [socket])
-
-	console.log('playerstats ' + playerstats + '\ndecide ' + decide);
 
 	const [nbBall, setNbBall] = useState(Ball1);
 	const [nbMap, setNbMap] = useState(Map1);

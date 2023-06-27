@@ -47,7 +47,6 @@ const OneScoreBlock = ({game, playerId}: { game: Game, playerId: string }) => {
 
 
 	useEffect(() => {
-		console.log('try it')
 		if (game.score2 > game.score1) {
 			setUserWinner(2);
 		}
@@ -169,15 +168,12 @@ const ListBlockScore = ({userId, username}: { userId: string, username: string }
 	}, [navigate]);
 
 	useEffect(() => {
-		console.log(process.env.REACT_APP_IP + ':3000/game/history/' + userId);
 		axios.get(process.env.REACT_APP_IP + ':3000/game/history/' + userId, {
 			headers: {
 				Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 			},
 		})
 			.then((response) => {
-				console.log('here response histo');
-				console.log(response);
 				setListGame(response.data);
 			})
 			.catch((error) => {
@@ -242,7 +238,6 @@ const History = () => {
 	}, [navigate, id]);
 
 	useEffect(() => {
-		console.log(id);
 		if (id != null) {
 			fetchDataUser(id);
 		}

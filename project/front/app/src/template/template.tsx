@@ -24,31 +24,26 @@ const Template = () => {
 
 
 	const confirmFriend = () => {
-		console.log('confirm friend')
 		socket.emit('friend_request', {friend_id: friendId, token: localStorage.getItem('jwtAuthorization')})
 	}
 
 	const rejectFriend = () => {
-		console.log('reject friend')
+		null
 	}
 
 
 	function confirmChallenge() {
-		console.log('confirm challenge')
 		socket.emit('challenge', {rival_id: rivalId, token: localStorage.getItem('jwtAuthorization')})
 	}
 
 	function rejectChallenge() {
-		console.log('reject challenge')
+		null
 	}
 
 	useEffect(() => {
-		console.log('bonjour je suis le template');
 		socket.on('receive_challenge', (data: any) => {
-			console.log(data);
 			if (data.code == 3) {
 				socket.on('game_found', (data) => {
-					console.log(data);
 					dispatch(setBeginStatus({
 						decide: data.decide,
 						playerstate: data.user,
@@ -68,16 +63,11 @@ const Template = () => {
 		});
 
 		socket.on('connection_error', (data: any) => {
-			console.log(data);
 			setErrorLocalStorage('unauthorized')
 			navigate('/error');
 		});
 
 		socket.on('notif_message', (data: any) => {
-			console.log(conversationId);
-			console.log(data.channel.id);
-			console.log(data);
-			console.log(conversationId == data.channel.id);
 			if (conversationId == data.channel.id)
 				return;
 			let newmessage = data.user.username + ' : ' + data.content;

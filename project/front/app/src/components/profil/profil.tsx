@@ -45,7 +45,6 @@ export default function Profil() {
 	const id = useSelector((state: RootState) => state.modal.id);
 	const dispatch = useDispatch();
 
-	console.log(id);
 	const refresh = useCallback((id: string | null) => {
 		axios.get(process.env.REACT_APP_IP + ':3000/auth/2fa/is2FA', {
 			headers: {
@@ -97,7 +96,6 @@ export default function Profil() {
 			headers: {Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,},
 		}).then((Response) => {
 			for (const request of Response.data) {
-				console.log(request);
 				if (request.sender.id === id) {
 					setHasFriendRequest(1);
 					return;
@@ -120,7 +118,6 @@ export default function Profil() {
 		axios.get(process.env.REACT_APP_IP + ':3000/user/friend/blocked', {
 			headers: {Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,},
 		}).then((Response) => {
-			console.log(Response.data);
 			for (const blocked of Response.data) {
 				if (blocked.id === id) {
 					setIsUserBlocked(true);
@@ -140,17 +137,14 @@ export default function Profil() {
 
 	useEffect(() => {
 		socket.on('block_code', (data) => {
-			console.log(data);
 			if (data.code == 2) {
 				setIsUserBlocked(true);
 			} else if (data.code == 3) {
 				setIsUserBlocked(false);
-			} else
-				console.log('error' + data.message);
+			}
 		})
 
 		socket.on('friend_code', (data: any) => {
-			console.log(data);
 			if (data.code === 2 && !isFriend) {
 				setIsFriend(!isFriend);
 				return;
@@ -161,9 +155,6 @@ export default function Profil() {
 
 
 		socket.on('friend_request', (data: any) => {
-			console.log('frend request :');
-			console.log(data);
-			console.log('friend request => ' + data.code);
 			if (data.id == id && (data.code == 2 || data.code == 7 || data.code == 5)) {
 				setIsFriend(!isFriend);
 			}
@@ -208,12 +199,10 @@ export default function Profil() {
 	}
 
 	const clicked = () => {
-		console.log('change clicked');
 		if (!checked) {
 			navigate('/CreateTwoFa');
 			dispatch(closeModal());
 		} else {
-			console.log('change clicked');
 			axios.get(process.env.REACT_APP_IP + ':3000/auth/2fa/disable', {
 				headers: {
 					Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
@@ -245,13 +234,11 @@ export default function Profil() {
 				},
 				data: formData,
 			})
-				.then((response) => {
-					console.log(response);
+				.then(() => {
 					change = true;
 					setErrorImageMessage('');
 				})
 				.catch((error) => {
-					console.log('err image')
 					if (error?.response?.status == 401
 						|| error?.response?.status == 500) {
 						setErrorLocalStorage('Error ' + error?.response?.status);
@@ -273,17 +260,14 @@ export default function Profil() {
 	};
 
 	const handleAddFriend = (id: string | null) => {
-		console.log('add friend ' + id);
 		socket.emit('friend_request', {friend_id: id, token: localStorage.getItem('jwtAuthorization')});
 	};
 
 	const handleUnFriend = (id: string | null) => {
-		console.log('add friend ' + id);
 		socket.emit('unfriend_request', {friend_id: id, token: localStorage.getItem('jwtAuthorization')});
 	};
 
 	const handlechallenge = (id: string | null) => {
-		console.log('challenge ' + id);
 		socket.emit('challenge', {rival_id: id, token: localStorage.getItem('jwtAuthorization')});
 	}
 

@@ -62,7 +62,6 @@ const AddUserId = ({usersId, setUserId}: AddUserIdProps) => {
 			},
 		})
 			.then((res) => {
-				console.log(res);
 				setListUser(res.data);
 			})
 			.catch((error) => {
@@ -90,7 +89,6 @@ const AddUserId = ({usersId, setUserId}: AddUserIdProps) => {
 	if (listUser == null || listUser.length == 0) {
 		return (null);
 	}
-	console.log(listUser);
 	return (
 		<div className='chat-users-list-add-user-by-id'>
 			{listUser.slice(0, 3).map((user) => (

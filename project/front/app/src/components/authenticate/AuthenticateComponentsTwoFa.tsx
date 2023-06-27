@@ -38,7 +38,6 @@ function AuthenticateComponentsTwoFa() {
 	const handleOnChange = (res: string) => {
 		setResult(res);
 		if (res.length === 6) {
-			console.log('result of input create 2fa ' + res);
 			axios.post(process.env.REACT_APP_IP + ':3000/auth/authenticate',
 				{
 					code: res
@@ -49,7 +48,6 @@ function AuthenticateComponentsTwoFa() {
 					},
 				})
 				.then((response) => {
-					console.log(response);
 					setCookieJwt(response.data.access_token);
 					localStorage.removeItem('tenMinToken');
 					navigate('/authenticate/waiting');

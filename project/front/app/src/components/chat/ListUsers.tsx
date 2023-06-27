@@ -29,7 +29,6 @@ const MakeAdmin = ({id, channel}: changeChannelProps) => {
 			admin_id: id,
 			token: localStorage.getItem('jwtAuthorization')
 		});
-		console.log('ON CLICK add admin');
 	};
 
 	return (
@@ -47,7 +46,6 @@ const DeleteAdmin = ({id, channel}: changeChannelProps) => {
 			admin_id: id,
 			token: localStorage.getItem('jwtAuthorization')
 		});
-		console.log('ON CLICK Delete admin');
 	};
 
 	return (
@@ -61,7 +59,6 @@ const BanHammer = ({id, channel}: changeChannelProps) => {
 
 	const handleClickBanHammer = () => {
 		socket.emit('ban_user', {channel_id: channel.id, ban_id: id, token: localStorage.getItem('jwtAuthorization')});
-		console.log('ON CLICK ban user');
 	};
 
 	return (
@@ -79,7 +76,6 @@ const UnBanHammer = ({id, channel}: changeChannelProps) => {
 			unban_id: id,
 			token: localStorage.getItem('jwtAuthorization')
 		});
-		console.log('unban user');
 	};
 
 	return (
@@ -97,7 +93,6 @@ const MuteButton = ({id, channel}: changeChannelProps) => {
 			mute_id: id,
 			token: localStorage.getItem('jwtAuthorization')
 		});
-		console.log('mute user');
 	};
 
 	return (
@@ -115,7 +110,6 @@ const UnMuteButton = ({id, channel}: changeChannelProps) => {
 			mute_id: id,
 			token: localStorage.getItem('jwtAuthorization')
 		});
-		console.log('mute user');
 	};
 
 	return (
@@ -184,10 +178,7 @@ const ListUser = ({channel}: listUserProps) => {
 		}
 	}, [navigate]);
 
-	console.log('hey')
-	console.log(channel);
 	const isMuted = (user: User, channel: Channel) => {
-		console.log(channel);
 		return channel.mutedUsers.some((banned) => banned.id === user.id);
 
 	}
