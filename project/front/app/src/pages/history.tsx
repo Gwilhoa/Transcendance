@@ -47,7 +47,6 @@ const OneScoreBlock = ({game, playerId}: { game: Game, playerId: string }) => {
 
 
 	useEffect(() => {
-		console.log('try it')
 		if (game.score2 > game.score1) {
 			setUserWinner(2);
 		}
@@ -88,7 +87,7 @@ const OneScoreBlock = ({game, playerId}: { game: Game, playerId: string }) => {
 				}
 			}
 		}
-	}, [playerId, game, myId, userWinner]);
+	}, [playerId, game, myId, userWinner, leftImage, rightImage, navigate]);
 
 	useEffect(() => {
 		axios.get(process.env.REACT_APP_IP + ':3000/user/image/' + playerId, {
@@ -101,7 +100,7 @@ const OneScoreBlock = ({game, playerId}: { game: Game, playerId: string }) => {
 				setLeftImage(data);
 			})
 			.catch((error) => {
-				setErrorLocalStorage('Error ' + error.response.status);
+				setErrorLocalStorage('Error ' + error?.response?.status);
 				console.error(error);
 				navigate('/Error');
 				return;
@@ -122,7 +121,7 @@ const OneScoreBlock = ({game, playerId}: { game: Game, playerId: string }) => {
 				setRightImage(data);
 			})
 			.catch((error) => {
-				setErrorLocalStorage('Error ' + error.response.status);
+				setErrorLocalStorage('Error ' + error?.response?.status);
 				console.error(error);
 				navigate('/Error');
 				return;
@@ -216,10 +215,10 @@ const ListBlockScore = ({userId, username}: { userId: string, username: string }
 const History = () => {
 	const navigate = useNavigate();
 	const [username, setUsername] = useState<string>('');
-	const {id} = useParams();
+	const [userId, setUserId] = useState<string>('');
 
 	const fetchDataUser = useCallback((userId: string) => {
-		if (id != null) {
+		if (userId != null) {
 			axios.get(process.env.REACT_APP_IP + ':3000/user/id/' + userId, {
 				headers: {
 					Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
@@ -239,16 +238,18 @@ const History = () => {
 		} else {
 			navigate('/home');
 		}
-	}, [navigate, id]);
+	}, [navigate, userId]);
 
+	const {id} = useParams();
 	useEffect(() => {
-		console.log(id);
+
 		if (id != null) {
 			fetchDataUser(id);
+			setUserId(id);
 		}
-	}, [id, navigate, fetchDataUser]);
+	}, [userId, navigate, fetchDataUser, id]);
 
-	if (id == '' || id == null) {
+	if (userId == '' || userId == null) {
 		return (null);
 	}
 	return (
@@ -260,7 +261,7 @@ const History = () => {
 				</div>
 			</header>
 			<div className='scrollBlock'>
-				<ListBlockScore userId={id} username={username}/>
+				<ListBlockScore userId={userId} username={username}/>
 			</div>
 		</div>
 	);
