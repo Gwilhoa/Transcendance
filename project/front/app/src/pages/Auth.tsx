@@ -20,7 +20,8 @@ function Auth() {
 					navigate('/home');
 				})
 				.catch(() => {
-					null
+					// eslint-disable-next-line @typescript-eslint/no-unused-expressions
+					null;
 				});
 		}
 	}, [navigate]);
