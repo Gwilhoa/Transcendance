@@ -102,6 +102,9 @@ export class EventsGateway
         wrongtoken(client, 'connection');
         return;
       }
+      if (id == null || getSocketFromId(id, getSockets(this.server)) != null) {
+        wrongtoken(client, 'connection');
+      }
       if (
         (await this.userService.changeStatus(id, UserStatus.CONNECTED)) == null
       ) {

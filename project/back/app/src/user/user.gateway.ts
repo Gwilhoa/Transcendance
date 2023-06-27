@@ -65,6 +65,9 @@ export class UserGateway implements OnGatewayInit {
     const friend = await this.userService.getUserById(friend_id);
     let ret;
     let friend_socket: Socket | null;
+    if (friend_id == user_id) {
+      return;
+    }
     if (friend != null) {
       friend_socket = getSocketFromId(friend_id, getSockets(this.server));
     }
@@ -140,7 +143,9 @@ export class UserGateway implements OnGatewayInit {
         user_id,
         friend_id,
       );
-      await this.channelService.deletechannel(mpchannel.id);
+      if (mpchannel != null) {
+        await this.channelService.deletechannel(mpchannel.id);
+      }
       client.emit('delete_channel', { id: mpchannel.id });
       client.emit('friend_code', {
         code: FriendCode.UNFRIEND_SUCCESS,
