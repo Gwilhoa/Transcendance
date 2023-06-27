@@ -51,7 +51,6 @@ const Template = () => {
 						gamestate: 1
 					}));
 					socket.emit('leave_matchmaking', {token: localStorage.getItem('jwtAuthorization')})
-					navigate("/home")
 					navigate("/optiongame")
 					socket.off('game_found')
 				});
