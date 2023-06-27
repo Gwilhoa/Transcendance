@@ -59,6 +59,8 @@ export class GameService {
       .leftJoinAndSelect('game.user2', 'user2')
       .where('game.id = :id', { id: id })
       .getOne();
+    await this.userService.changeStatus(game.user1.id, UserStatus.CONNECTED);
+    await this.userService.changeStatus(game.user2.id, UserStatus.CONNECTED);
     if (game == null) throw new Error('Game not found');
     if (game.finished == GameStatus.FINISHED)
       return await this.gameRepository.save(game);

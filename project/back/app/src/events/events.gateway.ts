@@ -67,11 +67,6 @@ export class EventsGateway
       return;
     }
     this.logger.log(`Client disconnected: ${id}`);
-    if ((await this.userService.changeStatus(id, UserStatus.OFFLINE)) == null) {
-      wrongtoken(client, 'connection');
-      this.clients = disconnect(id, this.clients);
-      this.sendconnected();
-    }
     this.clients = disconnect(id, this.clients);
     if (getKeys(this.ingame).includes(id)) {
       const game = await this.gameService.remakeGame(this.ingame.get(id));
@@ -82,8 +77,14 @@ export class EventsGateway
       const ingame = await this.games[game.id];
       this.ingame.delete(ingame.getUser1().data.id);
       this.ingame.delete(ingame.getUser2().data.id);
+      this.sendconnected();
       await ingame.remake();
       this.games.delete(game.id);
+    }
+    if ((await this.userService.changeStatus(id, UserStatus.OFFLINE)) == null) {
+      wrongtoken(client, 'connection');
+      this.clients = disconnect(id, this.clients);
+      this.sendconnected();
     }
     if (this.matchmaking.includes(client)) {
       this.matchmaking.splice(this.matchmaking.indexOf(client), 1);
@@ -129,6 +130,7 @@ export class EventsGateway
         client.join(channel.id);
       }
       this.logger.log(`Client connected: ${id}`);
+      this.sendconnected();
     });
   }
 
@@ -151,6 +153,7 @@ export class EventsGateway
       return;
     }
     let i = 0;
+    this.sendconnected();
     while (i < this.matchmaking.length) {
       const player = this.matchmaking[i];
       if (player.id == client.id) {
@@ -168,6 +171,7 @@ export class EventsGateway
     const send = {
       code: 0,
     };
+    this.sendconnected();
     client.emit('matchmaking_code', send);
     this.check_matchmaking();
   }
@@ -253,10 +257,10 @@ export class EventsGateway
       create_gameDTO.user2_id,
       UserStatus.IN_GAME,
     );
-    this.sendconnected();
     const create_game = await this.gameService.createGame(create_gameDTO);
     this.ingame.set(create_gameDTO.user1_id, create_game.id);
     this.ingame.set(create_gameDTO.user2_id, create_game.id);
+    this.sendconnected();
     const FirstDecide = Math.random() < 0.5;
     player.emit('game_found', {
       game_id: create_game.id,
@@ -469,6 +473,15 @@ export class EventsGateway
     if (game != null) {
       this.ingame.delete(client.data.id);
       this.ingame.delete(client.data.id);
+      await this.userService.changeStatus(
+        game.getUser1().data.id,
+        UserStatus.CONNECTED,
+      );
+      await this.userService.changeStatus(
+        game.getUser1().data.id,
+        UserStatus.CONNECTED,
+      );
+      this.sendconnected();
       game.remake();
     } else {
       this.ingame.delete(id);

@@ -99,8 +99,8 @@ const Template = () => {
 
 		return () => {
 			socket.off('receive_challenge');
+			socket.off('notif_message');
 			socket.off('connection_error');
-			socket.off('message');
 			socket.off('friend_request');
 		};
 	}, [navigate, conversationId, socket, dispatch, confirmChallenge, confirmFriend]);
