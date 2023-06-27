@@ -1,14 +1,21 @@
 import io from 'socket.io-client';
+import {useNavigate} from "react-router-dom";
 
 class SocketSingleton {
 	private static instance: SocketSingleton;
 	private socket;
+	private navigate = useNavigate();
+
 
 	private constructor() {
 		this.socket = io(process.env.REACT_APP_IP + ':3000', {
 			transports: ['websocket']
 		});
 		this.socket.on('connect', async () => {
+			this.socket.on('connection_error', (data) => {
+				console.log(data);
+				this.navigate('/error');
+			})
 			let jwtAuthorization = localStorage.getItem('jwtAuthorization');
 			while (!jwtAuthorization) {
 				await new Promise((resolve) => setTimeout(resolve, 100));
@@ -16,8 +23,6 @@ class SocketSingleton {
 			}
 			this.socket.emit('connection', {token: jwtAuthorization});
 		});
-
-
 	}
 
 	public static getInstance() {
