@@ -15,10 +15,6 @@ import jwtDecode from 'jwt-decode';
 
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
-socket.on('message_code', (data: any) => {
-	console.log(data);
-});
-
 
 const Add = () => {
 	const [listUser, setListUser] = useState<Array<IUser> | null>([]);
@@ -26,15 +22,11 @@ const Add = () => {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 
-	console.log('Add');
 	const searchUser = (useSelector((state: RootState) => state.searchUser.users));
 	useEffect(() => {
 		setListUser(searchUser);
 	}, [searchUser]);
 
-	console.log(listUser?.length);
-	if (listUser == null)
-		console.log('listUser null');
 	const refresh = useCallback(() => {
 		axios.get(process.env.REACT_APP_IP + ':3000/user/friend', {
 			headers: {
@@ -42,7 +34,6 @@ const Add = () => {
 			},
 		})
 			.then((res) => {
-				console.log(res);
 				setListUser(res.data);
 			})
 			.catch((error) => {
@@ -67,9 +58,7 @@ const Add = () => {
 			})
 
 			socket.on('friend_request', (data: any) => {
-				console.log('before code');
 				if (data.code == 2 || data.code == 7) {
-					console.log('refresh friend request');
 					refresh();
 					return;
 				}
@@ -89,14 +78,12 @@ const Add = () => {
 			<p className='home-no-friend'>Knowing how to enjoy your own company is an art. <span>Natasha Adamo</span>
 			</p>);
 	}
-	console.log(listUser);
 
 	const handleHistory = (id: string | null) => {
 		navigate('/history/' + id);
 	};
 
 	const handlechallenge = (id: string | null) => {
-		console.log('challenge ' + id);
 		socket.emit('challenge', {rival_id: id, token: localStorage.getItem('jwtAuthorization')});
 	}
 
@@ -138,8 +125,6 @@ const Add = () => {
 }
 
 const Home = () => {
-	console.log('start home');
-
 	const navigate = useNavigate();
 	const [myId, setMyId] = useState<string>('');
 

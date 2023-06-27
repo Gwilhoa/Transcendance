@@ -24,7 +24,7 @@ function AuthenticateComponentsTwoFa() {
 				})
 				.catch((error) => {
 					localStorage.removeItem('tenMinToken');
-					setErrorLocalStorage('Error ' + error.response.status);
+					setErrorLocalStorage('Error ' + error?.response?.status);
 					console.error(error);
 					navigate('/Error');
 				});
@@ -38,7 +38,6 @@ function AuthenticateComponentsTwoFa() {
 	const handleOnChange = (res: string) => {
 		setResult(res);
 		if (res.length === 6) {
-			console.log('result of input create 2fa ' + res);
 			axios.post(process.env.REACT_APP_IP + ':3000/auth/authenticate',
 				{
 					code: res
@@ -54,7 +53,7 @@ function AuthenticateComponentsTwoFa() {
 					navigate('/authenticate/waiting');
 				})
 				.catch((error) => {
-					if (error.response.status === 401) {
+					if (error?.response?.status === 401) {
 						setErrorLocalStorage('unauthorized');
 						navigate('/Error');
 					} else {

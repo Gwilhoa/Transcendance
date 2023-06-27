@@ -15,7 +15,6 @@ class SocketSingleton {
 				jwtAuthorization = localStorage.getItem('jwtAuthorization');
 			}
 			this.socket.emit('connection', {token: jwtAuthorization});
-			console.log('connected');
 		});
 
 

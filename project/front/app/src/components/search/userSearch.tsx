@@ -25,21 +25,15 @@ const Search = (
 		const res = event.target.value;
 		if (res.length === 0 && defaultAllUsers === false) {
 			dispatch(setUsersNull());
-			console.log('handleOnChange null');
 		} else {
-			console.log('handleOnChange');
-			console.log('emit: ' + res);
 			socket.emit('research_name', {name: res, token: localStorage.getItem('jwtAuthorization')});
 		}
 	};
 
 	useEffect(() => {
 		socket.on('research_name', (data: any) => {
-			console.log('research_name received my_id : ' + myId + 'user_id : ' + data.id);
 			const UsersWithoutYou = data.filter((user: IUser) => user.id !== myId);
 			dispatch(setUsers(UsersWithoutYou));
-			console.log('research_name');
-			console.log(data);
 		});
 
 		socket.on('new_user', (data: IUser) => {

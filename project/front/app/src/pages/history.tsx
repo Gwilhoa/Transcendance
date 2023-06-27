@@ -168,15 +168,12 @@ const ListBlockScore = ({userId, username}: { userId: string, username: string }
 	}, [navigate]);
 
 	useEffect(() => {
-		console.log(process.env.REACT_APP_IP + ':3000/game/history/' + userId);
 		axios.get(process.env.REACT_APP_IP + ':3000/game/history/' + userId, {
 			headers: {
 				Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 			},
 		})
 			.then((response) => {
-				console.log('here response histo');
-				console.log(response);
 				setListGame(response.data);
 			})
 			.catch((error) => {
@@ -242,7 +239,6 @@ const History = () => {
 
 	const {id} = useParams();
 	useEffect(() => {
-
 		if (id != null) {
 			fetchDataUser(id);
 			setUserId(id);

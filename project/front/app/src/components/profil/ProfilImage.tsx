@@ -67,7 +67,6 @@ export const ProfilImage = ({id, OnClickOpenProfil, OverwriteClassName}: {
 			});
 
 		socket.on('connection_server', (data: any) => {
-			console.log(data);
 			for (const ingame_id of data.ingame) {
 				if (ingame_id == id) {
 					setUserStatus('profil-status-in-game');
@@ -75,9 +74,7 @@ export const ProfilImage = ({id, OnClickOpenProfil, OverwriteClassName}: {
 				}
 			}
 			for (const connected_id of data.connected) {
-				console.log(connected_id + ' ' + id);
 				if (connected_id == id) {
-					console.log('connected')
 					setUserStatus('profil-status-connected');
 					return;
 				}
