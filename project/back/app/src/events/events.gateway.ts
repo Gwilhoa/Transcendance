@@ -449,7 +449,7 @@ export class EventsGateway
     }
   }
 
-  @SubscribeMessage('disconnect_socket')
+  @SubscribeMessage('logout')
   async disconnect_socket(client: Socket, payload: any) {
     client.disconnect();
   }
