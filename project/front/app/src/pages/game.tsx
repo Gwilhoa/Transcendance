@@ -92,7 +92,6 @@ const Game: React.FC<GameProps> = () => {
 
 	const leaveGame = () => {
 		socket.emit("leave_game", {token: localStorage.getItem('jwtAuthorization')})
-		// window.location.reload()
 		navigate('/home');
 	}
 
