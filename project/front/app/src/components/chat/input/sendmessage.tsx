@@ -1,6 +1,7 @@
 import '../css/sendMessageBar.css'
-import React, {Dispatch, SetStateAction, useState} from 'react'
+import React, {Dispatch, SetStateAction, useEffect, useState} from 'react'
 import SocketSingleton from '../../../socket';
+import Messages from '../conversation/message';
 
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
@@ -16,8 +17,16 @@ const SendMessage = ({
 	setPostMessage: Dispatch<SetStateAction<boolean>>,
 	postMessage: boolean,
 }) => {
+	const [oldId, setOldId] = useState<string>('');
 	const [message, setMessage] = useState<string>('');
 	const [timer, setTimer] = useState<boolean>(false);
+
+	useEffect(() => {
+		if (conversation != oldId) {
+			setOldId(conversation);
+			setMessage('');
+		}	
+	}, [conversation]);
 
 	const handleSendMessage = () => {
 		if (message.length < 1)
