@@ -41,7 +41,6 @@ const AddUserId = ({usersId, setUserId, channelId, channel}: AddUserIdProps) => 
 			},
 		})
 			.then((res) => {
-				console.log(res);
 				setListUser(res.data);
 			})
 			.catch((error) => {
@@ -74,7 +73,6 @@ const AddUserId = ({usersId, setUserId, channelId, channel}: AddUserIdProps) => 
 	if (listUser == null || listUser.length == 0) {
 		return (null);
 	}
-	console.log(listUser);
 	return (
 		<div className='chat-channel-invite-add-user-by-id'>
 			{listUser.slice(0, 6).map((user) => (

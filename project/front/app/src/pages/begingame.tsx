@@ -31,11 +31,9 @@ const BeginGame = () => {
 	useEffect(() => {
 
 		socket.on('matchmaking_code', (data: any) => {
-			console.log(data)
 			if (!gamefound.current)
 				return;
 			if (data.code === 0) {
-				console.log('enter matchmaking successfull');
 				gamefound.current = true;
 			} else {
 				navigate("/home");
@@ -44,7 +42,6 @@ const BeginGame = () => {
 		});
 
 		socket.on('game_found', (data) => {
-			console.log(data);
 			dispatch(setBeginStatus({decide: data.decide, playerstate: data.user, gameid: data.game_id, gamestate: 1}));
 			socket.emit('leave_matchmaking')
 			navigate("/optiongame")

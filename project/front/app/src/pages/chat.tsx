@@ -127,7 +127,6 @@ function Chat() {
 					Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 				},
 			});
-			console.log(response.data);
 			setListAvailableChannel(response.data);
 		} catch (error: any) {
 			console.error(error);
@@ -144,7 +143,6 @@ function Chat() {
 					Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 				},
 			});
-			console.log(response);
 			setListChannel(response.data);
 		} catch (error) {
 			console.error(error);
@@ -161,7 +159,6 @@ function Chat() {
 					Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 				},
 			});
-			console.log(response);
 			if (response.status === 204) {
 				setMessages([]);
 			} else {
@@ -194,16 +191,12 @@ function Chat() {
 	}, [isOpenListUserChannel, dispatch, conversationId, listChannel]);
 
 	const handleResearchChannel = useCallback((data: any) => {
-		console.log('research_channel');
-		console.log(data);
 		if (!data.channels || data.channels.length == 0)
 			return;
 		setListAvailableChannel(data.channels);
 	}, []);
 
 	const handleUpdateUserChannel = useCallback((data: any) => {
-		console.log('user_update');
-		console.log(data);
 		if (data.code === 0) {
 			setListChannel((prevListChannel) => {
 				let channelExists = false;
@@ -211,8 +204,6 @@ function Chat() {
 				const updatedListChannel = prevListChannel.map((itemChannel) => {
 					if (itemChannel.id === data.channel.id) {
 						channelExists = true;
-						console.log('updated channel');
-						console.log(data.channel);
 						return data.channel;
 					}
 					return itemChannel;
@@ -233,8 +224,6 @@ function Chat() {
 	}, [updateChannel]);
 
 	const handleJoinChannel = useCallback((channel_id: string) => {
-		console.log('join_channel');
-		console.log(password.get(channel_id));
 		if (password.get(channel_id)) {
 			socket.emit('join_channel', {
 				channel_id: channel_id,
@@ -246,11 +235,6 @@ function Chat() {
 			socket.emit('join_channel', {channel_id: channel_id, token: localStorage.getItem('jwtAuthorization')});
 		}
 	}, [password]);
-
-	const handleUserCode = useCallback((data: any) => {
-		console.log('user_join');
-		console.log(data);
-	}, []);
 
 	const handleMessage = useCallback((data: any) => {
 		if (data.channel.id == conversationId) {
@@ -274,7 +258,6 @@ function Chat() {
 	}, [conversationId]);
 
 	const handleMessageCode = useCallback((data: any) => {
-		console.log(data);
 		setSendMessage(false);
 		if (data.code == 3) {
 			setErrorPostMessage(data.message);
@@ -285,8 +268,6 @@ function Chat() {
 	}, []);
 
 	const handleDeleteChannel = useCallback((data: any) => {
-		console.log('delete channel');
-		console.log(data);
 		if (conversationId == data.id) {
 			setConversationId('');
 			dispatch(closeChatModalListUser());
@@ -297,10 +278,7 @@ function Chat() {
 	}, [conversationId, dispatch]);
 
 	const handleUpdateChannel = useCallback((data: any) => {
-		console.log('update_channel');
-		console.log(data);
 		if (data.code == 0) {
-			console.log('HEY I CHANGE NAME : ' + data?.channel_id + " :" + conversationId);
 			setListChannel((prevListChannel) =>
 				prevListChannel.map((itemChannel) => {
 					if (itemChannel.id === data.channel_id) {
@@ -320,7 +298,6 @@ function Chat() {
 		fetchAvailableChannel();
 
 		socket.on('update_user_channel', handleUpdateUserChannel);
-		socket.on('user_join', handleUserCode);
 		socket.on('research_channel', handleResearchChannel);
 
 		return () => {
@@ -328,11 +305,10 @@ function Chat() {
 			socket.off('user_join');
 			socket.off('research_channel');
 		}
-	}, [fetchListChannel, handleUpdateUserChannel, handleUserCode, handleResearchChannel]);
+	}, [fetchListChannel, handleUpdateUserChannel, handleResearchChannel]);
 	useEffect(() => {
 		fetchListMessage();
 		findChannel();
-		console.log('change channel');
 
 		socket.on('join_channel', handleJoinChannel);
 		socket.on('message', handleMessage);
@@ -355,7 +331,6 @@ function Chat() {
 	]);
 
 	useEffect(() => {
-		console.log('change conversation ' + conversationId);
 		setChannelId(conversationId);
 	}, [conversationId, dispatch]);
 

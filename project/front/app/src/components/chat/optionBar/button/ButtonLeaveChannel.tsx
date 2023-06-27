@@ -6,7 +6,6 @@ const socket = socketInstance.getSocket();
 const ButtonLeaveChannel = ({channelId}: { channelId: string }) => {
 
 	function leaveChannel() {
-		console.log('leave channel');
 		socket.emit('leave_channel', {token: localStorage.getItem('jwtAuthorization'), channel_id: channelId});
 	}
 

@@ -9,7 +9,6 @@ import ErrorToken from '../components/IfError';
 
 
 const EndGame = () => {
-	console.log("je suis la !!!");
 	const myrevengeRef = useRef(false);
 	const [revenge, setRevenge] = useState(false);
 	const [myrevenge, setMyrevenge] = useState(false);
@@ -22,7 +21,6 @@ const EndGame = () => {
 
 	useEffect(() => {
 		return () => {
-			console.log("unmount revenge : " + myrevenge);
 			if (!myrevengeRef.current)
 				socket.emit('game_finished', {rematch: false, token: localStorage.getItem('jwtAuthorization')});
 		};
@@ -48,13 +46,11 @@ const EndGame = () => {
 	useEffect(() => {
 
 		socket.on('game_found', (data) => {
-			console.log(data);
 			dispatch(setBeginStatus({decide: data.decide, playerstate: data.user, gameid: data.game_id, gamestate: 1}));
 			navigate("/optiongame")
 		});
 
 		socket.on('rematch', (any: { rematch: any; }) => {
-			console.log("rematch");
 			const rematch = any.rematch;
 			if (rematch) {
 				if (myrevenge) {
