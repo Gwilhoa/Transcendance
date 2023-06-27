@@ -119,6 +119,18 @@ const UnMuteButton = ({id, channel}: changeChannelProps) => {
 	);
 }
 
+const KickUser = ({id, channel}: changeChannelProps) => {
+	const handleClickKicUser = () => {
+		console.log('kick user');
+		socket.emit('kick_user', {channel_id: channel.id, kick_id: id, token: localStorage.getItem('jwtAuthorization')});
+	};
+	
+	return (
+		<div className='chat-list-users-button-ban-hammer' onClick={handleClickKicUser}>
+			Kick
+		</div>
+	);
+};
 
 const ListAdmin = ({channel}: listUserProps) => {
 	const dispatch = useDispatch();
@@ -206,6 +218,7 @@ const ListUser = ({channel}: listUserProps) => {
 									) : (
 										<MuteButton id={user.id} channel={channel}/>
 									)}
+									<KickUser id={user.id} channel={channel}/>
 								</div>
 								:
 								null
@@ -247,6 +260,7 @@ const ListBannedUser = ({channel}: listUserProps) => {
 						{isAdmin(channel, '' + myId) && !isMe(user, '' + myId) ?
 							<div className='chat-list-users-buttons-user'>
 								<UnBanHammer id={user.id} channel={channel}/>
+								<KickUser id={user.id} channel={channel}/>
 							</div>
 							:
 							null}
