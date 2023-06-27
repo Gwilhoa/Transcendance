@@ -4,7 +4,6 @@ import {useNavigate} from "react-router-dom";
 class SocketSingleton {
 	private static instance: SocketSingleton;
 	private socket;
-	private navigate = useNavigate();
 
 
 	private constructor() {
@@ -12,15 +11,14 @@ class SocketSingleton {
 			transports: ['websocket']
 		});
 		this.socket.on('connect', async () => {
-			this.socket.on('connection_error', (data) => {
-				console.log(data);
-				this.navigate('/error');
-			})
 			let jwtAuthorization = localStorage.getItem('jwtAuthorization');
 			while (!jwtAuthorization) {
 				await new Promise((resolve) => setTimeout(resolve, 100));
 				jwtAuthorization = localStorage.getItem('jwtAuthorization');
 			}
+			this.socket.on('connection_error', (data) => {
+				localStorage.removeItem('jwtAuthorization');
+			})
 			this.socket.emit('connection', {token: jwtAuthorization});
 		});
 	}

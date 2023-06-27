@@ -31,10 +31,9 @@ const Head = () => {
 		navigate('/history/' + myId);
 	};
 
-	const handleGame = () => {
+	const setData = () => {
 		dispatch(setBeginStatus({gamestate: 10}));
-		navigate('/begingame')
-	};
+	}
 
 	return (
 		<div className='navbar'>
@@ -48,9 +47,9 @@ const Head = () => {
 				<button onClick={() => handleChat()} className='navbar__link'>
 					Chat
 				</button>
-				<button className='navbar__link' onClick={() => handleGame}>
+				<Link to="/begingame" className="navbar__link" onClick={setData}>
 					Game
-				</button>
+				</Link>
 				<button onClick={() => handleHisto()} className='navbar__link'>
 					History
 				</button>
