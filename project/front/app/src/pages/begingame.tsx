@@ -43,7 +43,7 @@ const BeginGame = () => {
 		});
 
 		socket.on('game_found', (data) => {
-			dispatch(closeModal());
+			// dispatch(closeModal());
 			dispatch(setBeginStatus({decide: data.decide, playerstate: data.user, gameid: data.game_id, gamestate: 1}));
 			socket.emit('leave_matchmaking')
 			navigate("/optiongame")
