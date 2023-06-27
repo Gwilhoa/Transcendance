@@ -25,7 +25,7 @@
     height: calc(100% - var(--search-bar-height));
 }
 
-.chat-error-get-message{
+.chat-error-get-message {
     grid-column-start: 2;
 }
 
@@ -73,7 +73,7 @@ pre {
     white-space: pre-wrap;
 }
 
-.chat-content-message{
+.chat-content-message {
     font-size: 1.125rem;
     opacity: 0.8;
     word-break: break-all;

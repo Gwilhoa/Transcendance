@@ -15,10 +15,7 @@ import {
 } from '../utils/socket.function';
 import { FriendCode } from '../utils/requestcode.enum';
 import { ChannelService } from '../channel/channel.service';
-import { addAdminDto } from '../dto/add-admin.dto';
 import { AuthService } from '../auth/auth.service';
-import {MpCreateDto} from "../dto/mp-create.dto";
-import {CreateChannelDto} from "../dto/create-channel.dto";
 
 @WebSocketGateway()
 export class UserGateway implements OnGatewayInit {
@@ -48,7 +45,6 @@ export class UserGateway implements OnGatewayInit {
     const user_id = client.data.id;
     this.logger.log('research_name + ' + user_id);
     const users = await this.userService.getUserBySimilarNames(name, user_id);
-    console.log(users);
     client.emit('research_name', users);
   }
 
@@ -69,6 +65,9 @@ export class UserGateway implements OnGatewayInit {
     const friend = await this.userService.getUserById(friend_id);
     let ret;
     let friend_socket: Socket | null;
+    if (friend_id == user_id) {
+      return;
+    }
     if (friend != null) {
       friend_socket = getSocketFromId(friend_id, getSockets(this.server));
     }
@@ -82,11 +81,11 @@ export class UserGateway implements OnGatewayInit {
       };
     } else if (await this.userService.asfriendrequestby(user_id, friend_id)) {
       await this.userService.removeFriendRequest(user_id, friend_id);
-      this.logger.debug('friend id : ' + friend_id);
       if (friend_socket != null) {
         send = {
           code: FriendCode.NEW_FRIEND,
           id: user_id,
+          username: user.username,
         };
         friend_socket.emit('friend_notif', send);
         friend_socket.emit('friend_request', send);
@@ -112,18 +111,17 @@ export class UserGateway implements OnGatewayInit {
         user_id,
         friend_id,
       );
-      this.logger.debug('friend id : ' + friend_id);
       if (friend_socket != null) {
         send = {
           code: FriendCode.FRIEND_REQUEST,
           id: user.id,
           request: requestFriend.id,
+          username: user.username,
         };
         friend_socket.emit('friend_notif', send);
         friend_socket.emit('friend_request', send);
       }
     }
-    this.logger.debug(`friend request code: ${ret.code}`);
     client.emit('friend_code', ret);
   }
 
@@ -145,7 +143,9 @@ export class UserGateway implements OnGatewayInit {
         user_id,
         friend_id,
       );
-      await this.channelService.deletechannel(mpchannel.id);
+      if (mpchannel != null) {
+        await this.channelService.deletechannel(mpchannel.id);
+      }
       client.emit('delete_channel', { id: mpchannel.id });
       client.emit('friend_code', {
         code: FriendCode.UNFRIEND_SUCCESS,

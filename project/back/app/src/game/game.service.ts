@@ -40,14 +40,14 @@ export class GameService {
     await this.userService.changeStatus(game.user1.id, UserStatus.CONNECTED);
     await this.userService.changeStatus(game.user2.id, UserStatus.CONNECTED);
     if (score1 > score2) {
-      await this.userService.endgame(game.user1.id, true);
-      await this.userService.endgame(game.user2.id, false);
-    } else {
       await this.userService.endgame(game.user1.id, false);
       await this.userService.endgame(game.user2.id, true);
+    } else {
+      await this.userService.endgame(game.user1.id, true);
+      await this.userService.endgame(game.user2.id, false);
     }
-    game.score1 = score1;
-    game.score2 = score2;
+    game.score1 = score2;
+    game.score2 = score1;
     game.finished = GameStatus.FINISHED;
     return await this.gameRepository.save(game);
   }
@@ -59,6 +59,8 @@ export class GameService {
       .leftJoinAndSelect('game.user2', 'user2')
       .where('game.id = :id', { id: id })
       .getOne();
+    await this.userService.changeStatus(game.user1.id, UserStatus.CONNECTED);
+    await this.userService.changeStatus(game.user2.id, UserStatus.CONNECTED);
     if (game == null) throw new Error('Game not found');
     if (game.finished == GameStatus.FINISHED)
       return await this.gameRepository.save(game);

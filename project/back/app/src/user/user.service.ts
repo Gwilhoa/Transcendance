@@ -30,9 +30,7 @@ export class UserService {
   ) {}
 
   public async getPathImage(id: string) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const fs = require('fs');
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const path = require('path');
     const imageDir = path.join(__dirname, '..', '..', '..', 'images');
     const files = await fs.promises.readdir(imageDir);
@@ -118,7 +116,6 @@ export class UserService {
       login = retUser.login + nbr;
       nbr++;
     }
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const fs = require('fs');
     const user = new User();
     user.status = UserStatus.IN_CONNECTION;
@@ -160,8 +157,6 @@ export class UserService {
         ])
         .where('user.id = :id', { id: id })
         .getOne();
-
-      console.log(userWithSecret);
       return userWithSecret;
     }
 
@@ -277,7 +272,8 @@ export class UserService {
       .leftJoinAndSelect('channels.admins', 'admins')
       .leftJoinAndSelect('channels.creator', 'creator')
       .leftJoinAndSelect('channels.bannedUsers', 'bannedUsers')
-      .leftJoinAndSelect('channels.mutedUser', 'mutedUser')
+      .leftJoinAndSelect('channels.mutedUsers', 'mutedUsers')
+      .leftJoinAndSelect('mutedUsers.mutedUser', 'mutedUser')
       .where('user.id = :id', { id })
       .getOne();
     if (!user) {
@@ -582,8 +578,6 @@ export class UserService {
       isauth: isauth,
       enabled2FA: check2FA,
     };
-    // const payload = { sub: parseInt(userId), isauth: isauth ,enabled2FA: 1};
-
     return {
       access_token: await this.jwt.signAsync(payload, {
         expiresIn: expiresTime,

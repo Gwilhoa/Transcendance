@@ -1,22 +1,27 @@
 import './template.css'
 import {Link, useNavigate} from 'react-router-dom';
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {useDispatch} from 'react-redux';
-import {openModal} from '../redux/modal/modalSlice';
+import {closeModal, openModal} from '../redux/modal/modalSlice';
 import {setBeginStatus} from "../redux/game/beginToOption";
 import jwtDecode from 'jwt-decode';
+import {setChannelId} from "../redux/conversationId/conversationId";
 
 
 const Head = () => {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
-	const jwt: string = jwtDecode(''+localStorage.getItem('jwtAuthorization')) ;
-	const [id] = useState<string>(jwt.sub);
-
-	console.log(id);
-
-	const handleOpenModal = (id: string | null) => {
-		dispatch(openModal(id));
+	const [myId, setMyId] = useState<string>('');
+	useEffect(() => {
+		if (localStorage.getItem('jwtAuthorization') != null) {
+			const jwt: any = jwtDecode('' + localStorage.getItem('jwtAuthorization'));
+			setMyId(jwt.sub);
+		} else {
+			navigate('/error');
+		}
+	}, [navigate]);
+	const handleOpenModal = (myId: string | null) => {
+		dispatch(openModal(myId));
 	};
 
 	const handleChat = () => {
@@ -24,17 +29,19 @@ const Head = () => {
 	};
 
 	const handleHisto = () => {
-		navigate('/history/' + id);
+		dispatch(setChannelId(''));
+		navigate('/history/' + myId);
 	};
 
 	const setData = () => {
+		dispatch(setChannelId(''));
 		dispatch(setBeginStatus({gamestate: 10}));
 	}
 
 	return (
 		<div className='navbar'>
 			<div className='navbar__link'>
-				<Link to='/home' className='transcendance-link'>
+				<Link to='/home' className='transcendance-link' onClick={() => dispatch(setChannelId(''))}>
 					Transcendence
 				</Link>
 			</div>
@@ -49,7 +56,7 @@ const Head = () => {
 				<button onClick={() => handleHisto()} className='navbar__link'>
 					History
 				</button>
-				<button onClick={() => handleOpenModal(id)} className='navbar__link'>
+				<button onClick={() => handleOpenModal(myId)} className='navbar__link'>
 					Profil
 				</button>
 			</div>

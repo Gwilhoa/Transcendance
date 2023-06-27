@@ -13,9 +13,9 @@ import SocketSingleton from '../socket';
 import ModifyChannel from "../components/chat/modifyChannel/ModifyChannel";
 import ListUserChannel from '../components/chat/ListUsers';
 import axios from 'axios';
-import {cookies} from '../App';
 import {useNavigate} from 'react-router-dom';
-import { closeChatModalListUser, switchChatModalListUser } from '../redux/chat/modalChatSlice';
+import {closeChatModalListUser, switchChatModalListUser} from '../redux/chat/modalChatSlice';
+import {setChannelId} from "../redux/conversationId/conversationId";
 
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
@@ -39,7 +39,7 @@ export interface Channel {
 	users: Array<User>;
 	admins: Array<User>;
 	bannedUsers: Array<User>;
-	mutedUser: Array<User>;
+	mutedUsers: Array<any>;
 }
 
 export interface Message {
@@ -73,15 +73,15 @@ export const initialChannelState: Channel = {
 	creator: initialUserState,
 	admins: [],
 	bannedUsers: [],
-	mutedUser: [],
+	mutedUsers: [],
 }
 
 export const isAdmin = (channel: Channel, userId: string) => {
-		return (channel.admins.some((admin) => admin.id === userId));
+	return (channel.admins.some((admin) => admin.id === userId));
 };
 
 export const isBan = (channel: Channel, userId: User) => {
-		return (channel.bannedUsers.some((banned) => banned.id === userId.id));
+	return (channel.bannedUsers.some((banned) => banned.id === userId.id));
 };
 
 export const isMe = (user: User, myId: string) => {
@@ -94,6 +94,7 @@ const updateAvailableChannel = (input: string) => {
 	}
 	socket.emit('research_channel', {search: input, token: localStorage.getItem('jwtAuthorization')})
 }
+
 ////////////////////////// CHAT ///////////////////////////////////////////////
 function Chat() {
 	const isOpenSideBar = useSelector((state: RootState) => state.modalChat.isOpenSideBar);
@@ -119,14 +120,13 @@ function Chat() {
 
 	const [password] = useState<Map<string, string>>(new Map());
 ////////////////////////// FETCH DATA /////////////////////////////////////////
-	const fetchAvailableChannel = async () => {
+	const fetchAvailableChannel = useCallback(async () => {
 		try {
 			const response = await axios.get(process.env.REACT_APP_IP + ':3000/channel/available', {
 				headers: {
 					Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 				},
 			});
-			console.log(response.data);
 			setListAvailableChannel(response.data);
 		} catch (error: any) {
 			console.error(error);
@@ -135,15 +135,14 @@ function Chat() {
 				navigate('/Error');
 			}
 		}
-	}
-	const fetchListChannel = useCallback( async () => {
+	}, [navigate]);
+	const fetchListChannel = useCallback(async () => {
 		try {
 			const response = await axios.get(process.env.REACT_APP_IP + ':3000/user/channels', {
 				headers: {
 					Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 				},
 			});
-			console.log(response);
 			setListChannel(response.data);
 		} catch (error) {
 			console.error(error);
@@ -160,7 +159,6 @@ function Chat() {
 					Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 				},
 			});
-			console.log(response);
 			if (response.status === 204) {
 				setMessages([]);
 			} else {
@@ -183,7 +181,7 @@ function Chat() {
 			if (isOpenListUserChannel) {
 				dispatch(switchChatModalListUser());
 			}
-			return ;
+			return;
 		}
 		listChannel.map((itemChannel) => {
 			if (itemChannel.id == conversationId) {
@@ -193,16 +191,12 @@ function Chat() {
 	}, [isOpenListUserChannel, dispatch, conversationId, listChannel]);
 
 	const handleResearchChannel = useCallback((data: any) => {
-		console.log('research_channel');
-		console.log(data);
 		if (!data.channels || data.channels.length == 0)
 			return;
 		setListAvailableChannel(data.channels);
 	}, []);
 
 	const handleUpdateUserChannel = useCallback((data: any) => {
-		console.log('user_update');
-		console.log(data);
 		if (data.code === 0) {
 			setListChannel((prevListChannel) => {
 				let channelExists = false;
@@ -210,8 +204,6 @@ function Chat() {
 				const updatedListChannel = prevListChannel.map((itemChannel) => {
 					if (itemChannel.id === data.channel.id) {
 						channelExists = true;
-						console.log('updated channel');
-						console.log(data.channel);
 						return data.channel;
 					}
 					return itemChannel;
@@ -219,8 +211,7 @@ function Chat() {
 
 				if (channelExists) {
 					return updatedListChannel;
-				} 
-				else {
+				} else {
 					setConversationId(data.channel.id);
 					return [...updatedListChannel, data.channel];
 				}
@@ -233,20 +224,17 @@ function Chat() {
 	}, [updateChannel]);
 
 	const handleJoinChannel = useCallback((channel_id: string) => {
-		console.log('join_channel');
-		console.log(password.get(channel_id));
 		if (password.get(channel_id)) {
-			socket.emit('join_channel', {channel_id: channel_id, password: password.get(channel_id), token: localStorage.getItem('jwtAuthorization')});
+			socket.emit('join_channel', {
+				channel_id: channel_id,
+				password: password.get(channel_id),
+				token: localStorage.getItem('jwtAuthorization')
+			});
 			return;
 		} else {
 			socket.emit('join_channel', {channel_id: channel_id, token: localStorage.getItem('jwtAuthorization')});
 		}
 	}, [password]);
-
-	const handleUserCode = useCallback((data: any) => {
-		console.log('user_join');
-		console.log(data);
-	}, []);
 
 	const handleMessage = useCallback((data: any) => {
 		if (data.channel.id == conversationId) {
@@ -270,7 +258,6 @@ function Chat() {
 	}, [conversationId]);
 
 	const handleMessageCode = useCallback((data: any) => {
-		console.log(data);
 		setSendMessage(false);
 		if (data.code == 3) {
 			setErrorPostMessage(data.message);
@@ -281,8 +268,6 @@ function Chat() {
 	}, []);
 
 	const handleDeleteChannel = useCallback((data: any) => {
-		console.log('delete channel');
-		console.log(data);
 		if (conversationId == data.id) {
 			setConversationId('');
 			dispatch(closeChatModalListUser());
@@ -293,10 +278,7 @@ function Chat() {
 	}, [conversationId, dispatch]);
 
 	const handleUpdateChannel = useCallback((data: any) => {
-		console.log('update_channel');
-		console.log(data);
 		if (data.code == 0) {
-			console.log('HEY I CHANGE NAME : ' + data?.channel_id + " :" + conversationId);
 			setListChannel((prevListChannel) =>
 				prevListChannel.map((itemChannel) => {
 					if (itemChannel.id === data.channel_id) {
@@ -316,19 +298,19 @@ function Chat() {
 		fetchAvailableChannel();
 
 		socket.on('update_user_channel', handleUpdateUserChannel);
-		socket.on('user_join', handleUserCode);
 		socket.on('research_channel', handleResearchChannel);
 
 		return () => {
 			socket.off('update_user_channel');
-			socket.off('user_join');
 			socket.off('research_channel');
 		}
-	}, [fetchListChannel, handleUpdateUserChannel, handleUserCode, handleResearchChannel]);
+	}, [fetchListChannel, handleUpdateUserChannel, handleResearchChannel, fetchAvailableChannel]);
 	useEffect(() => {
 		fetchListMessage();
 		findChannel();
-		console.log('change channel');
+		if (conversationId == '') {
+			dispatch(closeChatModalListUser());
+		}
 
 		socket.on('join_channel', handleJoinChannel);
 		socket.on('message', handleMessage);
@@ -344,61 +326,65 @@ function Chat() {
 			socket.off('message_code');
 			setErrorPostMessage('');
 		};
-	},[conversationId, updateChannel, fetchListChannel, listChannel, 
-		handleJoinChannel, handleMessage, handleDeleteChannel, 
+	}, [conversationId, updateChannel, fetchListChannel, listChannel,
+		handleJoinChannel, handleMessage, handleDeleteChannel,
 		findChannel, fetchListMessage, handleUpdateChannel,
-		handleMessageCode
+		handleMessageCode, dispatch
 	]);
+
+	useEffect(() => {
+		dispatch(setChannelId(conversationId));
+	}, [conversationId, dispatch])
 
 	return (
 		<>
 
-		<div className='chatPage'>
-			<ErrorToken/>
-			<OptionBar setId={setConversationId}/>
-			{isOpenSideBar && (<SideBarChat
-				listChannel={listChannel}
-				setConversationId={setConversationId}
-			/>)}
-			{isOpenCreateChannel && (<CreateChannel/>)}
-			{isOpenInviteChannel && (<InviteChannel channel={channel}/>)}
-			{isOpenUpdateChannel && (<ModifyChannel channel={channel}/>)}
-			{conversationId != '' ? (
-			<div className='chat-right-page'>
+			<div className='chatPage'>
+				<ErrorToken/>
+				<OptionBar setId={setConversationId}/>
+				{isOpenSideBar && (<SideBarChat
+					listChannel={listChannel}
+					setConversationId={setConversationId}
+				/>)}
+				{isOpenCreateChannel && (<CreateChannel/>)}
+				{isOpenInviteChannel && (<InviteChannel channel={channel}/>)}
+				{isOpenUpdateChannel && (<ModifyChannel channel={channel}/>)}
+				{conversationId != '' ? (
+					<div className='chat-right-page'>
 
-				<Conversation
-					listMessages={messages}
-					channel={channel}
-					errorGetMessage={errorGetMessage}
-				/>
-				<SendMessage
-					conversation={conversationId}
-					errorPostMessage={errorPostMessage}
-					setPostMessage={setSendMessage}
-					postMessage={sendMessage}
-				/>
+						<Conversation
+							listMessages={messages}
+							channel={channel}
+							errorGetMessage={errorGetMessage}
+						/>
+						<SendMessage
+							conversation={conversationId}
+							errorPostMessage={errorPostMessage}
+							setPostMessage={setSendMessage}
+							postMessage={sendMessage}
+						/>
+					</div>
+				) : (
+					<div className='chat-page-channel'>
+						<h1>Channels disponible</h1>
+						<input className='chat-page-channels-input' placeholder='Search channel' onChange={(e) => updateAvailableChannel(e.target.value)}/>
+						{listAvailableChannel.length > 0 ? (
+							listAvailableChannel.map((itemChannel) => (
+								<div className='chat-page-channels-channel' key={itemChannel.id}>
+									<p>{itemChannel.name}</p>
+									{itemChannel.type == 2 ? (
+										<input className='chat-page-channel-password-input' type='password' placeholder='Password' onChange={event => password.set(itemChannel.id, event.target.value)}/>
+									) : null
+									}
+									<button onClick={() => handleJoinChannel(itemChannel.id)}>Join</button>
+								</div>
+							))
+						) : null
+						}
+					</div>
+				)}
+				{isOpenListUserChannel && (<ListUserChannel channel={channel}/>)}
 			</div>
-			) : (
-				<div className='chat-page-channel'>
-					<h1>Channels disponible</h1>
-					<input className='chat-page-channels-input' placeholder='Search channel' onChange={(e) => updateAvailableChannel(e.target.value)}/>
-					{ listAvailableChannel.length > 0 ? (
-						listAvailableChannel.map((itemChannel) => (
-							<div className='chat-page-channels-channel' key={itemChannel.id}>
-								<p>{itemChannel.name}</p>
-								{itemChannel.type == 2 ? (
-									<input className='chat-page-channel-password-input' placeholder='Password' onChange={event => password.set(itemChannel.id, event.target.value)}/>
-								) : null
-								}
-								<button onClick={() => handleJoinChannel(itemChannel.id)}>Join</button>
-							</div>
-						))
-					) : null
-					}
-				</div>
-			)}
-			{isOpenListUserChannel && (<ListUserChannel channel={channel}/>)}
-		</div>
 		</>
 	);
 }

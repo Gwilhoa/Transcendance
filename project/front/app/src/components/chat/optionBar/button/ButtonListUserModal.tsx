@@ -1,8 +1,8 @@
 import '../../css/optionBar.css'
 import React from 'react'
-import { useDispatch } from 'react-redux';
-import { switchChatModalListUser } from '../../../../redux/chat/modalChatSlice';
-import { ReactComponent as User } from '../../../../images/chat/user-solid.svg'
+import {useDispatch} from 'react-redux';
+import {switchChatModalListUser} from '../../../../redux/chat/modalChatSlice';
+import {ReactComponent as User} from '../../../../images/chat/user-solid.svg'
 
 
 const ButtonListChannel = () => {

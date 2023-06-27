@@ -83,20 +83,6 @@ start: build
 	docker-compose -f docker-compose.yml up
 	# printf "$(GREEN)[✓]$(END)\n\n"
 
-# ~~~~~~~~~~~~~~ DATABASE ~~~~~~~~~~~~~~
-
-database:
-	docker-compose up -d db
-	docker-compose up -d adminer
-
-# ~~~~~~~~~~~~~~ BACKEND ~~~~~~~~~~~~~~
-
-back: database
-	docker-compose -f docker-compose.yml build back
-	docker-compose -f docker-compose.yml create back
-	docker-compose up back
-# ~~~~~~~~~~~~~~ FRONTEND ~~~~~~~~~~~~~~
-
 # ~~~~~~~~~~~~~~~~ STOP ~~~~~~~~~~~~~~~~
 
 stop clean:

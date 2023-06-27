@@ -1,11 +1,11 @@
-.game-option-game-page{
+.game-option-game-page {
     height: 100vh;
     width: 100vw;
     display: flex;
     justify-content: center;
     text-align: center;
     align-items: center;
-    color : var(--light-color);
+    color: var(--light-color);
 }
 
 .game-waiting-settings {
@@ -13,21 +13,21 @@
     height: 6rem;
 }
 
-.game-option-game-block{
+.game-option-game-block {
     background-color: var(--box-color);
-    max-height : 80vh;
+    max-height: 80vh;
     overflow: auto;
     border-radius: 20px;
     width: 37rem;
 }
 
-.game-option-game-title{
+.game-option-game-title {
     font-size: 3rem;
     margin: 1rem;
     font-weight: bold;
 }
 
-.game-option-game-titles-option{
+.game-option-game-titles-option {
     font-size: 2rem;
     margin: 1rem;
     font-weight: bold;
@@ -60,8 +60,7 @@
     margin-bottom: 2rem;
 }
 
-.game-option-game-background
-{
+.game-option-game-background {
     margin-top: 1rem;
 }
 

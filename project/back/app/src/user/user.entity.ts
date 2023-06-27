@@ -4,13 +4,14 @@ import {
   Column,
   Entity,
   JoinTable,
-  ManyToMany,
+  ManyToMany, ManyToOne,
   OneToMany,
   PrimaryColumn,
 } from 'typeorm';
 import { RequestFriend } from './requestfriend.entity';
 import { Game } from 'src/game/game.entity';
 import { UserStatus } from 'src/utils/user.enum';
+import {Mute} from "../channel/mute.entity";
 
 @Entity({ name: 'users' })
 export class User {
@@ -81,6 +82,6 @@ export class User {
   @Column({ nullable: false, default: 0 })
   defeats: number;
 
-  @ManyToMany((type) => Channel, (channel) => channel.mutedUser)
-  mutedChannels: Channel[];
+  @ManyToOne((type) => Mute, (channel) => channel.mutedUser)
+  mutedChannels: Mute[];
 }

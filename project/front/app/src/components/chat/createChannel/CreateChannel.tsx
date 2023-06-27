@@ -3,7 +3,6 @@ import React, {useCallback, useEffect, useState} from 'react'
 import {useDispatch, useSelector} from 'react-redux';
 import {switchChatModalCreateChannel} from '../../../redux/chat/modalChatSlice';
 import {Channel, User} from '../../../pages/chat';
-import {cookies} from '../../../App';
 import axios from 'axios';
 import SocketSingleton from '../../../socket';
 import Search from '../../search/userSearch';
@@ -37,7 +36,7 @@ const initialChannelState: Channel = {
 	creator: initialUserState,
 	admins: [],
 	bannedUsers: [],
-	mutedUser: [],
+	mutedUsers: [],
 
 }
 
@@ -63,7 +62,6 @@ const AddUserId = ({usersId, setUserId}: AddUserIdProps) => {
 			},
 		})
 			.then((res) => {
-				console.log(res);
 				setListUser(res.data);
 			})
 			.catch((error) => {
@@ -91,7 +89,6 @@ const AddUserId = ({usersId, setUserId}: AddUserIdProps) => {
 	if (listUser == null || listUser.length == 0) {
 		return (null);
 	}
-	console.log(listUser);
 	return (
 		<div className='chat-users-list-add-user-by-id'>
 			{listUser.slice(0, 3).map((user) => (
@@ -101,9 +98,7 @@ const AddUserId = ({usersId, setUserId}: AddUserIdProps) => {
 							OverwriteClassName='chat-small-user-image'/>
 						<ProfilName id={user.id}/>
 					</div>
-				) : (
-					null
-				)
+				) : null
 			))}
 		</div>
 	);
@@ -117,8 +112,16 @@ const CreateChannel = () => {
 	const [usersId, setUserId] = useState<Array<string>>([]);
 	const [errorPwd, setErrorPwd] = useState<boolean>(false);
 	const [errorMessage, setErrorMessage] = useState<string>('');
-	const jwt: string = jwtDecode(''+localStorage.getItem('jwtAuthorization')) ;
-	const [myId] = useState<string>(jwt.sub);
+	const [myId, setMyId] = useState<string>('');
+
+	useEffect(() => {
+		if (localStorage.getItem('jwtAuthorization') != null) {
+			const jwt_decode : any = jwtDecode('' + localStorage.getItem('jwtAuthorization'));
+			setMyId(jwt_decode.sub);
+		} else {
+			navigate('/error');
+		}
+	}, [navigate]);
 
 	const onSubmitChannelName = (str: string) => {
 		setChannelParams((prevChannelParams) => ({
@@ -147,7 +150,7 @@ const CreateChannel = () => {
 			const pwd = '' + channelParams.pwd;
 			if (pwd.length === 0) {
 				setErrorPwd(true);
-				return ;
+				return;
 			}
 		}
 		axios.post(process.env.REACT_APP_IP + ':3000/channel/create',
@@ -162,9 +165,16 @@ const CreateChannel = () => {
 			})
 			.then((response) => {
 				setErrorMessage('');
-				socket.emit('join_channel', {channel_id: response.data.id, token: localStorage.getItem('jwtAuthorization')});
+				socket.emit('join_channel', {
+					channel_id: response.data.id,
+					token: localStorage.getItem('jwtAuthorization')
+				});
 				usersId.map((userId) => {
-					socket.emit('invite_channel', {receiver_id: userId, channel_id: response.data.id, token: localStorage.getItem('jwtAuthorization')});
+					socket.emit('invite_channel', {
+						receiver_id: userId,
+						channel_id: response.data.id,
+						token: localStorage.getItem('jwtAuthorization')
+					});
 				});
 				dispatch(switchChatModalCreateChannel());
 			})
@@ -189,9 +199,9 @@ const CreateChannel = () => {
 					onChange={(e) => onSubmitChannelName(e.target.value)}/>
 				<div className='ButtonChangeTypeChannel'>
 					<h3>Channel Type</h3>
-					<button className='channel-type-button' onClick={() => handleChannelTypeChange(0)}>Private</button>
-					<button className='channel-type-button' onClick={() => handleChannelTypeChange(1)}>Public</button>
-					<button className='channel-type-button' onClick={() => handleChannelTypeChange(2)}>Protected
+					<button className={'channel-type-button' + ' ' + (channelParams.type === 0 ? 'channel-type-button-selected' : '')} onClick={() => handleChannelTypeChange(0)}>Private</button>
+					<button className={'channel-type-button' + ' ' + (channelParams.type === 1 ? 'channel-type-button-selected' : '')} onClick={() => handleChannelTypeChange(1)}>Public</button>
+					<button className={'channel-type-button' + ' ' + (channelParams.type === 2 ? 'channel-type-button-selected' : '')} onClick={() => handleChannelTypeChange(2)}>Protected
 					</button>
 				</div>
 				{channelParams.type === 2 ? (
@@ -205,11 +215,11 @@ const CreateChannel = () => {
 								id='password'
 								onChange={(e) => handlePasswordChange(e.target.value)}
 							/>
-							{ errorPwd ? 
+							{errorPwd ?
 								<p className='chat-create-channel-error-message'>
 									{"* password length can't be null"}
 								</p>
-							:
+								:
 								null
 							}
 						</div>
@@ -219,8 +229,8 @@ const CreateChannel = () => {
 					<>
 						<div className='chat-create-channel-find-user'>
 							<h3>Invite some people:</h3>
-							<Search 
-								defaultAllUsers={true} 
+							<Search
+								defaultAllUsers={true}
 								OverwriteClassName={'create-channel-invite-input'}
 								id={myId}
 							/>
@@ -228,11 +238,11 @@ const CreateChannel = () => {
 						</div>
 					</>
 				) : null}
-				{ errorMessage !== '' ? (
+				{errorMessage !== '' ? (
 					<p className='chat-create-channel-error-message'>
 						{'* ' + errorMessage}
 					</p>
-				) : null }
+				) : null}
 				<button className='channel-create-channel-button' onClick={() => handleNewChannel()}>New Channel
 				</button>
 			</div>

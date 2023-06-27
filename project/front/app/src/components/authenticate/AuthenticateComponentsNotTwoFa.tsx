@@ -1,14 +1,27 @@
 import React, {useEffect, useState} from 'react';
-import Cookies from 'universal-cookie';
 import axios from 'axios';
 import {useNavigate} from 'react-router-dom';
 import {setErrorLocalStorage} from '../IfError';
+import SocketSingleton from '../../socket';
 
-const cookies = new Cookies();
 
 function AuthenticateComponentsNotTwoFa() {
 	const navigate = useNavigate();
 	const [error, setError] = useState<boolean>(false);
+
+	const socketInstance = SocketSingleton.getInstance();
+	const socket = socketInstance.getSocket();
+	
+	useEffect(() => {
+		socket.on('connection_error', () => {
+			setErrorLocalStorage('unauthorized')
+			navigate('/error');
+		});
+
+		return () => {
+			socket.off('connection_error');
+		};
+	}, [navigate]);
 
 	useEffect(() => {
 		const url = process.env.REACT_APP_IP + ':3000/auth/authenticate';
@@ -29,7 +42,7 @@ function AuthenticateComponentsNotTwoFa() {
 				})
 				.catch((error) => {
 					localStorage.removeItem('tenMinToken');
-					setErrorLocalStorage('Error ' + error.response.status);
+					setErrorLocalStorage('Error ' + error?.response?.status);
 					console.error(error);
 					navigate('/Error');
 				});
@@ -48,7 +61,7 @@ function AuthenticateComponentsNotTwoFa() {
 				})
 				.catch((error) => {
 					localStorage.removeItem('tenMinToken');
-					setErrorLocalStorage('Error ' + error.response.status);
+					setErrorLocalStorage('Error ' + error?.response?.status);
 					console.error(error);
 					navigate('/Error');
 				});

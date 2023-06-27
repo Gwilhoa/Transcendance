@@ -1,6 +1,6 @@
 /* Invite page */
 
-.chat-channel-invite-people{
+.chat-channel-invite-people {
     position: absolute;
     text-align: center;
     position: fixed;
@@ -17,8 +17,8 @@
     border-radius: 20px;
 }
 
-.chat-channel-invite-people > h2{
-	margin-bottom: 2.5rem;
+.chat-channel-invite-people > h2 {
+    margin-bottom: 2.5rem;
 }
 
 .chat-side-bar-close-add-people-channel {
@@ -36,24 +36,24 @@
 
 .chat-side-bar-invite-channel-input {
     background-color: var(--background-color);
-	width: 75%;
-	margin: 0 0 3rem;
+    width: 75%;
+    margin: 0 0 3rem;
 }
 
-.chat-invite-people-user{
-	display: flex;
-	justify-content: center;
-	align-items: center;
+.chat-invite-people-user {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-.chat-invite-people-user > div{
-	margin-left: 1rem
+.chat-invite-people-user > div {
+    margin-left: 1rem
 }
 
 
-.chat-channel-invite-add-user-by-id{
-	overflow-y: auto;
-	min-height: 5rem;
+.chat-channel-invite-add-user-by-id {
+    overflow-y: auto;
+    min-height: 5rem;
 }
 
 /* end Invite page */

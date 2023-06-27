@@ -2,12 +2,10 @@ import './css/history.css'
 import React, {useCallback, useEffect, useState} from 'react';
 import ErrorToken, {setErrorLocalStorage} from '../components/IfError';
 import {useNavigate, useParams} from 'react-router-dom';
-import {cookies} from '../App'
-import {useDispatch, useSelector} from 'react-redux';
+import {useDispatch} from 'react-redux';
 import {openModal} from '../redux/modal/modalSlice';
 import axios from 'axios';
-import { User } from './chat';
-import { RootState } from '../redux/store';
+import {User} from './chat';
 import jwtDecode from 'jwt-decode';
 
 interface Game {
@@ -19,11 +17,19 @@ interface Game {
 	user2: User;
 }
 
-const OneScoreBlock = ({ game, playerId }: { game: Game, playerId: string }) => {
-	const navigate = useNavigate();
+const OneScoreBlock = ({game, playerId}: { game: Game, playerId: string }) => {
 	const dispatch = useDispatch();
-	const jwt: string = jwtDecode(''+localStorage.getItem('jwtAuthorization')) ;
-	const [myId] = useState<string>(jwt.sub);
+	const navigate = useNavigate();
+	const [myId, setMyId] = useState<string>('');
+
+	useEffect(() => {
+		if (localStorage.getItem('jwtAuthorization') != null) {
+			const jwt_decode : any = jwtDecode('' + localStorage.getItem('jwtAuthorization'));
+			setMyId(jwt_decode.sub);
+		} else {
+			navigate('/error');
+		}
+	}, [navigate]);
 
 	const [leftImage, setLeftImage] = useState<string>('');
 	const [rightImage, setRightImage] = useState<string>('');
@@ -36,12 +42,11 @@ const OneScoreBlock = ({ game, playerId }: { game: Game, playerId: string }) => 
 
 	const [userWinner, setUserWinner] = useState<number>(1);
 
-	
+
 	const [messageWinner, setMessageWinner] = useState<string>('');
 
 
 	useEffect(() => {
-		console.log('try it')
 		if (game.score2 > game.score1) {
 			setUserWinner(2);
 		}
@@ -53,21 +58,17 @@ const OneScoreBlock = ({ game, playerId }: { game: Game, playerId: string }) => 
 				setRightScore(game.score1);
 				if (userWinner == 2) {
 					setMessageWinner('You won');
-				}
-				else {
+				} else {
 					setMessageWinner('You loose');
 				}
-			}
-			else {
+			} else {
 				if (userWinner == 1) {
 					setMessageWinner('You won');
-				}
-				else {
+				} else {
 					setMessageWinner('You loose');
 				}
 			}
-		}
-		else {
+		} else {
 			if (game.user2.id == playerId) {
 				setLeftUser(game.user2);
 				setLeftScore(game.score2)
@@ -75,21 +76,19 @@ const OneScoreBlock = ({ game, playerId }: { game: Game, playerId: string }) => 
 				setRightScore(game.score1);
 				if (userWinner == 2) {
 					setMessageWinner(game.user2.username + ' won');
-				}
-				else {
+				} else {
 					setMessageWinner(game.user2.username + ' loose');
 				}
-			}
-			else {
+			} else {
 				if (userWinner == 1) {
 					setMessageWinner(game.user1.username + ' won');
-				}
-				else {
+				} else {
 					setMessageWinner(game.user1.username + ' loose');
 				}
 			}
 		}
-	}, [playerId, game, myId, userWinner]);
+	}, [playerId, game, myId, userWinner, leftImage, rightImage, navigate,
+		leftScore, rightScore]);
 
 	useEffect(() => {
 		axios.get(process.env.REACT_APP_IP + ':3000/user/image/' + playerId, {
@@ -102,7 +101,7 @@ const OneScoreBlock = ({ game, playerId }: { game: Game, playerId: string }) => 
 				setLeftImage(data);
 			})
 			.catch((error) => {
-				setErrorLocalStorage('Error ' + error.response.status);
+				setErrorLocalStorage('Error ' + error?.response?.status);
 				console.error(error);
 				navigate('/Error');
 				return;
@@ -110,8 +109,7 @@ const OneScoreBlock = ({ game, playerId }: { game: Game, playerId: string }) => 
 		let image;
 		if (game.user1.id == playerId) {
 			image = game.user2.id;
-		}
-		else {
+		} else {
 			image = game.user1.id;
 		}
 		axios.get(process.env.REACT_APP_IP + ':3000/user/image/' + image, {
@@ -124,12 +122,13 @@ const OneScoreBlock = ({ game, playerId }: { game: Game, playerId: string }) => 
 				setRightImage(data);
 			})
 			.catch((error) => {
-				setErrorLocalStorage('Error ' + error.response.status);
+				setErrorLocalStorage('Error ' + error?.response?.status);
 				console.error(error);
 				navigate('/Error');
 				return;
 			});
-	}, [leftUser, rightUser, navigate, playerId, game]);
+	}, [leftUser, rightUser, navigate, playerId, game, leftScore,
+		rightScore]);
 
 	if (messageWinner == '') {
 		return null;
@@ -155,22 +154,28 @@ const OneScoreBlock = ({ game, playerId }: { game: Game, playerId: string }) => 
 	);
 };
 
-const ListBlockScore = ({ userId, username }: { userId: string, username: string }) => {
+const ListBlockScore = ({userId, username}: { userId: string, username: string }) => {
 	const [listGame, setListGame] = useState<Array<Game>>([]);
-	const jwt: string = jwtDecode(''+localStorage.getItem('jwtAuthorization')) ;
-	const [myId] = useState<string>(jwt.sub);
-
 	const navigate = useNavigate();
+
+	const [myId, setMyId] = useState<string>('');
+
 	useEffect(() => {
-		console.log(process.env.REACT_APP_IP + ':3000/game/history/' + userId);
+		if (localStorage.getItem('jwtAuthorization') != null) {
+			const jwt_decode : any = jwtDecode('' + localStorage.getItem('jwtAuthorization'));
+			setMyId(jwt_decode.sub);
+		} else {
+			navigate('/error');
+		}
+	}, [navigate]);
+
+	useEffect(() => {
 		axios.get(process.env.REACT_APP_IP + ':3000/game/history/' + userId, {
 			headers: {
 				Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 			},
 		})
 			.then((response) => {
-				console.log('here response histo');
-				console.log(response);
 				setListGame(response.data);
 			})
 			.catch((error) => {
@@ -182,26 +187,25 @@ const ListBlockScore = ({ userId, username }: { userId: string, username: string
 	if (listGame == null || listGame.length == 0) {
 		if (userId == myId) {
 			return (<p className='no-game-played'>{"You don't have played a game yet!"}</p>);
-		}
-		else {
-			return (<p className='no-game-played'>{ username + " has never yet played a game"}</p>);
+		} else {
+			return (<p className='no-game-played'>{username + " has never yet played a game"}</p>);
 		}
 	}
 
 	return (
 		<div className='score-board'>
 			{
-				listGame.map((itemGame) => (
+				listGame.map((itemGame, index) => (
 					itemGame.finished == 'FINISHED' ? (
-						<div key={itemGame.id}>
+						<div key={index + itemGame.id}>
 							<OneScoreBlock
 								game={itemGame}
 								playerId={userId}
 							/>
 						</div>
 					) : (
-						<div key={itemGame.id}></div>)
-					))
+						<div key={index + itemGame.id}></div>)
+				))
 			}
 		</div>
 	);
@@ -210,41 +214,42 @@ const ListBlockScore = ({ userId, username }: { userId: string, username: string
 const History = () => {
 	const navigate = useNavigate();
 	const [username, setUsername] = useState<string>('');
-	const { id } = useParams();
+	const [userId, setUserId] = useState<string>('');
+	const {id} = useParams();
 
-		const fetchDataUser = useCallback((userId: string) => {
-				if (id != null) {
-				axios.get(process.env.REACT_APP_IP + ':3000/user/id/' + userId, {
-					headers: {
-						Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
-					},
+
+	const fetchDataUser = useCallback((userId: string) => {
+		if (userId != null) {
+			axios.get(process.env.REACT_APP_IP + ':3000/user/id/' + userId, {
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
+				},
+			})
+				.then((response) => {
+					setUsername(response.data.username);
 				})
-					.then((response) => {
-						setUsername(response.data.username);
-					})
-					.catch((error) => {
-						if (error?.response?.status == 401 || error?.response?.status == 500) {
-							setErrorLocalStorage('Error ' + error?.response?.status);
-							navigate('/Error');
-						}
-						else (
-							navigate('/home')
-						)
-					});
-			}
-			else {
-				navigate('/home');
-			}
-		}, [navigate, id]);
+				.catch((error) => {
+					if (error?.response?.status == 401 || error?.response?.status == 500) {
+						setErrorLocalStorage('Error ' + error?.response?.status);
+						navigate('/Error');
+					} else (
+						navigate('/home')
+					)
+				});
+		} else {
+			navigate('/home');
+		}
+	}, [navigate, userId, id]);
 
 	useEffect(() => {
-		console.log(id);
 		if (id != null) {
 			fetchDataUser(id);
+			setUserId(id);
 		}
-	}, [id, navigate, fetchDataUser]);
+	}, [navigate, fetchDataUser, id, userId]);
 
-	if (id == '' || id == null) {
+
+	if (userId == '' || userId == null) {
 		return (null);
 	}
 	return (
@@ -256,7 +261,7 @@ const History = () => {
 				</div>
 			</header>
 			<div className='scrollBlock'>
-				<ListBlockScore userId={id} username={username} />
+				<ListBlockScore userId={userId} username={username}/>
 			</div>
 		</div>
 	);

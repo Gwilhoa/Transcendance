@@ -2,11 +2,9 @@ import './css/CreateTwoFa.css';
 import axios from 'axios';
 import React, {useEffect, useRef, useState} from 'react';
 import AuthCode, {AuthCodeRef} from 'react-auth-code-input';
-import Cookies from 'universal-cookie';
 import ErrorToken, {setErrorLocalStorage} from '../components/IfError';
 import {useNavigate} from 'react-router-dom';
 
-const cookies = new Cookies();
 
 export const ErrorInput = () => {
 
@@ -52,7 +50,6 @@ const CreateTwoFaPage = () => {
 	const handleOnChange = (res: string) => {
 		setResult(res);
 		if (res.length === 6) {
-			console.log('result of input create 2fa ' + res);
 			axios.post(process.env.REACT_APP_IP + ':3000/auth/2fa/enable',
 				{
 					code: res
@@ -62,8 +59,7 @@ const CreateTwoFaPage = () => {
 						Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 					},
 				})
-				.then((response) => {
-					console.log(response);
+				.then(() => {
 					navigate('/home');
 				})
 				.catch((error) => {
@@ -89,11 +85,9 @@ const CreateTwoFaPage = () => {
 			},
 		})
 			.then((response) => {
-				console.log(response);
 				setDataImage(response.data);
 			})
 			.catch((error) => {
-				console.error(error);
 				setErrorLocalStorage('Error ' + error.response.status);
 				navigate('/Error');
 			});

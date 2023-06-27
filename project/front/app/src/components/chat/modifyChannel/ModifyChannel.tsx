@@ -13,22 +13,19 @@ const ModifyChannel = ({channel}: { channel: Channel }) => {
 	const [errorMessage, setErrorMessage] = useState<string>('');
 
 	const updateChannel = () => {
-		axios.post(process.env.REACT_APP_IP + ':3000/channel/modifychannel/' + channel.id, 
-		{
-			name: name,
-			password: newPassword,
-			old_password: password
-		},
-		{
-					headers: {
-						Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
-					},
-		}).then((response) => {
-			console.log('updatechannel');
-			console.log(response);
+		axios.post(process.env.REACT_APP_IP + ':3000/channel/modifychannel/' + channel.id,
+			{
+				name: name,
+				password: newPassword,
+				old_password: password
+			},
+			{
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
+				},
+			}).then(() => {
 			dispatch(switchChatModalUpdateChannel());
 		}).catch((error) => {
-			console.log('updatechannel');
 			console.error(error);
 			setErrorMessage(error.response.data);
 		});
@@ -42,18 +39,16 @@ const ModifyChannel = ({channel}: { channel: Channel }) => {
 						onClick={() => dispatch(switchChatModalUpdateChannel())}/>
 
 				<h3>Channel Name</h3>
-				<input className='chat-side-bar-close-modify-channel-name' type='text' placeholder='Channel name'
-					onChange={(e) => setName(e.target.value)}/>
+				<input className='chat-side-bar-close-modify-channel-name' type='text' placeholder='Channel name' onChange={(e) => setName(e.target.value)}/>
 				{channel?.type == 2 ?
 					<>
 						<h3>Change Password</h3>
-						<input className='chat-side-bar-close-modify-channel-password' type='password' placeholder='old password'
-						onChange={(e) => setPassword(e.target.value)}/>
-					</>: <></>}
+						<input className='chat-side-bar-close-modify-channel-password' type='password' placeholder='old password' onChange={(e) => setPassword(e.target.value)}/>
+					</> : <></>}
 				{(channel?.type == 1 || channel?.type == 2) ?
-					<input className='chat-side-bar-close-modify-channel-password' type='password' placeholder='new password'
-					onChange={(e) => setNewPassword(e.target.value)}/> : <></>}
-					{errorMessage != '' && (<p className='chat-side-bar-modify-channel-error-message'>{'* ' + errorMessage}</p>)}
+					<input className='chat-side-bar-close-modify-channel-password' type='password' placeholder='new password' onChange={(e) => setNewPassword(e.target.value)}/> : <></>}
+				{errorMessage != '' && (
+					<p className='chat-side-bar-modify-channel-error-message'>{'* ' + errorMessage}</p>)}
 				<button className='chat-side-bar-modify-channel-button-update' onClick={updateChannel}>Update</button>
 			</div>
 		</div>

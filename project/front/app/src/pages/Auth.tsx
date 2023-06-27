@@ -2,10 +2,8 @@ import './css/auth.css'
 import axios from 'axios';
 import React, {useEffect} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
-import Cookies from 'universal-cookie';
 import logo from '../images/pegi18.png'
 
-const cookies = new Cookies();
 
 function Auth() {
 	const navigate = useNavigate();
@@ -21,8 +19,9 @@ function Auth() {
 				.then(() => {
 					navigate('/home');
 				})
-				.catch((error) => {
-					console.error(error.status)
+				.catch(() => {
+					// eslint-disable-next-line @typescript-eslint/no-unused-expressions
+					null;
 				});
 		}
 	}, [navigate]);

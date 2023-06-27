@@ -1,9 +1,10 @@
 import io from 'socket.io-client';
-import {cookies} from './App';
+import {useNavigate} from "react-router-dom";
 
 class SocketSingleton {
 	private static instance: SocketSingleton;
 	private socket;
+
 
 	private constructor() {
 		this.socket = io(process.env.REACT_APP_IP + ':3000', {
@@ -15,11 +16,11 @@ class SocketSingleton {
 				await new Promise((resolve) => setTimeout(resolve, 100));
 				jwtAuthorization = localStorage.getItem('jwtAuthorization');
 			}
+			this.socket.on('connection_error', (data) => {
+				localStorage.removeItem('jwtAuthorization');
+			})
 			this.socket.emit('connection', {token: jwtAuthorization});
-			console.log('connected');
 		});
-
-
 	}
 
 	public static getInstance() {

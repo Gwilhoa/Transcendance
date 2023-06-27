@@ -1,6 +1,7 @@
 import { Server, Socket } from 'socket.io';
 import { GameService } from 'src/game/game.service';
 import { sleep } from '../utils/sleep';
+import { time } from 'console';
 
 export class Game {
   static default_sizeMaxX = 100;
@@ -106,36 +107,34 @@ export class Game {
     return this._user2;
   }
 
-
-  private beginStop = (userStop: Socket, userNoStop: Socket) => {
-    if (!this._stop) {
+  private beginStop = (userStop: Socket, userNoStop: Socket, time: number) => {
+    if (!this._stop && this._started) {
       this._stop = true;
-      userStop.emit('is_stop_game', { stop: true, stoper: true });
-      userNoStop.emit('is_stop_game', { stop: true, stoper: false });
-      //clearInterval(this._loopid);
+      userStop.emit('is_stop_game', { stop: true, stoper: true, time: time });
+      userNoStop.emit('is_stop_game', {
+        stop: true,
+        stoper: false,
+        time: time,
+      });
       this._playerstop = userStop.id;
       this._loop_stop = setInterval(this.delayStop, 1000);
     }
-  }
+  };
 
   public updateRacket = (player: Socket, y: number) => {
-    if (y == 2 && this._started) {
-      console.log('enter');
-      console.log(this._stop);
-      console.log(player.id);
-      console.log(this._playerstop);
+    if (y == 2) {
       if (this._stop && player.id == this._playerstop) {
-        console.log('clearinterval');
         this.endOfStop();
         return;
       }
       if (!this._stop) {
         if (player.id == this._user1.id && this._time_stop_user1 > 0) {
-          this.beginStop(this._user1, this._user2);
-          }
-        if (player.id == this._user2.id && this._time_stop_user2 > 0)
-        {
-          this.beginStop(this._user2, this._user1);
+          this._time_stop_user1 -= 1;
+          this.beginStop(this._user1, this._user2, this._time_stop_user1);
+        }
+        if (player.id == this._user2.id && this._time_stop_user2 > 0) {
+          this._time_stop_user2 -= 1;
+          this.beginStop(this._user2, this._user1, this._time_stop_user2);
         }
       }
     }
@@ -223,8 +222,7 @@ export class Game {
   }
 
   public async start() {
-    console.log('power up ' + this._isPowerUp);
-    await sleep(3000);
+    await sleep(1000);
     while (
       Math.cos(this._angle) < 0.5 &&
       Math.cos(this._angle) > -0.5 &&
@@ -327,9 +325,6 @@ export class Game {
   };
 
   public async remake() {
-    console.log(
-      'finish game for ' + this._user1.data.id + ' ' + this._user2.data.id,
-    );
     this._io.to(this._id).emit('finish_game', {
       score1: 0,
       score2: 0,
@@ -346,17 +341,16 @@ export class Game {
   public clear = () => {
     if (this._loopid != null) clearInterval(this._loopid);
     this._loopid = null;
-  }
+  };
 
   private endOfStop = () => {
     if (this._stop) {
       clearInterval(this._loop_stop);
-      //this._loopid = setInterval(this.gameLoop, Game.default_update);
       this._user1.emit('is_stop_game', { stop: false, stoper: false });
       this._user2.emit('is_stop_game', { stop: false, stoper: false });
       this._stop = false;
     }
-  }
+  };
 
   private delayStop = () => {
     if (
@@ -383,7 +377,6 @@ export class Game {
     this._endgame = true;
     this._time_stop_user1 = Game.default_maxtimestop;
     this._time_stop_user2 = Game.default_maxtimestop;
-    console.log('game finish ' + this._id);
     this._user1.leave(this._id);
     this._user2.leave(this._id);
     const g = await this._gameService.finishGame(
@@ -400,7 +393,6 @@ export class Game {
       losename = g.user2.username;
       winname = g.user1.username;
     }
-    console.log('game finish ' + winname + ' ' + losename);
     this._user2.leave(this._id);
     this._user1.leave(this._id);
     userWin.emit('finish_game', {
@@ -420,6 +412,7 @@ export class Game {
 
   private endBattle = (scoreWin: number): number => {
     scoreWin++;
+    this._started = false;
     if (scoreWin < Game.default_victorygoal) {
       this._rack1y = Game.default_positionR;
       this._rack2y = Game.default_positionR;

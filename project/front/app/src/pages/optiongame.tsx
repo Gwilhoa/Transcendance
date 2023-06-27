@@ -1,6 +1,5 @@
 import './css/optiongame.css'
 import './css/game.css'
-import Cookies from 'universal-cookie';
 import {animated, useSpring} from 'react-spring';
 import React, {useEffect, useState} from 'react';
 import SocketSingleton from '../socket';
@@ -8,7 +7,7 @@ import {useNavigate} from 'react-router-dom';
 import {RootState} from '../redux/store';
 import {useDispatch, useSelector} from 'react-redux';
 import ErrorToken from '../components/IfError';
-import { setBeginStatus } from '../redux/game/beginToOption';
+import {setBeginStatus} from '../redux/game/beginToOption';
 
 import Ball1 from '../images/game/ball/Ball1.png';
 import Ball2 from '../images/game/ball/Ball2.png';
@@ -20,52 +19,52 @@ import Map3 from '../images/game/map/Map3.png';
 
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
-const cookies = new Cookies();
 
 
 const OptionGame = () => {
-    
-    const spinnerAnimationBall = useSpring({
-        from: { transform: 'rotate(0deg)' },
-        to: { transform: 'rotate(360deg)' },
-        loop: true,
-        config: { duration: 4000 },
-    });
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
-    const decide = useSelector((state: RootState) => state.beginToOption.decide);
-    const playerstats = useSelector((state: RootState) => state.beginToOption.playerstate);
-    const id = useSelector((state: RootState) => state.beginToOption.gameid);
-    const gamestate = useSelector((state: RootState) => state.beginToOption.gamestate)
-    console.log(gamestate);
-    useEffect(() => {
-        if (id == null || gamestate != 1)
-            navigate('/home');
-        dispatch(setBeginStatus({decide: decide, playerstate: playerstats, gameid: id ,gamestate: 2}));
 
-        socket.on("finish_game", (data) => {
-            navigate('/home')
-        })
+	const spinnerAnimationBall = useSpring({
+		from: {transform: 'rotate(0deg)'},
+		to: {transform: 'rotate(360deg)'},
+		loop: true,
+		config: {duration: 4000},
+	});
+	const dispatch = useDispatch();
+	const navigate = useNavigate();
+	const decide = useSelector((state: RootState) => state.beginToOption.decide);
+	const playerstats = useSelector((state: RootState) => state.beginToOption.playerstate);
+	const id = useSelector((state: RootState) => state.beginToOption.gameid);
+	const gamestate = useSelector((state: RootState) => state.beginToOption.gamestate)
+	useEffect(() => {
+		if (id == null || gamestate != 1)
+			navigate('/home');
+		dispatch(setBeginStatus({decide: decide, playerstate: playerstats, gameid: id, gamestate: 2}));
 
-		socket.on('will_started', (data) => {
-			console.log(data);
+		socket.on("finish_game", () => {
+			navigate('/home')
+		})
+
+		socket.on('will_started', () => {
 			navigate('/game');
 		})
 
-        return () => {
-            socket.off('will_started');
-        }
-        
-    }, [socket])
+		return () => {
+			socket.off('will_started');
+		}
 
-	console.log('playerstats ' + playerstats + '\ndecide ' + decide);
+	}, [socket])
 
 	const [nbBall, setNbBall] = useState(Ball1);
 	const [nbMap, setNbMap] = useState(Map1);
 	const [isPowerup, setIsPowerup] = useState(false);
 
 	const enterGame = () => {
-		socket.emit('option_send', {ball: nbBall, map: nbMap, powerup: isPowerup, token: localStorage.getItem('jwtAuthorization')})
+		socket.emit('option_send', {
+			ball: nbBall,
+			map: nbMap,
+			powerup: isPowerup,
+			token: localStorage.getItem('jwtAuthorization')
+		})
 	}
 
 	const selectBall = (str: string) => {
@@ -82,7 +81,7 @@ const OptionGame = () => {
 
 	return (
 		<div className='game-option-game-page'>
-            <ErrorToken/>
+			<ErrorToken/>
 			{!decide &&
                 <div className='game-waiting-settings'>
                     Waiting your opponent to choose settings...
@@ -114,7 +113,8 @@ const OptionGame = () => {
                         </button>
                     </div>
                     <div className='game-option-game-ball'>
-                        <animated.img src={nbBall} className={'game-option-game-ball'} style={spinnerAnimationBall}></animated.img>
+                        <animated.img src={nbBall} className={'game-option-game-ball'}
+                                      style={spinnerAnimationBall}></animated.img>
                     </div>
 
                     <div className='game-option-game-titles-option'>

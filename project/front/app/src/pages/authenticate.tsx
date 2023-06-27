@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, {useEffect} from 'react';
 import axios from 'axios';
 import {setErrorLocalStorage} from '../components/IfError'
 import {useNavigate} from 'react-router-dom';
@@ -12,7 +12,7 @@ export function TokenPage() {
 	const navigate = useNavigate();
 
 	useEffect(() => {
-		const interval = setInterval(()=>{
+		const interval = setInterval(() => {
 			if (localStorage.getItem('tenMinToken') != null) {
 				axios.get(process.env.REACT_APP_IP + ':3000/auth/2fa/is2FA', {
 					headers: {
@@ -26,7 +26,7 @@ export function TokenPage() {
 							navigate('/authenticate/TwoFa');
 					})
 					.catch((error) => {
-						setErrorLocalStorage('Error ' + error.response.status);
+						setErrorLocalStorage('Error ' + error?.response?.status);
 						console.error(error);
 						navigate('/Error');
 					});
@@ -34,9 +34,9 @@ export function TokenPage() {
 		}, 500);
 
 		return () => {
-			clearInterval(interval);		
+			clearInterval(interval);
 		};
-	}, []);
+	}, [navigate, token]);
 
 	return (
 		<>

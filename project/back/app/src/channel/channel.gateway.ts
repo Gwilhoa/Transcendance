@@ -52,6 +52,9 @@ export class ChannelGateway implements OnGatewayInit {
     const receiver = await this.userService.getUserById(receiver_id);
     const sender = await this.userService.getUserById(sender_id);
     const channel = await this.channelService.getChannelById(channel_id);
+    if (channel == null) {
+      return;
+    }
     if (receiver == null || sender == null) {
       client.emit('update_user_channel', {
         code: 1,
@@ -129,8 +132,6 @@ export class ChannelGateway implements OnGatewayInit {
       wrongtoken(client, 'send_message');
       return;
     }
-    this.logger.debug('send_message');
-    this.logger.debug(payload.content);
     if (
       payload.token == null ||
       payload.channel_id == null ||
@@ -290,11 +291,17 @@ export class ChannelGateway implements OnGatewayInit {
       return;
     } else {
       if (channel.creator.id == user_id) {
-        this.server.to(channel_id).emit('delete_channel', send);
+        this.server.to(channel_id).emit('delete_channel', { id: channel_id });
+        for (const User of channel.users) {
+          const socket = getSocketFromId(User.id, getSockets(this.server));
+          if (socket != null) {
+            socket.emit('delete_channel', { id: channel_id });
+            socket.leave(channel_id);
+          }
+        }
         await this.channelService.deletechannel(channel_id);
         return;
       }
-      client.leave(channel_id);
       send.channel = await this.channelService.leaveChannel(
         user_id,
         channel.id,
@@ -302,6 +309,60 @@ export class ChannelGateway implements OnGatewayInit {
       this.server.to(channel_id).emit('update_user_channel', send);
       send.message = 'ok';
       client.emit('delete_channel', { id: channel_id });
+    }
+  }
+
+  @SubscribeMessage('kick_user')
+  async kick_user(client: Socket, payload: any) {
+    if (
+      payload.token == null ||
+      !verifyToken(payload.token, this.authService)
+    ) {
+      wrongtoken(client, 'ban_user');
+      return;
+    }
+    const user_id = client.data.id;
+    const channel_id = payload.channel_id;
+    const kick_id = payload.kick_id;
+    const addBan = new BanUserDto();
+    const channel = await this.channelService.getChannelById(channel_id);
+    addBan.channel_id = channel_id;
+    addBan.user_id = kick_id;
+    try {
+      const chan = await this.channelService.kickUser(addBan, user_id);
+      if (chan != null) {
+        const socket: Socket = getSocketFromId(
+          kick_id,
+          getSockets(this.server),
+        );
+        if (socket != null) {
+          socket.leave(channel_id);
+          socket.emit('delete_channel', { id: channel_id });
+        }
+        this.server.to(channel_id).emit('update_user_channel', {
+          channel: chan,
+          sender_id: user_id,
+          code: 0,
+        });
+        client.emit('update_user_channel', {
+          channel: chan,
+          sender_id: user_id,
+          code: 0,
+          message: 'ok',
+        });
+      }
+    } catch (e) {
+      this.server.to(channel_id).emit('update_user_channel', {
+        channel: channel,
+        sender_id: user_id,
+        code: 1,
+      });
+      client.emit('update_user_channel', {
+        channel: channel,
+        sender_id: user_id,
+        code: 1,
+        message: e.message,
+      });
     }
   }
 
@@ -329,7 +390,7 @@ export class ChannelGateway implements OnGatewayInit {
           socket.leave(channel_id);
           socket.emit('delete_channel', { id: channel_id });
         }
-        this.server.to(chan.id).emit('update_user_channel', {
+        this.server.to(channel_id).emit('update_user_channel', {
           channel: chan,
           sender_id: user_id,
           code: 0,
@@ -421,7 +482,7 @@ export class ChannelGateway implements OnGatewayInit {
     try {
       const chan = await this.channelService.addAdmin(addAdmin, user_id);
       if (chan != null) {
-        this.server.to(chan.id).emit('update_user_channel', {
+        this.server.to(channel_id).emit('update_user_channel', {
           channel: chan,
           code: 0,
           sender_id: user_id,
@@ -434,7 +495,7 @@ export class ChannelGateway implements OnGatewayInit {
         });
       }
     } catch (e) {
-      this.server.to(channel.id).emit('update_user_channel', {
+      this.server.to(channel_id).emit('update_user_channel', {
         channel: channel,
         code: 1,
         sender_id: user_id,
@@ -480,7 +541,7 @@ export class ChannelGateway implements OnGatewayInit {
         });
       }
     } catch (e) {
-      this.server.to(channel.id).emit('update_user_channel', {
+      this.server.to(channel_id).emit('update_user_channel', {
         channel: channel,
         code: 1,
         sender_id: user_id,
@@ -512,7 +573,10 @@ export class ChannelGateway implements OnGatewayInit {
 
   @SubscribeMessage('add_muted')
   async add_muted(client: Socket, payload: any) {
-    if (payload.token == null || !verifyToken(payload.token, this.authService)) {
+    if (
+      payload.token == null ||
+      !verifyToken(payload.token, this.authService)
+    ) {
       wrongtoken(client, 'add_muted');
       return;
     }

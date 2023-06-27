@@ -1,21 +1,21 @@
 import {configureStore} from '@reduxjs/toolkit';
 import modalReducer from './modal/modalSlice';
 import modalChatReducer from './chat/modalChatSlice';
-import conversationIdReducer from './chat/conversationIdSlice';
 import finalGameStat from './game/gameSlice';
 import searchReducer from './search/searchSlice';
 import beginToOption from "./game/beginToOption";
 import idReducer from './id/idSlice';
+import conversationId from './conversationId/conversationId';
 
 const store = configureStore({
 	reducer: {
 		modal: modalReducer,
 		modalChat: modalChatReducer,
-		conversation: conversationIdReducer,
 		finalGame: finalGameStat,
 		searchUser: searchReducer,
 		beginToOption: beginToOption,
-		id:				idReducer
+		id: idReducer,
+		conversationId: conversationId,
 	},
 });
 

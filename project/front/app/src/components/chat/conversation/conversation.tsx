@@ -6,8 +6,9 @@ import Messages from './message';
 import {useNavigate} from 'react-router-dom';
 import {setErrorLocalStorage} from '../../IfError';
 import ButtonListChannel from '../optionBar/button/ButtonListUserModal';
-import { parseChannelName } from '../Channel';
+import {parseChannelName} from '../Channel';
 import jwtDecode from 'jwt-decode';
+
 
 export interface imageProfil {
 	id: string;
@@ -16,14 +17,21 @@ export interface imageProfil {
 
 
 function Conversation(
-	{ listMessages, channel, errorGetMessage }:
-	{ listMessages: Array<Message>, channel: Channel, errorGetMessage: boolean })
-{
+	{listMessages, channel, errorGetMessage}:
+		{ listMessages: Array<Message>, channel: Channel, errorGetMessage: boolean }) {
 	const [listImageProfil, setListImageProfil] = useState<Array<imageProfil>>([]);
 	const navigate = useNavigate();
 	const scrollRef = useRef(null);
-	const jwt: string = jwtDecode(''+localStorage.getItem('jwtAuthorization')) ;
-	const [myId] = useState<string>(jwt.sub);
+	const [myId, setMyId] = useState<string>('');
+
+	useEffect(() => {
+		if (localStorage.getItem('jwtAuthorization') != null) {
+			const jwt_decode : any = jwtDecode('' + localStorage.getItem('jwtAuthorization'));
+			setMyId(jwt_decode.sub);
+		} else {
+			navigate('/error');
+		}
+	}, [navigate]);
 
 	const addImageProfil = useCallback((id: string) => {
 		let add = true;
@@ -58,7 +66,7 @@ function Conversation(
 
 	const scrollToBottom = () => {
 		if (scrollRef.current) {
-			(scrollRef.current as HTMLElement).scrollIntoView({ behavior: 'smooth', block: 'end' });
+			(scrollRef.current as HTMLElement).scrollIntoView({behavior: 'smooth', block: 'end'});
 		}
 	};
 
@@ -69,13 +77,13 @@ function Conversation(
 					<p className="chat-error-get-message">
 						{"you can't access this channel"}
 					</p>
-					: 
-						<>
-							<p className='chat-conversation-channel-name'>
-								{parseChannelName(channel, '' + myId)}
-							</p>
-							<ButtonListChannel/>
-						</>	
+					:
+					<>
+						<p className='chat-conversation-channel-name'>
+							{parseChannelName(channel, '' + myId)}
+						</p>
+						<ButtonListChannel/>
+					</>
 				}
 			</div>
 			{(listMessages != null && listMessages.length > 0) ?
@@ -83,12 +91,12 @@ function Conversation(
 
 					{(listMessages.map((message) => (
 						<Messages
-						key={message.id}
-						message={message}
-						listImage={listImageProfil}
+							key={message.id}
+							message={message}
+							listImage={listImageProfil}
 						/>
-						)))}
-					<div ref={scrollRef} />
+					)))}
+					<div ref={scrollRef}/>
 				</div> : (
 					channel.id != '' && !errorGetMessage ? (
 						<p className="chat-conversation-write-the-first-message">

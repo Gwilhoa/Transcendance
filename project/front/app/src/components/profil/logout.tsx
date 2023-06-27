@@ -1,20 +1,19 @@
 import React from 'react';
 import {useDispatch} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
-import Cookies from 'universal-cookie';
-import { setId } from '../../redux/id/idSlice';
 import {closeModal} from '../../redux/modal/modalSlice';
+import SocketSingleton from "../../socket";
 
-const cookies = new Cookies();
 
 function LogoutButton() {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
+	const socket = SocketSingleton.getInstance().getSocket();
 
 	const handleOnClick = () => {
-
 		dispatch(closeModal());
 		localStorage.removeItem('jwtAuthorization');
+		socket.emit('logout');
 		navigate('/');
 	};
 

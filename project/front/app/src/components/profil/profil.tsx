@@ -12,6 +12,7 @@ import axios from 'axios';
 import SocketSingleton from '../../socket';
 import {ProfilName} from './ProfilName';
 import jwtDecode from 'jwt-decode';
+
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
 
@@ -20,8 +21,16 @@ export default function Profil() {
 	const initialElement = [];
 	const navigate = useNavigate();
 	const [isMe, setIsMe] = useState<boolean>(false);
-	const jwt: string = jwtDecode(''+localStorage.getItem('jwtAuthorization')) ;
-	const [myId] = useState<string>(jwt.sub);
+	const [myId, setMyId] = useState<string>('');
+
+	useEffect(() => {
+		if (localStorage.getItem('jwtAuthorization') != null) {
+			const jwt_decode : any = jwtDecode('' + localStorage.getItem('jwtAuthorization'));
+			setMyId(jwt_decode.sub);
+		} else {
+			navigate('/error');
+		}
+	}, [navigate]);
 
 	const [isFriend, setIsFriend] = useState<boolean>(false);
 	const [checked, setChecked] = useState(false);
@@ -36,21 +45,20 @@ export default function Profil() {
 	const id = useSelector((state: RootState) => state.modal.id);
 	const dispatch = useDispatch();
 
-	console.log(id);
 	const refresh = useCallback((id: string | null) => {
-			axios.get(process.env.REACT_APP_IP + ':3000/auth/2fa/is2FA', {
-				headers: {
-					Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
-				},
+		axios.get(process.env.REACT_APP_IP + ':3000/auth/2fa/is2FA', {
+			headers: {
+				Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
+			},
+		})
+			.then((response) => {
+				setChecked(response.data);
 			})
-				.then((response) => {
-					setChecked(response.data);
-				})
-				.catch((error) => {
-					setErrorLocalStorage('Error ' + error?.response?.status);
-					navigate('/Error');
-					dispatch(closeModal());
-				});
+			.catch((error) => {
+				setErrorLocalStorage('Error ' + error?.response?.status);
+				navigate('/Error');
+				dispatch(closeModal());
+			});
 
 		axios.get(process.env.REACT_APP_IP + ':3000/user/id/' + id, {
 			headers: {
@@ -61,6 +69,9 @@ export default function Profil() {
 				setVictory(response.data.victories);
 				setDefeat(response.data.defeats);
 				setExperience(response.data.experience);
+				if (myId == response.data.id) {
+					setIsMe(true);
+				}
 			})
 			.catch((error) => {
 				setErrorLocalStorage('Error ' + error?.response?.status);
@@ -88,7 +99,6 @@ export default function Profil() {
 			headers: {Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,},
 		}).then((Response) => {
 			for (const request of Response.data) {
-				console.log(request);
 				if (request.sender.id === id) {
 					setHasFriendRequest(1);
 					return;
@@ -99,19 +109,18 @@ export default function Profil() {
 				}
 			}
 		}).catch((error) => {
-				if (error?.response?.status === 401 || error?.response?.status === 500) {
-					setErrorLocalStorage('Error ' + error?.response?.status);
-					navigate('/Error');
-					dispatch(closeModal());
-				}
+			if (error?.response?.status === 401 || error?.response?.status === 500) {
+				setErrorLocalStorage('Error ' + error?.response?.status);
 				navigate('/Error');
 				dispatch(closeModal());
+			}
+			navigate('/Error');
+			dispatch(closeModal());
 		});
 
 		axios.get(process.env.REACT_APP_IP + ':3000/user/friend/blocked', {
 			headers: {Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,},
 		}).then((Response) => {
-			console.log(Response.data);
 			for (const blocked of Response.data) {
 				if (blocked.id === id) {
 					setIsUserBlocked(true);
@@ -119,46 +128,43 @@ export default function Profil() {
 				}
 			}
 		}).catch((error) => {
-				if (error?.response?.status === 401 || error?.response?.status === 500) {
-					setErrorLocalStorage('Error ' + error?.response?.status);
-					navigate('/Error');
-					dispatch(closeModal());
-				}
+			if (error?.response?.status === 401 || error?.response?.status === 500) {
+				setErrorLocalStorage('Error ' + error?.response?.status);
 				navigate('/Error');
 				dispatch(closeModal());
+			}
+			navigate('/Error');
+			dispatch(closeModal());
 		});
 	}, [navigate, dispatch, myId]);
 
 	useEffect(() => {
-		socket.on('block_code',(data) => {
-			console.log(data);
+		if (id === myId) {
+			setIsMe(true);
+		}
+		refresh(id);
+	}, [navigate, id, refresh, dispatch, myId]);
+
+	useEffect(() => {
+		socket.on('block_code', (data) => {
 			if (data.code == 2) {
 				setIsUserBlocked(true);
-			} else if (data.code == 3)
-			{
+			} else if (data.code == 3) {
 				setIsUserBlocked(false);
 			}
-			else
-				console.log('error' + data.message);
 		})
 
 		socket.on('friend_code', (data: any) => {
-			console.log(data);
 			if (data.code === 2 && !isFriend) {
 				setIsFriend(!isFriend);
 				return;
-			}
-			else if (data.code === 5 || data.code === 7) {
+			} else if (data.code === 5 || data.code === 7) {
 				setIsFriend(!isFriend);
 			}
 		})
 
 
-
 		socket.on('friend_request', (data: any) => {
-			console.log('frend request :');
-			console.log(data);
-			console.log('friend request => ' + data.code);
 			if (data.id == id && (data.code == 2 || data.code == 7 || data.code == 5)) {
 				setIsFriend(!isFriend);
 			}
@@ -171,12 +177,6 @@ export default function Profil() {
 		}
 	}, [isFriend, id, navigate]);
 
-	useEffect(() => {
-		if (id === myId) {
-			setIsMe(true);
-		}
-		refresh(id);
-	}, [navigate, id, refresh, dispatch, myId]);
 
 	const changeName = (str: string) => {
 		axios.post(process.env.REACT_APP_IP + ':3000/user/name',
@@ -190,7 +190,7 @@ export default function Profil() {
 				setErrorName(false);
 			})
 			.catch((error) => {
-				if (error?.response?.status == 401 
+				if (error?.response?.status == 401
 					|| error?.response?.status == 500) {
 					setErrorLocalStorage('Error ' + error?.response?.status);
 					console.error(error);
@@ -203,12 +203,10 @@ export default function Profil() {
 	}
 
 	const clicked = () => {
-		console.log('change clicked');
 		if (!checked) {
 			navigate('/CreateTwoFa');
 			dispatch(closeModal());
 		} else {
-			console.log('change clicked');
 			axios.get(process.env.REACT_APP_IP + ':3000/auth/2fa/disable', {
 				headers: {
 					Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
@@ -240,14 +238,12 @@ export default function Profil() {
 				},
 				data: formData,
 			})
-				.then((response) => {
-					console.log(response);
+				.then(() => {
 					change = true;
 					setErrorImageMessage('');
 				})
 				.catch((error) => {
-					console.log('err image')
-					if (error?.response?.status == 401 
+					if (error?.response?.status == 401
 						|| error?.response?.status == 500) {
 						setErrorLocalStorage('Error ' + error?.response?.status);
 						navigate('/Error');
@@ -257,7 +253,7 @@ export default function Profil() {
 					setErrorImageMessage(error?.response?.data?.message);
 				});
 			if (change === false) {
-				setErrorImageMessage('Bad format');		
+				setErrorImageMessage('Bad format');
 			}
 		}
 	};
@@ -268,17 +264,14 @@ export default function Profil() {
 	};
 
 	const handleAddFriend = (id: string | null) => {
-		console.log('add friend ' + id);
 		socket.emit('friend_request', {friend_id: id, token: localStorage.getItem('jwtAuthorization')});
 	};
 
 	const handleUnFriend = (id: string | null) => {
-		console.log('add friend ' + id);
 		socket.emit('unfriend_request', {friend_id: id, token: localStorage.getItem('jwtAuthorization')});
 	};
 
 	const handlechallenge = (id: string | null) => {
-		console.log('challenge ' + id);
 		socket.emit('challenge', {rival_id: id, token: localStorage.getItem('jwtAuthorization')});
 	}
 
@@ -300,8 +293,8 @@ export default function Profil() {
 					<span>{defeats}</span>
 				</p>
 				<p>
-				<span className='profil-game-info-title'>Ratio</span>
-				<span>{defeats === 0 ? (victories === 0 ? 0 : 1) : (victories / defeats).toFixed(2)}</span>
+					<span className='profil-game-info-title'>Ratio</span>
+					<span>{defeats === 0 ? (victories === 0 ? 0 : 1) : (victories / defeats).toFixed(2)}</span>
 				</p>
 			</div>
 			<p className='profil-experience'>{experience} XP</p>
@@ -313,7 +306,6 @@ export default function Profil() {
 			<div className='browse-file' key='changeImage'>
 				<input type='file' onChange={handleImageChange} id='files'/>
 				<label htmlFor='files' className='profil-button'>Change image</label>
-				{errorImageMessage != '' && (<p>{errorImageMessage}</p>)}
 			</div>
 		)
 
@@ -326,7 +318,6 @@ export default function Profil() {
 					classInput='profil-button'
 					classButton='profil-button'
 				/>
-				{errorName ? <p className='Error-msg'>{errorNameMessage}</p> : <></>}
 			</div>
 		)
 
@@ -340,19 +331,22 @@ export default function Profil() {
 			</div>
 		)
 		initialElement.push(
-			<div key='logout' className='logout'>
-				<LogoutButton/>
+			<div key='logout'>
+				{errorName && <p className='Error-msg'>{'* ' + errorNameMessage}</p>}
+				{errorImageMessage != '' && (<p className='Error-msg'>{'* ' + errorImageMessage}</p>)}
+				<div className='logout'>
+					<LogoutButton/>
+				</div>
 			</div>
 		)
 	}
 
 	function handleChangeBlock() {
-			if (isUserBlocked) {
-				socket.emit('unblock_user', {unblock_id: id, token:localStorage.getItem('jwtAuthorization')})
-			}
-			else {
-				socket.emit('block_user', {block_id: id, token: localStorage.getItem('jwtAuthorization')})
-			}
+		if (isUserBlocked) {
+			socket.emit('unblock_user', {unblock_id: id, token: localStorage.getItem('jwtAuthorization')})
+		} else {
+			socket.emit('block_user', {block_id: id, token: localStorage.getItem('jwtAuthorization')})
+		}
 	}
 
 	return (
@@ -379,8 +373,8 @@ export default function Profil() {
 									{
 										isUserBlocked ? (
 											'unblock'
-											) : 'block'
-										}
+										) : 'block'
+									}
 								</button>
 							</>
 						) : (
@@ -394,7 +388,7 @@ export default function Profil() {
 								</button>
 							</>
 						)}
-						<br />
+						<br/>
 						<button onClick={() => handleHistory(id)}>
 							history
 						</button>

@@ -12,13 +12,10 @@ import TokenPage from './pages/authenticate';
 import NotTwoFa from './components/authenticate/AuthenticateComponentsNotTwoFa'
 import TwoFa from './components/authenticate/AuthenticateComponentsTwoFa'
 import React from 'react';
-import Cookies from 'universal-cookie';
 import Chat from './pages/chat';
 import BeginGame from "./pages/begingame";
 import OptionGame from "./pages/optiongame";
 import Waiting from './pages/waiting';
-
-export const cookies = new Cookies();
 
 
 const AppInsideBrowser = () => {
@@ -30,7 +27,7 @@ const AppInsideBrowser = () => {
 				<Route path="/authenticate" Component={TokenPage}/>
 				<Route path="/authenticate/NotTwoFa" Component={NotTwoFa}/>
 				<Route path="/authenticate/TwoFa" Component={TwoFa}/>
-				<Route path="/authenticate/waiting" Component={Waiting} />
+				<Route path="/authenticate/waiting" Component={Waiting}/>
 				<Route path="/Error" Component={TryToReconnect}/>
 				<Route path="/game" element={<Game gameId={0}/>}/>
 				<Route path="/optionGame" element={<OptionGame></OptionGame>}/>

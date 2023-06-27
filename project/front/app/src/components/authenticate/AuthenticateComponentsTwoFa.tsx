@@ -5,12 +5,27 @@ import {useNavigate} from 'react-router-dom';
 import AuthCode, {AuthCodeRef} from 'react-auth-code-input';
 import {setErrorLocalStorage} from '../IfError';
 import {ErrorInput} from '../../pages/CreateTwoFa';
+import SocketSingleton from '../../socket';
 
 function AuthenticateComponentsTwoFa() {
 	const [, setResult] = useState<string>('');
 	const [Error, setError] = useState<boolean>(false);
 	const navigate = useNavigate();
 	const AuthInputRef = useRef<AuthCodeRef>(null);
+
+	const socketInstance = SocketSingleton.getInstance();
+	const socket = socketInstance.getSocket();
+
+	useEffect(() => {
+		socket.on('connection_error', () => {
+			setErrorLocalStorage('unauthorized')
+			navigate('/error');
+		});
+
+		return () => {
+			socket.off('connection_error');
+		};
+	}, [navigate]);
 
 	useEffect(() => {
 		if (localStorage.getItem('jwtAuthorization') != null) {
@@ -24,7 +39,7 @@ function AuthenticateComponentsTwoFa() {
 				})
 				.catch((error) => {
 					localStorage.removeItem('tenMinToken');
-					setErrorLocalStorage('Error ' + error.response.status);
+					setErrorLocalStorage('Error ' + error?.response?.status);
 					console.error(error);
 					navigate('/Error');
 				});
@@ -38,29 +53,26 @@ function AuthenticateComponentsTwoFa() {
 	const handleOnChange = (res: string) => {
 		setResult(res);
 		if (res.length === 6) {
-			console.log('result of input create 2fa ' + res);
 			axios.post(process.env.REACT_APP_IP + ':3000/auth/authenticate',
 				{
 					code: res
 				},
 				{
 					headers: {
-						Authorization: `Bearer ${localStorage.getItem('TenMinToken')}`,
+						Authorization: `Bearer ${localStorage.getItem('tenMinToken')}`,
 					},
 				})
 				.then((response) => {
-					console.log(response);
 					setCookieJwt(response.data.access_token);
 					localStorage.removeItem('tenMinToken');
 					navigate('/authenticate/waiting');
 				})
 				.catch((error) => {
-					if (error.response.status === 401) {
+					if (error?.response?.status === 401) {
 						setErrorLocalStorage('unauthorized');
 						navigate('/Error');
 					} else {
 						setError(true);
-						console.error(error);
 						AuthInputRef.current?.clear();
 					}
 				});
@@ -81,7 +93,7 @@ function AuthenticateComponentsTwoFa() {
 						onChange={handleOnChange}
 						inputClassName='input'
 						ref={AuthInputRef}
-						/>
+					/>
 					{Error == true ? (<ErrorInput/>) : (<></>)}
 				</div>
 			</div>

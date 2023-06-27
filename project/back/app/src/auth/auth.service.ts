@@ -7,7 +7,6 @@ export class AuthService {
   constructor(private jwt: JwtService) {}
 
   public async getUserIntra(token) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const axios = require('axios');
     const url = 'https://api.intra.42.fr/v2/me';
     const data = {

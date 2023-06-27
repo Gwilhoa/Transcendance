@@ -1,5 +1,5 @@
 import '../css/sendMessageBar.css'
-import React, {Dispatch, SetStateAction, useState} from 'react'
+import React, {Dispatch, SetStateAction, useEffect, useState} from 'react'
 import SocketSingleton from '../../../socket';
 
 const socketInstance = SocketSingleton.getInstance();
@@ -16,11 +16,20 @@ const SendMessage = ({
 	setPostMessage: Dispatch<SetStateAction<boolean>>,
 	postMessage: boolean,
 }) => {
+	const [oldId, setOldId] = useState<string>('');
 	const [message, setMessage] = useState<string>('');
 	const [timer, setTimer] = useState<boolean>(false);
 
+	useEffect(() => {
+		if (conversation != oldId) {
+			setOldId(conversation);
+			setMessage('');
+		}	
+	}, [conversation, oldId]);
+
 	const handleSendMessage = () => {
-		console.log('send message pls : ' + conversation);
+		if (message.length < 1)
+			return;
 		socket.emit('send_message', {
 			token: localStorage.getItem('jwtAuthorization'),
 			channel_id: conversation,
