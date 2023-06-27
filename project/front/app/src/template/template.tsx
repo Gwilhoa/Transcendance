@@ -41,7 +41,6 @@ const Template = () => {
 	}
 
 	useEffect(() => {
-		console.log('template id : ' + conversationId);
 		socket.on('receive_challenge', (data: any) => {
 			if (data.code == 3) {
 				socket.on('game_found', (data) => {
@@ -70,7 +69,16 @@ const Template = () => {
 
 		socket.on('notif_message', (data: any) => {
 			if (conversationId == data.channel.id)
-				return;
+			{
+				setNotifVisible(false);
+
+				// return;
+			}
+			else
+			{
+			setNotifVisible(true);
+
+			}
 			let newmessage = data.user.username + ' : ' + data.content;
 			if (data.content.length > 16) {
 				newmessage = data.user.username + ' : ' + data.content.substring(0, 16) + '...';
@@ -80,11 +88,10 @@ const Template = () => {
 			}} onCancel={() => {
 				null
 			}} hasButton={false} setVisible={setNotifVisible}/>)
-			setNotifVisible(true);
+			// setNotifVisible(true);
 		})
 
 		socket.on('friend_notif', (data: any) => {
-			console.count('friend_request');
 			if (data.code == 4) {
 				friendId = data.id;
 				setNotif(<Notification message={data.username + ' wants to be your friend'} onConfirm={confirmFriend} onCancel={rejectFriend} hasButton={true} setVisible={setNotifVisible}/>);
