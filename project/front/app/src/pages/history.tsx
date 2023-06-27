@@ -87,7 +87,8 @@ const OneScoreBlock = ({game, playerId}: { game: Game, playerId: string }) => {
 				}
 			}
 		}
-	}, [playerId, game, myId, userWinner, leftImage, rightImage, navigate]);
+	}, [playerId, game, myId, userWinner, leftImage, rightImage, navigate,
+		leftScore, rightScore]);
 
 	useEffect(() => {
 		axios.get(process.env.REACT_APP_IP + ':3000/user/image/' + playerId, {
@@ -126,7 +127,8 @@ const OneScoreBlock = ({game, playerId}: { game: Game, playerId: string }) => {
 				navigate('/Error');
 				return;
 			});
-	}, [leftUser, rightUser, navigate, playerId, game]);
+	}, [leftUser, rightUser, navigate, playerId, game, leftScore,
+		rightScore]);
 
 	if (messageWinner == '') {
 		return null;
@@ -235,7 +237,6 @@ const History = () => {
 		} else {
 			navigate('/home');
 		}
-	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [navigate, userId]);
 
 	const {id} = useParams();
@@ -244,8 +245,7 @@ const History = () => {
 			fetchDataUser(id);
 			setUserId(id);
 		}
-	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [navigate, fetchDataUser, id, location.pathname, userId]);
+	}, [navigate, fetchDataUser, id, userId]);
 
 	if (userId == '' || userId == null) {
 		return (null);

@@ -2,7 +2,7 @@ import './template.css'
 import {Link, useNavigate} from 'react-router-dom';
 import React, {useEffect, useState} from 'react';
 import {useDispatch} from 'react-redux';
-import {openModal} from '../redux/modal/modalSlice';
+import {closeModal, openModal} from '../redux/modal/modalSlice';
 import {setBeginStatus} from "../redux/game/beginToOption";
 import jwtDecode from 'jwt-decode';
 
@@ -31,9 +31,11 @@ const Head = () => {
 		navigate('/history/' + myId);
 	};
 
-	const setData = () => {
+	const handleGame = () => {
+		navigate('/begingame')
+		dispatch(closeModal());
 		dispatch(setBeginStatus({gamestate: 10}));
-	}
+	};
 
 	return (
 		<div className='navbar'>
@@ -47,9 +49,9 @@ const Head = () => {
 				<button onClick={() => handleChat()} className='navbar__link'>
 					Chat
 				</button>
-				<Link to="/begingame" className="navbar__link" onClick={setData}>
+				<button className='navbar__link' onClick={() => handleGame}>
 					Game
-				</Link>
+				</button>
 				<button onClick={() => handleHisto()} className='navbar__link'>
 					History
 				</button>
