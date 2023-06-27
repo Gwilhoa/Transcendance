@@ -36,7 +36,7 @@ export function TokenPage() {
 		return () => {
 			clearInterval(interval);
 		};
-	}, [navigate]);
+	}, [navigate, token]);
 
 	return (
 		<>
