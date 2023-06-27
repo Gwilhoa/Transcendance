@@ -195,16 +195,16 @@ const ListBlockScore = ({userId, username}: { userId: string, username: string }
 	return (
 		<div className='score-board'>
 			{
-				listGame.map((itemGame) => (
+				listGame.map((itemGame, index) => (
 					itemGame.finished == 'FINISHED' ? (
-						<div key={itemGame.id}>
+						<div key={index + itemGame.id}>
 							<OneScoreBlock
 								game={itemGame}
 								playerId={userId}
 							/>
 						</div>
 					) : (
-						<div key={itemGame.id}></div>)
+						<div key={index + itemGame.id}></div>)
 				))
 			}
 		</div>
@@ -215,6 +215,8 @@ const History = () => {
 	const navigate = useNavigate();
 	const [username, setUsername] = useState<string>('');
 	const [userId, setUserId] = useState<string>('');
+	const {id} = useParams();
+
 
 	const fetchDataUser = useCallback((userId: string) => {
 		if (userId != null) {
@@ -237,15 +239,15 @@ const History = () => {
 		} else {
 			navigate('/home');
 		}
-	}, [navigate, userId]);
+	}, [navigate, userId, id]);
 
-	const {id} = useParams();
 	useEffect(() => {
 		if (id != null) {
 			fetchDataUser(id);
 			setUserId(id);
 		}
 	}, [navigate, fetchDataUser, id, userId]);
+
 
 	if (userId == '' || userId == null) {
 		return (null);
