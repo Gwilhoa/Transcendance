@@ -303,6 +303,60 @@ export class ChannelGateway implements OnGatewayInit {
     }
   }
 
+  @SubscribeMessage('kick_user')
+  async kick_user(client: Socket, payload: any) {
+    if (
+      payload.token == null ||
+      !verifyToken(payload.token, this.authService)
+    ) {
+      wrongtoken(client, 'ban_user');
+      return;
+    }
+    const user_id = client.data.id;
+    const channel_id = payload.channel_id;
+    const kick_id = payload.kick_id;
+    const addBan = new BanUserDto();
+    const channel = await this.channelService.getChannelById(channel_id);
+    addBan.channel_id = channel_id;
+    addBan.user_id = kick_id;
+    try {
+      const chan = await this.channelService.kickUser(addBan, user_id);
+      if (chan != null) {
+        const socket: Socket = getSocketFromId(
+          kick_id,
+          getSockets(this.server),
+        );
+        if (socket != null) {
+          socket.leave(channel_id);
+          socket.emit('delete_channel', { id: channel_id });
+        }
+        this.server.to(chan.id).emit('update_user_channel', {
+          channel: chan,
+          sender_id: user_id,
+          code: 0,
+        });
+        client.emit('update_user_channel', {
+          channel: chan,
+          sender_id: user_id,
+          code: 0,
+          message: 'ok',
+        });
+      }
+    } catch (e) {
+      this.server.to(channel.id).emit('update_user_channel', {
+        channel: channel,
+        sender_id: user_id,
+        code: 1,
+      });
+      client.emit('update_user_channel', {
+        channel: channel,
+        sender_id: user_id,
+        code: 1,
+        message: e.message,
+      });
+    }
+  }
+
   @SubscribeMessage('ban_user')
   async ban_user(client: Socket, payload: any) {
     if (
@@ -510,7 +564,10 @@ export class ChannelGateway implements OnGatewayInit {
 
   @SubscribeMessage('add_muted')
   async add_muted(client: Socket, payload: any) {
-    if (payload.token == null || !verifyToken(payload.token, this.authService)) {
+    if (
+      payload.token == null ||
+      !verifyToken(payload.token, this.authService)
+    ) {
       wrongtoken(client, 'add_muted');
       return;
     }
