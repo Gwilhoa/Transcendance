@@ -45,7 +45,6 @@ export default function Profil() {
 	const id = useSelector((state: RootState) => state.modal.id);
 	const dispatch = useDispatch();
 
-	console.log(id);
 	const refresh = useCallback((id: string | null) => {
 		axios.get(process.env.REACT_APP_IP + ':3000/auth/2fa/is2FA', {
 			headers: {
@@ -70,6 +69,9 @@ export default function Profil() {
 				setVictory(response.data.victories);
 				setDefeat(response.data.defeats);
 				setExperience(response.data.experience);
+				if (myId == response.data.id) {
+					setIsMe(true);
+				}
 			})
 			.catch((error) => {
 				setErrorLocalStorage('Error ' + error?.response?.status);
@@ -139,6 +141,13 @@ export default function Profil() {
 	}, [navigate, dispatch, myId]);
 
 	useEffect(() => {
+		if (id === myId) {
+			setIsMe(true);
+		}
+		refresh(id);
+	}, [navigate, id, refresh, dispatch, myId]);
+
+	useEffect(() => {
 		socket.on('block_code', (data) => {
 			console.log(data);
 			if (data.code == 2) {
@@ -176,12 +185,6 @@ export default function Profil() {
 		}
 	}, [isFriend, id, navigate]);
 
-	useEffect(() => {
-		if (id === myId) {
-			setIsMe(true);
-		}
-		refresh(id);
-	}, [navigate, id, refresh, dispatch, myId]);
 
 	const changeName = (str: string) => {
 		axios.post(process.env.REACT_APP_IP + ':3000/user/name',
