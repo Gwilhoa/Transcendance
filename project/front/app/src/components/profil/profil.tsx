@@ -21,8 +21,16 @@ export default function Profil() {
 	const initialElement = [];
 	const navigate = useNavigate();
 	const [isMe, setIsMe] = useState<boolean>(false);
-	const jwt: string = jwtDecode('' + localStorage.getItem('jwtAuthorization'));
-	const [myId] = useState<string>(jwt.sub);
+	const [myId, setMyId] = useState<string>('');
+
+	useEffect(() => {
+		if (localStorage.getItem('jwtAuthorization') != null) {
+			const jwt_decode : any = jwtDecode('' + localStorage.getItem('jwtAuthorization'));
+			setMyId(jwt_decode.sub);
+		} else {
+			navigate('/error');
+		}
+	}, [navigate]);
 
 	const [isFriend, setIsFriend] = useState<boolean>(false);
 	const [checked, setChecked] = useState(false);

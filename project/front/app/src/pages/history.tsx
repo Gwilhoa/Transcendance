@@ -18,10 +18,18 @@ interface Game {
 }
 
 const OneScoreBlock = ({game, playerId}: { game: Game, playerId: string }) => {
-	const navigate = useNavigate();
 	const dispatch = useDispatch();
-	const jwt: string = jwtDecode('' + localStorage.getItem('jwtAuthorization'));
-	const [myId] = useState<string>(jwt.sub);
+	const navigate = useNavigate();
+	const [myId, setMyId] = useState<string>('');
+
+	useEffect(() => {
+		if (localStorage.getItem('jwtAuthorization') != null) {
+			const jwt_decode : any = jwtDecode('' + localStorage.getItem('jwtAuthorization'));
+			setMyId(jwt_decode.sub);
+		} else {
+			navigate('/error');
+		}
+	}, [navigate]);
 
 	const [leftImage, setLeftImage] = useState<string>('');
 	const [rightImage, setRightImage] = useState<string>('');
@@ -147,10 +155,19 @@ const OneScoreBlock = ({game, playerId}: { game: Game, playerId: string }) => {
 
 const ListBlockScore = ({userId, username}: { userId: string, username: string }) => {
 	const [listGame, setListGame] = useState<Array<Game>>([]);
-	const jwt: string = jwtDecode('' + localStorage.getItem('jwtAuthorization'));
-	const [myId] = useState<string>(jwt.sub);
-
 	const navigate = useNavigate();
+
+	const [myId, setMyId] = useState<string>('');
+
+	useEffect(() => {
+		if (localStorage.getItem('jwtAuthorization') != null) {
+			const jwt_decode : any = jwtDecode('' + localStorage.getItem('jwtAuthorization'));
+			setMyId(jwt_decode.sub);
+		} else {
+			navigate('/error');
+		}
+	}, [navigate]);
+
 	useEffect(() => {
 		console.log(process.env.REACT_APP_IP + ':3000/game/history/' + userId);
 		axios.get(process.env.REACT_APP_IP + ':3000/game/history/' + userId, {

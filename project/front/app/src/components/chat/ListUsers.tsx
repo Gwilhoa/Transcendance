@@ -1,5 +1,5 @@
 import './css/listUsers.css';
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {useDispatch} from 'react-redux';
 import {Channel, isAdmin, isMe, User} from '../../pages/chat';
 import {ProfilImage} from '../profil/ProfilImage';
@@ -7,6 +7,7 @@ import {ProfilName} from '../profil/ProfilName';
 import {openModal} from '../../redux/modal/modalSlice';
 import SocketSingleton from '../../socket';
 import jwtDecode from 'jwt-decode';
+import {useNavigate} from 'react-router-dom';
 
 const socketInstance = SocketSingleton.getInstance();
 const socket = socketInstance.getSocket();
@@ -127,8 +128,17 @@ const UnMuteButton = ({id, channel}: changeChannelProps) => {
 
 const ListAdmin = ({channel}: listUserProps) => {
 	const dispatch = useDispatch();
-	const jwt: string = jwtDecode('' + localStorage.getItem('jwtAuthorization'));
-	const [myId] = useState<string>(jwt.sub);
+	const navigate = useNavigate();
+	const [myId, setMyId] = useState<string>('');
+
+	useEffect(() => {
+		if (localStorage.getItem('jwtAuthorization') != null) {
+			const jwt_decode : any = jwtDecode('' + localStorage.getItem('jwtAuthorization'));
+			setMyId(jwt_decode.sub);
+		} else {
+			navigate('/error');
+		}
+	}, [navigate]);
 
 	return (
 		<>
@@ -162,8 +172,17 @@ const ListAdmin = ({channel}: listUserProps) => {
 
 const ListUser = ({channel}: listUserProps) => {
 	const dispatch = useDispatch();
-	const jwt: string = jwtDecode('' + localStorage.getItem('jwtAuthorization'));
-	const [myId] = useState<string>(jwt.sub);
+	const navigate = useNavigate();
+	const [myId, setMyId] = useState<string>('');
+
+	useEffect(() => {
+		if (localStorage.getItem('jwtAuthorization') != null) {
+			const jwt_decode : any = jwtDecode('' + localStorage.getItem('jwtAuthorization'));
+			setMyId(jwt_decode.sub);
+		} else {
+			navigate('/error');
+		}
+	}, [navigate]);
 
 	console.log('hey')
 	console.log(channel);
@@ -211,8 +230,17 @@ const ListUser = ({channel}: listUserProps) => {
 
 const ListBannedUser = ({channel}: listUserProps) => {
 	const dispatch = useDispatch();
-	const jwt: string = jwtDecode('' + localStorage.getItem('jwtAuthorization'));
-	const [myId] = useState<string>(jwt.sub);
+	const navigate = useNavigate();
+	const [myId, setMyId] = useState<string>('');
+
+	useEffect(() => {
+		if (localStorage.getItem('jwtAuthorization') != null) {
+			const jwt_decode : any = jwtDecode('' + localStorage.getItem('jwtAuthorization'));
+			setMyId(jwt_decode.sub);
+		} else {
+			navigate('/error');
+		}
+	}, [navigate]);
 
 	return (
 		<>

@@ -10,17 +10,17 @@ import jwtDecode from 'jwt-decode';
 const Head = () => {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
-	const [id, setId] = useState<string>('');
+	const [myId, setMyId] = useState<string>('');
 	useEffect(() => {
 		if (localStorage.getItem('jwtAuthorization') != null) {
-			const jwt: string = jwtDecode('' + localStorage.getItem('jwtAuthorization'));
-			setId(jwt.sub);
+			const jwt: any = jwtDecode('' + localStorage.getItem('jwtAuthorization'));
+			setMyId(jwt.sub);
 		} else {
 			navigate('/error');
 		}
 	}, [navigate]);
-	const handleOpenModal = (id: string | null) => {
-		dispatch(openModal(id));
+	const handleOpenModal = (myId: string | null) => {
+		dispatch(openModal(myId));
 	};
 
 	const handleChat = () => {
@@ -28,7 +28,7 @@ const Head = () => {
 	};
 
 	const handleHisto = () => {
-		navigate('/history/' + id);
+		navigate('/history/' + myId);
 	};
 
 	const setData = () => {
@@ -53,7 +53,7 @@ const Head = () => {
 				<button onClick={() => handleHisto()} className='navbar__link'>
 					History
 				</button>
-				<button onClick={() => handleOpenModal(id)} className='navbar__link'>
+				<button onClick={() => handleOpenModal(myId)} className='navbar__link'>
 					Profil
 				</button>
 			</div>

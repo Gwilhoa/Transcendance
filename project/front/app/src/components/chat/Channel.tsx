@@ -1,9 +1,10 @@
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {Channel, isAdmin} from '../../pages/chat';
 import ButtonInviteChannel from './optionBar/button/ButtonInviteChannelModal';
 import ButtonUpdateChannel from './optionBar/button/ButtonUpdateChannel';
 import ButtonLeaveChannel from './optionBar/button/ButtonLeaveChannel';
 import jwtDecode from 'jwt-decode';
+import { useNavigate } from 'react-router-dom';
 
 export const parseChannelName = (channel: Channel, myId: string) => {
 	if (channel.type !== 3) {
@@ -16,8 +17,17 @@ export const parseChannelName = (channel: Channel, myId: string) => {
 };
 
 const ChannelSideBar = ({channel}: { channel: Channel }) => {
-	const jwt: string = jwtDecode('' + localStorage.getItem('jwtAuthorization'));
-	const [myId] = useState<string>(jwt.sub);
+	const navigate = useNavigate();
+	const [myId, setMyId] = useState<string>('');
+
+	useEffect(() => {
+		if (localStorage.getItem('jwtAuthorization') != null) {
+			const jwt_decode : any = jwtDecode('' + localStorage.getItem('jwtAuthorization'));
+			setMyId(jwt_decode.sub);
+		} else {
+			navigate('/error');
+		}
+	}, [navigate]);
 
 	const troncChannelName = (channel: Channel) => {
 		let name = parseChannelName(channel, '' + myId);
