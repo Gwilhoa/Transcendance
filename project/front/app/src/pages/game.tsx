@@ -44,7 +44,6 @@ const Game: React.FC<GameProps> = () => {
 	const [stop, setStop] = useState(false);
 	const [timeStop, setTimeStop] = useState(60);
 	const dispatch = useDispatch();
-	const finalStatus = useSelector((state: RootState) => state.finalGame.finalStatus);
 	const [IamStoper, setIamStoper] = useState(false);
 
 	const socketInstance = SocketSingleton.getInstance();

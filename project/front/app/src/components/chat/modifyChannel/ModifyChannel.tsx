@@ -23,7 +23,7 @@ const ModifyChannel = ({channel}: { channel: Channel }) => {
 				headers: {
 					Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 				},
-			}).then((response) => {
+			}).then(() => {
 			dispatch(switchChatModalUpdateChannel());
 		}).catch((error) => {
 			console.error(error);

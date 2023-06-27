@@ -3,7 +3,7 @@
     color: var(--light-color);
     background-color: var(--box-color);
     width: 35rem;
-    overflow-y: auto;
+    overflow: auto;
 }
 
 .chat-right-bar-list-user > div {
@@ -36,6 +36,10 @@
     cursor: pointer;
 }
 
+.chat-list-users-name-kick{
+    display: flex;
+}
+
 .chat-list-users-buttons-user {
     display: flex;
 }
@@ -46,6 +50,7 @@
     border-radius: 6px;
     margin: 0.5rem 0 0.5rem 0.5rem;
     padding: 0 0.3rem;
+    cursor: pointer;
 }
 
 .chat-list-users-button-ban-hammer, .chat-list-users-button-unban-hammer {
@@ -54,6 +59,7 @@
     border-radius: 6px;
     margin: 0.5rem 0 0.5rem 0.5rem;
     padding: 0 0.3rem;
+    cursor: pointer;
 }
 
 .chat-list-users-button-mute, .chat-list-users-button-unmute {
@@ -62,4 +68,14 @@
     border-radius: 6px;
     margin: 0.5rem 0 0.5rem 0.5rem;
     padding: 0 0.3rem;
+    cursor: pointer;
+}
+
+.chat-list-users-button-kick-user{
+    background-color: var(--background-color);
+    border: 0.25rem solid var(--background-color);
+    border-radius: 6px;
+    margin: 0 0 0.5rem 0.5rem;
+    padding: 0 0.3rem;
+    cursor: pointer;
 }

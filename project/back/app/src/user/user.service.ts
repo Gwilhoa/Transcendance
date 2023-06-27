@@ -30,9 +30,7 @@ export class UserService {
   ) {}
 
   public async getPathImage(id: string) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const fs = require('fs');
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const path = require('path');
     const imageDir = path.join(__dirname, '..', '..', '..', 'images');
     const files = await fs.promises.readdir(imageDir);
@@ -118,7 +116,6 @@ export class UserService {
       login = retUser.login + nbr;
       nbr++;
     }
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const fs = require('fs');
     const user = new User();
     user.status = UserStatus.IN_CONNECTION;
@@ -581,8 +578,6 @@ export class UserService {
       isauth: isauth,
       enabled2FA: check2FA,
     };
-    // const payload = { sub: parseInt(userId), isauth: isauth ,enabled2FA: 1};
-
     return {
       access_token: await this.jwt.signAsync(payload, {
         expiresIn: expiresTime,

@@ -26,7 +26,7 @@ const BeginGame = () => {
 		return () => {
 			socket.emit('leave_matchmaking', {token: localStorage.getItem('jwtAuthorization')})
 		};
-	}, []);
+	}, [navigate, gamestate, dispatch]);
 
 	useEffect(() => {
 
@@ -52,7 +52,7 @@ const BeginGame = () => {
 			socket.off('matchmaking_code');
 			socket.off('game_found');
 		};
-	}, []);
+	}, [navigate, dispatch]);
 
 
 	const spinnerAnimation = useSpring({

@@ -17,7 +17,7 @@ export default function Notification({message, onConfirm, onCancel, hasButton, s
 		}, 3000);
 
 		return () => clearTimeout(timer);
-	}, []);
+	}, [setVisible]);
 
 	const handleClose = () => {
 		setVisible(false);
