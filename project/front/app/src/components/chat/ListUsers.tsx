@@ -210,7 +210,7 @@ const ListUser = ({channel}: listUserProps) => {
 								<div className='chat-list-users-user-name' onClick={() => dispatch(openModal(user.id))}>
 									<ProfilName id={user.id}/>
 								</div>
-								<KickUser id={user.id} channel={channel}/>
+								{isAdmin(channel, '' + myId) && (<KickUser id={user.id} channel={channel}/>)}
 							</div>
 							{isAdmin(channel, '' + myId) && !isMe(user, '' + myId) ?
 								<div className='chat-list-users-buttons-user'>
