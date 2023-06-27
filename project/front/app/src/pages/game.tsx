@@ -100,11 +100,6 @@ const Game: React.FC<GameProps> = () => {
 		socket.emit("input_game", {game_id: gameId, type: 2})
 	}
 
-	socket.on('create_game', (any) => {
-		console.log('WESH')
-		console.log(any);
-	})
-
 	socket.on('will_started', (data) => {
 		if (data.time == 0) {
 			canPress.current = true;
@@ -133,7 +128,6 @@ const Game: React.FC<GameProps> = () => {
 			setNbBall(data.ball);
 			setNbMap(data.map);
 			setIsPowerup(data.powerup);
-			console.log(data)
 		})
 
 		socket.on('game_start', () => {
@@ -141,24 +135,19 @@ const Game: React.FC<GameProps> = () => {
 		})
 
 		socket.on('stop_game', (any) => {
-			console.log(any);
 			setTimeStop(any.time);
 		})
 
 		socket.on('is_stop_game', (any) => {
-			console.log(any);
 			setStop(any.stop);
 			setTimeStop(any.time);
 			setIamStoper(any.stoper);
-			console.log(any.stoper);
-			console.log(IamStoper);
 		})
 
 		socket.on('update_game', (data) => {
 			if (data.package > packageNumber) {
 				setStarted(data.score2 + "  " + data.score1)
 				packageNumber = data.package;
-				console.log (data.ballx, data.bally);
 				data.ballx += 1;
 				if(data.ballx > 100) {
 					data.ballx = 100
@@ -170,7 +159,6 @@ const Game: React.FC<GameProps> = () => {
 		});
 
 		socket.on('finish_game', (any) => {
-			console.log(any)
 			if (isCall) {
 				const content = {
 					status: any.status,
@@ -193,9 +181,6 @@ const Game: React.FC<GameProps> = () => {
         socket.off('is_stop_game');
         socket.off('stop_game');
         socket.off('option_receive');
-        socket.off('create_game');
-        //leaveGame();
-
 		};
 	}, []);
 

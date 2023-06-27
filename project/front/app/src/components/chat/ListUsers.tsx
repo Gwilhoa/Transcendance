@@ -121,7 +121,6 @@ const UnMuteButton = ({id, channel}: changeChannelProps) => {
 
 const KickUser = ({id, channel}: changeChannelProps) => {
 	const handleClickKicUser = () => {
-		console.log('kick user');
 		socket.emit('kick_user', {channel_id: channel.id, kick_id: id, token: localStorage.getItem('jwtAuthorization')});
 	};
 	
