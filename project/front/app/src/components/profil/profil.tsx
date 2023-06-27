@@ -69,6 +69,9 @@ export default function Profil() {
 				setVictory(response.data.victories);
 				setDefeat(response.data.defeats);
 				setExperience(response.data.experience);
+				if (myId == response.data.id) {
+					setIsMe(true);
+				}
 			})
 			.catch((error) => {
 				setErrorLocalStorage('Error ' + error?.response?.status);
@@ -136,6 +139,13 @@ export default function Profil() {
 	}, [navigate, dispatch, myId]);
 
 	useEffect(() => {
+		if (id === myId) {
+			setIsMe(true);
+		}
+		refresh(id);
+	}, [navigate, id, refresh, dispatch, myId]);
+
+	useEffect(() => {
 		socket.on('block_code', (data) => {
 			if (data.code == 2) {
 				setIsUserBlocked(true);
@@ -167,12 +177,6 @@ export default function Profil() {
 		}
 	}, [isFriend, id, navigate]);
 
-	useEffect(() => {
-		if (id === myId) {
-			setIsMe(true);
-		}
-		refresh(id);
-	}, [navigate, id, refresh, dispatch, myId]);
 
 	const changeName = (str: string) => {
 		axios.post(process.env.REACT_APP_IP + ':3000/user/name',

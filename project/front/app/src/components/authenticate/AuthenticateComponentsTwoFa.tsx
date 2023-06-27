@@ -53,13 +53,11 @@ function AuthenticateComponentsTwoFa() {
 					navigate('/authenticate/waiting');
 				})
 				.catch((error) => {
-					console.error(error);
 					if (error.response.status === 401) {
 						setErrorLocalStorage('unauthorized');
 						navigate('/Error');
 					} else {
 						setError(true);
-						console.error(error);
 						AuthInputRef.current?.clear();
 					}
 				});
