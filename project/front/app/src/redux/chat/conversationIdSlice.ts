@@ -14,7 +14,6 @@ const conversationIdSlice = createSlice({
 	reducers: {
 		setConversation: (state, action: PayloadAction<string>) => {
 			state.id = action.payload;
-			localStorage.setItem('conversationId', action.payload);
 		},
 	},
 });
