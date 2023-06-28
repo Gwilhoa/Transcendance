@@ -28,7 +28,6 @@ const Template = () => {
 	}, [socket, friendId]);
 
 	const rejectFriend = () => {
-		// eslint-disable-next-line @typescript-eslint/no-unused-expressions
 		null
 	}
 
@@ -38,13 +37,11 @@ const Template = () => {
 	}, [socket, rivalId]);
 
 	function rejectChallenge() {
-		// eslint-disable-next-line @typescript-eslint/no-unused-expressions
 		null
 	}
 
 	useEffect(() => {
 		socket.on('receive_challenge', (data: any) => {
-			// eslint-disable-next-line eqeqeq
 			if (data.code == 3) {
 				socket.on('game_found', (data) => {
 					dispatch(setBeginStatus({
@@ -58,7 +55,6 @@ const Template = () => {
 					socket.off('game_found')
 				});
 				navigate('/optiongame');
-				// eslint-disable-next-line eqeqeq
 			} else if (data.code == 2) {
 				setRivalId(data.rival);
 				setNotif(<Notification message={data.rival_name + ' wants battle'} onConfirm={confirmChallenge} onCancel={rejectChallenge} hasButton={true} setVisible={setNotifVisible}/>)
@@ -72,7 +68,6 @@ const Template = () => {
 		});
 
 		socket.on('notif_message', (data: any) => {
-			// eslint-disable-next-line eqeqeq
 			if (conversationId == data.channel.id)
 			{
 				setNotifVisible(false);
@@ -87,16 +82,13 @@ const Template = () => {
 				newmessage = data.user.username + ' : ' + data.content.substring(0, 16) + '...';
 			}
 			setNotif(<Notification message={newmessage} onConfirm={() => {
-				// eslint-disable-next-line @typescript-eslint/no-unused-expressions
 				null
 			}} onCancel={() => {
-				// eslint-disable-next-line @typescript-eslint/no-unused-expressions
 				null
 			}} hasButton={false} setVisible={setNotifVisible}/>)
 		})
 
 		socket.on('friend_notif', (data: any) => {
-			// eslint-disable-next-line eqeqeq
 			if (data.code == 4) {
 				setFriendId(data.id);
 				setNotif(<Notification message={data.username + ' wants to be your friend'} onConfirm={confirmFriend} onCancel={rejectFriend} hasButton={true} setVisible={setNotifVisible}/>);

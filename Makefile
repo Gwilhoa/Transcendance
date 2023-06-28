@@ -66,7 +66,6 @@ all:   header start
 
 build :
 	printf "%-62b%b" "$(BOLD)$(CYAN)Create$(END) volumes folder"
-	mkdir -p device
 	printf "$(GREEN)[✓]$(END)\n\n"
 	printf "$(BOLD)$(CYAN)Building$(END) containers ... \n"
 	docker-compose -f docker-compose.yml build
