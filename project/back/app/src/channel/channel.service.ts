@@ -609,7 +609,7 @@ export class ChannelService {
       await this.muteRepository.save(mute);
       await this.channelRepository.save(channel);
 
-      return channel;
+      return await this.getChannelById(channel_id);
     } catch (error) {
       console.error('Error saving Mute:', error.message);
       throw error;
@@ -637,6 +637,7 @@ export class ChannelService {
       else await this.muteRepository.delete(mutedUser);
     }
     channel.mutedUsers = mutedUsers;
-    return await this.channelRepository.save(channel);
+     await this.channelRepository.save(channel);
+    return await this.getChannelById(channel_id);
   }
 }
