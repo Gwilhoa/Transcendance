@@ -273,6 +273,7 @@ export default function Profil() {
 
 	const handlechallenge = (id: string | null) => {
 		socket.emit('challenge', {rival_id: id, token: localStorage.getItem('jwtAuthorization')});
+		dispatch(closeModal());
 	}
 
 	initialElement.push(

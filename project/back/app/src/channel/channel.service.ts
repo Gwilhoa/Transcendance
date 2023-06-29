@@ -460,14 +460,7 @@ export class ChannelService {
     if (self_user == null) throw new Error('User not found');
     const target = await this.userService.getUserById(body.user_id);
     if (target == null) throw new Error('User not found');
-    const channel = await this.channelRepository
-      .createQueryBuilder('channel')
-      .leftJoinAndSelect('channel.bannedUsers', 'bannedUsers')
-      .leftJoinAndSelect('channel.users', 'users')
-      .leftJoinAndSelect('channel.admins', 'admins')
-      .leftJoinAndSelect('channel.creator', 'creator')
-      .where('channel.id = :id', { id: body.channel_id })
-      .getOne();
+    const channel = await this.getChannelById(body.channel_id);
     if (channel == null) throw new Error('Channel not found');
     if (!includeUser(self_user, channel.users))
       throw new Error('User is not in this channel');
@@ -609,7 +602,7 @@ export class ChannelService {
       await this.muteRepository.save(mute);
       await this.channelRepository.save(channel);
 
-      return channel;
+      return await this.getChannelById(channel_id);
     } catch (error) {
       console.error('Error saving Mute:', error.message);
       throw error;
@@ -637,6 +630,7 @@ export class ChannelService {
       else await this.muteRepository.delete(mutedUser);
     }
     channel.mutedUsers = mutedUsers;
-    return await this.channelRepository.save(channel);
+     await this.channelRepository.save(channel);
+    return await this.getChannelById(channel_id);
   }
 }

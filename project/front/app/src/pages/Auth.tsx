@@ -20,7 +20,6 @@ function Auth() {
 					navigate('/home');
 				})
 				.catch(() => {
-					// eslint-disable-next-line @typescript-eslint/no-unused-expressions
 					null;
 				});
 		}

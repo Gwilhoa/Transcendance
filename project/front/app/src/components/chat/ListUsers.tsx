@@ -190,7 +190,8 @@ const ListUser = ({channel}: listUserProps) => {
 	}, [navigate]);
 
 	const isMuted = (id: string, channel: Channel) => {
-		return channel.mutedUsers.some((banned) => banned.mutedUser);
+		console.log(channel.mutedUsers);
+		return channel.mutedUsers.some((banned) => banned.mutedUser.id === id);
 	}
 
 	return (

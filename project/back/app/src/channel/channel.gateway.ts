@@ -636,6 +636,7 @@ export class ChannelGateway implements OnGatewayInit {
         user_id,
         channel_id,
       );
+      console.log(chan);
       client.emit('update_user_channel', {
         channel: chan,
         code: 0,
