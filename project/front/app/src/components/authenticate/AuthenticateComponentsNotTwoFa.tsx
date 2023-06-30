@@ -1,65 +1,79 @@
-import React, { useEffect, useState } from "react";
-import Cookies from "universal-cookie";
-const cookies = new Cookies();
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import { setErrorLocalStorage } from "../IfError";
+import React, {useEffect, useState} from 'react';
+import axios from 'axios';
+import {useNavigate} from 'react-router-dom';
+import {setErrorLocalStorage} from '../IfError';
+import SocketSingleton from '../../socket';
+
 
 function AuthenticateComponentsNotTwoFa() {
 	const navigate = useNavigate();
 	const [error, setError] = useState<boolean>(false);
 
+	const socketInstance = SocketSingleton.getInstance();
+	const socket = socketInstance.getSocket();
+	
 	useEffect(() => {
-			const url = process.env.REACT_APP_IP + ":3000/auth/authenticate";
+		socket.on('connection_error', () => {
+			setErrorLocalStorage('unauthorized')
+			navigate('/error');
+		});
 
-			const setCookieJwt = (jwtToken: string) => {
-				cookies.set('jwtAuthorization', jwtToken, {sameSite: 'lax', maxAge: 2 * 60 * 60 });
-			};
+		return () => {
+			socket.off('connection_error');
+		};
+	}, [navigate]);
 
-		if (cookies.get('jwtAuthorization') != null) {
-			axios.get(process.env.REACT_APP_IP + ":3000/auth/2fa/is2FA", {
+	useEffect(() => {
+		const url = process.env.REACT_APP_IP + ':3000/auth/authenticate';
+
+		const setCookieJwt = (jwtToken: string) => {
+			localStorage.setItem('jwtAuthorization', jwtToken);
+		};
+
+		if (localStorage.getItem('jwtAuthorization') != null) {
+			axios.get(process.env.REACT_APP_IP + ':3000/auth/2fa/is2FA', {
 				headers: {
-					Authorization: `Bearer ${cookies.get('jwtAuthorization')}`,
+					Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 				},
 			})
 				.then(() => {
 					setError(true);
-					cookies.remove('Error');
 					navigate('/home');
 				})
 				.catch((error) => {
-					cookies.remove('tenMinToken');
-					setErrorLocalStorage("Error " + error.response.status);
+					localStorage.removeItem('tenMinToken');
+					setErrorLocalStorage('Error ' + error?.response?.status);
 					console.error(error);
 					navigate('/Error');
 				});
 		}
-			
-			if (error === false) {
-			axios.post(url, {code: ""},{
+
+		if (error === false) {
+			axios.post(url, {code: ''}, {
 				headers: {
-					Authorization: `Bearer ${cookies.get('tenMinToken')}`,
+					Authorization: `Bearer ${localStorage.getItem('tenMinToken')}`,
 				},
 			})
 				.then((response) => {
 					setCookieJwt(response.data.access_token);
-					cookies.remove('tenMinToken');
-					navigate('/home');
+					localStorage.removeItem('tenMinToken');
+					navigate('/authenticate/waiting');
 				})
 				.catch((error) => {
-					cookies.remove('tenMinToken');
-					setErrorLocalStorage("Error " + error.response.status);
+					localStorage.removeItem('tenMinToken');
+					setErrorLocalStorage('Error ' + error?.response?.status);
 					console.error(error);
 					navigate('/Error');
 				});
-			}
+
+		}
 	}, [navigate, error]);
 
-    return (
-        <div>
+	return (
+		<div>
 			<p>Waiting ...</p>
-        </div>
-    );
+		</div>
+	);
 }
 
 export default AuthenticateComponentsNotTwoFa;

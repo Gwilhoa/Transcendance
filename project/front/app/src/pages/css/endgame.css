@@ -3,26 +3,28 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100vh;
-  }
-  
-  .end_game_title {
+    height: calc(100vh - var(--header-size));
+}
+
+.end_game_title {
     font-size: 36px;
     font-weight: bold;
     margin-bottom: 20px;
-  }
-  
-  .end_game_text {
+    color: lightblue;
+}
+
+.end_game_text {
     font-size: 24px;
     margin-bottom: 40px;
-  }
-  
-  .end_game_buttons {
+}
+
+.end_game_buttons {
+    color: var(--light-color);
     display: flex;
     gap: 20px;
-  }
-  
-  .end_game_button {
+}
+
+.end_game_button {
     padding: 10px 20px;
     font-size: 18px;
     background-color: #007bff;
@@ -30,8 +32,8 @@
     border: none;
     border-radius: 5px;
     cursor: pointer;
-  }
-  
-  .end_game_button:hover {
+}
+
+.end_game_button:hover {
     background-color: #0056b3;
-  }
+}

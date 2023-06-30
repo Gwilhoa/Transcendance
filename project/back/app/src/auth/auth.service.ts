@@ -2,16 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { authenticator } from 'otplib';
 
-// import { Token } from './token.entity';
-
 @Injectable()
 export class AuthService {
-  // constructor(private jwt: JwtService, private config: ConfigService, private tokenRepository: Repository<Token>) {}
-  // constructor(private readonly userService: UserService, private jwt: JwtService) {}
   constructor(private jwt: JwtService) {}
 
   public async getUserIntra(token) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const axios = require('axios');
     const url = 'https://api.intra.42.fr/v2/me';
     const data = {
@@ -32,7 +27,6 @@ export class AuthService {
     const appId = process.env.APP_ID;
     const appSecret = process.env.APP_SECRET;
     const appRedirect = process.env.APP_REDIRECT_URI;
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const axios = require('axios');
     const url = 'https://api.intra.42.fr/oauth/token';
     const data = {
@@ -46,7 +40,6 @@ export class AuthService {
     try {
       const response = await axios.post(url, data);
       return response.data;
-      //return this.signJwtToken(response.data.user_id, response.data.email);
     } catch (error) {
       console.error(error);
       return null;

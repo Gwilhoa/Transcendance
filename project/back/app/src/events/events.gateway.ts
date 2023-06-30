@@ -12,18 +12,20 @@ import { Server, Socket } from 'socket.io';
 import { UserService } from 'src/user/user.service';
 import { AuthService } from 'src/auth/auth.service';
 import { ChannelService } from 'src/channel/channel.service';
-import { sendMessageDTO } from 'src/dto/sendmessage.dto';
 import { GameService } from 'src/game/game.service';
 import { CreateGameDTO } from 'src/dto/create-game.dto';
 import { UserStatus } from 'src/utils/user.enum';
 import {
-  getIdFromSocket,
+  disconnect,
+  getdualrequest,
   getKeys,
+  getSocketFromId,
+  getSockets,
   send_connection_server,
   verifyToken,
   wrongtoken,
 } from 'src/utils/socket.function';
-import { FriendCode, messageCode } from 'src/utils/requestcode.enum';
+import { sleep } from '../utils/sleep';
 
 @WebSocketGateway({
   cors: {
@@ -34,7 +36,7 @@ export class EventsGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
   @WebSocketServer() server: Server;
-  private clients: Map<string, Socket> = new Map<string, Socket>();
+  private clients: string[] = [];
   private ingame: Map<string, string> = new Map<string, string>();
   private games: Map<string, Game> = new Map<string, Game>();
   private rematch: Map<string, boolean> = new Map<string, boolean>();
@@ -50,35 +52,39 @@ export class EventsGateway
   ) {}
 
   sendconnected() {
-    send_connection_server(this.clients, this.ingame, this.server);
+    send_connection_server(getSockets(this.server), this.ingame, this.server);
   }
 
   afterInit() {
     this.logger.log('Socket server initialized');
+    this.server.setMaxListeners(20);
   }
 
   async handleDisconnect(client: Socket) {
-    const id = getIdFromSocket(client, this.clients);
+    const id = client.data.id;
     if (id == null) {
       client.disconnect();
       return;
     }
     this.logger.log(`Client disconnected: ${id}`);
-    if ((await this.userService.changeStatus(id, UserStatus.OFFLINE)) == null) {
-      wrongtoken(client);
-      this.clients.delete(id);
-      this.sendconnected();
-    }
-    this.clients.delete(id);
+    this.clients = disconnect(id, this.clients);
     if (getKeys(this.ingame).includes(id)) {
       const game = await this.gameService.remakeGame(this.ingame.get(id));
       if (game == null) {
         this.logger.error('game not found');
         return;
       }
-      this.ingame.delete(id);
-      this.games[game.id].remake();
+      const ingame = await this.games[game.id];
+      this.ingame.delete(ingame.getUser1().data.id);
+      this.ingame.delete(ingame.getUser2().data.id);
+      this.sendconnected();
+      await ingame.remake();
       this.games.delete(game.id);
+    }
+    if ((await this.userService.changeStatus(id, UserStatus.OFFLINE)) == null) {
+      wrongtoken(client, 'connection');
+      this.clients = disconnect(id, this.clients);
+      this.sendconnected();
     }
     if (this.matchmaking.includes(client)) {
       this.matchmaking.splice(this.matchmaking.indexOf(client), 1);
@@ -88,273 +94,57 @@ export class EventsGateway
 
   //on connection
   async handleConnection(client: Socket) {
+    client.setMaxListeners(20);
     let id;
     await client.on('connection', async (data) => {
       try {
         id = this.authService.getIdFromToken(data.token);
       } catch (error) {
-        wrongtoken(client);
+        wrongtoken(client, 'connection');
+        data.id = null;
+        return;
+      }
+      if (id == null || getSocketFromId(id, getSockets(this.server)) != null) {
+        wrongtoken(client, 'connection');
         return;
       }
       if (
         (await this.userService.changeStatus(id, UserStatus.CONNECTED)) == null
       ) {
-        wrongtoken(client);
+        wrongtoken(client, 'connection');
         return;
       }
-      this.clients.set(id, client);
+      client.data.id = id;
       this.sendconnected();
       let channels = null;
       try {
         channels = await this.channelService.getAccessibleChannels(id);
       } catch (error) {
-        wrongtoken(client);
+        wrongtoken(client, 'connection');
         return;
       }
       if (channels == null) {
-        wrongtoken(client);
+        wrongtoken(client, 'connection');
         return;
       }
-      this.logger.debug(channels);
       for (const channel of channels) {
         client.join(channel.id);
       }
       this.logger.log(`Client connected: ${id}`);
+      this.sendconnected();
     });
-  }
-
-  //on friend request
-  @SubscribeMessage('friend_request') //reception d'une demande d'ami / accepter une demande d'ami
-  async handleFriendRequest(client: Socket, payload: any) {
-    let send;
-    const token = payload.token;
-    const friend_id = payload.friend_id;
-    let user_id = null;
-    try {
-      user_id = verifyToken(token, this.authService);
-    } catch (error) {
-      wrongtoken(client);
-      return;
-    }
-    if (user_id == null) {
-      client.emit('friend_code', FriendCode.UNAUTHORIZED);
-      return;
-    }
-    const user = await this.userService.getUserById(user_id);
-    const friend = await this.userService.getUserById(friend_id);
-    let ret;
-    if (friend == null) {
-      ret = {
-        code: FriendCode.UNEXISTING_USER,
-      };
-    } else if (this.userService.isfriend(user, friend)) {
-      ret = {
-        code: FriendCode.ALREADY_FRIEND,
-      };
-    } else if (this.userService.asfriendrequestby(user, friend)) {
-      await this.userService.removeFriendRequest(user_id, friend_id);
-      if (this.clients[friend_id] != null) {
-        send = {
-          code: FriendCode.NEW_FRIEND,
-          id: user.id,
-        };
-        this.server.sockets[this.clients[friend_id]].emit(
-          'friend_request',
-          send,
-        );
-        await this.userService.addFriend(user_id, friend_id);
-        await this.userService.addFriend(friend_id, user_id);
-      }
-      ret = {
-        code: FriendCode.NEW_FRIEND,
-      };
-    } else {
-      ret = {
-        code: FriendCode.SUCCESS,
-      };
-      await this.userService.addFriendRequest(user_id, friend_id);
-      if (this.clients[friend_id] != null) {
-        send = {
-          code: FriendCode.FRIEND_REQUEST,
-          id: user.id,
-        };
-        this.server.sockets[this.clients[friend_id]].emit(
-          'friend_request',
-          send,
-        );
-      }
-    }
-    client.emit('friend_code', ret);
-  }
-
-  //on send message
-  @SubscribeMessage('send_message')
-  async handleMessage(client: Socket, payload: any) {
-    if (
-      payload.token == null ||
-      payload.channel_id == null ||
-      payload.content == null
-    ) {
-      client.emit('message_code', messageCode.INVALID_FORMAT);
-    }
-    const token = payload.token;
-    const channel_id = payload.channel_id;
-    let message = payload.content;
-    let send;
-    const user_id = getIdFromSocket(client, this.clients);
-    try {
-      verifyToken(token, this.authService);
-    } catch (error) {
-      wrongtoken(client);
-      return;
-    }
-    const user = await this.userService.getUserById(user_id);
-    const channel = await this.channelService.getChannelById(channel_id);
-    if (user == null) {
-      send = {
-        code: messageCode.UNAUTHORIZED,
-      };
-    } else if (channel == null) {
-      send = {
-        code: messageCode.UNEXISTING_CHANNEL,
-      };
-    } else if (!(await this.channelService.isInChannel(user.id, channel.id))) {
-      send = {
-        code: messageCode.UNACCESSIBLE_CHANNEL,
-      };
-    } else {
-      message = new sendMessageDTO();
-      message.content = payload.content;
-      message.channel_id = payload.channel_id;
-      let msg;
-      try {
-        msg = await this.channelService.sendMessage(message, user.id);
-      } catch (error) {
-        send = {
-          code: messageCode.INVALID_FORMAT,
-        };
-        client.emit('message_code', send);
-        return;
-      }
-      send = {
-        code: messageCode.SUCCESS,
-      };
-      const sendmsg = {
-        id: msg.id,
-        content: msg.content,
-        user: msg.user.id,
-        username: msg.user.username,
-        channel: msg.channel,
-        date: msg.date,
-      };
-      this.server.to(channel.id).emit('message', sendmsg);
-      //this.server.emit('message', sendmsg);
-    }
-    client.emit('message_code', send);
-  }
-
-  @SubscribeMessage('join_channel')
-  async handleJoinChannel(client: Socket, payload: any) {
-    let send;
-    const token = payload.token;
-    const channel_id = payload.channel_id;
-    const user_id = verifyToken(token, this.authService);
-    if (user_id == null) {
-      send = {
-        code: 401,
-      };
-      client.emit('join_code', send);
-      return;
-    }
-    const user = await this.userService.getUserById(user_id);
-    const channel = await this.channelService.getChannelById(channel_id);
-    send = {
-      code: 0,
-    };
-    if (channel == null) {
-      send = {
-        code: 1,
-      };
-    } else if (!(await this.channelService.isInChannel(user.id, channel.id))) {
-      send = {
-        code: 2,
-      };
-    } else {
-      client.join(channel_id);
-      send = {
-        code: 0,
-      };
-    }
-    client.emit('join_code', send);
-    send = {
-      user_id: user.id,
-      channel_id: channel_id,
-    };
-    this.server.to(channel_id).emit('user_join', send);
-  }
-
-  @SubscribeMessage('leave_channel')
-  async handleLeaveChannel(client: Socket, payload: any) {
-    let send;
-    const token = payload.token;
-    const channel_id = payload.channel_id;
-    const user_id = getIdFromSocket(client, this.clients);
-    try {
-      verifyToken(token, this.authService);
-    } catch (error) {
-      wrongtoken(client);
-      return;
-    }
-    if (user_id == null) {
-      send = {
-        code: 401,
-      };
-      client.emit('leave_code', send);
-      return;
-    }
-    const user = await this.userService.getUserById(user_id);
-    const channel = await this.channelService.getChannelById(channel_id);
-    send = {
-      code: 0,
-    };
-    if (channel == null) {
-      send = {
-        code: 1,
-      };
-    } else if (!(await this.channelService.isInChannel(user.id, channel.id))) {
-      send = {
-        code: 2,
-      };
-    } else {
-      client.leave(channel_id);
-      send = {
-        code: 0,
-      };
-    }
-    client.emit('leave_code', send);
-    send = {
-      user_id: user.id,
-      channel_id: channel_id,
-    };
-    this.server.to(channel_id).emit('user_leave', send);
   }
 
   @SubscribeMessage('join_matchmaking')
   async join_matchmaking(client: Socket, payload: any) {
-    if (payload.token == null) {
-      wrongtoken(client);
+    if (
+      payload.token == null ||
+      !verifyToken(payload.token, this.authService)
+    ) {
+      wrongtoken(client, 'join_matchmaking');
       return;
     }
-    const id = await this.authService.getIdFromToken(payload.token);
-    if (id == null) {
-      wrongtoken(client);
-      return;
-    }
-    const user = await this.userService.getUserById(id);
-    if (user == null || user.status != UserStatus.CONNECTED) {
-      wrongtoken(client);
-      return;
-    }
+    const id = client.data.id;
     if (getKeys(this.ingame).includes(id)) {
       const send = {
         code: 1,
@@ -364,6 +154,7 @@ export class EventsGateway
       return;
     }
     let i = 0;
+    this.sendconnected();
     while (i < this.matchmaking.length) {
       const player = this.matchmaking[i];
       if (player.id == client.id) {
@@ -376,30 +167,26 @@ export class EventsGateway
       }
       i++;
     }
-    this.logger.debug('new in matchmaking ' + id);
+    this.logger.log(id + ' has joined matchmaking');
     this.matchmaking.push(client);
     const send = {
       code: 0,
     };
+    this.sendconnected();
     client.emit('matchmaking_code', send);
     this.check_matchmaking();
   }
 
   async check_matchmaking() {
-    this.logger.debug('checking matchmaking');
     let i = 0;
     while (i < this.matchmaking.length) {
-      this.logger.debug(this.matchmaking[i].id);
       const player = this.matchmaking[i];
       const authorized_player = [];
       let j = 0;
       while (j < this.matchmaking.length) {
         const pretended_player = this.matchmaking[j];
-        const player_id = getIdFromSocket(player, this.clients);
-        const pretended_player_id = getIdFromSocket(
-          pretended_player,
-          this.clients,
-        );
+        const player_id = player.data.id;
+        const pretended_player_id = pretended_player.data.id;
         if (
           pretended_player_id != null &&
           pretended_player_id != player_id &&
@@ -417,7 +204,6 @@ export class EventsGateway
           authorized_player[
             Math.floor(Math.random() * authorized_player.length)
           ];
-        this.logger.debug('found rival ' + rival.id);
         if (this.server.sockets.sockets.get(player.id) == null) {
           const tempmatchmaking = [];
           for (const p of this.matchmaking) {
@@ -453,8 +239,17 @@ export class EventsGateway
 
   async play_game(player: Socket, rival: Socket) {
     const create_gameDTO = new CreateGameDTO();
-    create_gameDTO.user1_id = getIdFromSocket(player, this.clients);
-    create_gameDTO.user2_id = getIdFromSocket(rival, this.clients);
+    create_gameDTO.user1_id = player.data.id;
+    create_gameDTO.user2_id = rival.data.id;
+    if (create_gameDTO.user1_id == null || create_gameDTO.user2_id == null) {
+      player.emit('game_found', {
+        game_id: null,
+        user: null,
+        rival: null,
+        decided: false,
+      });
+      return;
+    }
     await this.userService.changeStatus(
       create_gameDTO.user1_id,
       UserStatus.IN_GAME,
@@ -463,27 +258,22 @@ export class EventsGateway
       create_gameDTO.user2_id,
       UserStatus.IN_GAME,
     );
-    this.sendconnected();
     const create_game = await this.gameService.createGame(create_gameDTO);
     this.ingame.set(create_gameDTO.user1_id, create_game.id);
     this.ingame.set(create_gameDTO.user2_id, create_game.id);
-    this.logger.debug(
-      'game created ' +
-        create_game.id +
-        ' ' +
-        create_gameDTO.user1_id +
-        ' ' +
-        create_gameDTO.user2_id,
-    );
+    this.sendconnected();
+    const FirstDecide = Math.random() < 0.5;
     player.emit('game_found', {
       game_id: create_game.id,
       user: 1,
-      rival: rival.id,
+      rival: create_gameDTO.user2_id,
+      decide: FirstDecide,
     });
     rival.emit('game_found', {
       game_id: create_game.id,
       user: 2,
-      rival: player.id,
+      rival: create_gameDTO.user1_id,
+      decide: !FirstDecide,
     });
     player.join(create_game.id);
     rival.join(create_game.id);
@@ -495,12 +285,6 @@ export class EventsGateway
       this.gameService,
     );
     this.games[game.getId()] = game;
-    game.onFinish((finishedGame) => {
-      this.logger.debug(game);
-      this.sendconnected();
-      this.logger.log(game.getId() + ' finished');
-      return;
-    });
     const tempmatchmaking = [];
     for (const t of this.matchmaking) {
       if (t.id != rival.id && player.id != t.id) {
@@ -508,8 +292,33 @@ export class EventsGateway
       }
     }
     this.matchmaking = tempmatchmaking;
-    this.server.to(game.getId()).emit('game_start', game.getId());
-    this.logger.log('game ' + game.getId() + ' started');
+    this.server.to(game.getId()).emit('game_created', game.getId());
+    this.logger.log('game ' + game.getId() + ' created ');
+  }
+
+  @SubscribeMessage('option_send')
+  async option_send(client: Socket, payload: any) {
+    const user_id = client.data.id;
+
+    const game_id = this.ingame.get(user_id);
+    if (game_id == null) {
+      return;
+    }
+    const game: Game = this.games[game_id];
+    if (game == null) {
+      return;
+    }
+
+    game.definePowerUp(payload.powerup);
+    this.server.to(game_id).emit('will_started', { time: 3 });
+    await sleep(1000);
+    this.server.to(game_id).emit('option_receive', payload);
+    this.server.to(game_id).emit('will_started', { time: 2 });
+    await sleep(1000);
+    this.server.to(game_id).emit('will_started', { time: 1 });
+    await sleep(1000);
+    this.server.to(game_id).emit('will_started', { time: 0 });
+    await sleep(1000);
     game.start();
   }
 
@@ -517,26 +326,20 @@ export class EventsGateway
   async input_game(client: Socket, payload: any) {
     const game_id = payload.game_id;
     const type = payload.type;
-    this.logger.debug('game id = ' + game_id + ' ' + type);
     this.games[game_id].updateRacket(client, type);
     this.server
       .to(game_id)
       .emit('update_game', this.games[game_id].getGameInfo());
   }
 
-  async sendchangename(id: string, name: string) {
-    this.server.emit('change_name', { id: id, name: name });
-  }
-
   @SubscribeMessage('leave_matchmaking')
   async leave_matchmaking(client: Socket, payload: any) {
-    const id = getIdFromSocket(client, this.clients);
     const tempmatchmaking = [];
     let send = {
       code: 1,
     };
     for (const t of this.matchmaking) {
-      if (t.id != id) {
+      if (t.id != client.id) {
         tempmatchmaking.push(t);
         send = {
           code: 0,
@@ -544,83 +347,142 @@ export class EventsGateway
       }
     }
     this.matchmaking = tempmatchmaking;
-    this.logger.debug('leaving matchmaking ' + id);
     client.emit('matchmaking_code', send);
   }
 
   @SubscribeMessage('game_finished')
   async game_finished(client: Socket, payload: any) {
+    if (
+      payload.token == null ||
+      !verifyToken(payload.token, this.authService)
+    ) {
+      wrongtoken(client, 'game_finished');
+      return;
+    }
     const rematch = payload.rematch;
-    const id = getIdFromSocket(client, this.clients);
-    this.logger.debug('game finished ' + id);
+    const id = client.data.id;
     const game_id = this.ingame.get(id);
     const game = this.games[game_id];
     if (game != null) {
       if (!rematch) {
-        this.ingame.delete(getIdFromSocket(game.getUser1(), this.clients));
-        this.ingame.delete(getIdFromSocket(game.getUser2(), this.clients));
+        this.games.delete(game_id);
+        game.getUser1().emit('rematch', { rematch: false });
+        game.getUser2().emit('rematch', { rematch: false });
+        this.ingame.delete(game.getUser1().data.id);
+        this.ingame.delete(game.getUser2().data.id);
       } else {
         if (this.rematch.get(game_id) == null) {
           this.rematch.set(game_id, true);
+          const send = {
+            rematch: true,
+          };
           if (game.getUser1().id == client.id) {
-            game.getUser2().emit('rematch', true);
+            game.getUser2().emit('rematch', send);
           }
           if (game.getUser2().id == client.id) {
-            game.getUser1().emit('rematch', true);
+            game.getUser1().emit('rematch', send);
           }
         } else {
-          if (
-            this.server.sockets.sockets.get(game.getUser1()) != null ||
-            this.server.sockets.sockets.get(game.getUser2()) != null
-          ) {
-            this.play_game(game.getUser1(), game.getUser2());
-          }
+          this.rematch.delete(game_id);
+          const send = {
+            rematch: true,
+          };
+          game.getUser1().emit('rematch', send);
+          game.getUser2().emit('rematch', send);
+          this.ingame.delete(game.getUser1().data.id);
+          this.ingame.delete(game.getUser2().data.id);
+          this.rematch.delete(game_id);
+          this.play_game(game.getUser1(), game.getUser2());
+          return;
         }
       }
     }
   }
 
-  @SubscribeMessage('dualrequest')
+  @SubscribeMessage('challenge')
   async dual_request(client: Socket, payload: any) {
+    if (
+      payload.token == null ||
+      !verifyToken(payload.token, this.authService)
+    ) {
+      wrongtoken(client, 'challenge');
+      return;
+    }
     const rival_id = payload.rival_id;
-    const socket = this.server.sockets.sockets.get(rival_id);
+    if (await this.userService.OneOfTwoBlocked(client.data.id, rival_id)) {
+      client.emit('receive_challenge', {
+        message: 'you are blocked',
+        code: 1,
+      });
+      return;
+    }
+    const socket = getSocketFromId(rival_id, getSockets(this.server));
+    const user = await this.userService.getUserById(client.data.id);
     if (socket != null) {
-      if (this.dual.get(rival_id) != null) {
-        if (this.dual.get(rival_id) == getIdFromSocket(client, this.clients)) {
-          this.dual.delete(rival_id);
-          socket.emit('receive_dualrequest', {
-            message: 'ok game will started soon',
-          });
-          client.emit('receive_dualrequest', {
-            message: 'ok game will started soon',
-          });
-          await this.play_game(client, socket);
-        } else {
-          client.emit('receive_dualrequest', {
-            message: 'user is in dual',
-          });
-          return;
-        }
-        this.dual.set(getIdFromSocket(client, this.clients), rival_id);
-        socket.emit('receive_dualrequest', {
-          rival: getIdFromSocket(client, this.clients),
+      const rival_request = getdualrequest(this.dual, rival_id);
+      if (rival_request == null) {
+        this.dual.set(client.data.id, rival_id);
+        client.emit('receive_challenge', {
+          message: 'challenge sent',
+          code: 0,
+        });
+        socket.emit('receive_challenge', {
+          message: 'challenge received',
+          rival: client.data.id,
+          rival_name: user.username,
+          code: 2,
         });
       } else {
-        client.emit('receive_dualrequest', {
-          message: 'user is not connected',
-        });
+        if (rival_request == client.data.id) {
+          this.dual.delete(rival_id);
+          client.emit('receive_challenge', {
+            message: 'challenge accepted',
+            code: 3,
+          });
+          socket.emit('receive_challenge', {
+            message: 'challenge accepted',
+            code: 3,
+          });
+          this.play_game(socket, client);
+        }
       }
+    } else {
+      client.emit('receive_challenge', {
+        message: 'user is not connected',
+        code: 1,
+      });
     }
+  }
+
+  @SubscribeMessage('logout')
+  async disconnect_socket(client: Socket, payload: any) {
+    client.disconnect();
   }
 
   @SubscribeMessage('leave_game')
   async leave_game(client: Socket, payload: any) {
-    const id = getIdFromSocket(client, this.clients);
+    if (
+      payload.token == null ||
+      !verifyToken(payload.token, this.authService)
+    ) {
+      wrongtoken(client, 'leave_game');
+      return;
+    }
+    const id = client.data.id;
     const game_id = this.ingame.get(id);
     const game = this.games[game_id];
     if (game != null) {
-      this.ingame.delete(getIdFromSocket(game.getUser1(), this.clients));
-      this.ingame.delete(getIdFromSocket(game.getUser2(), this.clients));
+      this.ingame.delete(client.data.id);
+      this.ingame.delete(client.data.id);
+      await this.userService.changeStatus(
+        game.getUser1().data.id,
+        UserStatus.CONNECTED,
+      );
+      await this.userService.changeStatus(
+        game.getUser2().data.id,
+        UserStatus.CONNECTED,
+      );
+      this.sendconnected();
       game.remake();
     } else {
       this.ingame.delete(id);

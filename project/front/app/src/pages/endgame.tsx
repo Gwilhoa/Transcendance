@@ -1,67 +1,99 @@
 import './css/endgame.css'
-import React, { useState, useEffect, useRef } from "react";
-import { socket } from '../components/utils/API';
-import Cookies from 'universal-cookie';
-import { useNavigate } from 'react-router-dom';
-import { Link } from 'react-router-dom';
-
-const cookies = new Cookies();
-
-const EndGame = ({ result }: { result: string }) => {
-    const navigate = useNavigate();
+import React, {useCallback, useEffect, useRef, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {useDispatch, useSelector} from "react-redux";
+import {RootState} from "../redux/store";
+import SocketSingleton from "../socket";
+import {setBeginStatus} from '../redux/game/beginToOption';
+import ErrorToken from '../components/IfError';
 
 
+const EndGame = () => {
+	const myrevengeRef = useRef(false);
+	const [revenge, setRevenge] = useState(false);
+	const [myrevenge, setMyrevenge] = useState(false);
+	const [replay, setMyReplay] = useState(true);
+	const navigate = useNavigate();
+	const finalStatus = useSelector((state: RootState) => state.finalGame.finalStatus);
+	const socketInstance = SocketSingleton.getInstance();
+	const socket = socketInstance.getSocket();
+	const dispatch = useDispatch();
 
-  const homebutton = () => {
-    socket.emit('game_finished', {rematch : false});
-    navigate("/home");
-  }
+	useEffect(() => {
+		return () => {
+			if (!myrevengeRef.current)
+				socket.emit('game_finished', {rematch: false, token: localStorage.getItem('jwtAuthorization')});
+		};
+	}, [myrevenge, socket]);
 
-  const replaybutton = () => {
-    socket.emit('game_finished', {rematch : true})
-  }
+	const homebutton = () => {
+		socket.emit('game_finished', {rematch: false, token: localStorage.getItem('jwtAuthorization')});
+		navigate('/home');
+	}
 
-    let revenge = false;
-    let replay = true;
+	const launchReplay = useCallback(() => {
+		socket.emit('game_finished', {rematch: true, token: localStorage.getItem('jwtAuthorization')});
+	}, [socket]);
 
-    socket.on('rematch', (any) => {
-    const rematch = any.rematch;
-    if (rematch) {
-        revenge = true;
-        console.log("sjsjs");
-    } else {
-        replay = false;
-    }
-    });
 
-  return (
-    <>  
-    <div className="end_game">
-        <h1 className="end_game_title">{"you " + result}</h1>
-        <div className="end_game_buttons">
-            {revenge &&
-            <p>ton adversaire veut une revenche</p>}
+	const replaybutton = () => {
+		myrevengeRef.current = true;
+		socket.emit('game_finished', {rematch: true, token: localStorage.getItem('jwtAuthorization')})
+		if (!revenge)
+			setMyrevenge(true);
+	}
 
-            {replay &&
-            <button className="end_game_button" onClick={replaybutton}>Replay</button>}
+	useEffect(() => {
 
-            <button className='end_game_button' onClick={homebutton}> Home</button>
-        </div>
-        </div>
-    </>
-  );
+		socket.on('game_found', (data) => {
+			dispatch(setBeginStatus({decide: data.decide, playerstate: data.user, gameid: data.game_id, gamestate: 1}));
+			navigate("/optiongame")
+		});
+
+		socket.on('rematch', (any: { rematch: any; }) => {
+			const rematch = any.rematch;
+			if (rematch) {
+				if (myrevenge) {
+					launchReplay();
+				} else
+					setRevenge(true);
+			} else {
+				setMyReplay(false);
+			}
+		});
+		return () => {
+			socket.off('rematch')
+			/*socket.off('game_found')*/
+		}
+	}, [dispatch, launchReplay, myrevenge, navigate, socket])
+	useEffect(() => {
+
+		if (finalStatus == null || finalStatus.adversary == null) {
+			socket.emit('leave_game', {token: localStorage.getItem('jwtAuthorization')})
+			navigate('/home');
+		}
+	}, [finalStatus, navigate, socket]);
+
+
+	return (
+		<>
+			<ErrorToken/>
+			<div className="end_game">
+				<h1 className="end_game_title">{"you " + finalStatus?.status + " against " + finalStatus?.adversary}</h1>
+				<div className="end_game_buttons">
+					{revenge &&
+                        <p>your opponent wants revenge</p>}
+
+					{myrevenge && replay &&
+                        <p>request taken</p>}
+
+					{replay && !myrevenge &&
+                        <button className='end_game_button' onClick={replaybutton}>Replay</button>}
+					<button className='end_game_button' onClick={homebutton}> Home</button>
+				</div>
+			</div>
+		</>
+	);
 }
-
-let revenge = false;
-let replay = true;
-
-socket.on('rematch', (any) => {
-  const rematch = any.rematch;
-  if (rematch) {
-    revenge = true;
-  } else {
-    replay = false;
-  }
-});
 
 export default EndGame;

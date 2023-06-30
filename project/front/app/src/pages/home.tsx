@@ -1,69 +1,158 @@
 import './css/home.css'
-import React, { useEffect, useState } from 'react';
 import '../components/notification/notification.css'
-import ErrorToken from '../components/IfError';
+import React, {useCallback, useEffect, useState} from 'react';
+import ErrorToken, {setErrorLocalStorage} from '../components/IfError';
+import {useNavigate} from 'react-router-dom';
+import {IUser} from '../components/utils/interface';
+import {useDispatch, useSelector} from 'react-redux';
+import {RootState} from '../redux/store';
+import {openModal} from '../redux/modal/modalSlice';
+import Search from '../components/search/userSearch';
+import axios from 'axios';
+import SocketSingleton from '../socket';
+import {ProfilImage} from '../components/profil/ProfilImage';
+import jwtDecode from 'jwt-decode';
 
-type Friend = {
-    id: number;
-    name: string;
-    photo: string;
-    numberVictory: number;
-    numberDefeat: number;
+const socketInstance = SocketSingleton.getInstance();
+const socket = socketInstance.getSocket();
 
-};
+const Add = () => {
+	const [listUser, setListUser] = useState<Array<IUser> | null>([]);
+
+	const navigate = useNavigate();
+	const dispatch = useDispatch();
+
+	const searchUser = (useSelector((state: RootState) => state.searchUser.users));
+	useEffect(() => {
+		setListUser(searchUser);
+	}, [searchUser]);
+
+	const refresh = useCallback(() => {
+		axios.get(process.env.REACT_APP_IP + ':3000/user/friend', {
+			headers: {
+				Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
+			},
+		})
+			.then((res) => {
+				setListUser(res.data);
+			})
+			.catch((error) => {
+				console.error(error);
+				setErrorLocalStorage(error.response.status);
+				navigate('/Error');
+			})
+	}, [navigate]);
 
 
+	useEffect(() => {
+		if (listUser == null) {
+			refresh();
+			socket.on('friend_code', (data: any) => {
+				if (data.code == 2) {
+					refresh()
+					return;
+				} else if (data.code === 5 || data.code === 7) {
+					refresh();
+				}
+				return;
+			})
 
+			socket.on('friend_request', (data: any) => {
+				if (data.code == 2 || data.code == 7) {
+					refresh();
+					return;
+				}
+				return;
+			})
+		}
+		return () => {
+			if (listUser == null) {
+				socket.off('friend_code');
+				socket.off('friend_request');
+			}
+		};
+	}, [listUser, refresh]);
 
-// const Add = () => {
-    // const [friendList, setFriendList] = useState<Friend[]>([]);
-    // const addFriend = (newItem:Friend) => {
-    //     setFriendList([...friendList, newItem]); 
-    // }
-    //     const [friendList, setFriendList] = useState<Friend[]>([]);
-//     const addFriend = (newItem:Friend) => {
-//         setFriendList([...friendList, newItem]); 
-//     }
-//     useEffect(() => {
-//         addFriend({ name: "Pigie16", photo: "https://s1.qwant.com/thumbr/0x380/2/2/8df4854dfd8e4557c0248eb7b135e5a7f769adf0a914e608e5c43cabc772f1/grunge_communist_emblem_by_frankoko-d4iez6z.png?u=https%3A%2F%2Fimg00.deviantart.net%2F6037%2Fi%2F2011%2F341%2F2%2F7%2Fgrunge_communist_emblem_by_frankoko-d4iez6z.png&q=0&b=1&p=0&a=0", numberVictory: 5, numberDefeat: 7, id: 1 });
-//         addFriend({ name: "Pigie17", photo: "https://s1.qwant.com/thumbr/0x380/2/2/8df4854dfd8e4557c0248eb7b135e5a7f769adf0a914e608e5c43cabc772f1/grunge_communist_emblem_by_frankoko-d4iez6z.png?u=https%3A%2F%2Fimg00.deviantart.net%2F6037%2Fi%2F2011%2F341%2F2%2F7%2Fgrunge_communist_emblem_by_frankoko-d4iez6z.png&q=0&b=1&p=0&a=0", numberVictory: 5, numberDefeat: 7, id: 9 });
-//         addFriend({ name: "Pigie18", photo: "https://s1.qwant.com/thumbr/0x380/2/2/8df4854dfd8e4557c0248eb7b135e5a7f769adf0a914e608e5c43cabc772f1/grunge_communist_emblem_by_frankoko-d4iez6z.png?u=https%3A%2F%2Fimg00.deviantart.net%2F6037%2Fi%2F2011%2F341%2F2%2F7%2Fgrunge_communist_emblem_by_frankoko-d4iez6z.png&q=0&b=1&p=0&a=0", numberVictory: 5, numberDefeat: 7, id: 2 });
-//         addFriend({ name: "Pigie19", photo: "https://s1.qwant.com/thumbr/0x380/2/2/8df4854dfd8e4557c0248eb7b135e5a7f769adf0a914e608e5c43cabc772f1/grunge_communist_emblem_by_frankoko-d4iez6z.png?u=https%3A%2F%2Fimg00.deviantart.net%2F6037%2Fi%2F2011%2F341%2F2%2F7%2Fgrunge_communist_emblem_by_frankoko-d4iez6z.png&q=0&b=1&p=0&a=0", numberVictory: 5, numberDefeat: 7, id: 3 });
-//         addFriend({ name: "Pigie20", photo: "https://s1.qwant.com/thumbr/0x380/2/2/8df4854dfd8e4557c0248eb7b135e5a7f769adf0a914e608e5c43cabc772f1/grunge_communist_emblem_by_frankoko-d4iez6z.png?u=https%3A%2F%2Fimg00.deviantart.net%2F6037%2Fi%2F2011%2F341%2F2%2F7%2Fgrunge_communist_emblem_by_frankoko-d4iez6z.png&q=0&b=1&p=0&a=0", numberVictory: 5, numberDefeat: 7, id: 4 });
-//     }, []);
+	if (listUser == null || listUser.length == 0) {
+		return (
+			<p className='home-no-friend'>Knowing how to enjoy your own company is an art. <span>Natasha Adamo</span>
+			</p>);
+	}
 
-//     return (
-//         <div className="friend-list">
+	const handleHistory = (id: string | null) => {
+		navigate('/history/' + id);
+	};
 
-//         </dvi>
-//     <div className="score-board">{blocks}</div>
-//     );
-// }
+	const handlechallenge = (id: string | null) => {
+		socket.emit('challenge', {rival_id: id, token: localStorage.getItem('jwtAuthorization')});
+	}
+
+	return (
+		<div className='home-users-list'>
+			{listUser.map((user) => (
+				<div className='home-users-list-user' key={user.id}>
+					<div className='home-users-list-user-info'>
+						<ProfilImage id={user.id} OnClickOpenProfil={true} OverwriteClassName='home-users-list-user-image-profil' />
+						<p className='home-users-list-user-info-name' onClick={() => dispatch(openModal(user.id))}>{user.username} </p>
+						<p className='xp'>{user.experience}XP</p>
+						<p>{user.victories + '/' + user.defeats}</p>
+						<p>
+							{user.defeats + user.victories === 0 ? (
+								null
+							) : (
+								'WR: ' +
+								((user.victories / (user.defeats + user.victories) * 100).toFixed(2)) + '%'
+							)}</p>
+					</div>
+					<div className='home-users-list-user-buttons'>
+						<button
+							onClick={() => handlechallenge(user.id)}
+							className='home-users-list-user-buttons-challenge-button'
+						>
+							Challenge
+						</button>
+						<button
+							onClick={() => handleHistory(user.id)}
+							className='home-users-list-user-buttons-hsitory-button'
+						>
+							history
+						</button>
+					</div>
+				</div>
+			))}
+		</div>
+	);
+}
 
 const Home = () => {
-        return (
-            <div className='home'>
-				<ErrorToken />
-                <div className="scrollBlock">
+	const navigate = useNavigate();
+	const [myId, setMyId] = useState<string>('');
 
-                    <div className="users-list">
-                        <div className="user">
-                            <img className='image' src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/42_Logo.svg/1200px-42_Logo.svg.png"></img>
-                            <p className="name">Friend1</p>
-                            <p className="status">Status</p>
-                            <p className='xp'>5000XP</p>
-                        </div>
+	useEffect(() => {
+		if (localStorage.getItem('jwtAuthorization') != null) {
+			const jwt_decode : any = jwtDecode('' + localStorage.getItem('jwtAuthorization'));
+			setMyId(jwt_decode.sub);
+		} else {
+			navigate('/error');
+		}
+	}, [navigate]);
+	
 
-
-                    </div>
-
-                    {/* <Add/> */}
-                </div>
-            </div>
-        );
+	return (
+		<div className='home'>
+			<ErrorToken/>
+			<div className='scrollBlock'>
+				<Search
+					defaultAllUsers={false}
+					OverwriteClassName={''}
+					id={myId}
+				/>
+				<Add/>
+			</div>
+		</div>
+	);
 
 }
-//<GetTokenUser url="http://localhost:3000/auth/login"/>
 
 export default Home;
 

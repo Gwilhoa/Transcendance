@@ -1,1 +1,0 @@
-curl http://localhost:3000/user -H "authorization: bearer $1"

@@ -1,12 +1,14 @@
 import { Server, Socket } from 'socket.io';
 import { AuthService } from '../auth/auth.service';
+import { User } from '../user/user.entity';
 
 export function verifyToken(token: string, authService: AuthService) {
   try {
-    return authService.getIdFromToken(token);
+    authService.getIdFromToken(token);
   } catch (error) {
-    throw Error('Invalid token');
+    return false;
   }
+  return true;
 }
 
 export function getKeys(map: Map<any, any>) {
@@ -17,22 +19,24 @@ export function getKeys(map: Map<any, any>) {
   return list;
 }
 
-export function wrongtoken(client: Socket) {
-  client.emit('connection_error', 'Invalid token');
+export function wrongtoken(client: Socket, canal: string) {
+  client.emit('connection_error', { message: 'Invalid token', canal: canal });
 }
 
 export function send_connection_server(
-  connected: Map<string, Socket>,
+  connected: Socket[],
   ingame: Map<string, string>,
   server: Server,
 ) {
-  const connectedlist = getKeys(connected);
+  const connectedlist = [];
+  connected.forEach((value) => {
+    connectedlist.push(value.data.id);
+  });
   const ingamelist = getKeys(ingame);
   const send = {
     connected: connectedlist,
     ingame: ingamelist,
   };
-  console.log(send);
   server.emit('connection_server', send);
 }
 
@@ -44,6 +48,55 @@ export function getIdFromSocket(
   connected.forEach((value, key) => {
     if (value.id == socket.id) {
       ret = key;
+    }
+  });
+  return ret;
+}
+
+export function getSocketFromId(id: string, connected: Socket[]): Socket {
+  let ret = null;
+  for (const socket of connected) {
+    if (socket.data.id == id) {
+      ret = socket;
+    }
+  }
+  return ret;
+}
+
+export function includeUser(user: User, list: User[]) {
+  let ret = false;
+  list.forEach((value) => {
+    if (value.id == user.id) {
+      ret = true;
+    }
+  });
+  return ret;
+}
+
+
+export function disconnect(id: any, clients: string[]): string[] {
+  const ret: string[] = [];
+  for (const c_id of clients) {
+    if (c_id != id) {
+      ret.push(c_id);
+    }
+  }
+  return ret;
+}
+
+export function getSockets(server: Server): Socket[] {
+  const ret: Socket[] = [];
+  server.sockets.sockets.forEach((value) => {
+    ret.push(value);
+  });
+  return ret;
+}
+
+export function getdualrequest(dual: Map<string, string>, id: string): string {
+  let ret = null;
+  dual.forEach((value, key) => {
+    if (key == id) {
+      ret = value;
     }
   });
   return ret;

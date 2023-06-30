@@ -11,20 +11,27 @@ import { JwtService } from '@nestjs/jwt';
 import { AuthModule } from 'src/auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Message } from './message.entity';
+import { RequestFriend } from '../user/requestfriend.entity';
+import { ChannelGateway } from './channel.gateway';
+import { Mute } from "./mute.entity";
+
 
 @Module({
   providers: [
-    ChannelService,
     AuthService,
     JwtService,
     ConfigService,
     UserService,
+    ChannelGateway,
+    ChannelService,
   ],
   controllers: [ChannelController],
   imports: [
     TypeOrmModule.forFeature([Message]),
     TypeOrmModule.forFeature([Channel]),
     TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([RequestFriend]),
+    TypeOrmModule.forFeature([Mute]),
     AuthModule,
     ConfigModule,
     UserModule,

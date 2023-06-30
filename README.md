@@ -3,6 +3,7 @@
 Realisation d'un super site web Full Stack!
 
 Possedant :
+
 - Un magnifique chat
 - Un jeux de pong epoustouflant
 - Et une authentifcation inviolable*

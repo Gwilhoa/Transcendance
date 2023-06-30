@@ -13,25 +13,6 @@ export class GameService {
     private readonly userService: UserService,
   ) {}
 
-  async getGames(id) {
-    let tabgame = [];
-    const games1 = await this.gameRepository
-      .createQueryBuilder('game')
-      .leftJoinAndSelect('game.user1', 'user1')
-      .leftJoinAndSelect('game.user2', 'user2')
-      .where('user1.id = :id', { id: id })
-      .getMany();
-
-    const games2 = await this.gameRepository
-      .createQueryBuilder('game')
-      .leftJoinAndSelect('game.user1', 'user1')
-      .leftJoinAndSelect('game.user2', 'user2')
-      .where('user2.id = :id', { id: id })
-      .getMany();
-    tabgame = [...games1, ...games2];
-    return tabgame;
-  }
-
   async createGame(body: CreateGameDTO) {
     const game = new Game();
     const user1 = await this.userService.getUserById(body.user1_id);
@@ -58,8 +39,15 @@ export class GameService {
     if (game == null) throw new Error('Game not found');
     await this.userService.changeStatus(game.user1.id, UserStatus.CONNECTED);
     await this.userService.changeStatus(game.user2.id, UserStatus.CONNECTED);
-    game.score1 = score1;
-    game.score2 = score2;
+    if (score1 > score2) {
+      await this.userService.endgame(game.user1.id, false);
+      await this.userService.endgame(game.user2.id, true);
+    } else {
+      await this.userService.endgame(game.user1.id, true);
+      await this.userService.endgame(game.user2.id, false);
+    }
+    game.score1 = score2;
+    game.score2 = score1;
     game.finished = GameStatus.FINISHED;
     return await this.gameRepository.save(game);
   }
@@ -71,8 +59,30 @@ export class GameService {
       .leftJoinAndSelect('game.user2', 'user2')
       .where('game.id = :id', { id: id })
       .getOne();
+    await this.userService.changeStatus(game.user1.id, UserStatus.CONNECTED);
+    await this.userService.changeStatus(game.user2.id, UserStatus.CONNECTED);
     if (game == null) throw new Error('Game not found');
+    if (game.finished == GameStatus.FINISHED)
+      return await this.gameRepository.save(game);
     game.finished = GameStatus.REMAKE;
     return await this.gameRepository.save(game);
+  }
+
+  async getGameHistory(id: string) {
+    const tabgame = [];
+    const games1 = await this.gameRepository
+      .createQueryBuilder('game')
+      .leftJoinAndSelect('game.user1', 'user1')
+      .leftJoinAndSelect('game.user2', 'user2')
+      .where('user1.id = :id', { id: id })
+      .getMany();
+    const games2 = await this.gameRepository
+      .createQueryBuilder('game')
+      .leftJoinAndSelect('game.user1', 'user1')
+      .leftJoinAndSelect('game.user2', 'user2')
+      .where('user2.id = :id', { id: id })
+      .getMany();
+    tabgame.push(...games1, ...games2);
+    return tabgame;
   }
 }

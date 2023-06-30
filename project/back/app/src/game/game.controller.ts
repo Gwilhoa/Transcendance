@@ -17,12 +17,6 @@ import { GetUser } from '../auth/decorator/auth.decorator';
 export class GameController {
   constructor(private readonly gameService: GameService) {}
 
-  @Get()
-  async getGames(@GetUser('sub') id: string, @Res() response) {
-    console.log(await this.gameService.getGames(id));
-    return response.status(200).send(await this.gameService.getGames(id));
-  }
-
   @Post()
   async createGame(@Body() body: CreateGameDTO, @Res() response) {
     return response.status(200).send(await this.gameService.createGame(body));
@@ -31,5 +25,10 @@ export class GameController {
   @Get('/id/:id')
   async getGameById(@Param('id') id: string, @Res() response) {
     return response.status(200).send(await this.gameService.getGameById(id));
+  }
+
+  @Get('/history/:id')
+  async getGameHistory(@Param('id') id: string, @Res() response) {
+    return response.status(200).send(await this.gameService.getGameHistory(id));
   }
 }

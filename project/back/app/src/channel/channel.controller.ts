@@ -18,7 +18,6 @@ import { LeaveChannelDto } from '../dto/leave-channel.dto';
 import { addAdminDto } from '../dto/add-admin.dto';
 import { BanUserDto } from '../dto/ban-user.dto';
 import { GetMessageDto } from '../dto/get-message.dto';
-import { sendMessageDTO } from '../dto/sendmessage.dto';
 import { MpCreateDto } from '../dto/mp-create.dto';
 
 @UseGuards(JwtIsAuthGuard)
@@ -73,22 +72,6 @@ export class ChannelController {
       return;
     }
     return response.status(201).send(ret);
-  }
-
-  @Post('leave')
-  async leaveChannel(
-    @Body() body: LeaveChannelDto,
-    @GetUser('sub') user_id: string,
-    @Res() response,
-  ) {
-    let ret;
-    try {
-      ret = await this.channelService.leaveChannel(user_id, body.channel_id);
-    } catch (e) {
-      response.status(400).send(e.message);
-      return;
-    }
-    return response.status(200).send(ret);
   }
 
   @Post('admin')
@@ -173,55 +156,22 @@ export class ChannelController {
     return ret;
   }
 
-  @Get('message')
+  @Get('message/:id')
   async getMessages(
     @Body() body: GetMessageDto,
     @GetUser('sub') id: string,
     @Res() resp,
+    @Param('id') channel_id,
   ) {
     let ret;
     try {
-      ret = await this.channelService.getMessage(body.channel_id, id);
+      ret = await this.channelService.getMessage(channel_id, id);
     } catch (e) {
       resp.status(400).send(e.message);
       return;
     }
     if (ret == null) {
       resp.status(204).send('No content');
-      return;
-    }
-    return resp.status(200).send(ret);
-  }
-
-  @Post('message')
-  async createMessage(
-    @Body() body: sendMessageDTO,
-    @GetUser('sub') id: string,
-    @Res() resp,
-  ) {
-    let ret;
-    try {
-      ret = await this.channelService.sendMessage(body, id);
-    } catch (e) {
-      return resp.status(400).send(e.message);
-    }
-    if (ret == null) {
-      return resp.status(204).send('No content');
-    }
-    return resp.status(200).send(ret);
-  }
-
-  @Post('/mp/create')
-  async createMp(
-    @Body() body: MpCreateDto,
-    @GetUser('sub') id: string,
-    @Res() resp,
-  ) {
-    let ret;
-    try {
-      ret = await this.channelService.createMPChannel(id, body.user_id);
-    } catch (e) {
-      resp.status(400).send(e.message);
       return;
     }
     return resp.status(200).send(ret);
@@ -238,6 +188,9 @@ export class ChannelController {
 
   @Get('/id/:id')
   async getChannelById(@Param('id') id: string, @Res() resp) {
+    if (id == 'null' || id == null) {
+      return resp.status(400).send('Invalid id');
+    }
     const channel = await this.channelService.getChannelById(id);
     if (channel == null) {
       return resp.status(204).send('No content');
@@ -252,5 +205,22 @@ export class ChannelController {
       return resp.status(204).send('No content');
     }
     return resp.status(200).send(channels);
+  }
+
+  @Post('modifychannel/:id')
+  async modifyChannel(
+    @GetUser('sub') user_id,
+    @Param('id') channel_id,
+    @Body() body,
+    @Res() resp,
+  ) {
+    let ret;
+    try {
+      ret = await this.channelService.updateChannel(channel_id, user_id, body);
+    } catch (e) {
+      resp.status(400).send(e.message);
+      return;
+    }
+    return resp.status(200).send(ret);
   }
 }

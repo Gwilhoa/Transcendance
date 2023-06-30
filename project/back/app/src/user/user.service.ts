@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AuthService } from '../auth/auth.service';
 import { Repository } from 'typeorm';
@@ -10,6 +10,8 @@ import { JwtService } from '@nestjs/jwt';
 import { UserStatus } from '../utils/user.enum';
 import { WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server } from 'socket.io';
+import { includeUser } from '../utils/socket.function';
+
 @WebSocketGateway({
   cors: {
     origin: '*',
@@ -17,17 +19,18 @@ import { Server } from 'socket.io';
 })
 @Injectable()
 export class UserService {
-  @WebSocketServer() server: Server;
+  @WebSocketServer() private server: Server;
+
   constructor(
     private jwt: JwtService,
     @InjectRepository(User) private userRepository: Repository<User>,
+    @InjectRepository(RequestFriend)
+    private requestsRepository: Repository<RequestFriend>,
     private authService: AuthService,
   ) {}
 
   public async getPathImage(id: string) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const fs = require('fs');
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const path = require('path');
     const imageDir = path.join(__dirname, '..', '..', '..', 'images');
     const files = await fs.promises.readdir(imageDir);
@@ -38,19 +41,51 @@ export class UserService {
     return path.join(imageDir, matchingFiles[0]);
   }
 
-  public asfriendrequestby(user: User, friend: User) {
+  public async asfriendrequestby(user_id: string, friend_id: string) {
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.requests', 'requests')
+      .leftJoinAndSelect('user.requestsReceived', 'requestsReceived')
+      .where('user.id = :id', { id: user_id })
+      .getOne();
+    const friend = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.requests', 'requests')
+      .leftJoinAndSelect('user.requestsReceived', 'requestsReceived')
+      .where('user.id = :id', { id: friend_id })
+      .getOne();
     if (user.requestsReceived == null) {
       return false;
     }
     for (let i = 0; i < user.requestsReceived.length; i++) {
-      if (user.requestsReceived[i].sender.id == friend.id) {
+      const request = await this.requestsRepository
+        .createQueryBuilder('request')
+        .leftJoinAndSelect('request.sender', 'sender')
+        .leftJoinAndSelect('request.receiver', 'receiver')
+        .where('request.id = :id', { id: user.requestsReceived[i].id })
+        .getOne();
+      if (request.sender.id == friend.id) {
         return true;
       }
     }
     return false;
   }
 
-  public isfriend(user: User, friend: User) {
+  public async isfriend(user_id: string, friend_id: string) {
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.friends', 'friends')
+      .where('user.id = :id', { id: user_id })
+      .getOne();
+
+    const friend = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.friends', 'friends')
+      .where('user.id = :id', { id: friend_id })
+      .getOne();
+    if (user == null || friend == null) {
+      return false;
+    }
     if (user.friends == null) {
       return false;
     }
@@ -61,12 +96,16 @@ export class UserService {
     }
     return false;
   }
+
   public async createUsers(code) {
     const retIntra = await this.authService.getIntraToken(code);
     if (retIntra == null) {
       return null;
     }
     const retUser = await this.authService.getUserIntra(retIntra.access_token);
+    if (retUser == null) {
+      return null;
+    }
     const verif_user = await this.userRepository.findOneBy({ id: retUser.id });
     if (verif_user != null) {
       return await this.changeStatus(verif_user.id, UserStatus.IN_CONNECTION);
@@ -77,7 +116,6 @@ export class UserService {
       login = retUser.login + nbr;
       nbr++;
     }
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const fs = require('fs');
     const user = new User();
     user.status = UserStatus.IN_CONNECTION;
@@ -95,15 +133,33 @@ export class UserService {
     if ((await this.userRepository.findOneBy({ id: user.id })) != null) {
       return user;
     }
-    await this.userRepository.save(user);
-    return user;
+    const ret = await this.userRepository.save(user);
+    this.server.emit('new_user', ret);
+    return ret;
   }
 
   public async getUsers() {
     return await this.userRepository.find();
   }
 
-  public async getUserById(id: string) {
+  public async getUserById(id: string, withsecret = false) {
+    if (withsecret) {
+      const userWithSecret = await this.userRepository
+        .createQueryBuilder('user')
+        .select([
+          'user.id',
+          'user.email',
+          'user.username',
+          'user.experience',
+          'user.secret2FA',
+          'user.status',
+          'user.enabled2FA',
+        ])
+        .where('user.id = :id', { id: id })
+        .getOne();
+      return userWithSecret;
+    }
+
     return await this.userRepository.findOneBy({ id: id });
   }
 
@@ -116,8 +172,18 @@ export class UserService {
   }
 
   public async addFriend(id: string, friend_id: string) {
-    const user = await this.userRepository.findOneBy({ id: id });
-    const friend = await this.userRepository.findOneBy({ id: friend_id });
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.friends', 'friends')
+      .where('user.id = :id', { id })
+      .getOne();
+    const friend = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.friends', 'friends')
+      .where('user.id = :id', { id: friend_id })
+      .getOne();
+    await this.removeBlocked(id, friend_id);
+    await this.removeBlocked(friend_id, id);
     if (user == null || friend == null) {
       throw new Error('User not found');
     }
@@ -127,14 +193,8 @@ export class UserService {
     if (!user.friends) {
       user.friends = [];
     }
-    if (!user.requestsReceived.find((e) => e.sender.id == friend.id)) {
-      await this.addFriendRequest(id, friend_id);
-      return null;
-    }
     user.friends.push(friend);
-    await this.userRepository.save(user);
-    await this.userRepository.save(friend);
-    return user;
+    return await this.userRepository.save(user);
   }
 
   public async getFriends(id: string) {
@@ -164,8 +224,16 @@ export class UserService {
   }
 
   public async addBlocked(id: string, blocked_id: string) {
-    const user = await this.userRepository.findOneBy({ id: id });
-    const blocked = await this.userRepository.findOneBy({ id: blocked_id });
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.blockedUsers', 'blockedUsers')
+      .where('user.id = :id', { id })
+      .getOne();
+    const blocked = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.blockedUsers', 'blockedUsers')
+      .where('user.id = :id', { id: blocked_id })
+      .getOne();
     if (user == null || blocked == null) {
       throw new Error('User not found');
     }
@@ -176,8 +244,8 @@ export class UserService {
       user.blockedUsers = [];
     }
     user.blockedUsers.push(blocked);
-    if (this.isfriend(user, blocked)) {
-      await this.removeFriend(user, blocked);
+    if (await this.isfriend(id, blocked_id)) {
+      await this.removeFriends(user.id, blocked.id);
     }
     await this.userRepository.save(user);
     await this.userRepository.save(blocked);
@@ -200,6 +268,12 @@ export class UserService {
     const user = await this.userRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.joinedChannels', 'channels')
+      .leftJoinAndSelect('channels.users', 'users')
+      .leftJoinAndSelect('channels.admins', 'admins')
+      .leftJoinAndSelect('channels.creator', 'creator')
+      .leftJoinAndSelect('channels.bannedUsers', 'bannedUsers')
+      .leftJoinAndSelect('channels.mutedUsers', 'mutedUsers')
+      .leftJoinAndSelect('mutedUsers.mutedUser', 'mutedUser')
       .where('user.id = :id', { id })
       .getOne();
     if (!user) {
@@ -211,7 +285,9 @@ export class UserService {
   public async getFriendRequests(id: string) {
     const user = await this.userRepository
       .createQueryBuilder('user')
-      .leftJoinAndSelect('user.friendRequests', 'friendRequests')
+      .leftJoinAndSelect('user.requestsReceived', 'requestsReceived')
+      .leftJoinAndSelect('requestsReceived.sender', 'sender')
+      .leftJoinAndSelect('requestsReceived.receiver', 'receiver')
       .where('user.id = :id', { id })
       .getOne();
     if (!user) {
@@ -221,8 +297,16 @@ export class UserService {
   }
 
   public async addFriendRequest(id: string, friend_id: string) {
-    const user = await this.userRepository.findOneBy({ id: id });
-    const friend = await this.userRepository.findOneBy({ id: friend_id });
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.requests', 'RequestFriend')
+      .where('user.id = :id', { id: id })
+      .getOne();
+    const friend = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.requests', 'RequestFriend')
+      .where('user.id = :id', { id: friend_id })
+      .getOne();
     if (user == null || friend == null) {
       throw new Error('User not found');
     }
@@ -235,30 +319,22 @@ export class UserService {
     const friendrequest = new RequestFriend();
     friendrequest.sender = user;
     friendrequest.receiver = friend;
-    user.requestsReceived.push(friendrequest);
-    await this.userRepository.save(user);
-    await this.userRepository.save(friend);
-    return user;
+    return await this.requestsRepository.save(friendrequest);
   }
 
   public async removeFriendRequest(id: string, friend_id: string) {
-    const user = await this.userRepository.findOneBy({ id: id });
-    const friend = await this.userRepository.findOneBy({ id: friend_id });
-    if (user == null || friend == null) {
-      return null;
-    }
-    if (user == friend) {
-      return null;
-    }
-    if (!user.requestsReceived || user.requestsReceived.length == 0) {
-      return null;
-    }
-    user.requestsReceived = user.requestsReceived.filter(
-      (request) => request.receiver.id != friend.id,
-    );
-    await this.userRepository.save(user);
-    await this.userRepository.save(friend);
-    return user;
+    const requests = await this.requestsRepository
+      .createQueryBuilder('request')
+      .leftJoinAndSelect('request.sender', 'sender')
+      .leftJoinAndSelect('request.receiver', 'receiver')
+      .getMany();
+    requests.forEach((request) => {
+      if (request.sender.id == id && request.receiver.id == friend_id) {
+        this.requestsRepository.delete(request);
+      } else if (request.sender.id == friend_id && request.receiver.id == id) {
+        this.requestsRepository.delete(request);
+      }
+    });
   }
 
   public async setName(id: string, name: string) {
@@ -272,6 +348,10 @@ export class UserService {
         throw new Error('Username already taken');
       }
     });
+
+    const regex = /^[a-zA-Z0-9-_]+$/;
+    if (!regex.test(name))
+      throw new Error('Username must contain only alphanumeric characters');
     if (name.length > 10)
       throw new Error('Username must be less or equals than 10 characters');
     user.username = name;
@@ -280,11 +360,11 @@ export class UserService {
       id: user.id,
       type: 'name',
     };
-    this.server.emit('updateprofil', send);
+    this.server.emit('update_profil', send);
     return user;
   }
 
-  public async setAvatar(id, buffer, extname) {
+  public async setAvatar(id: string, buffer: NodeJS.ArrayBufferView, extname) {
     const fs = require('fs');
     const path = require('path');
     const lastimage = await this.getPathImage(id);
@@ -293,7 +373,6 @@ export class UserService {
         if (error) {
           console.error('Error deleting last image:', error);
         } else {
-          console.log('Last image deleted successfully');
         }
       });
     }
@@ -314,9 +393,9 @@ export class UserService {
       fs.writeFileSync(imagePath, buffer);
       const send = {
         id: id,
-        type: 'name',
+        type: 'image',
       };
-      this.server.emit('updateprofil', send);
+      this.server.emit('update_profil', send);
       return imagePath;
     } catch (error) {
       return null;
@@ -332,7 +411,8 @@ export class UserService {
     if (user == friend) {
       throw new Error('user id and friend id are the same');
     }
-    return this.isfriend(user, friend);
+    const res = { isfriend: await this.isfriend(id, friend_id) };
+    return res;
   }
 
   public async getMpChannels(id: string) {
@@ -344,11 +424,7 @@ export class UserService {
   }
 
   public async set2FASecret(secret: string, id: string) {
-    const user = await this.userRepository
-      .createQueryBuilder('user')
-      .select('user.secret2FA')
-      .where('user.id = :id', { id })
-      .getOne();
+    const user = await this.getUserById(id, true);
     if (user == null) {
       return null;
     }
@@ -357,11 +433,7 @@ export class UserService {
   }
 
   public async enabled2FA(id: string) {
-    const user = await this.userRepository
-      .createQueryBuilder('user')
-      .select('user.secret2FA')
-      .where('user.id = :id', { id })
-      .getOne();
+    const user = await this.getUserById(id, true);
     if (user == null) {
       return false;
     }
@@ -382,15 +454,20 @@ export class UserService {
   }
 
   public async isBlocked(myuser_id: string, user_id: string): Promise<boolean> {
-    const myuser = await this.getUserById(myuser_id);
-    const user = await this.getUserById(user_id);
-    if (user == null && myuser == null) {
+    const myuser = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.blockedUsers', 'blockedUsers')
+      .where('user.id = :id', { id: myuser_id })
+      .getOne();
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.blockedUsers', 'blockedUsers')
+      .where('user.id = :id', { id: user_id })
+      .getOne();
+    if (user == null || myuser == null) {
       return false;
     }
-    myuser.blockedUsers.forEach((element) => {
-      if (element.id == user.id) return true;
-    });
-    return false;
+    return includeUser(user, myuser.blockedUsers);
   }
 
   public async OneOfTwoBlocked(
@@ -431,16 +508,32 @@ export class UserService {
     return user.games;
   }
 
-  public async getUserBySimilarNames(names: string) {
+  public async getUserBySimilarNames(
+    names: string,
+    id: string,
+    gethimself = false,
+  ) {
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.blockedUsers', 'blockedUsers')
+      .where('user.id = :id', { id: id })
+      .getOne();
     const users = await this.userRepository
       .createQueryBuilder('user')
       .where('user.username LIKE :name', { name: `%${names}%` })
       .getMany();
-    if (users == null) {
-      return null;
+    const ret = [];
+    for (const u of users) {
+      if (u.id == user.id && gethimself == true) {
+        ret.push(u);
+      }
+      if (!includeUser(u, user.blockedUsers) && u.id != user.id) {
+        ret.push(u);
+      }
     }
-    return users;
+    return ret;
   }
+
   public async changeStatus(id: string, status: number) {
     const user = await this.userRepository.findOneBy({ id: id });
     if (user == null) {
@@ -459,11 +552,7 @@ export class UserService {
   }
 
   public async check2FAenabled(id: string) {
-    const user = await this.userRepository
-      .createQueryBuilder('user')
-      .select('user.enabled2FA')
-      .where('user.id = :id', { id })
-      .getOne();
+    const user = await this.getUserById(id, true);
     if (user == null) {
       throw new Error('User not found');
     }
@@ -489,8 +578,6 @@ export class UserService {
       isauth: isauth,
       enabled2FA: check2FA,
     };
-    // const payload = { sub: parseInt(userId), isauth: isauth ,enabled2FA: 1};
-
     return {
       access_token: await this.jwt.signAsync(payload, {
         expiresIn: expiresTime,
@@ -500,30 +587,43 @@ export class UserService {
   }
 
   async removeBlocked(id: string, blocked_id: string) {
-    const user = await this.userRepository.findOneBy({ id: id });
-    const blocked_user = await this.userRepository.findOneBy({
-      id: blocked_id,
-    });
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.blockedUsers', 'blockedUsers')
+      .where('user.id = :id', { id: id })
+      .getOne();
+    const blocked_user = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.blockedUsers', 'blockedUsers')
+      .where('user.id = :id', { id: blocked_id })
+      .getOne();
     if (user == null || blocked_user == null) {
       throw new Error('User not found');
     }
-    if (
-      user.blockedUsers.find((element) => element.id == blocked_user.id) == null
-    ) {
-      throw new Error('User not blocked');
+    const blocks = [];
+    for (const block of user.blockedUsers) {
+      if (block.id != blocked_id) {
+        blocks.push(block);
+      }
     }
-    user.blockedUsers = user.blockedUsers.filter(
-      (element) => element.id != blocked_user.id,
-    );
+    user.blockedUsers = blocks;
     return await this.userRepository.save(user);
   }
 
   async removeFriends(id: string, friend_id: string) {
-    return await this.removeFriend(
-      await this.getUserById(id),
-      await this.getUserById(friend_id),
-    );
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.friends', 'friends')
+      .where('user.id = :id', { id: id })
+      .getOne();
+    const friend = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.friends', 'friends')
+      .where('user.id = :id', { id: friend_id })
+      .getOne();
+    return await this.removeFriend(user, friend);
   }
+
   async removeFriend(user: User, blocked: User) {
     user.friends = user.friends.filter((element) => element.id != blocked.id);
     blocked.friends = blocked.friends.filter(
@@ -535,11 +635,25 @@ export class UserService {
   }
 
   async getSecret2fa(id: string) {
-    const user = await this.userRepository
-      .createQueryBuilder('user')
-      .select('user.secret2FA')
-      .where('user.id = :id', { id })
-      .getOne();
+    const user = await this.getUserById(id, true);
+    if (user.secret2FA == null) {
+      return null;
+    }
     return user.secret2FA;
+  }
+
+  async endgame(user_id, iswin) {
+    const user = await this.getUserById(user_id);
+    if (user == null) {
+      throw new Error('User not found');
+    }
+    if (iswin) {
+      user.victories += 1;
+      user.experience += 500;
+    } else {
+      user.defeats += 1;
+      user.experience += 100;
+    }
+    await this.userRepository.save(user);
   }
 }

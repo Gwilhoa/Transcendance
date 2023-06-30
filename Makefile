@@ -66,7 +66,6 @@ all:   header start
 
 build :
 	printf "%-62b%b" "$(BOLD)$(CYAN)Create$(END) volumes folder"
-	mkdir -p device
 	printf "$(GREEN)[✓]$(END)\n\n"
 	printf "$(BOLD)$(CYAN)Building$(END) containers ... \n"
 	docker-compose -f docker-compose.yml build
@@ -82,19 +81,6 @@ start: build
 	# printf "%-62b%b" "$(BOLD)$(GREEN)Starting$(END) containers"
 	docker-compose -f docker-compose.yml up
 	# printf "$(GREEN)[✓]$(END)\n\n"
-
-# ~~~~~~~~~~~~~~ DATABASE ~~~~~~~~~~~~~~
-
-database:
-	docker-compose up -d db
-
-# ~~~~~~~~~~~~~~ BACKEND ~~~~~~~~~~~~~~
-
-back: database
-	docker-compose -f docker-compose.yml build back
-	docker-compose -f docker-compose.yml create back
-	docker-compose up back
-# ~~~~~~~~~~~~~~ FRONTEND ~~~~~~~~~~~~~~
 
 # ~~~~~~~~~~~~~~~~ STOP ~~~~~~~~~~~~~~~~
 

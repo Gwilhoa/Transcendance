@@ -18,8 +18,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtIsAuthGuard } from '../auth/guard/jwt.guard';
 import { GetUser } from '../auth/decorator/auth.decorator';
 import * as path from 'path';
-import * as fs from 'fs';
 import { extname } from 'path';
+import * as fs from 'fs';
 import { promisify } from 'util';
 import fetch from 'node-fetch';
 
@@ -27,6 +27,7 @@ import fetch from 'node-fetch';
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
   @Get()
   async getUsers(): Promise<User[]> {
     return this.userService.getUsers();
@@ -60,12 +61,12 @@ export class UserController {
     try {
       imagePath = await this.userService.getImageById(id);
     } catch (e) {
-      const request = await fetch(
-        'https://cdn.bitume2000.fr/achievement/0.png',
+      const asyncReadFile = promisify(fs.readFile);
+      const image = await asyncReadFile(
+        __dirname + '/../../src/utils/null.png',
       );
-      const buffer = await request.buffer();
       fs.mkdirSync(__dirname + '/../../../images', { recursive: true });
-      await this.userService.setAvatar(id, buffer, '.png');
+      await this.userService.setAvatar(id, image, '.png');
       imagePath = await this.userService.getImageById(id);
     }
     try {
@@ -87,12 +88,12 @@ export class UserController {
     try {
       imagePath = await this.userService.getImageById(id);
     } catch (e) {
-      const request = await fetch(
-        'https://cdn.bitume2000.fr/achievement/0.png',
+      const asyncReadFile = promisify(fs.readFile);
+      const image = await asyncReadFile(
+        __dirname + '/../../src/utils/null.png',
       );
-      const buffer = await request.buffer();
       fs.mkdirSync(__dirname + '/../../../images', { recursive: true });
-      await this.userService.setAvatar(id, buffer, '.png');
+      await this.userService.setAvatar(id, image, '.png');
       imagePath = await this.userService.getImageById(id);
     }
 
@@ -138,7 +139,13 @@ export class UserController {
     @UploadedFile() file,
   ) {
     if (!file) {
-      throw new HttpException('No file uploaded', HttpStatus.BAD_REQUEST);
+      return response.status(HttpStatus.BAD_REQUEST).send('No file uploaded');
+    }
+    if (file.size > 1024 * 1024 * 5) {
+      return response.status(HttpStatus.BAD_REQUEST).send('File too large');
+    }
+    if (file.buffer.length === 0) {
+      throw new HttpException('Empty file', HttpStatus.BAD_REQUEST);
     }
 
     const ret = await this.userService.setAvatar(
@@ -156,6 +163,7 @@ export class UserController {
 
     return response.status(HttpStatus.OK).send(ret);
   }
+
   @Delete('/friend')
   async removeFriend(
     @GetUser('sub') id: string,
@@ -170,19 +178,6 @@ export class UserController {
       return;
     }
     response.status(200).send(ret);
-  }
-
-  @Get('/similar')
-  async getSimilarUsers(
-    @Body() body,
-    @GetUser('sub') id: string,
-    @Res() response,
-  ) {
-    const ret = await this.userService.getUserBySimilarNames(id);
-    if (ret == null) {
-      return response.status(204).send('No Content');
-    }
-    return response.status(200).send(ret);
   }
 
   @Get('/friend')
@@ -265,7 +260,7 @@ export class UserController {
     return response.status(200).send(ret);
   }
 
-  @Get('isfriend')
+  @Post('isfriend')
   async isFriend(
     @GetUser('sub') id: string,
     @Body('friend_id') friend_id: string,
@@ -278,7 +273,7 @@ export class UserController {
       response.status(400).send('Bad Request ' + e);
       return;
     }
-    response.status(200).send(ret);
+    response.status(200).json(ret);
   }
 
   @Get('/mpchannel')
@@ -309,5 +304,6 @@ export class UserController {
     if (ret == null) {
       return response.status(204).send('No Channels');
     }
+    return response.status(200).send(ret);
   }
 }

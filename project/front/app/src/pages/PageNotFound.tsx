@@ -1,15 +1,15 @@
+import './css/PageNotFound.css'
 import React from 'react';
 import ErrorToken from '../components/IfError';
-import './css/PageNotFound.css'
 
-function NotFound () {
+function NotFound() {
 	return (
 		<div className='Error-page'>
-			<ErrorToken />
+			<ErrorToken/>
 			<h1 className='Error-404'>404</h1>
 			<h3 className='Error-description'>Page not found!!!</h3>
 		</div>
-	);	
+	);
 }
 
 export default NotFound;

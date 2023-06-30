@@ -8,7 +8,6 @@ async function bootstrap() {
     origin: '*',
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const cors = require('cors');
 
   app.enableCors(corsOptions);
