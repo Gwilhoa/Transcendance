@@ -29,7 +29,7 @@ function AuthenticateComponentsTwoFa() {
 
 	useEffect(() => {
 		if (localStorage.getItem('jwtAuthorization') != null) {
-			axios.get(process.env.REACT_APP_IP + ':3000/auth/2fa/is2FA', {
+			axios.get(process.env.REACT_APP_IP + '/auth/2fa/is2FA', {
 				headers: {
 					Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 				},
@@ -53,7 +53,7 @@ function AuthenticateComponentsTwoFa() {
 	const handleOnChange = (res: string) => {
 		setResult(res);
 		if (res.length === 6) {
-			axios.post(process.env.REACT_APP_IP + ':3000/auth/authenticate',
+			axios.post(process.env.REACT_APP_IP + '/auth/authenticate',
 				{
 					code: res
 				},

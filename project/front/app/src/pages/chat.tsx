@@ -122,7 +122,7 @@ function Chat() {
 ////////////////////////// FETCH DATA /////////////////////////////////////////
 	const fetchAvailableChannel = useCallback(async () => {
 		try {
-			const response = await axios.get(process.env.REACT_APP_IP + ':3000/channel/available', {
+			const response = await axios.get(process.env.REACT_APP_IP + '/channel/available', {
 				headers: {
 					Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 				},
@@ -138,7 +138,7 @@ function Chat() {
 	}, [navigate]);
 	const fetchListChannel = useCallback(async () => {
 		try {
-			const response = await axios.get(process.env.REACT_APP_IP + ':3000/user/channels', {
+			const response = await axios.get(process.env.REACT_APP_IP + '/user/channels', {
 				headers: {
 					Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 				},
@@ -154,7 +154,7 @@ function Chat() {
 			return;
 		}
 		try {
-			const response = await axios.get(process.env.REACT_APP_IP + ':3000/channel/message/' + conversationId, {
+			const response = await axios.get(process.env.REACT_APP_IP + ':/channel/message/' + conversationId, {
 				headers: {
 					Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 				},

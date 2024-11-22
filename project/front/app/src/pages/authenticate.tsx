@@ -14,7 +14,7 @@ export function TokenPage() {
 	useEffect(() => {
 		const interval = setInterval(() => {
 			if (localStorage.getItem('tenMinToken') != null) {
-				axios.get(process.env.REACT_APP_IP + ':3000/auth/2fa/is2FA', {
+				axios.get(process.env.REACT_APP_IP + '/auth/2fa/is2FA', {
 					headers: {
 						Authorization: `Bearer ${token}`,
 					},

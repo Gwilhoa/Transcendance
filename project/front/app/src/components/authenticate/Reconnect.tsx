@@ -14,7 +14,7 @@ function Reconnect() {
 				"can't access to back"
 			)}
 			</p>
-			<Link to={process.env.REACT_APP_IP + ':8080'}>
+			<Link to='/'>
 				<button className='login-button'>
 					Try to reconnect
 				</button>

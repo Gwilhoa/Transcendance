@@ -2,6 +2,6 @@ device/*
 temp/*
 project/back/images/*
 project/front/app/node_modules
-.env
+project/back/.env
 .idea
 .idea/*

@@ -46,7 +46,7 @@ export default function Profil() {
 	const dispatch = useDispatch();
 
 	const refresh = useCallback((id: string | null) => {
-		axios.get(process.env.REACT_APP_IP + ':3000/auth/2fa/is2FA', {
+		axios.get(process.env.REACT_APP_IP + '/auth/2fa/is2FA', {
 			headers: {
 				Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 			},
@@ -60,7 +60,7 @@ export default function Profil() {
 				dispatch(closeModal());
 			});
 
-		axios.get(process.env.REACT_APP_IP + ':3000/user/id/' + id, {
+		axios.get(process.env.REACT_APP_IP + '/user/id/' + id, {
 			headers: {
 				Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 			},
@@ -78,7 +78,7 @@ export default function Profil() {
 				navigate('/Error');
 				dispatch(closeModal());
 			});
-		axios.post(process.env.REACT_APP_IP + ':3000/user/isfriend',
+		axios.post(process.env.REACT_APP_IP + '/user/isfriend',
 			{friend_id: id},
 			{
 				headers: {Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,},
@@ -95,7 +95,7 @@ export default function Profil() {
 				navigate('/Error');
 				dispatch(closeModal());
 			});
-		axios.get(process.env.REACT_APP_IP + ':3000/user/friend/request', {
+		axios.get(process.env.REACT_APP_IP + '/user/friend/request', {
 			headers: {Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,},
 		}).then((Response) => {
 			for (const request of Response.data) {
@@ -118,7 +118,7 @@ export default function Profil() {
 			dispatch(closeModal());
 		});
 
-		axios.get(process.env.REACT_APP_IP + ':3000/user/friend/blocked', {
+		axios.get(process.env.REACT_APP_IP + '/user/friend/blocked', {
 			headers: {Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,},
 		}).then((Response) => {
 			for (const blocked of Response.data) {
@@ -179,7 +179,7 @@ export default function Profil() {
 
 
 	const changeName = (str: string) => {
-		axios.post(process.env.REACT_APP_IP + ':3000/user/name',
+		axios.post(process.env.REACT_APP_IP + '/user/name',
 			{name: str},
 			{
 				headers: {
@@ -207,7 +207,7 @@ export default function Profil() {
 			navigate('/CreateTwoFa');
 			dispatch(closeModal());
 		} else {
-			axios.get(process.env.REACT_APP_IP + ':3000/auth/2fa/disable', {
+			axios.get(process.env.REACT_APP_IP + '/auth/2fa/disable', {
 				headers: {
 					Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 				},
@@ -231,7 +231,7 @@ export default function Profil() {
 
 			axios({
 				method: 'post',
-				url: process.env.REACT_APP_IP + ':3000/user/image',
+				url: process.env.REACT_APP_IP + '/user/image',
 				headers: {
 					'Authorization': `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 					'Content-Type': 'multipart/form-data',

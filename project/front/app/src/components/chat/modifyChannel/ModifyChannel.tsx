@@ -13,7 +13,7 @@ const ModifyChannel = ({channel}: { channel: Channel }) => {
 	const [errorMessage, setErrorMessage] = useState<string>('');
 
 	const updateChannel = () => {
-		axios.post(process.env.REACT_APP_IP + ':3000/channel/modifychannel/' + channel.id,
+		axios.post(process.env.REACT_APP_IP + '/channel/modifychannel/' + channel.id,
 			{
 				name: name,
 				password: newPassword,

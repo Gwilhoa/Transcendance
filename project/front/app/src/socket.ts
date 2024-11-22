@@ -7,7 +7,7 @@ class SocketSingleton {
 
 
 	private constructor() {
-		this.socket = io(process.env.REACT_APP_IP + ':3000', {
+		this.socket = io(process.env.REACT_APP_IP + '', {
 			transports: ['websocket']
 		});
 		this.socket.on('connect', async () => {

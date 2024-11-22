@@ -11,7 +11,7 @@ function Auth() {
 	localStorage.removeItem('Error');
 	useEffect(() => {
 		if (localStorage.getItem('jwtAuthorization') != null) {
-			axios.get(process.env.REACT_APP_IP + ':3000/auth/2fa/is2FA', {
+			axios.get(process.env.REACT_APP_IP + '/auth/2fa/is2FA', {
 				headers: {
 					Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 				},
@@ -34,7 +34,7 @@ function Auth() {
 						<h1>Transcendence</h1>
 					</header>
 					<div className='auth-button'>
-						<Link to={process.env.REACT_APP_IP + ':3000/auth/login'}>
+						<Link to={process.env.REACT_APP_IP + '/auth/login'}>
 							<button className='login-button'>
 								Login
 							</button>

@@ -38,7 +38,7 @@ function Conversation(
 
 		listImageProfil.map((img) => img.id === id ? (add = false) : null)
 		if (add) {
-			axios.get(process.env.REACT_APP_IP + ':3000/user/image/' + id, {
+			axios.get(process.env.REACT_APP_IP + '/user/image/' + id, {
 				headers: {
 					Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 				},

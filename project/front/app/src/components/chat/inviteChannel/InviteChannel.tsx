@@ -35,7 +35,7 @@ const AddUserId = ({usersId, setUserId, channelId, channel}: AddUserIdProps) => 
 	}, [searchUser]);
 
 	const refresh = useCallback(() => {
-		axios.get(process.env.REACT_APP_IP + ':3000/user/friend', {
+		axios.get(process.env.REACT_APP_IP + '/user/friend', {
 			headers: {
 				Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 			},

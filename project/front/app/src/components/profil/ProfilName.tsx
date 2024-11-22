@@ -22,7 +22,7 @@ export const ProfilName = ({id}: { id: string | null }) => {
 	const [username, setUsername] = useState<string>('');
 
 	const changeName = useCallback(() => {
-		axios.get(process.env.REACT_APP_IP + ':3000/user/id/' + id, {
+		axios.get(process.env.REACT_APP_IP + '/user/id/' + id, {
 			headers: {
 				Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 			},
@@ -40,7 +40,7 @@ export const ProfilName = ({id}: { id: string | null }) => {
 	useEffect(() => {
 		setUserStatus('profil-status-disconnected');
 		changeName();
-		axios.get(process.env.REACT_APP_IP + ':3000/user/id/' + id, {
+		axios.get(process.env.REACT_APP_IP + '/user/id/' + id, {
 			headers: {
 				Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 			},

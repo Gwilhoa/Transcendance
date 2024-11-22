@@ -56,7 +56,7 @@ const AddUserId = ({usersId, setUserId}: AddUserIdProps) => {
 	}, [searchUser]);
 
 	const refresh = useCallback(() => {
-		axios.get(process.env.REACT_APP_IP + ':3000/user/friend', {
+		axios.get(process.env.REACT_APP_IP + '/user/friend', {
 			headers: {
 				Authorization: `Bearer ${localStorage.getItem('jwtAuthorization')}`,
 			},
@@ -153,7 +153,7 @@ const CreateChannel = () => {
 				return;
 			}
 		}
-		axios.post(process.env.REACT_APP_IP + ':3000/channel/create',
+		axios.post(process.env.REACT_APP_IP + '/channel/create',
 			{
 				name: channelParams.name,
 				creator_id: myId,
