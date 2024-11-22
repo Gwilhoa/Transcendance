@@ -12,7 +12,7 @@ import { UserGateway } from './user.gateway';
 import { ChannelService } from '../channel/channel.service';
 import { Channel } from '../channel/channel.entity';
 import { Message } from '../channel/message.entity';
-import {Mute} from "../channel/mute.entity";
+import { Mute } from '../channel/mute.entity';
 
 @Module({
   providers: [

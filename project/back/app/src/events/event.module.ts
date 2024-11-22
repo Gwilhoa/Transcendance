@@ -13,7 +13,7 @@ import { GameService } from 'src/game/game.service';
 import { Game } from 'src/game/game.entity';
 import { Message } from '../channel/message.entity';
 import { RequestFriend } from '../user/requestfriend.entity';
-import {Mute} from "../channel/mute.entity";
+import { Mute } from '../channel/mute.entity';
 
 @Module({
   imports: [

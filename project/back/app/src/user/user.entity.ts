@@ -3,20 +3,26 @@ import { Message } from 'src/channel/message.entity';
 import {
   Column,
   Entity,
+  Generated,
   JoinTable,
-  ManyToMany, ManyToOne,
+  ManyToMany,
+  ManyToOne,
   OneToMany,
   PrimaryColumn,
 } from 'typeorm';
 import { RequestFriend } from './requestfriend.entity';
 import { Game } from 'src/game/game.entity';
 import { UserStatus } from 'src/utils/user.enum';
-import {Mute} from "../channel/mute.entity";
+import { Mute } from '../channel/mute.entity';
 
 @Entity({ name: 'users' })
 export class User {
-  @PrimaryColumn()
+  @PrimaryColumn({ type: 'uuid' })
+  @Generated('uuid')
   id: string;
+
+  @Column({ nullable: true })
+  id_intra: string;
 
   @Column()
   email: string;

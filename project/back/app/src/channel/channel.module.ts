@@ -13,8 +13,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Message } from './message.entity';
 import { RequestFriend } from '../user/requestfriend.entity';
 import { ChannelGateway } from './channel.gateway';
-import { Mute } from "./mute.entity";
-
+import { Mute } from './mute.entity';
 
 @Module({
   providers: [

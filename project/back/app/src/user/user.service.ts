@@ -106,7 +106,9 @@ export class UserService {
     if (retUser == null) {
       return null;
     }
-    const verif_user = await this.userRepository.findOneBy({ id: retUser.id });
+    const verif_user = await this.userRepository.findOneBy({
+      id_intra: retUser.id,
+    });
     if (verif_user != null) {
       return await this.changeStatus(verif_user.id, UserStatus.IN_CONNECTION);
     }
@@ -119,21 +121,18 @@ export class UserService {
     const fs = require('fs');
     const user = new User();
     user.status = UserStatus.IN_CONNECTION;
-    user.id = retUser.id;
+    user.id_intra = retUser.id;
     user.username = login;
     user.email = retUser.email;
     const avatar_url = retUser.image.link;
     const request = await fetch(avatar_url);
     const buffer = await request.buffer();
     fs.mkdirSync(__dirname + '/../../../images', { recursive: true });
-    const image = await this.setAvatar(user.id, buffer, '.jpg');
+    const ret = await this.userRepository.save(user);
+    const image = await this.setAvatar(ret.id, buffer, '.jpg');
     if (image == null) {
       return null;
     }
-    if ((await this.userRepository.findOneBy({ id: user.id })) != null) {
-      return user;
-    }
-    const ret = await this.userRepository.save(user);
     this.server.emit('new_user', ret);
     return ret;
   }
@@ -573,7 +572,7 @@ export class UserService {
       check2FA = false;
     }
     const payload = {
-      sub: parseInt(userId),
+      sub: userId,
       email: email,
       isauth: isauth,
       enabled2FA: check2FA,

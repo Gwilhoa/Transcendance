@@ -1,7 +1,8 @@
 import { User } from 'src/user/user.entity';
 import {
   Column,
-  Entity, JoinColumn,
+  Entity,
+  JoinColumn,
   JoinTable,
   ManyToMany,
   ManyToOne,
@@ -10,7 +11,7 @@ import {
 } from 'typeorm';
 import { Message } from './message.entity';
 import { ChannelType } from 'src/utils/channel.enum';
-import {Mute} from "./mute.entity";
+import { Mute } from './mute.entity';
 @Entity('channels')
 export class Channel {
   @PrimaryGeneratedColumn('uuid')

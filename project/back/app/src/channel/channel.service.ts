@@ -630,7 +630,7 @@ export class ChannelService {
       else await this.muteRepository.delete(mutedUser);
     }
     channel.mutedUsers = mutedUsers;
-     await this.channelRepository.save(channel);
+    await this.channelRepository.save(channel);
     return await this.getChannelById(channel_id);
   }
 }
